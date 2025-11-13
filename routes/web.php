@@ -536,6 +536,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
 
     Route::resource('lead-contact', LeadContactController::class);
     Route::post('lead-contact/apply-quick-action', [LeadContactController::class, 'applyQuickAction'])->name('lead-contact.apply_quick_action');
+    Route::get('lead-list', [LeadContactController::class, 'leadList'])->name('lead-list.index');
+    Route::get('add-lead', [LeadContactController::class, 'addLead'])->name('add-lead.index');
+    Route::get('lead-details', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
 
     Route::get('deals/get-stage/{id}', [DealController::class, 'getStages'])->name('deals.get-stage');
     Route::get('deals/get-deals/{id}', [DealController::class, 'getDeals'])->name('deals.get-deals');

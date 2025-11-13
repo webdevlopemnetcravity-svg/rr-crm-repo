@@ -62,6 +62,82 @@ class LeadContactController extends AccountBaseController
 
     }
 
+    public function leadList(LeadContactDataTable $dataTable)
+    {
+        $this->destroySession();
+        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
+
+        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+
+        $this->pageTitle = 'app.leadList';
+
+        if (!request()->ajax()) {
+            $this->categories = LeadCategory::get();
+            $this->sources = LeadSource::get();
+            $this->employees = User::allEmployees(null, 'active');
+        }
+
+        return $dataTable->render('lead-list.index', $this->data);
+
+    }
+
+    public function addLead()
+    {
+        $this->addLeadPermission = user()->permission('add_lead');
+        abort_403(!in_array($this->addLeadPermission, ['all', 'added']));
+
+        $this->pageTitle = 'app.addLead';
+
+        $defaultStatus = LeadStatus::where('default', '1')->first();
+        $this->columnId = request('column_id') ?: $defaultStatus->id;
+
+        $this->leadAgents = LeadAgent::whereHas('user', function ($q) {
+            $q->where('status', 'active');
+        })->with('user')->get();
+
+        $this->leadAgentArray = $this->leadAgents->pluck('user_id')->toArray();
+
+        if ((in_array(user()->id, $this->leadAgentArray))) {
+            $this->myAgentId = $this->leadAgents->filter(function ($value, $key) {
+                return $value->user_id == user()->id;
+            })->first()->id;
+        }
+
+        $leadContact = new Lead();
+        $getCustomField = $leadContact->getCustomFieldGroupsWithFields();
+
+        if ($getCustomField) {
+            $this->fields = $getCustomField->fields;
+        }
+
+        $this->sources = LeadSource::all();
+        $this->categories = LeadCategory::all();
+        $this->countries = countries();
+        $this->salutations = Salutation::cases();
+        $this->leadPipelines = LeadPipeline::orderBy('default', 'DESC')->get();
+        $this->leadStages = PipelineStage::all();
+        $this->leadAgentArray = $this->leadAgents->pluck('user_id')->toArray();
+        $this->products = Product::all();
+
+        return view('add-lead.index', $this->data);
+    }
+
+    public function leadDetails()
+    {
+        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
+        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+
+        $this->pageTitle = 'app.leadDetails';
+
+        if (!request()->ajax()) {
+            $this->categories = LeadCategory::get();
+            $this->sources = LeadSource::get();
+            $this->employees = User::allEmployees(null, 'active');
+        }
+
+        return view('lead-details.index', $this->data);
+    }
+
     public function show($id)
     {
         $this->leadContact = Lead::findOrFail($id)->withCustomFields();
