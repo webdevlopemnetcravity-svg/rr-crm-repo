@@ -1,72 +1,1100 @@
 @extends('layouts.app')
 
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/lead-details.css') }}">
+@endpush
+
 @section('content')
     <!-- CONTENT WRAPPER START -->
     <div class="content-wrapper">
-        <!-- Add Task Export Buttons Start -->
-        <div class="d-grid d-lg-flex d-md-flex action-bar">
-            <div id="table-actions" class="flex-grow-1 align-items-center">
-                <h4 class="mb-0 f-21 font-weight-normal text-capitalize">
-                    @lang('app.leadDetails')
-                </h4>
-            </div>
-        </div>
-        <!-- Add Task Export Buttons End -->
-
-        <div class="d-flex flex-column w-100 rounded mt-3 bg-white">
-            {{-- <div class="p-20 border-bottom-grey">
-                <div class="row">
-                    <div class="col-lg-12 col-md-12">
-                        <h5 class="mb-0 f-18 font-weight-normal">
-                            Lead Details Overview
-                        </h5>
+        <div class="lead-details-container">
+            <!-- Top Header Bar -->
+            <div class="lead-header-bar bg-white p-3 border-bottom-grey">
+                <!-- Left Section: Avatar + Priority + Lead ID -->
+                <div class="lead-header-left-group d-flex align-items-center">
+                    <div class="lead-avatar-section d-flex align-items-center">
+                        <div class="lead-avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                            <i class="fa fa-user"></i>
+                        </div>
+                        <div class="lead-info-group">
+                            <div class="lead-priority d-flex align-items-center mb-1">
+                                <i class="fa fa-star text-warning mr-1"></i>
+                                <span class="f-12">1st Priority</span>
+                            </div>
+                            <div class="lead-id-header f-14 font-weight-bold">LEAD-0008</div>
+                        </div>
                     </div>
                 </div>
-            </div> --}}
 
-            {{-- <div class="p-20">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="alert alert-info">
-                            <i class="fa fa-info-circle"></i>
-                            <strong>@lang('app.leadDetails')</strong> - This page displays detailed information about leads.
+                <!-- Middle-Left Section: Contact Info -->
+                <div class="lead-contact-info d-flex align-items-center ml-4">
+                    <div class="contact-info-item mr-4">
+                        <a href="tel:+91123-456-7890" class="text-dark">
+                            <i class="fa fa-phone mr-1"></i>
+                            <span>+91 123 4567 890</span>
+                        </a>
+                    </div>
+                    <div class="contact-info-item">
+                        <a href="mailto:abc@gmail.com?subject=SUBJECT&body=Demo email" target="_blank" class="text-dark">
+                            <i class="fa fa-envelope mr-1"></i>
+                            <span>abc@gmail.com</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- View Resume Button -->
+                <button class="btn btn-secondary btn-sm ml-4">View Resume</button>
+
+                <!-- Service Name and Action Icons -->
+                <div class="lead-header-right-group ml-auto d-flex align-items-center">
+                    <div class="lead-service-actions-group d-flex align-items-center">
+                        <div class="lead-service-section mr-3">
+                            <div class="lead-service-name f-14 font-weight-bold">PR - Employer Nomination Scheme (ENS)(Subclass 186)</div>
                         </div>
-                        
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body p-4">
-                                <h5 class="mb-3">Lead Details Overview</h5>
-                                <p class="text-muted mb-4">
-                                    This page will show comprehensive details about leads including contact information, 
-                                    status, notes, deals, and other related data. The detailed view will be implemented here.
-                                </p>
-                                
-                                <div class="mt-3">
-                                    <x-forms.link-primary :link="route('lead-contact.index')" icon="list">
-                                        @lang('app.view') @lang('app.leadContact')
-                                    </x-forms.link-primary>
-                                    
-                                    <x-forms.link-secondary :link="route('lead-list.index')" class="ml-2" icon="list">
-                                        @lang('app.view') @lang('app.leadList')
-                                    </x-forms.link-secondary>
-                                    
-                                    <x-forms.link-secondary :link="route('add-lead.index')" class="ml-2" icon="plus">
-                                        @lang('app.addLead')
-                                    </x-forms.link-secondary>
+                        <div class="lead-header-actions d-flex align-items-center">
+                            <a href="https://wa.me/911234567896?text=Hello%20I%20want%20help%20with%20my%20passport%20process" target="_blank" rel="noopener" class="btn btn-sm btn-success mr-2">
+                                <i class="fa fa-whatsapp"></i>
+                            </a>
+                            <button class="btn btn-sm btn-primary mr-2">
+                                <i class="fa fa-envelope"></i>
+                            </button>
+                            <a href="{{ route('lead-list.index') }}" class="btn btn-sm btn-secondary">
+                                <i class="fa fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs Bar -->
+            <div class="lead-nav-tabs bg-white border-bottom-grey">
+                <div class="d-flex">
+                    <a href="#" class="lead-nav-tab active px-4 py-3 text-decoration-none" data-tab="clientInfoTab">
+                        <i class="fa fa-id-card mr-2"></i>
+                        <span>Client Info</span>
+                    </a>
+                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="processTab">
+                        <i class="fa fa-list mr-2"></i>
+                        <span>Process</span>
+                    </a>
+                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="fileNotesTab">
+                        <i class="fa fa-file-text mr-2"></i>
+                        <span>File Notes</span>
+                    </a>
+                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="documentsTab">
+                        <i class="fa fa-file-alt mr-2"></i>
+                        <span>Documents</span>
+                    </a>
+                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="accountsTab">
+                        <i class="fa fa-receipt mr-2"></i>
+                        <span>Accounts</span>
+                    </a>
+                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="communicationTab">
+                        <i class="fa fa-comments mr-2"></i>
+                        <span>Communication</span>
+                    </a>
+                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="followUpTab">
+                        <i class="fa fa-redo mr-2"></i>
+                        <span>Follow Up</span>
+                    </a>
+                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="travelDetailsTab">
+                        <i class="fa fa-map-marker-alt mr-2"></i>
+                        <span>Travel Details</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="lead-content-area bg-white p-20" id="mainContentArea">
+                <!-- Client Info Tab Content -->
+                <div class="tab-content active" id="clientInfoTab">
+                    <div class="content-section-header mb-4">
+                        <h3 class="f-18 font-weight-bold">Client Info</h3>
+                    </div>
+                    <div class="content-section-body">
+                        <!-- Candidate Information Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-title mb-3">
+                                <h4 class="f-16 font-weight-bold">Candidate Information</h4>
+                            </div>
+                            <!-- First Row: 4 fields -->
+                            <div class="info-grid candidate-info row mb-3">
+                                <div class="info-field col-md-3 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-user text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">First Name</div>
+                                            <div class="info-field-value f-14">Karan</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-field col-md-3 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-user text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Last Name</div>
+                                            <div class="info-field-value f-14">Sharma</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-field col-md-3 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-calendar text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Date of Birth</div>
+                                            <div class="info-field-value f-14">16-2-1994</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-field col-md-3 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-user text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Gender</div>
+                                            <div class="info-field-value f-14">Male</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Second Row: 3 fields -->
+                            <div class="info-grid candidate-info-row2 row">
+                                <div class="info-field col-md-4 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-heart text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Marital Status</div>
+                                            <div class="info-field-value f-14">Unmarried</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-field col-md-4 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-calendar text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Visa Expiry Date</div>
+                                            <div class="info-field-value f-14">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-field col-md-4 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-id-card text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Passport Number</div>
+                                            <div class="info-field-value f-14">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information Section -->
+                        <div class="info-section">
+                            <div class="info-section-title mb-3">
+                                <h4 class="f-16 font-weight-bold">Personal Information</h4>
+                            </div>
+                            <!-- First Row: 3 fields -->
+                            <div class="info-grid personal-info row mb-3">
+                                <div class="info-field col-md-3 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-phone text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Contact No.</div>
+                                            <div class="info-field-value f-14">+91 123 4567 890</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-field col-md-3 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-envelope text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Email Address</div>
+                                            <div class="info-field-value f-14">abc@gmail.com</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-field address-field col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-map-marker-alt text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Permanent Address</div>
+                                            <div class="info-field-value f-14">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Second Row: 2 fields -->
+                            <div class="info-grid personal-info-row2 row">
+                                <div class="info-field col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-link text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Social Links</div>
+                                            <div class="info-field-value f-14">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="info-field col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <div class="info-field-icon mr-2">
+                                            <i class="fa fa-user-tie text-primary"></i>
+                                        </div>
+                                        <div class="info-field-content">
+                                            <div class="info-field-label f-12 text-dark-grey mb-1">Sub Agent</div>
+                                            <div class="info-field-value f-14">-</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div> --}}
+                <!-- Process Tab Content -->
+                <div class="tab-content" id="processTab">
+                    <div class="content-section-header mb-4">
+                        <h3 class="f-18 font-weight-bold">Process - <span style="font-weight: 400; color: #000000;">Registered Date: 05-09-2025</span></h3>
+                    </div>
+                    <div class="content-section-body">
+                        <!-- Agent & Applicant Details Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-title mb-3">
+                                <h4 class="f-16 font-weight-bold">Agent & Applicant Details</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="applicant_name" fieldLabel="Applicant Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="applicant_name" id="applicant_name" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="visa_category" fieldLabel="Visa Category">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="visa_category" id="visa_category">
+                                        <option value="">Select</option>
+                                        <option value="PR">PR</option>
+                                        <option value="Student Visa">Student Visa</option>
+                                        <option value="Visit Visa">Visit Visa</option>
+                                        <option value="Work Permit">Work Permit</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <x-forms.label fieldId="subclass" fieldLabel="Subclass">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="subclass" id="subclass">
+                                        <option value="">Select</option>
+                                        <option value="Visitor Visa (Subclass 600)">Visitor Visa (Subclass 600)</option>
+                                        <option value="PR - Employer Nomination Scheme (ENS)(Subclass 186)">PR - Employer Nomination Scheme (ENS)(Subclass 186)</option>
+                                        <option value="PR - Skilled Nominated Visa (Subclass 190)">PR - Skilled Nominated Visa (Subclass 190)</option>
+                                        <option value="PR - Skilled Independent Visa (Subclass 189)">PR - Skilled Independent Visa (Subclass 189)</option>
+                                        <option value="Work Visa - Temporary Skill Shortage Visa (Subclass 482)">Work Visa - Temporary Skill Shortage Visa (Subclass 482)</option>
+                                        <option value="Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)">Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)</option>
+                                        <option value="Student Visa (Subclass 500)">Student Visa (Subclass 500)</option>
+                                        <option value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)">Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="passport_name" fieldLabel="Passport Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="passport_name" id="passport_name" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="passport_number" fieldLabel="Passport Number">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="passport_number" id="passport_number" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="agent_name" fieldLabel="Agent Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="agent_name" id="agent_name" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- All Fees Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-title mb-3">
+                                <h4 class="f-16 font-weight-bold">All Fees</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="advance_fees" fieldLabel="Advance Fees">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="advance_fees" id="advance_fees" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="advance_fees_due_date" fieldLabel="Advance Fees Due Date">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" name="advance_fees_due_date" id="advance_fees_due_date" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="remaining_fees" fieldLabel="Remaining Fees">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="remaining_fees" id="remaining_fees" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="remaining_fees_due_date" fieldLabel="Remaining Fees Due Date">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" name="remaining_fees_due_date" id="remaining_fees_due_date" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="agent_fees" fieldLabel="Agent Fees">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="agent_fees" id="agent_fees" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="submission_fees" fieldLabel="Submission Fees">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="submission_fees" id="submission_fees" placeholder="">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Process & Status Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-title mb-3">
+                                <h4 class="f-16 font-weight-bold">Process & Status</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="status" fieldLabel="Status Pending/Completed">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="status" id="status" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="processing_time" fieldLabel="Processing Time">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="processing_time" id="processing_time" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="bank_cheque_handover_date" fieldLabel="Bank Cheque Document Handover Date">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" name="bank_cheque_handover_date" id="bank_cheque_handover_date" placeholder="">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <x-forms.label fieldId="passport_handover_date" fieldLabel="Passport Handover Date">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" name="passport_handover_date" id="passport_handover_date" placeholder="">
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <x-forms.label fieldId="process_note" fieldLabel="Note related to agent or process">
+                                    </x-forms.label>
+                                    <textarea class="form-control f-14" name="process_note" id="process_note" rows="3" placeholder=""></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Documents Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-title mb-3">
+                                <h4 class="f-16 font-weight-bold">Upload Documents</h4>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <x-forms.label fieldId="contract_letter" fieldLabel="Contract Letter">
+                                    </x-forms.label>
+                                    <input type="file" class="form-control" name="contract_letter" id="contract_letter">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <x-forms.label fieldId="grant_letter" fieldLabel="Grant Letter">
+                                    </x-forms.label>
+                                    <input type="file" class="form-control" name="grant_letter" id="grant_letter">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <x-forms.label fieldId="offer_letter" fieldLabel="Offer Letter/Sponsor Letter">
+                                    </x-forms.label>
+                                    <input type="file" class="form-control" name="offer_letter" id="offer_letter">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <x-forms.label fieldId="medical_letter" fieldLabel="Medical Letter">
+                                    </x-forms.label>
+                                    <input type="file" class="form-control" name="medical_letter" id="medical_letter">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <x-forms.label fieldId="air_ticket" fieldLabel="Air Ticket">
+                                    </x-forms.label>
+                                    <input type="file" class="form-control" name="air_ticket" id="air_ticket">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <x-forms.label fieldId="accommodation_letter" fieldLabel="Accommodation Configuration Letter">
+                                    </x-forms.label>
+                                    <input type="file" class="form-control" name="accommodation_letter" id="accommodation_letter">
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-secondary btn-sm">
+                                    <i class="fa fa-plus mr-1"></i> Add More Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Save Button -->
+                    <div class="mt-4">
+                        <button type="button" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+                <!-- File Notes Tab Content -->
+                <div class="tab-content" id="fileNotesTab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="f-18 font-weight-bold mb-0">File Notes</h3>
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addFileNoteModal">
+                            <i class="fa fa-plus mr-1"></i>
+                        </button>
+                    </div>
+                    <div class="content-section-body">
+                        <div class="file-notes-list">
+                            <div class="file-note-item mb-3 p-3 bg-light rounded">
+                                <div class="file-note-text f-14 mb-2">Need student visa with admission service for Australia</div>
+                                <div class="file-note-meta f-12 text-dark-grey">
+                                    Created by: Samuel Parker - 17-07-2025 2:00 PM
+                                </div>
+                            </div>
+                            <div class="file-note-item mb-3 p-3 bg-light rounded">
+                                <div class="file-note-text f-14 mb-2">Need student visa with admission service for Australia</div>
+                                <div class="file-note-meta f-12 text-dark-grey">
+                                    Created by: Samuel Parker - 17-07-2025 2:00 PM
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Documents Tab Content -->
+                <div class="tab-content" id="documentsTab">
+                    <div class="content-section-header mb-4">
+                        <h3 class="f-18 font-weight-bold">Document Checklist - SIDDHARTH PATEL (MAIN APPLICANT)</h3>
+                    </div>
+                    <div class="content-section-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>DOCUMENT TYPE/NAME</th>
+                                        <th>STATUS</th>
+                                        <th>ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input">
+                                                <label class="form-check-label">Assessment Letter</label>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-secondary">-</span></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" checked>
+                                                <label class="form-check-label">Passport - Applicant</label>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-warning">Pending</span></td>
+                                        <td><button class="btn btn-sm btn-primary">Upload</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" checked>
+                                                <label class="form-check-label">Father Passport</label>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-warning">Pending</span></td>
+                                        <td><button class="btn btn-sm btn-primary">Upload</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" checked>
+                                                <label class="form-check-label">Child Document</label>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-success">Received</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info mr-1">View</button>
+                                            <a href="#" class="text-danger">Delete</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- Accounts Tab Content -->
+                <div class="tab-content" id="accountsTab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="f-18 font-weight-bold mb-0">ADD INVOICE</h3>
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addInvoiceModal">
+                            <i class="fa fa-plus mr-1"></i>
+                        </button>
+                    </div>
+                    <div class="content-section-body">
+                        <div class="text-center p-5">
+                            <p class="text-muted mb-3">No invoice has been created for this Lead.</p>
+                            <p class="text-muted">To create an Invoice, click on <i class="fa fa-plus"></i> at the top right corner</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Communication Tab Content -->
+                <div class="tab-content" id="communicationTab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="f-18 font-weight-bold mb-0">Communication History</h3>
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addCommunicationModal">
+                            <i class="fa fa-plus mr-1"></i>
+                        </button>
+                    </div>
+                    <div class="content-section-body">
+                        <div class="communication-list">
+                            <div class="communication-card mb-3 p-3 bg-light rounded">
+                                <div class="d-flex">
+                                    <div class="communication-icon mr-3">
+                                        <i class="fa fa-phone text-primary"></i>
+                                    </div>
+                                    <div class="communication-details">
+                                        <div class="communication-type f-14 font-weight-bold mb-1">Call</div>
+                                        <div class="communication-description f-14 mb-2">The customer has shown interest in the Australian admission service but the candidate is asking for discount once that is approved we will again call him back after Diwali so that we can finalise</div>
+                                        <div class="communication-meta f-12 text-dark-grey">Created by : Shivani Patel - 09-09-2025 11:46 AM</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Follow Up Tab Content -->
+                <div class="tab-content" id="followUpTab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h3 class="f-18 font-weight-bold mb-0">FOLLOW UP</h3>
+                            <div class="f-14 text-dark-grey mt-1">Next Follow-up: 09/09/2025 12:00 PM</div>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addFollowUpModal">
+                            <i class="fa fa-plus mr-1"></i>
+                        </button>
+                    </div>
+                    <div class="content-section-body">
+                        <div class="text-center p-5">
+                            <p class="text-muted">No data found</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Travel Details Tab Content -->
+                <div class="tab-content" id="travelDetailsTab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="f-18 font-weight-bold mb-0">Travel Details</h3>
+                        <div>
+                            <button type="button" class="btn btn-secondary btn-sm mr-2" data-toggle="modal" data-target="#notifyClientModal">Notify Client</button>
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addTravelDetailsModal">
+                                <i class="fa fa-pencil mr-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="content-section-body">
+                        <div class="text-center p-5">
+                            <p class="text-muted mb-3">No data found</p>
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addTravelDetailsModal">Add Travel Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- CONTENT WRAPPER END -->
+
+    <!-- Add File Note Modal -->
+    <div class="modal fade" id="addFileNoteModal" tabindex="-1" role="dialog" aria-labelledby="addFileNoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addFileNoteModalLabel">Add File Note</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Note</label>
+                        <textarea class="form-control" rows="5" placeholder="Enter your details."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Invoice Modal -->
+    <div class="modal fade" id="addInvoiceModal" tabindex="-1" role="dialog" aria-labelledby="addInvoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addInvoiceModalLabel">ADD INVOICE</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <x-forms.label fieldId="client_name" fieldLabel="Client Name">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14" value="Kishan Ghaghada">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <x-forms.label fieldId="invoice_date" fieldLabel="Invoice Date">
+                            </x-forms.label>
+                            <input type="date" class="form-control height-35 f-14" value="17-07-2023">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <x-forms.label fieldId="phone" fieldLabel="Phone">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14" value="+91 123 4567 890">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <x-forms.label fieldId="email" fieldLabel="Email">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14" value="abc@gmail.com">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <x-forms.label fieldId="address" fieldLabel="Address">
+                            </x-forms.label>
+                            <textarea class="form-control f-14" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <x-forms.label fieldId="bill_to" fieldLabel="Bill To">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14" value="">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <x-forms.label fieldId="invoice_belongs" fieldLabel="Invoice Belongs To">
+                            </x-forms.label>
+                            <select class="form-control select-picker height-35 f-14">
+                                <option value="">Select Agent</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <x-forms.label fieldId="service" fieldLabel="Service">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14" value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <x-forms.label fieldId="price" fieldLabel="Price">
+                            </x-forms.label>
+                            <input type="number" class="form-control height-35 f-14" value="">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <x-forms.label fieldId="tax" fieldLabel="Tax">
+                            </x-forms.label>
+                            <select class="form-control select-picker height-35 f-14">
+                                <option value="GST 18%" selected>GST 18%</option>
+                                <option value="GST 0%">GST 0%</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <x-forms.label fieldId="discount" fieldLabel="Discount">
+                            </x-forms.label>
+                            <input type="number" class="form-control height-35 f-14" value="">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <x-forms.label fieldId="net_amount" fieldLabel="Net Amount">
+                            </x-forms.label>
+                            <input type="number" class="form-control height-35 f-14" value="">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <x-forms.label fieldId="service_description" fieldLabel="Service Description">
+                            </x-forms.label>
+                            <textarea class="form-control f-14" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Communication Modal -->
+    <div class="modal fade" id="addCommunicationModal" tabindex="-1" role="dialog" aria-labelledby="addCommunicationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCommunicationModalLabel">Add Communication</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <x-forms.label fieldId="assignee" fieldLabel="Select Assignee">
+                        </x-forms.label>
+                        <select class="form-control select-picker height-35 f-14" required>
+                            <option value="" disabled selected>Select Assignee</option>
+                            <option value="1">Shivani Patel</option>
+                            <option value="2">John Doe</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="communication_type" fieldLabel="Type">
+                        </x-forms.label>
+                        <select class="form-control select-picker height-35 f-14" required>
+                            <option value="" disabled selected>Call / Meeting / Email / Whatsapp</option>
+                            <option value="call">Call</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="email">Email</option>
+                            <option value="whatsapp">Whatsapp</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="communication_date" fieldLabel="Date">
+                        </x-forms.label>
+                        <input type="date" class="form-control height-35 f-14" placeholder="Date">
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="comment" fieldLabel="Comment">
+                        </x-forms.label>
+                        <textarea class="form-control f-14" rows="4" placeholder="Comment"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Follow-Up Modal -->
+    <div class="modal fade" id="addFollowUpModal" tabindex="-1" role="dialog" aria-labelledby="addFollowUpModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addFollowUpModalLabel">Add Follow-Up</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="f-14 font-weight-bold mb-2">Follow-Up Type</label>
+                        <div class="d-flex gap-2">
+                            <label class="form-check-label mr-3">
+                                <input type="radio" name="followUpType" value="call" checked class="mr-1"> Call
+                            </label>
+                            <label class="form-check-label mr-3">
+                                <input type="radio" name="followUpType" value="meeting" class="mr-1"> Meeting
+                            </label>
+                            <label class="form-check-label mr-3">
+                                <input type="radio" name="followUpType" value="sms" class="mr-1"> SMS
+                            </label>
+                            <label class="form-check-label">
+                                <input type="radio" name="followUpType" value="email" class="mr-1"> Email
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="subject" fieldLabel="Subject">
+                        </x-forms.label>
+                        <input type="text" class="form-control height-35 f-14" value="">
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="outcome" fieldLabel="Outcome of Call">
+                        </x-forms.label>
+                        <input type="text" class="form-control height-35 f-14" value="">
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="notes" fieldLabel="Notes">
+                        </x-forms.label>
+                        <textarea class="form-control f-14" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="f-14 font-weight-bold mb-2">Do you want to get update for next follow-up - Set reminder?</label>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <x-forms.label fieldId="next_follow_up_date" fieldLabel="Next Follow Up Date">
+                                </x-forms.label>
+                                <input type="date" class="form-control height-35 f-14" placeholder="">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <x-forms.label fieldId="next_follow_up_time" fieldLabel="Next Follow Up Start Time">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14">
+                                    <option value="15 Minutes Before" selected>15 Minutes Before</option>
+                                    <option value="30 Minutes Before">30 Minutes Before</option>
+                                    <option value="1 Hour Before">1 Hour Before</option>
+                                    <option value="2 Hours Before">2 Hours Before</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="follow_up_subject_line" fieldLabel="Follow Up Subject Line">
+                        </x-forms.label>
+                        <input type="text" class="form-control height-35 f-14" value="">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notify Client Modal -->
+    <div class="modal fade" id="notifyClientModal" tabindex="-1" role="dialog" aria-labelledby="notifyClientModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notifyClientModalLabel">Notify Client?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-2">Only "Congratulations! Find your travel details" notification by:</p>
+                        <p class="mb-0">For further details please connect with your concealer.</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Purpose of Trip</div>
+                            <div class="f-14">Business visit and meetings with partners in the USA.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Place To Visit USA</div>
+                            <div class="f-14">San Francisco, Los Angeles, and New York City</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Date of Arrival</div>
+                            <div class="f-14">15 March 2026</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Arrival Flight</div>
+                            <div class="f-14">AI 173</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Arrival City</div>
+                            <div class="f-14">San Francisco</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Date of Departure From</div>
+                            <div class="f-14">30 March 2026</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Departure Flight</div>
+                            <div class="f-14">UA 868</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Phone Number (of other country)</div>
+                            <div class="f-14">+1 415 623 9874</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Address Where You Will Stay</div>
+                            <div class="f-14">123 Mission Street, Suite 400</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">City</div>
+                            <div class="f-14">San Francisco</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">State</div>
+                            <div class="f-14">California</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="f-12 text-dark-grey mb-1">Postal/Zip Code</div>
+                            <div class="f-14">94105</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Notify Client</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Travel Details Modal -->
+    <div class="modal fade" id="addTravelDetailsModal" tabindex="-1" role="dialog" aria-labelledby="addTravelDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTravelDetailsModalLabel">Add Travel Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <x-forms.label fieldId="purpose_of_trip" fieldLabel="Purpose of Trip">
+                        </x-forms.label>
+                        <input type="text" class="form-control height-35 f-14">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <x-forms.label fieldId="date_of_arrival" fieldLabel="Date of Arrival">
+                            </x-forms.label>
+                            <input type="date" class="form-control height-35 f-14">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <x-forms.label fieldId="arrival_flight" fieldLabel="Arrival Flight">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <x-forms.label fieldId="arrival_city" fieldLabel="Arrival City">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <x-forms.label fieldId="date_of_departure" fieldLabel="Date of Departure From">
+                            </x-forms.label>
+                            <input type="date" class="form-control height-35 f-14">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="departure_flight" fieldLabel="Departure Flight">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="departure_city" fieldLabel="Departure City">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="phone_number_other_country" fieldLabel="Phone Number (of other country)">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="place_to_visit" fieldLabel="Place To Visit USA">
+                        </x-forms.label>
+                        <textarea class="form-control f-14" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="address_stay" fieldLabel="Address Where You Will Stay">
+                        </x-forms.label>
+                        <textarea class="form-control f-14" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="city" fieldLabel="City">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="state" fieldLabel="State">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="postal_code" fieldLabel="Postal/Zip Code">
+                            </x-forms.label>
+                            <input type="text" class="form-control height-35 f-14">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <x-forms.label fieldId="person_paying" fieldLabel="Person Paying For Your Trip (Details)">
+                        </x-forms.label>
+                        <textarea class="form-control f-14" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="mother_in_country" fieldLabel="Is Your Mother in that country?">
+                            </x-forms.label>
+                            <select class="form-control select-picker height-35 f-14">
+                                <option value="" disabled selected>Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="immediate_relatives" fieldLabel="Immediate Relatives In that country?">
+                            </x-forms.label>
+                            <select class="form-control select-picker height-35 f-14">
+                                <option value="" disabled selected>Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <x-forms.label fieldId="other_relatives" fieldLabel="Other Relatives In that country?">
+                            </x-forms.label>
+                            <select class="form-control select-picker height-35 f-14">
+                                <option value="" disabled selected>Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // Lead Details page scripts will be added here
+            // Initialize select pickers
+            $('.select-picker').selectpicker();
+            
+            // Tab Switching Functionality
+            $('.lead-nav-tab').on('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all tabs
+                $('.lead-nav-tab').removeClass('active');
+                // Add active class to clicked tab
+                $(this).addClass('active');
+                
+                // Hide all tab contents
+                $('.tab-content').removeClass('active');
+                
+                // Show selected tab content
+                const tabId = $(this).data('tab');
+                if (tabId) {
+                    $('#' + tabId).addClass('active');
+                }
+            });
+
+            // Reinitialize select pickers when modals are opened
+            $('#addFileNoteModal, #addInvoiceModal, #addCommunicationModal, #addFollowUpModal, #notifyClientModal, #addTravelDetailsModal').on('shown.bs.modal', function () {
+                $('.select-picker').selectpicker('refresh');
+            });
         });
     </script>
 @endpush

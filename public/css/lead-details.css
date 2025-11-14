@@ -1,0 +1,46 @@
+/* Lead Details Page Styles */
+.lead-details-container {
+    width: 100%;
+}
+
+.lead-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.lead-nav-tab {
+    color: #6c757d;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.lead-nav-tab:hover {
+    color: #007bff;
+    border-bottom-color: #007bff;
+}
+
+.lead-nav-tab.active {
+    color: #007bff;
+    border-bottom-color: #007bff;
+    font-weight: 600;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.info-field-icon {
+    min-width: 20px;
+}
+
+.info-field-value {
+    word-break: break-word;
+}
+
