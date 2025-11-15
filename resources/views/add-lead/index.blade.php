@@ -360,9 +360,8 @@
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="pr_preferred_country" id="pr_preferred_country">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Canada">Canada</option>
-                                        <option value="Australia">Australia</option>
-                                        <option value="UK">UK</option>
+                                        <option value="Australia">@lang('app.countryAustralia')</option>
+                                        <option value="New Zealand">@lang('app.countryNewZealand')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -370,9 +369,24 @@
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="pr_preferred_state" id="pr_preferred_state">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Victoria">Victoria</option>
-                                        <option value="Ontario">Ontario</option>
-                                        <option value="Alberta">Alberta</option>
+                                        <!-- Australian States -->
+                                        <option value="Western Australia (WA)" data-country="Australia">@lang('app.stateWesternAustralia')</option>
+                                        <option value="South Australia (SA)" data-country="Australia">@lang('app.stateSouthAustralia')</option>
+                                        <option value="Australian Capital Territory (ACT)" data-country="Australia">@lang('app.stateAustralianCapitalTerritory')</option>
+                                        <option value="Queensland (QLD)" data-country="Australia">@lang('app.stateQueensland')</option>
+                                        <option value="New South Wales (NSW)" data-country="Australia">@lang('app.stateNewSouthWales')</option>
+                                        <option value="Victoria (VIC)" data-country="Australia">@lang('app.stateVictoria')</option>
+                                        <option value="Tasmania (TAS)" data-country="Australia">@lang('app.stateTasmania')</option>
+                                        <option value="Northern Territory (NT)" data-country="Australia">@lang('app.stateNorthernTerritory')</option>
+                                        <!-- New Zealand Regions -->
+                                        <option value="Waikato" data-country="New Zealand">@lang('app.stateWaikato')</option>
+                                        <option value="Bay of Plenty" data-country="New Zealand">@lang('app.stateBayOfPlenty')</option>
+                                        <option value="Hawke's Bay" data-country="New Zealand">@lang('app.stateHawkesBay')</option>
+                                        <option value="Manawatu-Whanganui" data-country="New Zealand">@lang('app.stateManawatuWhanganui')</option>
+                                        <option value="Taranaki" data-country="New Zealand">@lang('app.stateTaranaki')</option>
+                                        <option value="Canterbury" data-country="New Zealand">@lang('app.stateCanterbury')</option>
+                                        <option value="Otago" data-country="New Zealand">@lang('app.stateOtago')</option>
+                                        <option value="Southland" data-country="New Zealand">@lang('app.stateSouthland')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -423,8 +437,8 @@
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="visit_preferred_country" id="visit_preferred_country">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Australia">Australia</option>
-                                        <option value="New Zealand">New Zealand</option>
+                                        <option value="Australia">@lang('app.countryAustralia')</option>
+                                        <option value="New Zealand">@lang('app.countryNewZealand')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -432,8 +446,24 @@
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="visit_preferred_state" id="visit_preferred_state">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="New York">New York</option>
-                                        <option value="Dubai">Dubai</option>
+                                        <!-- Australian States -->
+                                        <option value="Western Australia (WA)" data-country="Australia">@lang('app.stateWesternAustralia')</option>
+                                        <option value="South Australia (SA)" data-country="Australia">@lang('app.stateSouthAustralia')</option>
+                                        <option value="Australian Capital Territory (ACT)" data-country="Australia">@lang('app.stateAustralianCapitalTerritory')</option>
+                                        <option value="Queensland (QLD)" data-country="Australia">@lang('app.stateQueensland')</option>
+                                        <option value="New South Wales (NSW)" data-country="Australia">@lang('app.stateNewSouthWales')</option>
+                                        <option value="Victoria (VIC)" data-country="Australia">@lang('app.stateVictoria')</option>
+                                        <option value="Tasmania (TAS)" data-country="Australia">@lang('app.stateTasmania')</option>
+                                        <option value="Northern Territory (NT)" data-country="Australia">@lang('app.stateNorthernTerritory')</option>
+                                        <!-- New Zealand Regions -->
+                                        <option value="Waikato" data-country="New Zealand">@lang('app.stateWaikato')</option>
+                                        <option value="Bay of Plenty" data-country="New Zealand">@lang('app.stateBayOfPlenty')</option>
+                                        <option value="Hawke's Bay" data-country="New Zealand">@lang('app.stateHawkesBay')</option>
+                                        <option value="Manawatu-Whanganui" data-country="New Zealand">@lang('app.stateManawatuWhanganui')</option>
+                                        <option value="Taranaki" data-country="New Zealand">@lang('app.stateTaranaki')</option>
+                                        <option value="Canterbury" data-country="New Zealand">@lang('app.stateCanterbury')</option>
+                                        <option value="Otago" data-country="New Zealand">@lang('app.stateOtago')</option>
+                                        <option value="Southland" data-country="New Zealand">@lang('app.stateSouthland')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -459,10 +489,48 @@
                                     <x-forms.label class="mt-3" fieldId="industry" :fieldLabel="__('app.industry')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="industry" id="industry">
-                                        <option value="List given in document" selected>@lang('app.listGivenInDocument')</option>
-                                        <option value="IT">IT</option>
-                                        <option value="Finance">Finance</option>
-                                        <option value="Healthcare">Healthcare</option>
+                                        <option value="">@lang('app.select')</option>
+                                        <option value="Agriculture">@lang('app.industryAgriculture')</option>
+                                        <option value="Aviation Ground Staff">@lang('app.industryAviationGroundStaff')</option>
+                                        <option value="Call Centres / BPO">@lang('app.industryCallCentresBPO')</option>
+                                        <option value="Catering Services">@lang('app.industryCateringServices')</option>
+                                        <option value="Chemical Manufacturing">@lang('app.industryChemicalManufacturing')</option>
+                                        <option value="Childcare">@lang('app.industryChildcare')</option>
+                                        <option value="Cleaning & Facility Management">@lang('app.industryCleaningFacilityManagement')</option>
+                                        <option value="Construction">@lang('app.industryConstruction')</option>
+                                        <option value="Courier & Delivery Services">@lang('app.industryCourierDeliveryServices')</option>
+                                        <option value="Dairy & Livestock">@lang('app.industryDairyLivestock')</option>
+                                        <option value="Data Entry Services">@lang('app.industryDataEntryServices')</option>
+                                        <option value="Education">@lang('app.industryEducation')</option>
+                                        <option value="Electronics Manufacturing">@lang('app.industryElectronicsManufacturing')</option>
+                                        <option value="Events & Entertainment">@lang('app.industryEventsEntertainment')</option>
+                                        <option value="Food Chains">@lang('app.industryFoodChains')</option>
+                                        <option value="Food Processing">@lang('app.industryFoodProcessing')</option>
+                                        <option value="Healthcare Services">@lang('app.industryHealthcareServices')</option>
+                                        <option value="Hospitals & Clinics">@lang('app.industryHospitalsClinics')</option>
+                                        <option value="Hotels & Hospitality">@lang('app.industryHotelsHospitality')</option>
+                                        <option value="Industrial Production">@lang('app.industryIndustrialProduction')</option>
+                                        <option value="Infrastructure">@lang('app.industryInfrastructure')</option>
+                                        <option value="IT Services">@lang('app.industryITServices')</option>
+                                        <option value="Logistics & Transport">@lang('app.industryLogisticsTransport')</option>
+                                        <option value="Manufacturing">@lang('app.industryManufacturing')</option>
+                                        <option value="Nursing & Aged Care">@lang('app.industryNursingAgedCare')</option>
+                                        <option value="Pharma">@lang('app.industryPharma')</option>
+                                        <option value="Real Estate">@lang('app.industryRealEstate')</option>
+                                        <option value="Repair & Maintenance Services (Electrical/Plumbing/AC)">@lang('app.industryRepairMaintenanceServices')</option>
+                                        <option value="Restaurants & Cafes">@lang('app.industryRestaurantsCafes')</option>
+                                        <option value="Retail (Apparel)">@lang('app.industryRetailApparel')</option>
+                                        <option value="Retail (Electronics)">@lang('app.industryRetailElectronics')</option>
+                                        <option value="Retail (Showrooms & Specialty Stores)">@lang('app.industryRetailShowroomsSpecialtyStores')</option>
+                                        <option value="Schools & Colleges">@lang('app.industrySchoolsColleges')</option>
+                                        <option value="Security Services">@lang('app.industrySecurityServices')</option>
+                                        <option value="Software Development">@lang('app.industrySoftwareDevelopment')</option>
+                                        <option value="Supermarket / Grocery">@lang('app.industrySupermarketGrocery')</option>
+                                        <option value="Technical Support">@lang('app.industryTechnicalSupport')</option>
+                                        <option value="Textiles & Garments">@lang('app.industryTextilesGarments')</option>
+                                        <option value="Training Institutes">@lang('app.industryTrainingInstitutes')</option>
+                                        <option value="Transport (Drivers)">@lang('app.industryTransportDrivers')</option>
+                                        <option value="Warehousing">@lang('app.industryWarehousing')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -479,8 +547,8 @@
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="work_preferred_country" id="work_preferred_country">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Australia">Australia</option>
-                                        <option value="New Zealand">New Zealand</option>
+                                        <option value="Australia">@lang('app.countryAustralia')</option>
+                                        <option value="New Zealand">@lang('app.countryNewZealand')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -514,13 +582,12 @@
                                     <input type="text" class="form-control height-35 f-14" name="preferred_course" id="preferred_course">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="student_country" :fieldLabel="__('app.country')">
+                                    <x-forms.label class="mt-3" fieldId="student_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="student_country" id="student_country">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Canada">Canada</option>
-                                        <option value="UK">UK</option>
-                                        <option value="Australia">Australia</option>
+                                        <option value="Australia">@lang('app.countryAustralia')</option>
+                                        <option value="New Zealand">@lang('app.countryNewZealand')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -880,12 +947,14 @@
                         <h6 class="mb-3 f-15 font-weight-bold">@lang('app.ieltsPtcOetToeflExamDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="ielts_clear_or_not" fieldLabel="IELTS/PTC/OET/TOEFL is Clear or Not">
+                                <x-forms.label class="mt-3" fieldId="ielts_clear_or_not" :fieldLabel="__('app.ieltsPtcOetToeflExamDetails')">
                                 </x-forms.label>
                                 <select class="form-control select-picker" name="ielts_clear_or_not" id="ielts_clear_or_not">
                                     <option value="">@lang('app.select')</option>
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
+                                    <option value="IELTS">@lang('app.ielts')</option>
+                                    <option value="PTE">@lang('app.pte')</option>
+                                    <option value="OET">@lang('app.oet')</option>
+                                    <option value="TOEFL">@lang('app.toefl')</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -991,16 +1060,41 @@
                         <h6 class="mb-3 f-15 font-weight-bold">@lang('app.graduationDegreeDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="graduation_degree" fieldLabel="Graduation Degree">
+                                <x-forms.label class="mt-3" fieldId="graduation_degree" :fieldLabel="__('app.graduationDegree')">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="graduation_degree" id="graduation_degree">
+                                <select class="form-control select-picker" name="graduation_degree" id="graduation_degree" data-live-search="true" data-live-search-placeholder="@lang('app.search')">
                                     <option value="">@lang('app.select')</option>
-                                    <option value="Bachelor of Fine Arts (B.F.A)">Bachelor of Fine Arts (B.F.A)</option>
-                                    <option value="Bachelor of Business Administration (B.B.A)">Bachelor of Business Administration (B.B.A)</option>
-                                    <option value="Bachelor of Engineering (B.Eng. or B.S.E)">Bachelor of Engineering (B.Eng. or B.S.E)</option>
-                                    <option value="Bachelor of Education (B.Ed.)">Bachelor of Education (B.Ed.)</option>
-                                    <option value="Bachelor of Medicine, Bachelor of Surgery (M.B.B.S)">Bachelor of Medicine, Bachelor of Surgery (M.B.B.S)</option>
-                                    <option value="Bachelor of Laws (LL.B.)">Bachelor of Laws (LL.B.)</option>
+                                    <option value="Bachelor of Arts (B.A. / B.A. Hons.)">@lang('app.gradDegreeBachelorOfArts')</option>
+                                    <option value="Bachelor of Journalism & Mass Communication (BJMC)">@lang('app.gradDegreeBachelorOfJournalismMassCommunication')</option>
+                                    <option value="Bachelor of Fine Arts (BFA)">@lang('app.gradDegreeBachelorOfFineArts')</option>
+                                    <option value="Bachelor of Design (B.Des)">@lang('app.gradDegreeBachelorOfDesign')</option>
+                                    <option value="Bachelor of Social Work (BSW)">@lang('app.gradDegreeBachelorOfSocialWork')</option>
+                                    <option value="B.A. LL.B. (5 Years Integrated)">@lang('app.gradDegreeBALLB')</option>
+                                    <option value="Bachelor of Science (B.Sc. / B.Sc. Hons.)">@lang('app.gradDegreeBachelorOfScience')</option>
+                                    <option value="Bachelor of Technology / Engineering (B.Tech / B.E.)">@lang('app.gradDegreeBachelorOfTechnologyEngineering')</option>
+                                    <option value="MBBS (Bachelor of Medicine & Surgery)">@lang('app.gradDegreeMBBS')</option>
+                                    <option value="Bachelor of Dental Surgery (BDS)">@lang('app.gradDegreeBachelorOfDentalSurgery')</option>
+                                    <option value="Bachelor of Pharmacy (B.Pharm)">@lang('app.gradDegreeBachelorOfPharmacy')</option>
+                                    <option value="Bachelor of Computer Applications (BCA)">@lang('app.gradDegreeBachelorOfComputerApplications')</option>
+                                    <option value="Bachelor of Physiotherapy (BPT)">@lang('app.gradDegreeBachelorOfPhysiotherapy')</option>
+                                    <option value="B.Sc Nursing">@lang('app.gradDegreeBScNursing')</option>
+                                    <option value="Bachelor of Computer Science / B.Sc IT / BCS">@lang('app.gradDegreeBachelorOfComputerScience')</option>
+                                    <option value="Bachelor of Commerce (B.Com / B.Com Hons.)">@lang('app.gradDegreeBachelorOfCommerce')</option>
+                                    <option value="Bachelor of Business Administration (BBA)">@lang('app.gradDegreeBachelorOfBusinessAdministration')</option>
+                                    <option value="Bachelor of Management Studies (BMS)">@lang('app.gradDegreeBachelorOfManagementStudies')</option>
+                                    <option value="Bachelor of Business Economics (BBE)">@lang('app.gradDegreeBachelorOfBusinessEconomics')</option>
+                                    <option value="Integrated B.Com-LL.B.">@lang('app.gradDegreeIntegratedBComLLB')</option>
+                                    <option value="Bachelor of Law (LL.B.) – 3-Year Degree">@lang('app.gradDegreeBachelorOfLaw')</option>
+                                    <option value="Bachelor of Hotel Management (BHM) / B.Sc Hospitality">@lang('app.gradDegreeBachelorOfHotelManagement')</option>
+                                    <option value="Bachelor of Architecture (B.Arch)">@lang('app.gradDegreeBachelorOfArchitecture')</option>
+                                    <option value="Bachelor of Elementary Education (B.El.Ed.)">@lang('app.gradDegreeBachelorOfElementaryEducation')</option>
+                                    <option value="Chartered Accountancy (CA)">@lang('app.gradDegreeCharteredAccountancy')</option>
+                                    <option value="Company Secretary (CS)">@lang('app.gradDegreeCompanySecretary')</option>
+                                    <option value="Cost & Management Accountant (CMA)">@lang('app.gradDegreeCostManagementAccountant')</option>
+                                    <option value="Bachelor of Vocational Studies (B.Voc)">@lang('app.gradDegreeBachelorOfVocationalStudies')</option>
+                                    <option value="Integrated BBA-LL.B. / B.A.-LL.B. / B.Sc.-LL.B.">@lang('app.gradDegreeIntegratedBBALLB')</option>
+                                    <option value="Degree Name (Custom)">@lang('app.gradDegreeDegreeNameCustom')</option>
+                                    <option value="Other">@lang('app.gradDegreeOther')</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -1036,16 +1130,26 @@
                         <h6 class="mb-3 f-15 font-weight-bold">@lang('app.postGraduationDegreeDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="post_graduation_degree" fieldLabel="Post Graduation Degree">
+                                <x-forms.label class="mt-3" fieldId="post_graduation_degree" :fieldLabel="__('app.postGraduationDegree')">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="post_graduation_degree" id="post_graduation_degree">
+                                <select class="form-control select-picker" name="post_graduation_degree" id="post_graduation_degree" data-live-search="true" data-live-search-placeholder="@lang('app.search')">
                                     <option value="">@lang('app.select')</option>
-                                    <option value="Masters of Arts (M.A.)">Masters of Arts (M.A.)</option>
-                                    <option value="Master of Science (M.S.)">Master of Science (M.S.)</option>
-                                    <option value="Master of Business Administration (M.B.A)">Master of Business Administration (M.B.A)</option>
-                                    <option value="Master of Education (M.Ed.)">Master of Education (M.Ed.)</option>
-                                    <option value="Master of Fine Arts (M.F.A)">Master of Fine Arts (M.F.A)</option>
-                                    <option value="Master of Public Health (M.P.H.)">Master of Public Health (M.P.H.)</option>
+                                    <option value="Master of Business Administration (MBA)">@lang('app.postGradDegreeMBA')</option>
+                                    <option value="Post Graduate Diploma in Management (PGDM)">@lang('app.postGradDegreePGDM')</option>
+                                    <option value="Master of Commerce (M.Com)">@lang('app.postGradDegreeMCom')</option>
+                                    <option value="Master of Business Economics (MBE)">@lang('app.postGradDegreeMBE')</option>
+                                    <option value="Master of Science (M.Sc.)">@lang('app.postGradDegreeMSc')</option>
+                                    <option value="Master of Technology (M.Tech)">@lang('app.postGradDegreeMTech')</option>
+                                    <option value="Master of Computer Applications (MCA)">@lang('app.postGradDegreeMCA')</option>
+                                    <option value="Master of Arts (M.A.)">@lang('app.postGradDegreeMA')</option>
+                                    <option value="Master in Social Work (MSW)">@lang('app.postGradDegreeMSW')</option>
+                                    <option value="Master of Design (M.Des)">@lang('app.postGradDegreeMDes')</option>
+                                    <option value="Master of Laws (LL.M.)">@lang('app.postGradDegreeLLM')</option>
+                                    <option value="Master of Education (M.Ed.)">@lang('app.postGradDegreeMEd')</option>
+                                    <option value="Master of Pharmacy (M.Pharm)">@lang('app.postGradDegreeMPharm')</option>
+                                    <option value="Master of Architecture (M.Arch)">@lang('app.postGradDegreeMArch')</option>
+                                    <option value="Doctor of Medicine (M.D.) / Master of Surgery (M.S.)">@lang('app.postGradDegreeMDMS')</option>
+                                    <option value="Other">@lang('app.postGradDegreeOther')</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -1699,6 +1803,68 @@
                 });
                 $('#total_income').val(total);
             });
+
+            // Function to filter states based on selected country
+            function filterStatesByCountry(countrySelectId, stateSelectId) {
+                const countrySelect = $('#' + countrySelectId);
+                const stateSelect = $('#' + stateSelectId);
+                
+                countrySelect.on('changed.bs.select', function() {
+                    const selectedCountry = $(this).val();
+                    
+                    if (selectedCountry) {
+                        // Hide all state options except the "Select" option
+                        stateSelect.find('option[value!=""]').each(function() {
+                            const $option = $(this);
+                            if ($option.data('country') === selectedCountry) {
+                                $option.prop('disabled', false);
+                            } else {
+                                $option.prop('disabled', true);
+                            }
+                        });
+                    } else {
+                        // If no country selected, enable all states
+                        stateSelect.find('option').prop('disabled', false);
+                    }
+                    
+                    // Reset state selection and refresh selectpicker
+                    stateSelect.val('').selectpicker('refresh');
+                });
+                
+                // Also handle regular change event for compatibility
+                countrySelect.on('change', function() {
+                    const selectedCountry = $(this).val();
+                    
+                    if (selectedCountry) {
+                        // Hide all state options except the "Select" option
+                        stateSelect.find('option[value!=""]').each(function() {
+                            const $option = $(this);
+                            if ($option.data('country') === selectedCountry) {
+                                $option.prop('disabled', false);
+                            } else {
+                                $option.prop('disabled', true);
+                            }
+                        });
+                    } else {
+                        // If no country selected, enable all states
+                        stateSelect.find('option').prop('disabled', false);
+                    }
+                    
+                    // Reset state selection and refresh selectpicker
+                    stateSelect.val('').selectpicker('refresh');
+                });
+                
+                // Trigger on page load if country is already selected
+                if (countrySelect.val()) {
+                    countrySelect.trigger('change');
+                }
+            }
+
+            // Initialize state filtering for PR section
+            filterStatesByCountry('pr_preferred_country', 'pr_preferred_state');
+            
+            // Initialize state filtering for Visit Visa section
+            filterStatesByCountry('visit_preferred_country', 'visit_preferred_state');
 
         });
     </script>
