@@ -15,31 +15,31 @@
                 <nav class="tabs px-4 border-bottom-grey">
                     <div class="nav" id="nav-tab" role="tablist">
                         <a class="nav-item-lead nav-link-lead f-14 active" id="nav-personal-tab" data-toggle="tab" href="#nav-preference" role="tab" aria-controls="nav-preference" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Personal_Details.svg') }}"></div>Personal Details
+                            <div class="tab-item"><img src="{{ asset('img/icon/Personal_Details.svg') }}"></div>@lang('app.personalDetails')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-preference-tab" data-toggle="tab" href="#nav-preference" role="tab" aria-controls="nav-preference" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Client_Preference.svg') }}"></div>Client Preference
+                            <div class="tab-item"><img src="{{ asset('img/icon/Client_Preference.svg') }}"></div>@lang('app.clientPreference')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-passport-tab" data-toggle="tab" href="#nav-passport" role="tab" aria-controls="nav-passport" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Passport_Details.svg') }}"></div>Passport Details
+                            <div class="tab-item"><img src="{{ asset('img/icon/Passport_Details.svg') }}"></div>@lang('app.passportDetails')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-relative-tab" data-toggle="tab" href="#nav-relative" role="tab" aria-controls="nav-relative" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Relative_Contact_Information.svg') }}"></div>Relative Contact Information
+                            <div class="tab-item"><img src="{{ asset('img/icon/Relative_Contact_Information.svg') }}"></div>@lang('app.relativeContactInformation')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-family-tab" data-toggle="tab" href="#nav-family" role="tab" aria-controls="nav-family" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Financial_Status.svg') }}"></div>Family Information
+                            <div class="tab-item"><img src="{{ asset('img/icon/Financial_Status.svg') }}"></div>@lang('app.familyInformation')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-education-tab" data-toggle="tab" href="#nav-education" role="tab" aria-controls="nav-education" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Education.svg') }}"></div>Education
+                            <div class="tab-item"><img src="{{ asset('img/icon/Education.svg') }}"></div>@lang('app.education')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-experience-tab" data-toggle="tab" href="#nav-experience" role="tab" aria-controls="nav-experience" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Professional_Experience.svg') }}"></div>Professional Experience
+                            <div class="tab-item"><img src="{{ asset('img/icon/Professional_Experience.svg') }}"></div>@lang('app.professionalExperience')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-property-tab" data-toggle="tab" href="#nav-property" role="tab" aria-controls="nav-property" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Property_Details.svg') }}"></div>Property Details
+                            <div class="tab-item"><img src="{{ asset('img/icon/Property_Details.svg') }}"></div>@lang('app.propertyDetails')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-financial-tab" data-toggle="tab" href="#nav-financial" role="tab" aria-controls="nav-financial" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Financial_Status.svg') }}"></div>Financial Status
+                            <div class="tab-item"><img src="{{ asset('img/icon/Financial_Status.svg') }}"></div>@lang('app.financialStatus')
                         </a>
                     </div>
                 </nav>
@@ -67,61 +67,61 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="lead_added_by" fieldLabel="Lead Added by">
+                                <x-forms.label class="mt-3" fieldId="lead_added_by" :fieldLabel="__('app.leadAddedBy')">
                                 </x-forms.label>
                                 <input type="text" class="form-control" id="lead_added_by" name="lead_added_by" value="{{ user()->name }}" disabled>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="lead_assign_to" fieldLabel="Lead Assign to" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="lead_assign_to" :fieldLabel="__('app.leadAssignTo')" fieldRequired="true">
                                 </x-forms.label>
                                 <select class="form-control select-picker" name="lead_assign_to" id="lead_assign_to">
-                                    <option value="">@lang('app.select') Lead Assign to</option>
+                                    <option value="">@lang('app.select') @lang('app.leadAssignTo')</option>
                                     <option value="{{ user()->id }}">{{ user()->name }}</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="passport_file" fieldLabel="Add Passport">
+                                <x-forms.label class="mt-3" fieldId="passport_file" :fieldLabel="__('app.addPassport')">
                                 </x-forms.label>
                                 <input class="form-control" type="file" id="passport_file" name="passport_file">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="surname" fieldLabel="Surname" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="surname" :fieldLabel="__('app.surname')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="surname" id="surname">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="given_name" fieldLabel="Given Name" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="given_name" :fieldLabel="__('app.givenName')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="given_name" id="given_name">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="gender" fieldLabel="Gender" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="gender" :fieldLabel="__('app.gender')" fieldRequired="true">
                                 </x-forms.label>
                                 <select class="form-control select-picker" name="gender" id="gender">
                                     <option value="">@lang('app.select')</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
+                                    <option value="Male">@lang('app.male')</option>
+                                    <option value="Female">@lang('app.female')</option>
+                                    <option value="Other">@lang('app.other')</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="marital_status" fieldLabel="Marital Status" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="marital_status" :fieldLabel="__('app.maritalStatus')" fieldRequired="true">
                                 </x-forms.label>
                                 <select class="form-control select-picker" name="marital_status" id="marital_status">
                                     <option value="">@lang('app.select')</option>
-                                    <option value="Single">Single</option>
-                                    <option value="Married">Married</option>
-                                    <option value="Divorced">Divorced</option>
-                                    <option value="Widowed">Widowed</option>
+                                    <option value="Single">@lang('app.single')</option>
+                                    <option value="Married">@lang('app.maritalStatus.married')</option>
+                                    <option value="Divorced">@lang('app.maritalStatus.divorced')</option>
+                                    <option value="Widowed">@lang('app.maritalStatus.widow')</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="date_of_birth" fieldLabel="Date of Birth" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="date_of_birth" :fieldLabel="__('app.dateOfBirth')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="date_of_birth" id="date_of_birth">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="country_of_origin" fieldLabel="Country of Origin (Nationality)" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="country_of_origin" :fieldLabel="__('app.countryOfOrigin')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="country_of_origin" id="country_of_origin">
                             </div>
@@ -130,7 +130,7 @@
                         <hr class="my-4">
 
                         <!-- Home Address Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Home Address</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.homeAddress')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="home_address" :fieldLabel="__('modules.lead.address')" fieldRequired="true">
@@ -138,17 +138,17 @@
                                 <input type="text" class="form-control height-35 f-14" name="home_address" id="home_address">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="home_city" fieldLabel="City" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="home_city" :fieldLabel="__('app.city')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="home_city" id="home_city">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="home_state" fieldLabel="State" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="home_state" :fieldLabel="__('app.state')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="home_state" id="home_state">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="home_pin_code" fieldLabel="Pin Code" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="home_pin_code" :fieldLabel="__('app.pinCode')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="home_pin_code" id="home_pin_code">
                             </div>
@@ -157,13 +157,13 @@
                         <hr class="my-4">
 
                         <!-- Mailing Address Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Mailing Address</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.mailingAddress')</h6>
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="mailing_same_as_home" id="mailing_same_as_home" value="1">
                                     <label class="form-check-label" for="mailing_same_as_home">
-                                        Mailing Address As Above
+                                        @lang('app.mailingAddressAsAbove')
                                     </label>
                                 </div>
                             </div>
@@ -173,17 +173,17 @@
                                 <input type="text" class="form-control height-35 f-14" name="mailing_address" id="mailing_address">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mailing_city" fieldLabel="City" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mailing_city" :fieldLabel="__('app.city')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mailing_city" id="mailing_city">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mailing_state" fieldLabel="State" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mailing_state" :fieldLabel="__('app.state')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mailing_state" id="mailing_state">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mailing_pin_code" fieldLabel="Pin Code" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mailing_pin_code" :fieldLabel="__('app.pinCode')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mailing_pin_code" id="mailing_pin_code">
                             </div>
@@ -192,25 +192,25 @@
                         <hr class="my-4">
 
                         <!-- Contact Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Contact Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.contactDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="primary_phone" fieldLabel="Primary Phone No" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="primary_phone" :fieldLabel="__('app.primaryPhoneNo')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="tel" maxlength="10" class="form-control height-35 f-14" name="primary_phone" id="primary_phone">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="secondary_phone" fieldLabel="Secondary Phone No">
+                                <x-forms.label class="mt-3" fieldId="secondary_phone" :fieldLabel="__('app.secondaryPhoneNo')">
                                 </x-forms.label>
                                 <input type="tel" maxlength="10" class="form-control height-35 f-14" name="secondary_phone" id="secondary_phone">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="work_phone" fieldLabel="Work Phone No">
+                                <x-forms.label class="mt-3" fieldId="work_phone" :fieldLabel="__('app.workPhoneNo')">
                                 </x-forms.label>
                                 <input type="tel" maxlength="10" class="form-control height-35 f-14" name="work_phone" id="work_phone">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_phone" fieldLabel="Other Phone No (Used in Last 5 Years)">
+                                <x-forms.label class="mt-3" fieldId="other_phone" :fieldLabel="__('app.otherPhoneNo')">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="3" name="other_phone" id="other_phone"></textarea>
                             </div>
@@ -220,12 +220,12 @@
                                 <input type="email" class="form-control height-35 f-14" name="email_address" id="email_address">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_email" fieldLabel="Other Email (Used in Last 5 Years)">
+                                <x-forms.label class="mt-3" fieldId="other_email" :fieldLabel="__('app.otherEmail')">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="3" name="other_email" id="other_email"></textarea>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="social_media_preference" fieldLabel="Social Media Preference">
+                                <x-forms.label class="mt-3" fieldId="social_media_preference" :fieldLabel="__('app.socialMediaPreference')">
                                 </x-forms.label>
                                 <select class="form-control select-picker" name="social_media_preference" id="social_media_preference">
                                     <option value="">@lang('app.select')</option>
@@ -233,7 +233,7 @@
                                     <option value="Instagram">Instagram</option>
                                     <option value="LinkedIn">LinkedIn</option>
                                     <option value="Twitter / X">Twitter / X</option>
-                                    <option value="Other">Other</option>
+                                    <option value="Other">@lang('app.other')</option>
                                 </select>
                             </div>
                         </div>
@@ -241,28 +241,28 @@
                         <hr class="my-4">
 
                         <!-- Visa Status Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Last Five Years Visa Status (If applicable)</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.lastFiveYearsVisaStatus')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-check mt-3">
                                     <input class="form-check-input" type="radio" name="visa_status" id="visa_granted" value="granted">
                                     <label class="form-check-label" for="visa_granted">
-                                        Visa Granted
+                                        @lang('app.visaGranted')
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_issue_date" fieldLabel="Visa Issue Date">
+                                <x-forms.label class="mt-3" fieldId="visa_issue_date" :fieldLabel="__('app.visaIssueDate')">
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_issue_date" id="visa_issue_date">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_expire_date" fieldLabel="Visa Expire Date">
+                                <x-forms.label class="mt-3" fieldId="visa_expire_date" :fieldLabel="__('app.visaExpireDate')">
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_expire_date" id="visa_expire_date">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_category" fieldLabel="Visa Category">
+                                <x-forms.label class="mt-3" fieldId="visa_category" :fieldLabel="__('app.visaCategory')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="visa_category" id="visa_category">
                             </div>
@@ -272,30 +272,30 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="visa_status" id="visa_refusal" value="refusal">
                                     <label class="form-check-label" for="visa_refusal">
-                                        Visa Refusal
+                                        @lang('app.visaRefusal')
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_rejection_date" fieldLabel="Visa Rejection Date">
+                                <x-forms.label class="mt-3" fieldId="visa_rejection_date" :fieldLabel="__('app.visaRejectionDate')">
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_rejection_date" id="visa_rejection_date">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_refusal_category" fieldLabel="Visa Category">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_category" :fieldLabel="__('app.visaCategory')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="visa_refusal_category" id="visa_refusal_category">
                             </div>
                         </div>
                         <div class="row mt-3">
                             <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="visa_refusal_reason" fieldLabel="Reason">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_reason" :fieldLabel="__('app.reason')">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="2" name="visa_refusal_reason" id="visa_refusal_reason"></textarea>
                             </div>
                             <div class="col-md-3 mt-3">
                                 <button type="button" class="btn btn-secondary btn-sm" id="add-more-visa-refusal">
-                                    <i class="fa fa-plus mr-1"></i>Add More Visa Refusal
+                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMoreVisaRefusal')
                                 </button>
                             </div>
                         </div>
@@ -305,7 +305,7 @@
                         <!-- Languages Spoken Section -->
                 <div class="row">
                             <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="languages_spoken" fieldLabel="Languages Spoken">
+                                <x-forms.label class="mt-3" fieldId="languages_spoken" :fieldLabel="__('app.languagesSpoken')">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="2" name="languages_spoken" id="languages_spoken"></textarea>
                             </div>
@@ -317,23 +317,23 @@
                         <!-- Visa Type Selection -->
                         <div class="row mb-4">
                             <div class="col-md-12">
-                                <x-forms.label class="mt-3 mb-3" fieldId="visa_type" fieldLabel="Select Visa Type:" fieldRequired="true">
+                                <x-forms.label class="mt-3 mb-3" fieldId="visa_type" :fieldLabel="__('app.selectVisaType')" fieldRequired="true">
                                 </x-forms.label>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_pr" value="pr">
-                                    <label class="form-check-label" for="visa_pr">PR</label>
+                                    <label class="form-check-label" for="visa_pr">@lang('app.pr')</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_visit" value="visit">
-                                    <label class="form-check-label" for="visa_visit">Visit Visa</label>
+                                    <label class="form-check-label" for="visa_visit">@lang('app.visitVisa')</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_work" value="work">
-                                    <label class="form-check-label" for="visa_work">Work Permit</label>
+                                    <label class="form-check-label" for="visa_work">@lang('app.workPermit')</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_student" value="student">
-                                    <label class="form-check-label" for="visa_student">Student Visa</label>
+                                    <label class="form-check-label" for="visa_student">@lang('app.studentVisa')</label>
                                 </div>
                     </div>
                 </div>
@@ -342,21 +342,21 @@
                         <div id="prSection" class="form-section d-none">
                 <div class="row">
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="skill_assessment_letter" fieldLabel="Skill Assessment Letter" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="skill_assessment_letter" :fieldLabel="__('app.skillAssessmentLetter')" fieldRequired="true">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="skill_assessment_letter" id="skill_assessment_letter">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Positive">Positive</option>
-                                        <option value="Negative">Negative</option>
+                                        <option value="Positive">@lang('app.positive')</option>
+                                        <option value="Negative">@lang('app.negative')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_assessment_letter_file" fieldLabel="Add Assessment Letter" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="pr_assessment_letter_file" :fieldLabel="__('app.addAssessmentLetter')" fieldRequired="true">
                                     </x-forms.label>
                                     <input class="form-control" type="file" id="pr_assessment_letter_file" name="pr_assessment_letter_file">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_preferred_country" fieldLabel="Preferred Country">
+                                    <x-forms.label class="mt-3" fieldId="pr_preferred_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="pr_preferred_country" id="pr_preferred_country">
                                         <option value="">@lang('app.select')</option>
@@ -366,7 +366,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_preferred_state" fieldLabel="Preferred State">
+                                    <x-forms.label class="mt-3" fieldId="pr_preferred_state" :fieldLabel="__('app.preferredState')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="pr_preferred_state" id="pr_preferred_state">
                                         <option value="">@lang('app.select')</option>
@@ -376,18 +376,18 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_family" fieldLabel="Family" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="pr_family" :fieldLabel="__('app.family')" fieldRequired="true">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="pr_family" id="pr_family">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Single">Single</option>
-                                        <option value="Couple Visa">Couple Visa</option>
-                                        <option value="Couple + Children Visa">Couple + Children Visa</option>
-                                        <option value="Family Visa">Family Visa</option>
+                                        <option value="Single">@lang('app.single')</option>
+                                        <option value="Couple Visa">@lang('app.coupleVisa')</option>
+                                        <option value="Couple + Children Visa">@lang('app.coupleChildrenVisa')</option>
+                                        <option value="Family Visa">@lang('app.familyVisa')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_subclass" fieldLabel="Subclass">
+                                    <x-forms.label class="mt-3" fieldId="pr_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="pr_subclass" id="pr_subclass">
                                         <option value="">@lang('app.select')</option>
@@ -403,23 +403,23 @@
                         <div id="visitSection" class="form-section d-none">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="purpose_of_visit" fieldLabel="Purpose of Visit" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="purpose_of_visit" :fieldLabel="__('app.purposeOfVisit')" fieldRequired="true">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" name="purpose_of_visit" id="purpose_of_visit">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_family" fieldLabel="Family" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="visit_family" :fieldLabel="__('app.family')" fieldRequired="true">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="visit_family" id="visit_family">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Single">Single</option>
-                                        <option value="Couple Visa">Couple Visa</option>
-                                        <option value="Couple + Children Visa">Couple + Children Visa</option>
-                                        <option value="Family Visa">Family Visa</option>
+                                        <option value="Single">@lang('app.single')</option>
+                                        <option value="Couple Visa">@lang('app.coupleVisa')</option>
+                                        <option value="Couple + Children Visa">@lang('app.coupleChildrenVisa')</option>
+                                        <option value="Family Visa">@lang('app.familyVisa')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_preferred_country" fieldLabel="Preferred Country">
+                                    <x-forms.label class="mt-3" fieldId="visit_preferred_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="visit_preferred_country" id="visit_preferred_country">
                                         <option value="">@lang('app.select')</option>
@@ -428,7 +428,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_preferred_state" fieldLabel="Preferred State">
+                                    <x-forms.label class="mt-3" fieldId="visit_preferred_state" :fieldLabel="__('app.preferredState')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="visit_preferred_state" id="visit_preferred_state">
                                         <option value="">@lang('app.select')</option>
@@ -437,7 +437,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_subclass" fieldLabel="Subclass">
+                                    <x-forms.label class="mt-3" fieldId="visit_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="visit_subclass" id="visit_subclass">
                                         <option value="">@lang('app.select')</option>
@@ -451,31 +451,31 @@
                         <div id="workSection" class="form-section d-none">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="preferred_designation" fieldLabel="Preferred Designation" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="preferred_designation" :fieldLabel="__('app.preferredDesignation')" fieldRequired="true">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="preferred_designation" id="preferred_designation" placeholder="Enter designation">
+                                    <input type="text" class="form-control height-35 f-14" name="preferred_designation" id="preferred_designation" placeholder="@lang('app.enterDesignation')">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="industry" fieldLabel="Industry">
+                                    <x-forms.label class="mt-3" fieldId="industry" :fieldLabel="__('app.industry')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="industry" id="industry">
-                                        <option value="List given in document" selected>List given in document</option>
+                                        <option value="List given in document" selected>@lang('app.listGivenInDocument')</option>
                                         <option value="IT">IT</option>
                                         <option value="Finance">Finance</option>
                                         <option value="Healthcare">Healthcare</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="on_role_off_role" fieldLabel="On Role / Off Role">
+                                    <x-forms.label class="mt-3" fieldId="on_role_off_role" :fieldLabel="__('app.onRoleOffRole')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="on_role_off_role" id="on_role_off_role">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="On Role">On Role</option>
-                                        <option value="Off Role">Off Role</option>
+                                        <option value="On Role">@lang('app.onRole')</option>
+                                        <option value="Off Role">@lang('app.offRole')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="work_preferred_country" fieldLabel="Preferred Country">
+                                    <x-forms.label class="mt-3" fieldId="work_preferred_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="work_preferred_country" id="work_preferred_country">
                                         <option value="">@lang('app.select')</option>
@@ -484,17 +484,17 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="work_category" fieldLabel="Work Category">
+                                    <x-forms.label class="mt-3" fieldId="work_category" :fieldLabel="__('app.workCategory')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="work_category" id="work_category">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Skilled">Skilled</option>
-                                        <option value="Semi-Skilled">Semi-Skilled</option>
-                                        <option value="Unskilled">Unskilled</option>
+                                        <option value="Skilled">@lang('app.skilled')</option>
+                                        <option value="Semi-Skilled">@lang('app.semiSkilled')</option>
+                                        <option value="Unskilled">@lang('app.unskilled')</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="work_subclass" fieldLabel="Subclass">
+                                    <x-forms.label class="mt-3" fieldId="work_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="work_subclass" id="work_subclass">
                                         <option value="">@lang('app.select')</option>
@@ -509,12 +509,12 @@
                         <div id="studentSection" class="form-section d-none">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="preferred_course" fieldLabel="Preferred Course">
+                                    <x-forms.label class="mt-3" fieldId="preferred_course" :fieldLabel="__('app.preferredCourse')">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" name="preferred_course" id="preferred_course">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="student_country" fieldLabel="Country">
+                                    <x-forms.label class="mt-3" fieldId="student_country" :fieldLabel="__('app.country')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="student_country" id="student_country">
                                         <option value="">@lang('app.select')</option>
@@ -524,17 +524,17 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="university" fieldLabel="University">
+                                    <x-forms.label class="mt-3" fieldId="university" :fieldLabel="__('app.university')">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" name="university" id="university">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="term_intake" fieldLabel="Term/ Intake" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="term_intake" :fieldLabel="__('app.termIntake')" fieldRequired="true">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" name="term_intake" id="term_intake">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="student_subclass" fieldLabel="Subclass">
+                                    <x-forms.label class="mt-3" fieldId="student_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
                                     <select class="form-control select-picker" name="student_subclass" id="student_subclass">
                                         <option value="">@lang('app.select')</option>
@@ -640,7 +640,7 @@
                             </div>
                             <div class="col-md-3 mt-3">
                                 <button type="button" class="btn btn-secondary btn-sm" id="add-more-relative">
-                                    <i class="fa fa-plus mr-1"></i>Add More
+                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMore')
                                 </button>
                             </div>
                         </div>
@@ -648,7 +648,7 @@
                     <!-- Family Information Tab -->
                     <div class="tab-pane fade" id="nav-family" role="tabpanel" aria-labelledby="nav-family-tab">
                         <!-- Father Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Father Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.fatherDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="father_surname" fieldLabel="Father's Surname" fieldRequired="true">
@@ -689,7 +689,7 @@
                         <hr class="my-4">
 
                         <!-- Mother Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Mother Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.motherDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mother_surname" fieldLabel="Mother's Surname" fieldRequired="true">
@@ -730,7 +730,7 @@
                         <hr class="my-4">
 
                         <!-- Spouse Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Spouse Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.spouseDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_surname" fieldLabel="Spouse's Surname">
@@ -821,7 +821,7 @@
                         <hr class="my-4">
 
                         <!-- Child Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Child 1</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.child') 1</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="child_name" fieldLabel="Child's Name">
@@ -869,7 +869,7 @@
                             </div>
                             <div class="col-md-3 mt-3">
                                 <button type="button" class="btn btn-secondary btn-sm" id="add-more-child">
-                                    <i class="fa fa-plus mr-1"></i>Add More Child
+                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMoreChild')
                                 </button>
                             </div>
                         </div>
@@ -877,7 +877,7 @@
                     <!-- Education Tab -->
                     <div class="tab-pane fade" id="nav-education" role="tabpanel" aria-labelledby="nav-education-tab">
                         <!-- IELTS/PTC/OET/TOEFL Exam Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">IELTS/PTC/OET/TOEFL Exam Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.ieltsPtcOetToeflExamDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="ielts_clear_or_not" fieldLabel="IELTS/PTC/OET/TOEFL is Clear or Not">
@@ -913,7 +913,7 @@
                         <hr class="my-4">
 
                         <!-- 10th Exam Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">10th Exam Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.tenthExamDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_passing_year" fieldLabel="10th Passing Year" fieldRequired="true">
@@ -945,7 +945,7 @@
                         <hr class="my-4">
 
                         <!-- 12th Exam Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">12th Exam Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.twelfthExamDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_passing_year" fieldLabel="12th Passing Year">
@@ -988,7 +988,7 @@
                         <hr class="my-4">
 
                         <!-- Graduation Degree Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Graduation Degree Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.graduationDegreeDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_degree" fieldLabel="Graduation Degree">
@@ -1033,7 +1033,7 @@
                         <hr class="my-4">
 
                         <!-- Post Graduation Degree Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Post Graduation Degree Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.postGraduationDegreeDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_degree" fieldLabel="Post Graduation Degree">
@@ -1078,7 +1078,7 @@
                         <hr class="my-4">
 
                         <!-- Other Degree Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Other Degree Details</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.otherDegreeDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_degree" fieldLabel="Other Degree">
@@ -1112,7 +1112,7 @@
                             </div>
                             <div class="col-md-3 mt-3">
                                 <button type="button" class="btn btn-secondary btn-sm" id="add-more-education">
-                                    <i class="fa fa-plus mr-1"></i>Add More
+                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMore')
                                 </button>
                             </div>
                         </div>
@@ -1120,7 +1120,7 @@
                     <!-- Professional Experience Tab -->
                     <div class="tab-pane fade" id="nav-experience" role="tabpanel" aria-labelledby="nav-experience-tab">
                         <!-- Job 1 Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Job 1</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.job') 1</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_duration_from" fieldLabel="Duration - From">
@@ -1164,14 +1164,14 @@
                             </div>
                             <div class="col-md-3 mt-3">
                                 <button type="button" class="btn btn-secondary btn-sm" id="add-more-job">
-                                    <i class="fa fa-plus mr-1"></i>Add More Job
+                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMoreJob')
                                 </button>
                             </div>
                         </div>
                     </div>
                     <!-- Property Details Tab -->
                     <div class="tab-pane fade" id="nav-property" role="tabpanel" aria-labelledby="nav-property-tab">
-                        <p class="small-text mt-2 mb-3">Enter valuation for each property type. Total valuation will be calculated automatically.</p>
+                        <p class="small-text mt-2 mb-3">@lang('app.enterValuationForEachProperty')</p>
                         
                         <!-- Property Valuation Inputs -->
                         <div class="row">
@@ -1218,14 +1218,14 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_valuation" fieldLabel="Total Valuation">
                                 </x-forms.label>
-                                <input type="number" id="total_valuation" class="form-control height-35 f-14" readonly placeholder="Auto calculated" name="total_valuation">
+                                <input type="number" id="total_valuation" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_valuation">
                             </div>
                         </div>
 
                         <hr class="my-4">
 
                         <!-- Loan Info Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">Loan Information</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.loanInformation')</h6>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_loan_value" fieldLabel="Total Loan Value">
@@ -1251,7 +1251,7 @@
                     </div>
                     <!-- Financial Status Tab -->
                     <div class="tab-pane fade" id="nav-financial" role="tabpanel" aria-labelledby="nav-financial-tab">
-                        <p class="small-text mt-2 mb-3">Enter Income for each users. Total income will be calculated automatically.</p>
+                        <p class="small-text mt-2 mb-3">@lang('app.enterIncomeForEachUsers')</p>
                         
                         <!-- Income Inputs -->
                         <div class="row">
@@ -1298,7 +1298,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_income" fieldLabel="Total Income">
                                 </x-forms.label>
-                                <input type="number" id="total_income" class="form-control height-35 f-14" readonly placeholder="Auto calculated" name="total_income">
+                                <input type="number" id="total_income" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_income">
                             </div>
                         </div>
                     </div>
@@ -1318,7 +1318,7 @@
                     </div>
                     <div class="col-12 col-md-auto d-flex flex-column flex-md-row gap-2 justify-content-md-end">
                         <x-forms.button-primary id="save-lead-form" icon="check">
-                            @lang('app.save') @lang('app.and') @lang('app.next')
+                            @lang('app.saveAndNext')
                         </x-forms.button-primary>
                         <x-forms.button-cancel :link="route('lead-list.index')" class="border-0">
                             @lang('app.cancel')
