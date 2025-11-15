@@ -21,6 +21,9 @@ use App\Models\LeadCustomForm;
 use App\Models\LeadPipeline;
 use App\Models\LeadProduct;
 use App\Models\LeadSource;
+use App\Models\LeadStepLog;
+use App\Models\LeadStepStatus;
+use App\Models\NewLead;
 use App\Models\PipelineStage;
 use App\Models\LeadStatus;
 use App\Models\Product;
@@ -118,6 +121,27 @@ class LeadContactController extends AccountBaseController
         $this->leadStages = PipelineStage::all();
         $this->leadAgentArray = $this->leadAgents->pluck('user_id')->toArray();
         $this->products = Product::all();
+
+        // Check if editing existing new lead
+        $leadId = request('lead_id');
+        $this->newLead = null;
+        $this->newLeadStepStatus = null;
+        
+        if ($leadId) {
+            try {
+                $this->newLead = NewLead::with(['stepStatus', 'stepLogs'])->find($leadId);
+                if ($this->newLead) {
+                    $this->newLeadStepStatus = $this->newLead->stepStatus;
+                    if (!$this->newLeadStepStatus) {
+                        $this->newLeadStepStatus = LeadStepStatus::getOrCreateForLead($leadId);
+                    }
+                }
+            } catch (\Exception $e) {
+                // If there's an error loading the lead, just continue without it
+                $this->newLead = null;
+                $this->newLeadStepStatus = null;
+            }
+        }
 
         return view('add-lead.index', $this->data);
     }
@@ -600,6 +624,617 @@ class LeadContactController extends AccountBaseController
                 $leadProduct->save();
             }
         }
+        }
+
+    /**
+     * Validate step data based on step number
+     */
+    private function validateStepData(Request $request, $stepNumber)
+    {
+        $rules = [];
+        $messages = [];
+
+        switch ($stepNumber) {
+            case 1:
+                // Step 1 - Personal Details
+                $rules = [
+                    'surname' => 'required|string|max:255',
+                    'given_name' => 'required|string|max:255',
+                    'gender' => 'required|string|in:Male,Female,Other',
+                    'marital_status' => 'required|string',
+                    'date_of_birth' => 'required|date',
+                    'country_of_origin' => 'required|string|max:255',
+                    'lead_source' => 'required|string',
+                    'lead_assign_to' => 'required|integer|exists:users,id',
+                    'home_address' => 'required|string|max:500',
+                    'home_city' => 'required|string|max:255',
+                    'home_state' => 'required|string|max:255',
+                    'home_pin_code' => 'required|string|max:20',
+                    'primary_phone' => 'required|string|regex:/^[0-9]{10}$/',
+                    'email_address' => 'required|email|max:255',
+                ];
+                
+                // Mailing address is required only if "same as home" is not checked
+                if (!$request->mailing_same_as_home) {
+                    $rules['mailing_address'] = 'required|string|max:500';
+                    $rules['mailing_city'] = 'required|string|max:255';
+                    $rules['mailing_state'] = 'required|string|max:255';
+                    $rules['mailing_pin_code'] = 'required|string|max:20';
+                }
+                
+                // Optional phone fields validation
+                if ($request->has('secondary_phone') && $request->secondary_phone) {
+                    $rules['secondary_phone'] = 'nullable|string|regex:/^[0-9]{10}$/';
+                }
+                if ($request->has('work_phone') && $request->work_phone) {
+                    $rules['work_phone'] = 'nullable|string|regex:/^[0-9]{10}$/';
+                }
+                if ($request->has('mobile') && $request->mobile) {
+                    $rules['mobile'] = 'nullable|string|regex:/^[0-9]{10}$/';
+                }
+                
+                // Optional email validation
+                if ($request->has('other_email') && $request->other_email) {
+                    $rules['other_email'] = 'nullable|email|max:255';
+                }
+                
+                $messages = [
+                    'surname.required' => __('validation.required', ['attribute' => __('app.surname')]),
+                    'given_name.required' => __('validation.required', ['attribute' => __('app.givenName')]),
+                    'gender.required' => __('validation.required', ['attribute' => __('app.gender')]),
+                    'marital_status.required' => __('validation.required', ['attribute' => __('app.maritalStatus')]),
+                    'date_of_birth.required' => __('validation.required', ['attribute' => __('app.dateOfBirth')]),
+                    'country_of_origin.required' => __('validation.required', ['attribute' => __('app.countryOfOrigin')]),
+                    'lead_source.required' => __('validation.required', ['attribute' => __('modules.lead.leadSource')]),
+                    'lead_assign_to.required' => __('validation.required', ['attribute' => __('app.leadAssignTo')]),
+                    'home_address.required' => __('validation.required', ['attribute' => __('modules.lead.address')]),
+                    'home_city.required' => __('validation.required', ['attribute' => __('app.city')]),
+                    'home_state.required' => __('validation.required', ['attribute' => __('app.state')]),
+                    'home_pin_code.required' => __('validation.required', ['attribute' => __('app.pinCode')]),
+                    'mailing_address.required' => __('validation.required', ['attribute' => __('modules.lead.address')]),
+                    'mailing_city.required' => __('validation.required', ['attribute' => __('app.city')]),
+                    'mailing_state.required' => __('validation.required', ['attribute' => __('app.state')]),
+                    'mailing_pin_code.required' => __('validation.required', ['attribute' => __('app.pinCode')]),
+                    'primary_phone.required' => __('validation.required', ['attribute' => __('app.primaryPhoneNo')]),
+                    'primary_phone.regex' => __('validation.regex', ['attribute' => __('app.primaryPhoneNo')]),
+                    'email_address.required' => __('validation.required', ['attribute' => __('modules.lead.email')]),
+                    'email_address.email' => __('validation.email', ['attribute' => __('modules.lead.email')]),
+                ];
+                break;
+
+            case 2:
+                // Step 2 - Client Preference
+                $rules = [
+                    'visa_type' => 'required|string|in:pr,visit,work,student,PR,Visit,Work,Student',
+                ];
+                
+                // Normalize visa_type to handle both lowercase and uppercase
+                $visaType = strtolower($request->visa_type);
+                
+                // PR Visa specific fields (only fields with *)
+                if ($visaType === 'pr') {
+                    $rules['skill_assessment_letter'] = 'required|string';
+                    // pr_assessment_letter_file is required if not already uploaded
+                    if (!$request->hasFile('pr_assessment_letter_file') && !$request->pr_assessment_letter_file_existing) {
+                        $rules['pr_assessment_letter_file'] = 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
+                    } else {
+                        $rules['pr_assessment_letter_file'] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
+                    }
+                    $rules['pr_family'] = 'required|string';
+                }
+                
+                // Visit Visa specific fields (only fields with *)
+                if ($visaType === 'visit') {
+                    $rules['purpose_of_visit'] = 'required|string|max:500';
+                    $rules['visit_family'] = 'required|string';
+                }
+                
+                // Work Visa specific fields (only fields with *)
+                if ($visaType === 'work') {
+                    $rules['preferred_designation'] = 'required|string|max:255';
+                }
+                
+                // Student Visa specific fields (only fields with *)
+                if ($visaType === 'student') {
+                    $rules['term_intake'] = 'required|string';
+                }
+                
+                $messages = [
+                    'visa_type.required' => __('validation.required', ['attribute' => __('app.selectVisaType')]),
+                ];
+                break;
+
+            case 3:
+                // Step 3 - Passport Details
+                $rules = [
+                    'issuing_country' => 'required|string|max:255',
+                    'city_where_issued' => 'required|string|max:255',
+                    'issuance_date' => 'required|date',
+                    'expiration_date' => 'required|date|after:issuance_date',
+                ];
+                
+                // Passport file is required if not already uploaded
+                if (!$request->hasFile('passport_file_upload') && !$request->passport_file_upload_existing) {
+                    $rules['passport_file_upload'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:10240';
+                } else {
+                    $rules['passport_file_upload'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240';
+                }
+                break;
+
+            case 4:
+                // Step 4 - Relative Contact Information
+                // No required fields - all fields are optional
+                break;
+
+            case 5:
+                // Step 5 - Family Information (same fields as Step 4, but may have additional spouse/child fields)
+                // For now, validate the same required fields as Step 4
+                $rules = [
+                    'father_surname' => 'required|string|max:255',
+                    'father_given_name' => 'required|string|max:255',
+                    'father_date_of_birth' => 'required|date',
+                    'father_occupation' => 'required|string|max:255',
+                    'father_have_passport' => 'required|string|in:Yes,No',
+                    'mother_surname' => 'required|string|max:255',
+                    'mother_given_name' => 'required|string|max:255',
+                    'mother_date_of_birth' => 'required|date',
+                    'mother_occupation' => 'required|string|max:255',
+                    'mother_have_passport' => 'required|string|in:Yes,No',
+                ];
+                
+                // Mother passport file is required if mother has passport
+                if ($request->mother_have_passport === 'Yes') {
+                    if (!$request->hasFile('mother_passport_file') && !$request->mother_passport_file_existing) {
+                        $rules['mother_passport_file'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:10240';
+                    } else {
+                        $rules['mother_passport_file'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240';
+                    }
+                }
+                break;
+
+            case 6:
+                // Step 6 - Education
+                $rules = [
+                    'tenth_passing_year' => 'required|integer|min:1950|max:' . date('Y'),
+                    'tenth_percentage' => 'required|numeric|min:0|max:100',
+                    'tenth_board_name' => 'required|string|max:255',
+                    'tenth_trial' => 'required|string|max:255',
+                ];
+                break;
+
+            case 7:
+                // Step 7 - Professional Experience
+                // No required fields based on form structure - all fields are optional
+                break;
+
+            case 8:
+                // Step 8 - Property Details
+                $rules = [
+                    'property_home' => 'required|numeric|min:0',
+                    'property_land' => 'required|numeric|min:0',
+                    'property_plot' => 'required|numeric|min:0',
+                    'property_commercials' => 'required|numeric|min:0',
+                    'property_other' => 'required|numeric|min:0',
+                    'property_shop' => 'required|numeric|min:0',
+                    'property_gold' => 'required|numeric|min:0',
+                    'property_silver' => 'required|numeric|min:0',
+                ];
+                break;
+
+            case 9:
+                // Step 9 - Financial Status
+                // No required fields based on form structure - all income fields are optional
+                // But validate file uploads if provided
+                if ($request->hasFile('father_income_document_file')) {
+                    $rules['father_income_document_file'] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
+                }
+                if ($request->hasFile('mother_income_document_file')) {
+                    $rules['mother_income_document_file'] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
+                }
+                if ($request->hasFile('candidate_income_document_file')) {
+                    $rules['candidate_income_document_file'] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
+                }
+                if ($request->hasFile('spouse_income_document_file')) {
+                    $rules['spouse_income_document_file'] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
+                }
+                break;
+        }
+
+        // Validate phone numbers if provided (only if not already in rules)
+        $phoneFields = ['secondary_phone', 'work_phone', 'mobile'];
+        foreach ($phoneFields as $field) {
+            if ($request->has($field) && $request->$field && !isset($rules[$field])) {
+                $rules[$field] = 'nullable|string|regex:/^[0-9]{10}$/';
+            }
+        }
+
+        // Validate email addresses if provided (only if not already in rules)
+        $emailFields = ['other_email'];
+        foreach ($emailFields as $field) {
+            if ($request->has($field) && $request->$field && !isset($rules[$field])) {
+                $rules[$field] = 'nullable|email|max:255';
+            }
+        }
+
+        if (empty($rules)) {
+            return true; // No validation needed for this step
+        }
+
+        $validator = \Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return Reply::error($validator->errors()->first());
+        }
+
+        return true;
+    }
+
+    /**
+     * Save step data for a lead
+     */
+    public function saveStep(Request $request, $stepNumber)
+    {
+        $this->addPermission = user()->permission('add_lead');
+        abort_403(!in_array($this->addPermission, ['all', 'added']));
+
+        if ($stepNumber < 1 || $stepNumber > 9) {
+            return Reply::error(__('app.invalidStepNumber'));
+        }
+
+        // Validate step data
+        $validationResult = $this->validateStepData($request, $stepNumber);
+        if ($validationResult !== true) {
+            return $validationResult;
+        }
+
+        $leadId = $request->lead_id;
+
+        // Create or get new lead
+        if ($leadId) {
+            $lead = NewLead::findOrFail($leadId);
+        } else {
+            // Create new lead
+            $lead = new NewLead();
+            $lead->company_id = company()->id;
+            $lead->client_name = ($request->surname ?? '') . ' ' . ($request->given_name ?? '');
+            $lead->client_email = $request->email_address ?? $request->email ?? null;
+            $lead->mobile = $request->mobile ?? $request->primary_phone ?? null;
+            $lead->added_by = user()->id;
+            $lead->hash = md5(microtime());
+            $lead->save();
+            $leadId = $lead->id;
+        }
+
+        // Get or create step status
+        $stepStatus = LeadStepStatus::getOrCreateForLead($leadId);
+
+        // Check if previous step is completed (except for step 1)
+        if ($stepNumber > 1) {
+            $previousStepField = 'step_' . ($stepNumber - 1) . '_completed';
+            if (!$stepStatus->$previousStepField) {
+                return Reply::error(__('app.pleaseCompletePreviousStepsFirst'));
+            }
+        }
+
+        // Save step data based on step number
+        if ($stepNumber === 1) {
+            $this->saveStep1Data($lead, $request);
+        } elseif ($stepNumber === 2) {
+            $this->saveStep2Data($lead, $request);
+        } else {
+            // Steps 3-9: Save to lead_candidate_details if exists, or create JSON structure
+            $this->saveStepData($lead, $request, $stepNumber);
+        }
+
+        // Mark step as completed
+        $stepField = 'step_' . $stepNumber . '_completed';
+        $stepStatus->$stepField = true;
+        $stepStatus->save();
+
+        // Update final status
+        $stepStatus->updateFinalStatus();
+
+        // Log step completion
+        $this->logStepCompletion($leadId, $stepNumber);
+
+        return Reply::successWithData(__('messages.recordSaved'), [
+            'lead_id' => $leadId,
+            'step_' . $stepNumber . '_completed' => true,
+            'final_status' => $stepStatus->final_status,
+        ]);
+    }
+
+    /**
+     * Save Step 1 - Personal Details
+     */
+    private function saveStep1Data(NewLead $lead, Request $request)
+    {
+        // Update lead basic info
+        $lead->client_name = ($request->surname ?? '') . ' ' . ($request->given_name ?? '');
+        $lead->client_email = $request->email_address ?? $request->email;
+        $lead->mobile = $request->mobile;
+        $lead->lead_owner = $request->lead_assign_to ?? user()->id;
+        $lead->lead_source = $request->lead_source;
+        $lead->last_updated_by = user()->id;
+        $lead->save();
+
+        // Handle mailing address same as home address
+        if ($request->mailing_same_as_home) {
+            $request->merge([
+                'mailing_address' => $request->home_address,
+                'mailing_city' => $request->home_city,
+                'mailing_state' => $request->home_state,
+                'mailing_country' => $request->home_country,
+                'mailing_pin_code' => $request->home_pin_code,
+            ]);
+        }
+
+        // Store step 1 data in lead_candidate_details table if it exists
+        // Otherwise, we can store in a JSON field or create the table
+        // For now, we'll store in the lead's note field as JSON (temporary solution)
+        
+        // Parse visa_refusals if it's a JSON string
+        $visaRefusals = [];
+        if ($request->has('visa_refusals') && $request->visa_refusals) {
+            if (is_string($request->visa_refusals)) {
+                $visaRefusals = json_decode($request->visa_refusals, true) ?? [];
+            } else {
+                $visaRefusals = $request->visa_refusals;
+            }
+        }
+        
+        $step1Data = [
+            'surname' => $request->surname,
+            'given_name' => $request->given_name,
+            'gender' => $request->gender,
+            'date_of_birth' => $request->date_of_birth,
+            'marital_status' => $request->marital_status,
+            'country_of_origin' => $request->country_of_origin,
+            'email' => $request->email_address ?? $request->email,
+            'email_address' => $request->email_address ?? $request->email,
+            'mobile' => $request->mobile,
+            'alternate_mobile' => $request->alternate_mobile,
+            'primary_phone' => $request->primary_phone,
+            'secondary_phone' => $request->secondary_phone,
+            'work_phone' => $request->work_phone,
+            'lead_assign_to' => $request->lead_assign_to,
+            'home_address' => $request->home_address,
+            'home_city' => $request->home_city,
+            'home_state' => $request->home_state,
+            'home_country' => $request->home_country,
+            'home_pin_code' => $request->home_pin_code,
+            'mailing_address' => $request->mailing_address,
+            'mailing_city' => $request->mailing_city,
+            'mailing_state' => $request->mailing_state,
+            'mailing_country' => $request->mailing_country,
+            'mailing_pin_code' => $request->mailing_pin_code,
+            'mailing_same_as_home' => $request->mailing_same_as_home ?? false,
+            'visa_status' => $request->visa_status,
+            'visa_refusals' => $visaRefusals,
+        ];
+
+        // Store step 1 data in separate column
+        $lead->step_1_data = $step1Data;
+        $lead->save();
+    }
+
+    /**
+     * Save Step 2 - Client Preference
+     */
+    private function saveStep2Data(NewLead $lead, Request $request)
+    {
+        // Handle PR Assessment Letter file upload
+        $prAssessmentLetterFile = null;
+        if ($request->hasFile('pr_assessment_letter_file')) {
+            // Delete old file if exists
+            if (isset($lead->step_2_data['pr_assessment_letter_file'])) {
+                $oldFileName = $lead->step_2_data['pr_assessment_letter_file'];
+                \App\Helper\Files::deleteFile($oldFileName, 'lead-assessment-letters/' . $lead->id);
+            }
+            // Upload new file
+            $prAssessmentLetterFile = \App\Helper\Files::uploadLocalOrS3(
+                $request->pr_assessment_letter_file,
+                'lead-assessment-letters/' . $lead->id
+            );
+        } elseif ($request->has('pr_assessment_letter_file_existing')) {
+            // Keep existing file if no new file is uploaded and existing file is specified
+            $prAssessmentLetterFile = $request->pr_assessment_letter_file_existing;
+        } elseif (isset($lead->step_2_data['pr_assessment_letter_file'])) {
+            // If existing file input is not present, it means user removed it, so delete file
+            $oldFileName = $lead->step_2_data['pr_assessment_letter_file'];
+            \App\Helper\Files::deleteFile($oldFileName, 'lead-assessment-letters/' . $lead->id);
+            $prAssessmentLetterFile = null;
+        }
+
+        $step2Data = [
+            'visa_type' => $request->visa_type,
+            // PR Section
+            'skill_assessment_letter' => $request->skill_assessment_letter,
+            'pr_assessment_letter_file' => $prAssessmentLetterFile,
+            'pr_preferred_country' => $request->pr_preferred_country,
+            'pr_preferred_state' => $request->pr_preferred_state,
+            'pr_family' => $request->pr_family,
+            'pr_subclass' => $request->pr_subclass,
+            // Visit Section
+            'purpose_of_visit' => $request->purpose_of_visit,
+            'visit_family' => $request->visit_family,
+            'visit_preferred_country' => $request->visit_preferred_country,
+            'visit_preferred_state' => $request->visit_preferred_state,
+            'visit_subclass' => $request->visit_subclass,
+            // Work Section
+            'preferred_designation' => $request->preferred_designation,
+            'industry' => $request->industry,
+            'on_role_off_role' => $request->on_role_off_role,
+            'work_preferred_country' => $request->work_preferred_country,
+            'work_preferred_state' => $request->work_preferred_state,
+            'work_category' => $request->work_category,
+            'work_subclass' => $request->work_subclass,
+            // Student Section
+            'preferred_course' => $request->preferred_course,
+            'student_country' => $request->student_country,
+            'university' => $request->university,
+            'student_subclass' => $request->student_subclass,
+        ];
+
+        // Store step 2 data in separate column
+        $lead->step_2_data = $step2Data;
+        $lead->save();
+    }
+
+    /**
+     * Save Steps 3-9 data
+     */
+    private function saveStepData(NewLead $lead, Request $request, $stepNumber)
+    {
+        $stepData = $request->except(['lead_id', '_token']);
+        
+        // Handle file uploads for step 9 (Financial Status)
+        if ($stepNumber === 9) {
+            // Handle income document file uploads
+            $fileFields = [
+                'father_income_document_file',
+                'mother_income_document_file',
+                'candidate_income_document_file',
+                'spouse_income_document_file',
+            ];
+            
+            foreach ($fileFields as $fileField) {
+                if ($request->hasFile($fileField)) {
+                    // Delete old file if exists
+                    if (isset($lead->step_9_data[$fileField])) {
+                        $oldFileName = $lead->step_9_data[$fileField];
+                        \App\Helper\Files::deleteFile($oldFileName, 'lead-income-documents/' . $lead->id);
+                    }
+                    // Upload new file
+                    $fileName = \App\Helper\Files::uploadLocalOrS3(
+                        $request->$fileField,
+                        'lead-income-documents/' . $lead->id
+                    );
+                    $stepData[$fileField] = $fileName;
+                } elseif ($request->has($fileField . '_existing')) {
+                    // Keep existing file if no new file is uploaded
+                    $stepData[$fileField] = $request->input($fileField . '_existing');
+                } elseif (isset($lead->step_9_data[$fileField])) {
+                    // If existing file input is not present, it means user removed it, so delete file
+                    $oldFileName = $lead->step_9_data[$fileField];
+                    \App\Helper\Files::deleteFile($oldFileName, 'lead-income-documents/' . $lead->id);
+                    $stepData[$fileField] = null;
+                }
+            }
+        }
+        
+        // Store step data in separate column based on step number
+        $stepField = 'step_' . $stepNumber . '_data';
+        $lead->$stepField = $stepData;
+        $lead->save();
+    }
+
+    /**
+     * Log step completion
+     */
+    private function logStepCompletion($leadId, $stepNumber)
+    {
+        // Check if log already exists for this step
+        $existingLog = LeadStepLog::where('lead_id', $leadId)
+            ->where('step_number', $stepNumber)
+            ->first();
+
+        if ($existingLog) {
+            $existingLog->status = 'completed';
+            $existingLog->completed_at = now();
+            $existingLog->completed_by = user()->id;
+            $existingLog->save();
+        } else {
+            LeadStepLog::create([
+                'lead_id' => $leadId,
+                'step_number' => $stepNumber,
+                'status' => 'completed',
+                'completed_at' => now(),
+                'completed_by' => user()->id,
+            ]);
+        }
+    }
+
+    /**
+     * Get lead step status
+     */
+    public function getLeadStepStatus($id)
+    {
+        try {
+            $lead = NewLead::with(['stepStatus', 'stepLogs'])->find($id);
+            
+            if (!$lead) {
+                return Reply::error(__('messages.recordNotFound'));
+            }
+            
+            $stepStatus = $lead->stepStatus;
+            
+            // If step status doesn't exist, create it
+            if (!$stepStatus) {
+                $stepStatus = LeadStepStatus::getOrCreateForLead($id);
+            }
+            
+            return Reply::dataOnly([
+                'lead_id' => $id,
+                'lead' => [
+                    'client_name' => $lead->client_name,
+                    'client_email' => $lead->client_email,
+                    'mobile' => $lead->mobile,
+                    'lead_source' => $lead->lead_source,
+                    'lead_owner' => $lead->lead_owner,
+                ],
+                'step_data' => [
+                    'step_1_data' => $lead->step_1_data ?? null,
+                    'step_2_data' => $lead->step_2_data ?? null,
+                    'step_3_data' => $lead->step_3_data ?? null,
+                    'step_4_data' => $lead->step_4_data ?? null,
+                    'step_5_data' => $lead->step_5_data ?? null,
+                    'step_6_data' => $lead->step_6_data ?? null,
+                    'step_7_data' => $lead->step_7_data ?? null,
+                    'step_8_data' => $lead->step_8_data ?? null,
+                    'step_9_data' => $lead->step_9_data ?? null,
+                ],
+                'step_status' => [
+                    'step_1_completed' => $stepStatus->step_1_completed ?? false,
+                    'step_2_completed' => $stepStatus->step_2_completed ?? false,
+                    'step_3_completed' => $stepStatus->step_3_completed ?? false,
+                    'step_4_completed' => $stepStatus->step_4_completed ?? false,
+                    'step_5_completed' => $stepStatus->step_5_completed ?? false,
+                    'step_6_completed' => $stepStatus->step_6_completed ?? false,
+                    'step_7_completed' => $stepStatus->step_7_completed ?? false,
+                    'step_8_completed' => $stepStatus->step_8_completed ?? false,
+                    'step_9_completed' => $stepStatus->step_9_completed ?? false,
+                    'final_status' => $stepStatus->final_status ?? 'draft',
+                ],
+                'step_logs' => $lead->stepLogs ?? [],
+            ]);
+        } catch (\Exception $e) {
+            return Reply::error($e->getMessage());
+        }
+    }
+
+    /**
+     * Download assessment letter file
+     */
+    public function downloadAssessmentLetter($leadId, $fileName)
+    {
+        $lead = NewLead::findOrFail($leadId);
+        
+        // Verify the file belongs to this lead
+        if (!isset($lead->step_2_data['pr_assessment_letter_file']) || 
+            $lead->step_2_data['pr_assessment_letter_file'] !== $fileName) {
+            abort(404);
+        }
+        
+        $filePath = 'lead-assessment-letters/' . $leadId . '/' . $fileName;
+        
+        // Use the download_local_s3 helper function
+        $file = (object) [
+            'filename' => $fileName,
+            'name' => $fileName,
+        ];
+        
+        return download_local_s3($file, $filePath);
     }
 
 }

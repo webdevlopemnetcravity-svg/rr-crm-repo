@@ -1608,4 +1608,11 @@ return [
   'postGradDegreeMArch' => 'Master of Architecture (M.Arch)',
   'postGradDegreeMDMS' => 'Doctor of Medicine (M.D.) / Master of Surgery (M.S.)',
   'postGradDegreeOther' => 'Andere',
+  
+  // Step-by-step lead form
+  'invalidStepNumber' => 'Ungültige Schrittnummer',
+  'pleaseCompletePreviousStepsFirst' => 'Bitte vervollständigen Sie zuerst die vorherigen Schritte',
+  'pleaseCompletePreviousSteps' => 'Bitte vervollständigen Sie zuerst die vorherigen Schritte',
+  'saving' => 'Speichern',
+  'allStepsCompleted' => 'Alle Schritte erfolgreich abgeschlossen!',
 ];

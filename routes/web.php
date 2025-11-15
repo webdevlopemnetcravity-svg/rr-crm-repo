@@ -538,7 +538,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('lead-contact/apply-quick-action', [LeadContactController::class, 'applyQuickAction'])->name('lead-contact.apply_quick_action');
     Route::get('lead-list', [LeadContactController::class, 'leadList'])->name('lead-list.index');
     Route::get('add-lead', [LeadContactController::class, 'addLead'])->name('add-lead.index');
+    Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
     Route::get('lead-details', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
+    
+    // Step-by-step lead saving routes
+    Route::post('add-lead/save-step/{stepNumber}', [LeadContactController::class, 'saveStep'])->name('add-lead.save-step');
+    Route::get('add-lead/step-status/{id}', [LeadContactController::class, 'getLeadStepStatus'])->name('add-lead.step-status');
 
     Route::get('deals/get-stage/{id}', [DealController::class, 'getStages'])->name('deals.get-stage');
     Route::get('deals/get-deals/{id}', [DealController::class, 'getDeals'])->name('deals.get-deals');

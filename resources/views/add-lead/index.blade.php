@@ -14,7 +14,7 @@
             <div class="s-b-n-header" id="tabs">
                 <nav class="tabs px-4 border-bottom-grey">
                     <div class="nav" id="nav-tab" role="tablist">
-                        <a class="nav-item-lead nav-link-lead f-14 active" id="nav-personal-tab" data-toggle="tab" href="#nav-preference" role="tab" aria-controls="nav-preference" aria-selected="false">
+                        <a class="nav-item-lead nav-link-lead f-14 active" id="nav-personal-tab" data-toggle="tab" href="#nav-personal" role="tab" aria-controls="nav-personal" aria-selected="true">
                             <div class="tab-item"><img src="{{ asset('img/icon/Personal_Details.svg') }}"></div>@lang('app.personalDetails')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-preference-tab" data-toggle="tab" href="#nav-preference" role="tab" aria-controls="nav-preference" aria-selected="false">
@@ -47,6 +47,7 @@
 
             <!-- Form Card -->
             <x-form id="addLeadForm" class="ajax-form">
+                <input type="hidden" name="lead_id" id="lead_id" value="{{ $newLead->id ?? '' }}">
                 <div class="tab-content p-20" id="nav-tabContent">
                     <!-- Personal Details Tab -->
                     <div class="tab-pane fade show active" id="nav-personal" role="tabpanel" aria-labelledby="nav-personal-tab">
@@ -354,6 +355,7 @@
                                     <x-forms.label class="mt-3" fieldId="pr_assessment_letter_file" :fieldLabel="__('app.addAssessmentLetter')" fieldRequired="true">
                                     </x-forms.label>
                                     <input class="form-control" type="file" id="pr_assessment_letter_file" name="pr_assessment_letter_file">
+                                    <small id="pr_assessment_letter_file_name" class="text-muted d-block mt-1" style="display: none;"></small>
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="pr_preferred_country" :fieldLabel="__('app.preferredCountry')">
@@ -1483,7 +1485,12 @@
 
             // Add more visa refusal functionality
             let visaRefusalCount = 0;
-            $('#add-more-visa-refusal').on('click', function() {
+            
+            // Use event delegation to handle dynamically added buttons
+            $(document).on('click', '#add-more-visa-refusal', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
                 visaRefusalCount++;
                 const newRow = `
                     <div class="row mt-3 visa-refusal-row" id="visa-refusal-row-${visaRefusalCount}">
@@ -1506,7 +1513,24 @@
                         </div>
                     </div>
                 `;
-                $(this).closest('.row').after(newRow);
+                
+                // Find the insertion point - the button is in a row, insert after that row
+                const $button = $(this);
+                const $buttonRow = $button.closest('.row');
+                
+                if ($buttonRow.length) {
+                    // Insert after the row containing the button
+                    $buttonRow.after(newRow);
+                } else {
+                    // Fallback: find the last visa-refusal-row or the button's parent container
+                    const $lastRefusalRow = $('.visa-refusal-row').last();
+                    if ($lastRefusalRow.length) {
+                        $lastRefusalRow.after(newRow);
+                    } else {
+                        // Insert after the button's parent div
+                        $button.parent().parent().after(newRow);
+                    }
+                }
             });
 
             // Remove visa refusal row
@@ -1521,14 +1545,8 @@
                 // This should be handled by the ajax-form class
             });
 
-            // Tab navigation - Previous button
-            $('#btn-previous').on('click', function() {
-                const activeTab = $('.nav-link-lead.active');
-                const prevTab = activeTab.parent().prev().find('.nav-link-lead');
-                if (prevTab.length) {
-                    prevTab.tab('show');
-                }
-            });
+            // Tab navigation - Previous button (old handler - will be replaced by the one below)
+            // This is kept for backward compatibility but the main handler is below
 
             // Handle visa type radio buttons for Client Preference tab
             $('input[name="visa_type"]').on('change', function() {
@@ -1550,6 +1568,18 @@
                 
                 // Reinitialize select picker for the visible section
                 $('.select-picker').selectpicker('refresh');
+            });
+            
+            // Handle PR Assessment Letter file input change
+            $('#pr_assessment_letter_file').on('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    $('#pr_assessment_letter_file_name').text(file.name).show();
+                    // Remove hidden input when new file is selected
+                    $('#pr_assessment_letter_file_hidden').remove();
+                } else {
+                    $('#pr_assessment_letter_file_name').hide();
+                }
             });
 
             // Add More Relative Contact functionality
@@ -1865,6 +1895,1335 @@
             
             // Initialize state filtering for Visit Visa section
             filterStatesByCountry('visit_preferred_country', 'visit_preferred_state');
+
+            // ==================== STEP-BY-STEP LEAD SAVING ====================
+            
+            // Get lead_id from URL parameter or hidden input
+            function getLeadIdFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get('lead_id');
+            }
+            
+            // Update URL with lead_id without page reload
+            function updateUrlWithLeadId(leadId) {
+                if (leadId) {
+                    const url = new URL(window.location);
+                    url.searchParams.set('lead_id', leadId);
+                    window.history.replaceState({}, '', url);
+                }
+            }
+            
+            let currentLeadId = $('#lead_id').val() || getLeadIdFromUrl() || null;
+            
+            // If lead_id is in URL but not in hidden input, update hidden input
+            if (currentLeadId && !$('#lead_id').val()) {
+                $('#lead_id').val(currentLeadId);
+            }
+            let currentStep = 1;
+            let stepStatus = {
+                step_1_completed: false,
+                step_2_completed: false,
+                step_3_completed: false,
+                step_4_completed: false,
+                step_5_completed: false,
+                step_6_completed: false,
+                step_7_completed: false,
+                step_8_completed: false,
+                step_9_completed: false,
+                final_status: 'draft'
+            };
+            
+            // Load existing lead data if lead_id exists
+            function loadExistingLeadData(leadId) {
+                if (!leadId || leadId === '' || leadId === 'null' || leadId === 'undefined') {
+                    return;
+                }
+                
+                $.ajax({
+                    url: '{{ route("add-lead.step-status", ":id") }}'.replace(':id', leadId),
+                    type: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        // Check if response has error (fail status)
+                        if (response.status === 'fail' || response.status === 'error') {
+                            console.error('Error loading lead:', response.message || 'Unknown error');
+                            return;
+                        }
+                        
+                        // Check if response has step_status
+                        if (response && response.step_status) {
+                            // Update step status
+                            stepStatus = {
+                                step_1_completed: response.step_status.step_1_completed || false,
+                                step_2_completed: response.step_status.step_2_completed || false,
+                                step_3_completed: response.step_status.step_3_completed || false,
+                                step_4_completed: response.step_status.step_4_completed || false,
+                                step_5_completed: response.step_status.step_5_completed || false,
+                                step_6_completed: response.step_status.step_6_completed || false,
+                                step_7_completed: response.step_status.step_7_completed || false,
+                                step_8_completed: response.step_status.step_8_completed || false,
+                                step_9_completed: response.step_status.step_9_completed || false,
+                                final_status: response.step_status.final_status || 'draft'
+                            };
+                            
+                            // Populate form fields with existing data
+                            if (response.step_data) {
+                                populateFormFields(response.step_data);
+                            }
+                            
+                            // Update UI
+                            updateTabNavigation();
+                            updateFooterButtons();
+                            
+                            // Navigate to the appropriate step
+                            navigateToAppropriateStep();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading lead status:', error);
+                        console.error('Response:', xhr.responseText);
+                        // Don't show error to user, just log it
+                    }
+                });
+            }
+            
+            // Populate form fields with existing step data
+            function populateFormFields(stepData) {
+                // Populate Step 1 data
+                if (stepData.step_1_data) {
+                    const data = stepData.step_1_data;
+                    $('#surname').val(data.surname || '');
+                    $('#given_name').val(data.given_name || '');
+                    $('#gender').val(data.gender || '').selectpicker('refresh');
+                    // Format date for HTML date input (YYYY-MM-DD)
+                    if (data.date_of_birth) {
+                        let dob = data.date_of_birth;
+                        // If date is in different format, convert it
+                        if (dob.includes('/')) {
+                            // Convert from DD/MM/YYYY or MM/DD/YYYY to YYYY-MM-DD
+                            const parts = dob.split('/');
+                            if (parts.length === 3) {
+                                // Assume DD/MM/YYYY format
+                                dob = parts[2] + '-' + parts[1] + '-' + parts[0];
+                            }
+                        } else if (dob.includes('-') && dob.split('-')[0].length === 2) {
+                            // Convert from DD-MM-YYYY to YYYY-MM-DD
+                            const parts = dob.split('-');
+                            dob = parts[2] + '-' + parts[1] + '-' + parts[0];
+                        }
+                        $('#date_of_birth').val(dob);
+                    } else {
+                        $('#date_of_birth').val('');
+                    }
+                    $('#marital_status').val(data.marital_status || '').selectpicker('refresh');
+                    $('#country_of_origin').val(data.country_of_origin || '');
+                    $('#email_address').val(data.email_address || data.email || '');
+                    $('#mobile').val(data.mobile || '');
+                    $('#alternate_mobile').val(data.alternate_mobile || '');
+                    $('#primary_phone').val(data.primary_phone || '');
+                    $('#secondary_phone').val(data.secondary_phone || '');
+                    $('#work_phone').val(data.work_phone || '');
+                    $('#lead_source').val(data.lead_source || '').selectpicker('refresh');
+                    $('#lead_assign_to').val(data.lead_assign_to || '').selectpicker('refresh');
+                    
+                    // Home address
+                    $('#home_address').val(data.home_address || '');
+                    $('#home_city').val(data.home_city || '');
+                    $('#home_state').val(data.home_state || '');
+                    $('#home_country').val(data.home_country || '').selectpicker('refresh');
+                    $('#home_pin_code').val(data.home_pin_code || '');
+                    
+                    // Mailing address
+                    $('#mailing_address').val(data.mailing_address || '');
+                    $('#mailing_city').val(data.mailing_city || '');
+                    $('#mailing_state').val(data.mailing_state || '');
+                    $('#mailing_country').val(data.mailing_country || '').selectpicker('refresh');
+                    $('#mailing_pin_code').val(data.mailing_pin_code || '');
+                    
+                    if (data.mailing_same_as_home) {
+                        $('#mailing_same_as_home').prop('checked', true).trigger('change');
+                    }
+                    
+                    // Visa status
+                    if (data.visa_status) {
+                        $('input[name="visa_status"][value="' + data.visa_status + '"]').prop('checked', true).trigger('change');
+                    }
+                    
+                    // Visa refusals
+                    if (data.visa_refusals) {
+                        // Handle if visa_refusals is a JSON string
+                        let visaRefusals = data.visa_refusals;
+                        if (typeof visaRefusals === 'string') {
+                            try {
+                                visaRefusals = JSON.parse(visaRefusals);
+                            } catch (e) {
+                                console.error('Error parsing visa_refusals:', e);
+                                visaRefusals = [];
+                            }
+                        }
+                        
+                        // Ensure it's an array
+                        if (Array.isArray(visaRefusals) && visaRefusals.length > 0) {
+                            visaRefusals.forEach(function(refusal, index) {
+                                if (index === 0) {
+                                    // Use existing fields
+                                    $('#visa_rejection_date').val(refusal.date || '');
+                                    $('#visa_refusal_category').val(refusal.category || '');
+                                    $('#visa_refusal_reason').val(refusal.reason || '');
+                                } else {
+                                    // Add more refusal rows
+                                    $('#add-more-visa-refusal').trigger('click');
+                                    const row = $('.visa-refusal-row').last();
+                                    row.find('input[name="visa_rejection_date[]"]').val(refusal.date || '');
+                                    row.find('input[name="visa_refusal_category[]"]').val(refusal.category || '');
+                                    row.find('textarea[name="visa_refusal_reason[]"]').val(refusal.reason || '');
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                // Populate Step 2 data
+                if (stepData.step_2_data) {
+                    const data = stepData.step_2_data;
+                    
+                    // Set visa type first to show the correct section
+                    if (data.visa_type) {
+                        $('input[name="visa_type"][value="' + data.visa_type + '"]').prop('checked', true).trigger('change');
+                        
+                        // Wait a bit for the section to show, then populate fields
+                        setTimeout(function() {
+                            // PR Section fields
+                            if (data.skill_assessment_letter) {
+                                $('#skill_assessment_letter').val(data.skill_assessment_letter).selectpicker('refresh');
+                            }
+                            // Show uploaded assessment letter file name if exists
+                            if (data.pr_assessment_letter_file) {
+                                const fileName = data.pr_assessment_letter_file;
+                                $('#pr_assessment_letter_file_name').text(fileName).show();
+                                
+                                // Store the file name in a hidden input for reference
+                                if ($('#pr_assessment_letter_file_hidden').length === 0) {
+                                    $('<input>').attr({
+                                        type: 'hidden',
+                                        id: 'pr_assessment_letter_file_hidden',
+                                        name: 'pr_assessment_letter_file_existing',
+                                        value: fileName
+                                    }).insertAfter('#pr_assessment_letter_file');
+                                } else {
+                                    $('#pr_assessment_letter_file_hidden').val(fileName);
+                                }
+                            }
+                            if (data.pr_preferred_country) {
+                                $('#pr_preferred_country').val(data.pr_preferred_country).selectpicker('refresh');
+                                // Filter states based on country
+                                const selectedCountry = data.pr_preferred_country;
+                                $('#pr_preferred_state').find('option[value!=""]').each(function() {
+                                    const $option = $(this);
+                                    if ($option.data('country') === selectedCountry) {
+                                        $option.prop('disabled', false);
+                                    } else {
+                                        $option.prop('disabled', true);
+                                    }
+                                });
+                            }
+                            if (data.pr_preferred_state) {
+                                $('#pr_preferred_state').val(data.pr_preferred_state).selectpicker('refresh');
+                            }
+                            if (data.pr_family) {
+                                $('#pr_family').val(data.pr_family).selectpicker('refresh');
+                            }
+                            if (data.pr_subclass) {
+                                $('#pr_subclass').val(data.pr_subclass).selectpicker('refresh');
+                            }
+                            
+                            // Visit Section fields
+                            if (data.purpose_of_visit) {
+                                $('#purpose_of_visit').val(data.purpose_of_visit);
+                            }
+                            if (data.visit_family) {
+                                $('#visit_family').val(data.visit_family).selectpicker('refresh');
+                            }
+                            if (data.visit_preferred_country) {
+                                $('#visit_preferred_country').val(data.visit_preferred_country).selectpicker('refresh');
+                                // Filter states based on country
+                                const selectedCountry = data.visit_preferred_country;
+                                $('#visit_preferred_state').find('option[value!=""]').each(function() {
+                                    const $option = $(this);
+                                    if ($option.data('country') === selectedCountry) {
+                                        $option.prop('disabled', false);
+                                    } else {
+                                        $option.prop('disabled', true);
+                                    }
+                                });
+                            }
+                            if (data.visit_preferred_state) {
+                                $('#visit_preferred_state').val(data.visit_preferred_state).selectpicker('refresh');
+                            }
+                            if (data.visit_subclass) {
+                                $('#visit_subclass').val(data.visit_subclass).selectpicker('refresh');
+                            }
+                            
+                            // Work Section fields
+                            if (data.preferred_designation) {
+                                $('#preferred_designation').val(data.preferred_designation);
+                            }
+                            if (data.industry) {
+                                $('#industry').val(data.industry).selectpicker('refresh');
+                            }
+                            if (data.on_role_off_role) {
+                                $('#on_role_off_role').val(data.on_role_off_role).selectpicker('refresh');
+                            }
+                            if (data.work_preferred_country) {
+                                $('#work_preferred_country').val(data.work_preferred_country).selectpicker('refresh');
+                                // Filter states based on country
+                                const selectedCountry = data.work_preferred_country;
+                                $('#work_preferred_state').find('option[value!=""]').each(function() {
+                                    const $option = $(this);
+                                    if ($option.data('country') === selectedCountry) {
+                                        $option.prop('disabled', false);
+                                    } else {
+                                        $option.prop('disabled', true);
+                                    }
+                                });
+                            }
+                            if (data.work_preferred_state) {
+                                $('#work_preferred_state').val(data.work_preferred_state).selectpicker('refresh');
+                            }
+                            if (data.work_category) {
+                                $('#work_category').val(data.work_category).selectpicker('refresh');
+                            }
+                            if (data.work_subclass) {
+                                $('#work_subclass').val(data.work_subclass).selectpicker('refresh');
+                            }
+                            
+                            // Student Section fields
+                            if (data.preferred_course) {
+                                $('#preferred_course').val(data.preferred_course);
+                            }
+                            if (data.student_country) {
+                                $('#student_country').val(data.student_country).selectpicker('refresh');
+                            }
+                            if (data.university) {
+                                $('#university').val(data.university);
+                            }
+                            if (data.student_subclass) {
+                                $('#student_subclass').val(data.student_subclass).selectpicker('refresh');
+                            }
+                        }, 300);
+                    }
+                }
+                
+                // Populate Steps 3-9 data
+                for (let stepNum = 3; stepNum <= 9; stepNum++) {
+                    const stepKey = 'step_' + stepNum + '_data';
+                    if (stepData[stepKey] && typeof stepData[stepKey] === 'object') {
+                        const stepDataObj = stepData[stepKey];
+                        // Populate all fields for this step
+                        Object.keys(stepDataObj).forEach(function(fieldName) {
+                            const $field = $('#' + fieldName + ', [name="' + fieldName + '"]').first();
+                            if ($field.length) {
+                                const value = stepDataObj[fieldName];
+                                if ($field.is('select')) {
+                                    $field.val(value).selectpicker('refresh');
+                                } else if ($field.is(':checkbox') || $field.is(':radio')) {
+                                    if ($field.is(':checkbox')) {
+                                        $field.prop('checked', value === true || value === '1' || value === 1);
+                                    } else {
+                                        $field.filter('[value="' + value + '"]').prop('checked', true);
+                                    }
+                                } else {
+                                    $field.val(value || '');
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            // Map tab IDs to step numbers
+            const tabStepMap = {
+                'nav-personal-tab': 1,
+                'nav-preference-tab': 2,
+                'nav-passport-tab': 3,
+                'nav-relative-tab': 4,
+                'nav-family-tab': 5,
+                'nav-education-tab': 6,
+                'nav-experience-tab': 7,
+                'nav-property-tab': 8,
+                'nav-financial-tab': 9 // Financial Status is step 9
+            };
+
+            // Get current step from active tab
+            function getCurrentStep() {
+                const activeTab = $('.nav-link-lead.active');
+                const tabId = activeTab.attr('id');
+                return tabStepMap[tabId] || 1;
+            }
+            
+            // Navigate to the appropriate step based on completion status
+            function navigateToAppropriateStep() {
+                // If all steps are completed and final status is 'complete', redirect to fresh form
+                const allCompleted = stepStatus.step_1_completed && 
+                                     stepStatus.step_2_completed && 
+                                     stepStatus.step_3_completed && 
+                                     stepStatus.step_4_completed && 
+                                     stepStatus.step_5_completed && 
+                                     stepStatus.step_6_completed && 
+                                     stepStatus.step_7_completed && 
+                                     stepStatus.step_8_completed &&
+                                     stepStatus.step_9_completed;
+                
+                if (allCompleted && stepStatus.final_status === 'complete') {
+                    // Redirect to fresh form
+                    window.location.href = '{{ route("add-lead.index") }}';
+                    return;
+                }
+                
+                // Find the first incomplete step
+                let targetStep = 1;
+                
+                for (let i = 1; i <= 9; i++) {
+                    const stepKey = 'step_' + i + '_completed';
+                    if (!stepStatus[stepKey]) {
+                        targetStep = i;
+                        break;
+                    }
+                }
+                
+                // If all steps are completed but status is still draft, go to step 9
+                if (allCompleted) {
+                    targetStep = 9;
+                }
+                
+                // Find the tab ID for the target step
+                let targetTabId = Object.keys(tabStepMap).find(key => tabStepMap[key] === targetStep);
+                
+                if (targetTabId && $('#' + targetTabId).length) {
+                    // Use Bootstrap's tab API to switch tabs
+                    $('#' + targetTabId).tab('show');
+                    
+                    // Update current step after tab is shown
+                    setTimeout(function() {
+                        currentStep = targetStep;
+                        updateFooterButtons();
+                    }, 100);
+                }
+            }
+
+            // Update tab navigation based on step completion
+            function updateTabNavigation() {
+                $('.nav-link-lead').each(function() {
+                    const tabId = $(this).attr('id');
+                    const stepNum = tabStepMap[tabId];
+                    
+                    if (!stepNum) return;
+                    
+                    // Step 1 is always enabled
+                    if (stepNum === 1) {
+                        $(this).removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
+                        return;
+                    }
+                    
+                    // Check if previous step is completed
+                    const previousStep = 'step_' + (stepNum - 1) + '_completed';
+                    if (stepStatus[previousStep]) {
+                        $(this).removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
+                    } else {
+                        $(this).addClass('disabled').css('pointer-events', 'none').css('opacity', '0.5');
+                    }
+                });
+            }
+
+            // Prevent navigation to disabled tabs
+            $('.nav-link-lead').on('click', function(e) {
+                if ($(this).hasClass('disabled')) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        text: '@lang('app.pleaseCompletePreviousSteps')',
+                        toast: true,
+                        position: "top-end",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                        customClass: {
+                            confirmButton: "btn btn-primary",
+                        },
+                        showClass: {
+                            popup: "swal2-noanimation",
+                            backdrop: "swal2-noanimation",
+                        },
+                    });
+                    return false;
+                }
+                currentStep = getCurrentStep();
+            });
+
+            // Update footer buttons based on current step
+            function updateFooterButtons() {
+                const $prevBtn = $('#btn-previous');
+                const $saveBtn = $('#save-lead-form');
+                
+                // Disable previous button on step 1
+                if (currentStep === 1) {
+                    $prevBtn.prop('disabled', true).addClass('disabled');
+                } else {
+                    $prevBtn.prop('disabled', false).removeClass('disabled');
+                }
+                
+                // Show "Save and Submit" on last step (step 9), "Save and Next" for others
+                if (currentStep === 9) {
+                    $saveBtn.html('<i class="fa fa-check mr-1"></i>Save and Submit');
+                } else {
+                    $saveBtn.html('<i class="fa fa-arrow-right mr-1"></i>@lang('app.saveAndNext')');
+                }
+            }
+
+            // Helper function to get select value (handles Bootstrap Selectpicker)
+            function getSelectValue(selector) {
+                const $select = $(selector);
+                if ($select.length === 0) return null;
+                
+                // Try selectpicker method first
+                try {
+                    if ($select.data('selectpicker')) {
+                        const val = $select.selectpicker('val');
+                        return val;
+                    }
+                } catch(e) {
+                    // If selectpicker method fails, fall back to regular val()
+                }
+                // Fallback to regular val()
+                return $select.val();
+            }
+            
+            // Validate current step before saving
+            function validateCurrentStep() {
+                currentStep = getCurrentStep();
+                let isValid = true;
+                let errorMessages = [];
+                
+                // Remove previous error styling
+                $('.form-control').removeClass('is-invalid');
+                $('.bootstrap-select').removeClass('is-invalid');
+                $('.invalid-feedback').remove();
+                
+                switch (currentStep) {
+                    case 1:
+                        // Step 1 - Personal Details
+                        const surnameVal = $('#surname').val() || '';
+                        if (!surnameVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.surname') @lang('validation.required')');
+                            $('#surname').addClass('is-invalid');
+                        }
+                        const givenNameVal = $('#given_name').val() || '';
+                        if (!givenNameVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.givenName') @lang('validation.required')');
+                            $('#given_name').addClass('is-invalid');
+                        }
+                        // Gender validation (select field)
+                        const genderVal = getSelectValue('#gender');
+                        if (!genderVal || genderVal === '' || genderVal === null || (Array.isArray(genderVal) && genderVal.length === 0)) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.gender') @lang('validation.required')');
+                            $('#gender').addClass('is-invalid');
+                            $('#gender').closest('.bootstrap-select').addClass('is-invalid');
+                        }
+                        // Marital Status validation (select field)
+                        const maritalStatusVal = getSelectValue('#marital_status');
+                        if (!maritalStatusVal || maritalStatusVal === '' || maritalStatusVal === null || (Array.isArray(maritalStatusVal) && maritalStatusVal.length === 0)) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.maritalStatus') @lang('validation.required')');
+                            $('#marital_status').addClass('is-invalid');
+                            $('#marital_status').closest('.bootstrap-select').addClass('is-invalid');
+                        }
+                        if (!$('#date_of_birth').val()) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.dateOfBirth') @lang('validation.required')');
+                            $('#date_of_birth').addClass('is-invalid');
+                        }
+                        const countryOfOriginVal = $('#country_of_origin').val() || '';
+                        if (!countryOfOriginVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.countryOfOrigin') @lang('validation.required')');
+                            $('#country_of_origin').addClass('is-invalid');
+                        }
+                        // Lead Source validation (select field)
+                        const leadSourceVal = getSelectValue('#lead_source');
+                        if (!leadSourceVal || leadSourceVal === '' || leadSourceVal === null || (Array.isArray(leadSourceVal) && leadSourceVal.length === 0)) {
+                            isValid = false;
+                            errorMessages.push('@lang('modules.lead.leadSource') @lang('validation.required')');
+                            $('#lead_source').addClass('is-invalid');
+                            $('#lead_source').closest('.bootstrap-select').addClass('is-invalid');
+                        }
+                        // Lead Assign To validation (select field)
+                        const leadAssignToVal = getSelectValue('#lead_assign_to');
+                        if (!leadAssignToVal || leadAssignToVal === '' || leadAssignToVal === null || (Array.isArray(leadAssignToVal) && leadAssignToVal.length === 0)) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.leadAssignTo') @lang('validation.required')');
+                            $('#lead_assign_to').addClass('is-invalid');
+                            $('#lead_assign_to').closest('.bootstrap-select').addClass('is-invalid');
+                        }
+                        const homeAddressVal = $('#home_address').val() || '';
+                        if (!homeAddressVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('@lang('modules.lead.address') @lang('validation.required')');
+                            $('#home_address').addClass('is-invalid');
+                        }
+                        const homeCityVal = $('#home_city').val() || '';
+                        if (!homeCityVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.city') @lang('validation.required')');
+                            $('#home_city').addClass('is-invalid');
+                        }
+                        const homeStateVal = $('#home_state').val() || '';
+                        if (!homeStateVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.state') @lang('validation.required')');
+                            $('#home_state').addClass('is-invalid');
+                        }
+                        const homePinCodeVal = $('#home_pin_code').val() || '';
+                        if (!homePinCodeVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.pinCode') @lang('validation.required')');
+                            $('#home_pin_code').addClass('is-invalid');
+                        }
+                        // Mailing address validation (only if not same as home)
+                        if (!$('#mailing_same_as_home').is(':checked')) {
+                            const mailingAddressVal = $('#mailing_address').val() || '';
+                            if (!mailingAddressVal.trim()) {
+                                isValid = false;
+                                errorMessages.push('@lang('modules.lead.address') @lang('validation.required')');
+                                $('#mailing_address').addClass('is-invalid');
+                            }
+                            const mailingCityVal = $('#mailing_city').val() || '';
+                            if (!mailingCityVal.trim()) {
+                                isValid = false;
+                                errorMessages.push('@lang('app.city') @lang('validation.required')');
+                                $('#mailing_city').addClass('is-invalid');
+                            }
+                            const mailingStateVal = $('#mailing_state').val() || '';
+                            if (!mailingStateVal.trim()) {
+                                isValid = false;
+                                errorMessages.push('@lang('app.state') @lang('validation.required')');
+                                $('#mailing_state').addClass('is-invalid');
+                            }
+                            const mailingPinCodeVal = $('#mailing_pin_code').val() || '';
+                            if (!mailingPinCodeVal.trim()) {
+                                isValid = false;
+                                errorMessages.push('@lang('app.pinCode') @lang('validation.required')');
+                                $('#mailing_pin_code').addClass('is-invalid');
+                            }
+                        }
+                        // Primary phone validation
+                        const primaryPhone = ($('#primary_phone').val() || '').trim();
+                        if (!primaryPhone) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.primaryPhoneNo') @lang('validation.required')');
+                            $('#primary_phone').addClass('is-invalid');
+                        } else if (!/^[0-9]{10}$/.test(primaryPhone)) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.primaryPhoneNo') must be 10 digits');
+                            $('#primary_phone').addClass('is-invalid');
+                        }
+                        // Email validation
+                        const emailAddress = ($('#email_address').val() || '').trim();
+                        if (!emailAddress) {
+                            isValid = false;
+                            errorMessages.push('@lang('modules.lead.email') @lang('validation.required')');
+                            $('#email_address').addClass('is-invalid');
+                        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress)) {
+                            isValid = false;
+                            errorMessages.push('@lang('modules.lead.email') must be a valid email address');
+                            $('#email_address').addClass('is-invalid');
+                        }
+                        // Optional phone fields validation
+                        const secondaryPhone = ($('#secondary_phone').val() || '').trim();
+                        if (secondaryPhone && !/^[0-9]{10}$/.test(secondaryPhone)) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.secondaryPhoneNo') must be 10 digits');
+                            $('#secondary_phone').addClass('is-invalid');
+                        }
+                        const workPhone = ($('#work_phone').val() || '').trim();
+                        if (workPhone && !/^[0-9]{10}$/.test(workPhone)) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.workPhoneNo') must be 10 digits');
+                            $('#work_phone').addClass('is-invalid');
+                        }
+                        const mobile = ($('#mobile').val() || '').trim();
+                        if (mobile && !/^[0-9]{10}$/.test(mobile)) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.mobile') must be 10 digits');
+                            $('#mobile').addClass('is-invalid');
+                        }
+                        // Optional email validation
+                        const otherEmail = ($('#other_email').val() || '').trim();
+                        if (otherEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(otherEmail)) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.otherEmail') must be a valid email address');
+                            $('#other_email').addClass('is-invalid');
+                        }
+                        break;
+                        
+                    case 2:
+                        // Step 2 - Client Preference
+                        if (!$('input[name="visa_type"]:checked').val()) {
+                            isValid = false;
+                            errorMessages.push('@lang('app.selectVisaType') @lang('validation.required')');
+                        } else {
+                            const visaType = $('input[name="visa_type"]:checked').val();
+                            
+                            // PR Visa validation (only fields with *)
+                            if (visaType === 'PR' || visaType === 'pr') {
+                                const skillAssessmentLetterVal = getSelectValue('#skill_assessment_letter');
+                                if (!skillAssessmentLetterVal || skillAssessmentLetterVal === '' || skillAssessmentLetterVal === null || (Array.isArray(skillAssessmentLetterVal) && skillAssessmentLetterVal.length === 0)) {
+                                    isValid = false;
+                                    errorMessages.push('@lang('app.skillAssessmentLetter') @lang('validation.required')');
+                                    $('#skill_assessment_letter').addClass('is-invalid');
+                                    $('#skill_assessment_letter').closest('.bootstrap-select').addClass('is-invalid');
+                                }
+                                // pr_assessment_letter_file is required if not already uploaded
+                                if (!$('#pr_assessment_letter_file').val() && !$('#pr_assessment_letter_file_hidden').length) {
+                                    isValid = false;
+                                    errorMessages.push('@lang('app.addAssessmentLetter') @lang('validation.required')');
+                                    $('#pr_assessment_letter_file').addClass('is-invalid');
+                                }
+                                const prFamilyVal = getSelectValue('#pr_family');
+                                if (!prFamilyVal || prFamilyVal === '' || prFamilyVal === null || (Array.isArray(prFamilyVal) && prFamilyVal.length === 0)) {
+                                    isValid = false;
+                                    errorMessages.push('@lang('app.family') @lang('validation.required')');
+                                    $('#pr_family').addClass('is-invalid');
+                                    $('#pr_family').closest('.bootstrap-select').addClass('is-invalid');
+                                }
+                            }
+                            
+                            // Visit Visa validation (only fields with *)
+                            if (visaType === 'Visit' || visaType === 'visit') {
+                                const purposeOfVisitVal = $('#purpose_of_visit').val() || '';
+                                if (!purposeOfVisitVal.trim()) {
+                                    isValid = false;
+                                    errorMessages.push('@lang('app.purposeOfVisit') @lang('validation.required')');
+                                    $('#purpose_of_visit').addClass('is-invalid');
+                                }
+                                const visitFamilyVal = getSelectValue('#visit_family');
+                                if (!visitFamilyVal || visitFamilyVal === '' || visitFamilyVal === null || (Array.isArray(visitFamilyVal) && visitFamilyVal.length === 0)) {
+                                    isValid = false;
+                                    errorMessages.push('@lang('app.family') @lang('validation.required')');
+                                    $('#visit_family').addClass('is-invalid');
+                                    $('#visit_family').closest('.bootstrap-select').addClass('is-invalid');
+                                }
+                            }
+                            
+                            // Work Visa validation (only fields with *)
+                            if (visaType === 'Work' || visaType === 'work') {
+                                const preferredDesignationVal = $('#preferred_designation').val() || '';
+                                if (!preferredDesignationVal.trim()) {
+                                    isValid = false;
+                                    errorMessages.push('@lang('app.preferredDesignation') @lang('validation.required')');
+                                    $('#preferred_designation').addClass('is-invalid');
+                                }
+                            }
+                            
+                            // Student Visa validation (only fields with *)
+                            if (visaType === 'Student' || visaType === 'student') {
+                                const termIntakeVal = ($('#term_intake').val() || '').trim();
+                                if (!termIntakeVal) {
+                                    isValid = false;
+                                    errorMessages.push('@lang('app.termIntake') @lang('validation.required')');
+                                    $('#term_intake').addClass('is-invalid');
+                                }
+                            }
+                        }
+                        break;
+                        
+                    case 3:
+                        // Step 3 - Passport Details
+                        const issuingCountryVal = $('#issuing_country').val() || '';
+                        if (!issuingCountryVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('Issuing Country @lang('validation.required')');
+                            $('#issuing_country').addClass('is-invalid');
+                        }
+                        const cityWhereIssuedVal = $('#city_where_issued').val() || '';
+                        if (!cityWhereIssuedVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('City Where Issued @lang('validation.required')');
+                            $('#city_where_issued').addClass('is-invalid');
+                        }
+                        if (!$('#issuance_date').val()) {
+                            isValid = false;
+                            errorMessages.push('Issuance Date @lang('validation.required')');
+                            $('#issuance_date').addClass('is-invalid');
+                        }
+                        if (!$('#expiration_date').val()) {
+                            isValid = false;
+                            errorMessages.push('Expiration Date @lang('validation.required')');
+                            $('#expiration_date').addClass('is-invalid');
+                        }
+                        if (!$('#passport_file_upload').val() && !$('#passport_file_upload_hidden').length) {
+                            isValid = false;
+                            errorMessages.push('Passport file @lang('validation.required')');
+                            $('#passport_file_upload').addClass('is-invalid');
+                        }
+                        break;
+                        
+                    case 4:
+                        // Step 4 - Relative Contact Information
+                        // No required fields - all fields are optional
+                        break;
+                        
+                    case 6:
+                        // Step 6 - Education
+                        if (!$('#tenth_passing_year').val()) {
+                            isValid = false;
+                            errorMessages.push('10th Passing Year @lang('validation.required')');
+                            $('#tenth_passing_year').addClass('is-invalid');
+                        }
+                        if (!$('#tenth_percentage').val()) {
+                            isValid = false;
+                            errorMessages.push('10th Percentage @lang('validation.required')');
+                            $('#tenth_percentage').addClass('is-invalid');
+                        }
+                        const tenthBoardNameVal = ($('#tenth_board_name').val() || '').trim();
+                        if (!tenthBoardNameVal) {
+                            isValid = false;
+                            errorMessages.push('10th Board Name @lang('validation.required')');
+                            $('#tenth_board_name').addClass('is-invalid');
+                        }
+                        const tenthTrialVal = ($('#tenth_trial').val() || '').trim();
+                        if (!tenthTrialVal) {
+                            isValid = false;
+                            errorMessages.push('10th Trial @lang('validation.required')');
+                            $('#tenth_trial').addClass('is-invalid');
+                        }
+                        break;
+                        
+                    case 5:
+                        // Step 5 - Family Information (same as Step 4)
+                        const step5FatherSurnameVal = $('#father_surname').val() || '';
+                        if (!step5FatherSurnameVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('Father\'s Surname @lang('validation.required')');
+                            $('#father_surname').addClass('is-invalid');
+                        }
+                        const step5FatherGivenNameVal = $('#father_given_name').val() || '';
+                        if (!step5FatherGivenNameVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('Father\'s Given Name @lang('validation.required')');
+                            $('#father_given_name').addClass('is-invalid');
+                        }
+                        if (!$('#father_date_of_birth').val()) {
+                            isValid = false;
+                            errorMessages.push('Father\'s Date of Birth @lang('validation.required')');
+                            $('#father_date_of_birth').addClass('is-invalid');
+                        }
+                        const step5FatherOccupationVal = $('#father_occupation').val() || '';
+                        if (!step5FatherOccupationVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('Father\'s Occupation @lang('validation.required')');
+                            $('#father_occupation').addClass('is-invalid');
+                        }
+                        const step5FatherHavePassportVal = getSelectValue('#father_have_passport');
+                        if (!step5FatherHavePassportVal || step5FatherHavePassportVal === '' || step5FatherHavePassportVal === null || (Array.isArray(step5FatherHavePassportVal) && step5FatherHavePassportVal.length === 0)) {
+                            isValid = false;
+                            errorMessages.push('Father\'s Have Passport @lang('validation.required')');
+                            $('#father_have_passport').addClass('is-invalid');
+                            $('#father_have_passport').closest('.bootstrap-select').addClass('is-invalid');
+                        }
+                        const step5MotherSurnameVal = $('#mother_surname').val() || '';
+                        if (!step5MotherSurnameVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('Mother\'s Surname @lang('validation.required')');
+                            $('#mother_surname').addClass('is-invalid');
+                        }
+                        const step5MotherGivenNameVal = $('#mother_given_name').val() || '';
+                        if (!step5MotherGivenNameVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('Mother\'s Given Name @lang('validation.required')');
+                            $('#mother_given_name').addClass('is-invalid');
+                        }
+                        if (!$('#mother_date_of_birth').val()) {
+                            isValid = false;
+                            errorMessages.push('Mother\'s Date of Birth @lang('validation.required')');
+                            $('#mother_date_of_birth').addClass('is-invalid');
+                        }
+                        const step5MotherOccupationVal = $('#mother_occupation').val() || '';
+                        if (!step5MotherOccupationVal.trim()) {
+                            isValid = false;
+                            errorMessages.push('Mother\'s Occupation @lang('validation.required')');
+                            $('#mother_occupation').addClass('is-invalid');
+                        }
+                        const step5MotherHavePassportVal = getSelectValue('#mother_have_passport');
+                        if (!step5MotherHavePassportVal || step5MotherHavePassportVal === '' || step5MotherHavePassportVal === null || (Array.isArray(step5MotherHavePassportVal) && step5MotherHavePassportVal.length === 0)) {
+                            isValid = false;
+                            errorMessages.push('Mother\'s Have Passport @lang('validation.required')');
+                            $('#mother_have_passport').addClass('is-invalid');
+                            $('#mother_have_passport').closest('.bootstrap-select').addClass('is-invalid');
+                        }
+                        if (step5MotherHavePassportVal === 'Yes' && !$('#mother_passport_file').val() && !$('#mother_passport_file_hidden').length) {
+                            isValid = false;
+                            errorMessages.push('Mother\'s Passport file @lang('validation.required')');
+                            $('#mother_passport_file').addClass('is-invalid');
+                        }
+                        break;
+                        
+                    case 8:
+                        // Step 8 - Property Details
+                        const propertyHomeVal = $('#property_home').val();
+                        if (propertyHomeVal === '' || propertyHomeVal === null || propertyHomeVal === undefined) {
+                            isValid = false;
+                            errorMessages.push('Property Home @lang('validation.required')');
+                            $('#property_home').addClass('is-invalid');
+                        }
+                        const propertyLandVal = $('#property_land').val();
+                        if (propertyLandVal === '' || propertyLandVal === null || propertyLandVal === undefined) {
+                            isValid = false;
+                            errorMessages.push('Property Land @lang('validation.required')');
+                            $('#property_land').addClass('is-invalid');
+                        }
+                        const propertyPlotVal = $('#property_plot').val();
+                        if (propertyPlotVal === '' || propertyPlotVal === null || propertyPlotVal === undefined) {
+                            isValid = false;
+                            errorMessages.push('Property Plot @lang('validation.required')');
+                            $('#property_plot').addClass('is-invalid');
+                        }
+                        const propertyCommercialsVal = $('#property_commercials').val();
+                        if (propertyCommercialsVal === '' || propertyCommercialsVal === null || propertyCommercialsVal === undefined) {
+                            isValid = false;
+                            errorMessages.push('Property Commercials @lang('validation.required')');
+                            $('#property_commercials').addClass('is-invalid');
+                        }
+                        const propertyOtherVal = $('#property_other').val();
+                        if (propertyOtherVal === '' || propertyOtherVal === null || propertyOtherVal === undefined) {
+                            isValid = false;
+                            errorMessages.push('Property Other @lang('validation.required')');
+                            $('#property_other').addClass('is-invalid');
+                        }
+                        const propertyShopVal = $('#property_shop').val();
+                        if (propertyShopVal === '' || propertyShopVal === null || propertyShopVal === undefined) {
+                            isValid = false;
+                            errorMessages.push('Property Shop @lang('validation.required')');
+                            $('#property_shop').addClass('is-invalid');
+                        }
+                        const propertyGoldVal = $('#property_gold').val();
+                        if (propertyGoldVal === '' || propertyGoldVal === null || propertyGoldVal === undefined) {
+                            isValid = false;
+                            errorMessages.push('Property Gold @lang('validation.required')');
+                            $('#property_gold').addClass('is-invalid');
+                        }
+                        const propertySilverVal = $('#property_silver').val();
+                        if (propertySilverVal === '' || propertySilverVal === null || propertySilverVal === undefined) {
+                            isValid = false;
+                            errorMessages.push('Property Silver @lang('validation.required')');
+                            $('#property_silver').addClass('is-invalid');
+                        }
+                        break;
+                }
+                
+                if (!isValid) {
+                    // Show all validation errors in toast message
+                    let errorText = '';
+                    if (errorMessages.length === 0) {
+                        errorText = 'Please fill in all required fields';
+                    } else if (errorMessages.length === 1) {
+                        errorText = errorMessages[0];
+                    } else {
+                        errorText = errorMessages.slice(0, 3).join('<br>') + (errorMessages.length > 3 ? '<br>... and ' + (errorMessages.length - 3) + ' more' : '');
+                    }
+                    
+                    // Ensure we have an error message to show
+                    if (!errorText || errorText.trim() === '') {
+                        errorText = 'Please fill in all required fields';
+                    }
+                    
+                    // Use setTimeout to ensure Swal is ready
+                    setTimeout(function() {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                html: errorText,
+                                toast: true,
+                                position: "top-end",
+                                timer: errorMessages.length > 1 ? 5000 : 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                                customClass: {
+                                    confirmButton: "btn btn-primary",
+                                },
+                                showClass: {
+                                    popup: "swal2-noanimation",
+                                    backdrop: "swal2-noanimation",
+                                },
+                            });
+                        } else {
+                            // Fallback to alert if Swal is not available
+                            alert(errorText.replace(/<br>/g, '\n'));
+                        }
+                    }, 100);
+                    
+                    // Scroll to first invalid field
+                    if ($('.is-invalid').length > 0) {
+                        setTimeout(function() {
+                            const firstInvalid = $('.is-invalid').first();
+                            if (firstInvalid.length && firstInvalid.offset()) {
+                                $('html, body').animate({
+                                    scrollTop: firstInvalid.offset().top - 100
+                                }, 500);
+                            }
+                        }, 200);
+                    }
+                }
+                
+                return isValid;
+            }
+
+            // Save current step
+            function saveCurrentStep() {
+                currentStep = getCurrentStep();
+                
+                // Validate before saving
+                if (!validateCurrentStep()) {
+                    return;
+                }
+                
+                const formData = new FormData($('#addLeadForm')[0]);
+                
+                // Add lead_id if exists
+                if (currentLeadId) {
+                    formData.append('lead_id', currentLeadId);
+                }
+                
+                // Collect visa refusals if step 1
+                if (currentStep === 1) {
+                    const visaRefusals = [];
+                    
+                    // Check if visa status is "refusal" and collect the first refusal entry
+                    if ($('input[name="visa_status"]:checked').val() === 'refusal') {
+                        const firstDate = $('#visa_rejection_date').val();
+                        const firstCategory = $('#visa_refusal_category').val();
+                        const firstReason = $('#visa_refusal_reason').val();
+                        
+                        // Only add first entry if at least one field has a value
+                        if (firstDate || firstCategory || firstReason) {
+                            visaRefusals.push({
+                                date: firstDate || '',
+                                category: firstCategory || '',
+                                reason: firstReason || ''
+                            });
+                        }
+                    }
+                    
+                    // Collect additional refusal rows
+                    $('.visa-refusal-row').each(function() {
+                        const date = $(this).find('input[name="visa_rejection_date[]"]').val();
+                        const category = $(this).find('input[name="visa_refusal_category[]"]').val();
+                        const reason = $(this).find('textarea[name="visa_refusal_reason[]"]').val();
+                        
+                        // Only add if at least one field has a value
+                        if (date || category || reason) {
+                            visaRefusals.push({
+                                date: date || '',
+                                category: category || '',
+                                reason: reason || ''
+                            });
+                        }
+                    });
+                    
+                    formData.append('visa_refusals', JSON.stringify(visaRefusals));
+                }
+                
+                // Show loading
+                const $saveBtn = $('#save-lead-form');
+                const originalHtml = $saveBtn.html();
+                $saveBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i>@lang('app.saving')...');
+                
+                $.ajax({
+                    url: '{{ route("add-lead.save-step", ":step") }}'.replace(':step', currentStep),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Update lead_id if it's a new lead
+                            if (response.lead_id) {
+                                currentLeadId = response.lead_id;
+                                $('#lead_id').val(currentLeadId);
+                                // Update URL with lead_id so it persists on refresh
+                                updateUrlWithLeadId(currentLeadId);
+                            }
+                            
+                            // Update step status
+                            stepStatus['step_' + currentStep + '_completed'] = true;
+                            stepStatus.final_status = response.final_status || 'draft';
+                            
+                            // Update UI
+                            updateTabNavigation();
+                            updateFooterButtons();
+                            
+                            // Show success message
+                            Swal.fire({
+                                icon: 'success',
+                                text: response.message || '@lang('messages.recordSaved')',
+                                toast: true,
+                                position: "top-end",
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                                customClass: {
+                                    confirmButton: "btn btn-primary",
+                                },
+                                showClass: {
+                                    popup: "swal2-noanimation",
+                                    backdrop: "swal2-noanimation",
+                                },
+                            });
+                            
+                            // If not last step, move to next step
+                            if (currentStep < 9) {
+                                setTimeout(function() {
+                                    // Find the first incomplete step after current step
+                                    let nextStep = currentStep + 1;
+                                    for (let i = currentStep + 1; i <= 9; i++) {
+                                        const stepKey = 'step_' + i + '_completed';
+                                        if (!stepStatus[stepKey]) {
+                                            nextStep = i;
+                                            break;
+                                        }
+                                    }
+                                    
+                                    // If all steps after current are completed, go to step 9
+                                    const allAfterCompleted = stepStatus.step_1_completed && 
+                                                              stepStatus.step_2_completed && 
+                                                              stepStatus.step_3_completed && 
+                                                              stepStatus.step_4_completed && 
+                                                              stepStatus.step_5_completed && 
+                                                              stepStatus.step_6_completed && 
+                                                              stepStatus.step_7_completed && 
+                                                              stepStatus.step_8_completed &&
+                                                              stepStatus.step_9_completed;
+                                    if (allAfterCompleted) {
+                                        nextStep = 9;
+                                    }
+                                    
+                                    const nextTabId = Object.keys(tabStepMap).find(key => tabStepMap[key] === nextStep);
+                                    if (nextTabId) {
+                                        $('#' + nextTabId).tab('show');
+                                        currentStep = nextStep;
+                                        updateFooterButtons();
+                                    }
+                                }, 500);
+                            } else {
+                                // Only show completion message on step 9 (last step)
+                                // Check if all steps are actually completed
+                                const allStepsCompleted = stepStatus.step_1_completed && 
+                                                          stepStatus.step_2_completed && 
+                                                          stepStatus.step_3_completed && 
+                                                          stepStatus.step_4_completed && 
+                                                          stepStatus.step_5_completed && 
+                                                          stepStatus.step_6_completed && 
+                                                          stepStatus.step_7_completed && 
+                                                          stepStatus.step_8_completed &&
+                                                          stepStatus.step_9_completed;
+                                
+                                if (allStepsCompleted && (response.final_status === 'complete' || stepStatus.final_status === 'complete')) {
+                                    // Show success message
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '@lang('app.allStepsCompleted')',
+                                        text: '@lang('messages.recordSaved')',
+                                        showConfirmButton: true,
+                                        confirmButtonText: 'OK',
+                                        customClass: {
+                                            confirmButton: "btn btn-primary",
+                                        },
+                                    }).then(function() {
+                                        // Redirect to new lead form (without lead_id)
+                                        window.location.href = '{{ route("add-lead.index") }}';
+                                    });
+                                } else {
+                                    // Step 9 saved but not all steps complete yet, just show regular success
+                                    // This shouldn't happen, but just in case
+                                }
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                text: response.message || '@lang('messages.errorOccurred')',
+                                toast: true,
+                                position: "top-end",
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                                customClass: {
+                                    confirmButton: "btn btn-primary",
+                                },
+                                showClass: {
+                                    popup: "swal2-noanimation",
+                                    backdrop: "swal2-noanimation",
+                                },
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = '@lang('messages.errorOccurred')';
+                        
+                        // Handle validation errors from backend
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            } else if (xhr.responseJSON.errors) {
+                                // Laravel validation errors - collect all errors
+                                const errors = xhr.responseJSON.errors;
+                                const errorList = [];
+                                for (let field in errors) {
+                                    if (errors.hasOwnProperty(field)) {
+                                        errorList.push(errors[field][0]);
+                                    }
+                                }
+                                errorMessage = errorList.length === 1 
+                                    ? errorList[0] 
+                                    : errorList.slice(0, 3).join('<br>') + (errorList.length > 3 ? '<br>... and ' + (errorList.length - 3) + ' more' : '');
+                            }
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            html: errorMessage,
+                            toast: true,
+                            position: "top-end",
+                            timer: errorMessage.includes('<br>') ? 5000 : 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                            customClass: {
+                                confirmButton: "btn btn-primary",
+                            },
+                            showClass: {
+                                popup: "swal2-noanimation",
+                                backdrop: "swal2-noanimation",
+                            },
+                        });
+                    },
+                    complete: function() {
+                        $saveBtn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            }
+
+            // Handle save button click
+            $('#save-lead-form').on('click', function(e) {
+                e.preventDefault();
+                saveCurrentStep();
+            });
+
+            // Handle previous button click
+            $('#btn-previous').on('click', function(e) {
+                e.preventDefault();
+                if (currentStep > 1) {
+                    const prevStep = currentStep - 1;
+                    const prevTabId = Object.keys(tabStepMap).find(key => tabStepMap[key] === prevStep);
+                    if (prevTabId) {
+                        // Use Bootstrap tab API to switch tabs properly
+                        $('#' + prevTabId).tab('show');
+                        // Update current step will be handled by the shown.bs.tab event
+                    }
+                }
+            });
+
+            // Track tab changes - ensure tab and pane are synchronized
+            $('.nav-link-lead').on('shown.bs.tab', function(e) {
+                const tabId = $(e.target).attr('id');
+                currentStep = tabStepMap[tabId] || 1;
+                updateFooterButtons();
+                
+                // Ensure the correct tab pane is active
+                const targetPane = $(e.target).attr('href') || $(e.target).data('target');
+                if (targetPane) {
+                    // Remove active class from all panes
+                    $('.tab-pane').removeClass('show active');
+                    // Add active class to target pane
+                    $(targetPane).addClass('show active');
+                }
+                
+                // Reload form data for the current step if lead_id exists
+                if (currentLeadId && stepStatus['step_' + currentStep + '_completed']) {
+                    // Reload data for this step to ensure all fields are populated
+                    loadStepData(currentStep);
+                }
+            });
+            
+            // Function to load data for a specific step
+            function loadStepData(stepNumber) {
+                if (!currentLeadId) return;
+                
+                $.ajax({
+                    url: '{{ route("add-lead.step-status", ":id") }}'.replace(':id', currentLeadId),
+                    type: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response && response.step_data) {
+                            // Only populate the current step's data
+                            const stepKey = 'step_' + stepNumber + '_data';
+                            if (response.step_data[stepKey]) {
+                                const stepData = {};
+                                stepData[stepKey] = response.step_data[stepKey];
+                                populateFormFields(stepData);
+                            }
+                        }
+                    },
+                    error: function() {
+                        // Silently fail - data might already be loaded
+                    }
+                });
+            }
+            
+            // Handle tab click to prevent navigation to disabled tabs and ensure sync
+            $('.nav-link-lead').on('click', function(e) {
+                // Only proceed if tab is not disabled
+                if ($(this).hasClass('disabled')) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        text: '@lang('app.pleaseCompletePreviousSteps')',
+                        toast: true,
+                        position: "top-end",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                        customClass: {
+                            confirmButton: "btn btn-primary",
+                        },
+                        showClass: {
+                            popup: "swal2-noanimation",
+                            backdrop: "swal2-noanimation",
+                        },
+                    });
+                    return false;
+                }
+            });
+
+            // Initialize on page load
+            currentStep = getCurrentStep();
+            
+            // Load existing lead data if lead_id exists (with a small delay to ensure DOM is ready)
+            if (currentLeadId) {
+                setTimeout(function() {
+                    loadExistingLeadData(currentLeadId);
+                }, 500);
+            }
+            
+            updateTabNavigation();
+            updateFooterButtons();
 
         });
     </script>
