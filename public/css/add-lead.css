@@ -1,3 +1,116 @@
 /* Add Lead Page Specific Styles */
 
 /* Add your custom styles for the add-lead page here */
+/* Tabs */
+/* FULL TAB BAR INLINE */
+.tabs .nav {
+    display: flex;
+    flex-wrap: nowrap !important;
+    gap: 20px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 8px 0;
+}
+
+/* SCROLLBAR */
+.tabs .nav::-webkit-scrollbar {
+    height: 6px;                     /* scrollbar height (horizontal) */
+}
+
+.tabs .nav::-webkit-scrollbar-track {
+    background: #F4F1FA;             /* very light lavender */
+    border-radius: 10px;
+}
+
+.tabs .nav::-webkit-scrollbar-thumb {
+    background: #CFC2F5;             /* light purple */
+    border-radius: 10px;
+}
+
+.tabs .nav::-webkit-scrollbar-thumb:hover {
+    background: #B8A7F0;             /* slightly darker on hover */
+}
+
+/* Firefox Support */
+.tabs .nav {
+    scrollbar-color: #CFC2F5 #F4F1FA;   /* thumb | track */
+    scrollbar-width: thin;
+}
+
+/* TAB LINK */
+.tabs .nav-link-lead {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0px 8px 0px !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 14px;
+    font-weight: 400;
+    color: #676767;
+    transition: 0.25s ease;
+    border-bottom: 1px !important;
+}
+
+/* ICON BOX */
+.tabs .nav-link-lead .tab-item {
+    width: 36px;
+    height: 36px;
+    background: #F2EDF9;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: 0.25s ease;
+}
+
+/* DEFAULT ICON */
+.tabs .nav-link-lead img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+    transition: 0.25s ease;
+}
+
+/* HOVER EFFECT */
+.tabs .nav-link-lead:hover .tab-item {
+    background: #E4D9FF;
+}
+
+.tabs .nav-link-lead:hover {
+    color: #000;
+}
+
+.tabs .nav-link-lead:hover img {
+    opacity: 1;
+}
+
+/* ACTIVE TAB */
+.tabs .nav-link-lead.active {
+    color: #000 !important;
+    font-weight: 500;
+}
+
+.tabs .nav-link-lead.active .tab-item {
+    background: #6A32FF !important;
+}
+
+.tabs .nav-link-lead.active img {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}
+
+/* NO BOOTSTRAP BORDER */
+.nav-tabs .nav-link-lead.active {
+    border: none !important;
+    background: transparent !important;
+}
+
+.tabs .nav .nav-link-lead.active, .tabs .nav .nav-item-lead:hover {
+    border-bottom: 0px solid var(--header_color) !important;
+}
+
+.tabs .nav .nav-link-lead.active, .tabs .nav .nav-item-lead:hover {
+    border-bottom: 0px solid var(--header_color) !important;
+}

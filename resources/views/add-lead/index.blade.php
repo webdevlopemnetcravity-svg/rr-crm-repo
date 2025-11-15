@@ -14,36 +14,33 @@
             <div class="s-b-n-header" id="tabs">
                 <nav class="tabs px-4 border-bottom-grey">
                     <div class="nav" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link f-14 active" id="nav-personal-tab" data-toggle="tab" href="#nav-personal" role="tab" aria-controls="nav-personal" aria-selected="true">
-                            <i class="fa fa-user mr-2"></i>Personal Details
+                        <a class="nav-item-lead nav-link-lead f-14 active" id="nav-personal-tab" data-toggle="tab" href="#nav-preference" role="tab" aria-controls="nav-preference" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Personal_Details.svg') }}"></div>Personal Details
                         </a>
-                        <a class="nav-item nav-link f-14" id="nav-preference-tab" data-toggle="tab" href="#nav-preference" role="tab" aria-controls="nav-preference" aria-selected="false">
-                            <i class="fa fa-briefcase mr-2"></i>Client Preference
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-preference-tab" data-toggle="tab" href="#nav-preference" role="tab" aria-controls="nav-preference" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Client_Preference.svg') }}"></div>Client Preference
                         </a>
-                        <a class="nav-item nav-link f-14" id="nav-passport-tab" data-toggle="tab" href="#nav-passport" role="tab" aria-controls="nav-passport" aria-selected="false">
-                            <i class="fa fa-id-card mr-2"></i>Passport Details
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-passport-tab" data-toggle="tab" href="#nav-passport" role="tab" aria-controls="nav-passport" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Passport_Details.svg') }}"></div>Passport Details
                         </a>
-                        <a class="nav-item nav-link f-14" id="nav-relative-tab" data-toggle="tab" href="#nav-relative" role="tab" aria-controls="nav-relative" aria-selected="false">
-                            <i class="fa fa-address-book mr-2"></i>Relative Contact Information
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-relative-tab" data-toggle="tab" href="#nav-relative" role="tab" aria-controls="nav-relative" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Relative_Contact_Information.svg') }}"></div>Relative Contact Information
                         </a>
-                        <a class="nav-item nav-link f-14" id="nav-family-tab" data-toggle="tab" href="#nav-family" role="tab" aria-controls="nav-family" aria-selected="false">
-                            <i class="fa fa-users mr-2"></i>Family Information
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-family-tab" data-toggle="tab" href="#nav-family" role="tab" aria-controls="nav-family" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Financial_Status.svg') }}"></div>Family Information
                         </a>
-                        <a class="nav-item nav-link f-14" id="nav-education-tab" data-toggle="tab" href="#nav-education" role="tab" aria-controls="nav-education" aria-selected="false">
-                            <i class="fa fa-graduation-cap mr-2"></i>Education
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-education-tab" data-toggle="tab" href="#nav-education" role="tab" aria-controls="nav-education" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Education.svg') }}"></div>Education
                         </a>
-                        <a class="nav-item nav-link f-14" id="nav-experience-tab" data-toggle="tab" href="#nav-experience" role="tab" aria-controls="nav-experience" aria-selected="false">
-                            <i class="fa fa-briefcase mr-2"></i>Professional Experience
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-experience-tab" data-toggle="tab" href="#nav-experience" role="tab" aria-controls="nav-experience" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Professional_Experience.svg') }}"></div>Professional Experience
                         </a>
-                        <a class="nav-item nav-link f-14" id="nav-property-tab" data-toggle="tab" href="#nav-property" role="tab" aria-controls="nav-property" aria-selected="false">
-                            <i class="fa fa-building mr-2"></i>Property Details
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-property-tab" data-toggle="tab" href="#nav-property" role="tab" aria-controls="nav-property" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Property_Details.svg') }}"></div>Property Details
                         </a>
-                        <a class="nav-item nav-link f-14" id="nav-financial-tab" data-toggle="tab" href="#nav-financial" role="tab" aria-controls="nav-financial" aria-selected="false">
-                            <i class="fa fa-money-bill-wave mr-2"></i>Financial Status
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-financial-tab" data-toggle="tab" href="#nav-financial" role="tab" aria-controls="nav-financial" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Financial_Status.svg') }}"></div>Financial Status
                         </a>
-                        {{-- <a class="nav-item nav-link f-14" id="nav-travel-tab" data-toggle="tab" href="#nav-travel" role="tab" aria-controls="nav-travel" aria-selected="false">
-                            <i class="fa fa-plane mr-2"></i>Travel Details
-                        </a> --}}
                     </div>
                 </nav>
             </div>
@@ -1422,8 +1419,8 @@
 
             // Tab navigation - Previous button
             $('#btn-previous').on('click', function() {
-                const activeTab = $('.nav-link.active');
-                const prevTab = activeTab.parent().prev().find('.nav-link');
+                const activeTab = $('.nav-link-lead.active');
+                const prevTab = activeTab.parent().prev().find('.nav-link-lead');
                 if (prevTab.length) {
                     prevTab.tab('show');
                 }
