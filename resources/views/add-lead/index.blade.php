@@ -56,7 +56,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="lead_source" :fieldLabel="__('modules.lead.leadSource')" fieldRequired="true">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="lead_source" id="lead_source">
+                                <select class="form-control select-picker height-35 f-14" name="lead_source" id="lead_source">
                                     <option value="">@lang('app.select') @lang('modules.lead.leadSource')</option>
                                     <option value="Facebook">Facebook</option>
                                     <option value="Google Ads">Google Ads</option>
@@ -70,12 +70,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="lead_added_by" :fieldLabel="__('app.leadAddedBy')">
                                 </x-forms.label>
-                                <input type="text" class="form-control" id="lead_added_by" name="lead_added_by" value="{{ user()->name }}" disabled>
+                                <input type="text" class="form-control height-35 f-14" id="lead_added_by" name="lead_added_by" value="{{ user()->name }}" readonly style="background-color: #e9ecef;">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="lead_assign_to" :fieldLabel="__('app.leadAssignTo')" fieldRequired="true">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="lead_assign_to" id="lead_assign_to">
+                                <select class="form-control select-picker height-35 f-14" name="lead_assign_to" id="lead_assign_to">
                                     <option value="">@lang('app.select') @lang('app.leadAssignTo')</option>
                                     <option value="{{ user()->id }}">{{ user()->name }}</option>
                                 </select>
@@ -83,7 +83,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="passport_file" :fieldLabel="__('app.addPassport')">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="passport_file" name="passport_file">
+                                <input class="form-control height-35 f-14" type="file" id="passport_file" name="passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="surname" :fieldLabel="__('app.surname')" fieldRequired="true">
@@ -98,7 +98,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="gender" :fieldLabel="__('app.gender')" fieldRequired="true">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="gender" id="gender">
+                                <select class="form-control select-picker height-35 f-14" name="gender" id="gender">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Male">@lang('app.male')</option>
                                     <option value="Female">@lang('app.female')</option>
@@ -108,7 +108,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="marital_status" :fieldLabel="__('app.maritalStatus')" fieldRequired="true">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="marital_status" id="marital_status">
+                                <select class="form-control select-picker height-35 f-14" name="marital_status" id="marital_status">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Single">@lang('app.single')</option>
                                     <option value="Married">@lang('app.maritalStatus.married')</option>
@@ -119,7 +119,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="date_of_birth" :fieldLabel="__('app.dateOfBirth')" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="date_of_birth" id="date_of_birth">
+                                <input type="date" class="form-control height-35 f-14" name="date_of_birth" id="date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="country_of_origin" :fieldLabel="__('app.countryOfOrigin')" fieldRequired="true">
@@ -198,22 +198,22 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="primary_phone" :fieldLabel="__('app.primaryPhoneNo')" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="primary_phone" id="primary_phone">
+                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="primary_phone" id="primary_phone" pattern="[0-9]{10}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="secondary_phone" :fieldLabel="__('app.secondaryPhoneNo')">
                                 </x-forms.label>
-                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="secondary_phone" id="secondary_phone">
+                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="secondary_phone" id="secondary_phone" pattern="[0-9]{10}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="work_phone" :fieldLabel="__('app.workPhoneNo')">
                                 </x-forms.label>
-                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="work_phone" id="work_phone">
+                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="work_phone" id="work_phone" pattern="[0-9]{10}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_phone" :fieldLabel="__('app.otherPhoneNo')">
                                 </x-forms.label>
-                                <textarea class="form-control f-14" rows="3" name="other_phone" id="other_phone"></textarea>
+                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="other_phone" id="other_phone" pattern="[0-9]{10}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="email_address" :fieldLabel="__('modules.lead.email')" fieldRequired="true">
@@ -223,12 +223,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_email" :fieldLabel="__('app.otherEmail')">
                                 </x-forms.label>
-                                <textarea class="form-control f-14" rows="3" name="other_email" id="other_email"></textarea>
+                                <input type="email" class="form-control height-35 f-14" name="other_email" id="other_email">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="social_media_preference" :fieldLabel="__('app.socialMediaPreference')">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="social_media_preference" id="social_media_preference">
+                                <select class="form-control select-picker height-35 f-14" name="social_media_preference" id="social_media_preference">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Facebook">Facebook</option>
                                     <option value="Instagram">Instagram</option>
@@ -243,15 +243,27 @@
 
                         <!-- Visa Status Section -->
                         <h6 class="mb-3 f-15 font-weight-bold">@lang('app.lastFiveYearsVisaStatus')</h6>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-check mt-3">
+                        
+                        <!-- Visa Status Radio Buttons -->
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-check form-check-inline mr-4">
                                     <input class="form-check-input" type="radio" name="visa_status" id="visa_granted" value="granted">
-                                    <label class="form-check-label" for="visa_granted">
+                                    <label class="form-check-label f-14" for="visa_granted">
                                         @lang('app.visaGranted')
                                     </label>
                                 </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="visa_status" id="visa_refusal" value="refusal">
+                                    <label class="form-check-label f-14" for="visa_refusal">
+                                        @lang('app.visaRefusal')
+                                    </label>
+                                </div>
                             </div>
+                        </div>
+                        
+                        <!-- Visa Granted Fields -->
+                        <div class="row" id="visa_granted_fields" style="display: none;">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="visa_issue_date" :fieldLabel="__('app.visaIssueDate')">
                                 </x-forms.label>
@@ -268,37 +280,39 @@
                                 <input type="text" class="form-control height-35 f-14" name="visa_category" id="visa_category">
                             </div>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-md-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="visa_status" id="visa_refusal" value="refusal">
-                                    <label class="form-check-label" for="visa_refusal">
-                                        @lang('app.visaRefusal')
-                                    </label>
+                        
+                        <!-- Visa Refusal Fields -->
+                        <div id="visa_refusal_fields" style="display: none;">
+                            <!-- Initial Visa Refusal Entry -->
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="visa_rejection_date" :fieldLabel="__('app.visaRejectionDate')">
+                                    </x-forms.label>
+                                    <input type="month" class="form-control height-35 f-14" name="visa_rejection_date" id="visa_rejection_date">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="visa_refusal_category" :fieldLabel="__('app.visaCategory')">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="visa_refusal_category" id="visa_refusal_category">
+                                </div>
+                                <div class="col-md-6">
+                                    <x-forms.label class="mt-3" fieldId="visa_refusal_reason" :fieldLabel="__('app.reason')">
+                                    </x-forms.label>
+                                    <textarea class="form-control f-14" rows="2" name="visa_refusal_reason" id="visa_refusal_reason"></textarea>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_rejection_date" :fieldLabel="__('app.visaRejectionDate')">
-                                </x-forms.label>
-                                <input type="month" class="form-control height-35 f-14" name="visa_rejection_date" id="visa_rejection_date">
+                            
+                            <!-- Add More Visa Refusal Button -->
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <button type="button" class="btn btn-secondary btn-sm" id="add-more-visa-refusal">
+                                        <i class="fa fa-plus mr-1"></i>@lang('app.addMoreVisaRefusal')
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_refusal_category" :fieldLabel="__('app.visaCategory')">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="visa_refusal_category" id="visa_refusal_category">
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="visa_refusal_reason" :fieldLabel="__('app.reason')">
-                                </x-forms.label>
-                                <textarea class="form-control f-14" rows="2" name="visa_refusal_reason" id="visa_refusal_reason"></textarea>
-                            </div>
-                            <div class="col-md-3 mt-3">
-                                <button type="button" class="btn btn-secondary btn-sm" id="add-more-visa-refusal">
-                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMoreVisaRefusal')
-                                </button>
-                            </div>
+                            
+                            <!-- Dynamic Visa Refusal Rows Container -->
+                            <div id="visa-refusal-rows-container"></div>
                         </div>
 
                         <hr class="my-4">
@@ -345,7 +359,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="skill_assessment_letter" :fieldLabel="__('app.skillAssessmentLetter')" fieldRequired="true">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="skill_assessment_letter" id="skill_assessment_letter">
+                                    <select class="form-control select-picker height-35 f-14" name="skill_assessment_letter" id="skill_assessment_letter">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Positive">@lang('app.positive')</option>
                                         <option value="Negative">@lang('app.negative')</option>
@@ -354,13 +368,12 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="pr_assessment_letter_file" :fieldLabel="__('app.addAssessmentLetter')" fieldRequired="true">
                                     </x-forms.label>
-                                    <input class="form-control" type="file" id="pr_assessment_letter_file" name="pr_assessment_letter_file">
-                                    <small id="pr_assessment_letter_file_name" class="text-muted d-block mt-1" style="display: none;"></small>
+                                    <input class="form-control height-35 f-14" type="file" id="pr_assessment_letter_file" name="pr_assessment_letter_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="pr_preferred_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="pr_preferred_country" id="pr_preferred_country">
+                                    <select class="form-control select-picker height-35 f-14" name="pr_preferred_country" id="pr_preferred_country">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Australia">@lang('app.countryAustralia')</option>
                                         <option value="New Zealand">@lang('app.countryNewZealand')</option>
@@ -369,7 +382,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="pr_preferred_state" :fieldLabel="__('app.preferredState')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="pr_preferred_state" id="pr_preferred_state">
+                                    <select class="form-control select-picker height-35 f-14" name="pr_preferred_state" id="pr_preferred_state">
                                         <option value="">@lang('app.select')</option>
                                         <!-- Australian States -->
                                         <option value="Western Australia (WA)" data-country="Australia">@lang('app.stateWesternAustralia')</option>
@@ -394,7 +407,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="pr_family" :fieldLabel="__('app.family')" fieldRequired="true">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="pr_family" id="pr_family">
+                                    <select class="form-control select-picker height-35 f-14" name="pr_family" id="pr_family">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Single">@lang('app.single')</option>
                                         <option value="Couple Visa">@lang('app.coupleVisa')</option>
@@ -405,7 +418,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="pr_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="pr_subclass" id="pr_subclass">
+                                    <select class="form-control select-picker height-35 f-14" name="pr_subclass" id="pr_subclass">
                                         <option value="">@lang('app.select')</option>
                                         <option value="PR - Employer Nomination Scheme (ENS)(Subclass 186)">PR - Employer Nomination Scheme (ENS)(Subclass 186)</option>
                                         <option value="PR - Skilled Nominated Visa (Subclass 190)">PR - Skilled Nominated Visa (Subclass 190)</option>
@@ -426,7 +439,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="visit_family" :fieldLabel="__('app.family')" fieldRequired="true">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="visit_family" id="visit_family">
+                                    <select class="form-control select-picker height-35 f-14" name="visit_family" id="visit_family">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Single">@lang('app.single')</option>
                                         <option value="Couple Visa">@lang('app.coupleVisa')</option>
@@ -437,7 +450,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="visit_preferred_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="visit_preferred_country" id="visit_preferred_country">
+                                    <select class="form-control select-picker height-35 f-14" name="visit_preferred_country" id="visit_preferred_country">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Australia">@lang('app.countryAustralia')</option>
                                         <option value="New Zealand">@lang('app.countryNewZealand')</option>
@@ -446,7 +459,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="visit_preferred_state" :fieldLabel="__('app.preferredState')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="visit_preferred_state" id="visit_preferred_state">
+                                    <select class="form-control select-picker height-35 f-14" name="visit_preferred_state" id="visit_preferred_state">
                                         <option value="">@lang('app.select')</option>
                                         <!-- Australian States -->
                                         <option value="Western Australia (WA)" data-country="Australia">@lang('app.stateWesternAustralia')</option>
@@ -471,7 +484,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="visit_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="visit_subclass" id="visit_subclass">
+                                    <select class="form-control select-picker height-35 f-14" name="visit_subclass" id="visit_subclass">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Visitor Visa (Subclass 600)">Visitor Visa (Subclass 600)</option>
                                     </select>
@@ -490,7 +503,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="industry" :fieldLabel="__('app.industry')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="industry" id="industry">
+                                    <select class="form-control select-picker height-35 f-14" name="industry" id="industry">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Agriculture">@lang('app.industryAgriculture')</option>
                                         <option value="Aviation Ground Staff">@lang('app.industryAviationGroundStaff')</option>
@@ -538,7 +551,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="on_role_off_role" :fieldLabel="__('app.onRoleOffRole')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="on_role_off_role" id="on_role_off_role">
+                                    <select class="form-control select-picker height-35 f-14" name="on_role_off_role" id="on_role_off_role">
                                         <option value="">@lang('app.select')</option>
                                         <option value="On Role">@lang('app.onRole')</option>
                                         <option value="Off Role">@lang('app.offRole')</option>
@@ -547,7 +560,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="work_preferred_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="work_preferred_country" id="work_preferred_country">
+                                    <select class="form-control select-picker height-35 f-14" name="work_preferred_country" id="work_preferred_country">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Australia">@lang('app.countryAustralia')</option>
                                         <option value="New Zealand">@lang('app.countryNewZealand')</option>
@@ -556,7 +569,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="work_category" :fieldLabel="__('app.workCategory')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="work_category" id="work_category">
+                                    <select class="form-control select-picker height-35 f-14" name="work_category" id="work_category">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Skilled">@lang('app.skilled')</option>
                                         <option value="Semi-Skilled">@lang('app.semiSkilled')</option>
@@ -566,7 +579,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="work_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="work_subclass" id="work_subclass">
+                                    <select class="form-control select-picker height-35 f-14" name="work_subclass" id="work_subclass">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Work Visa - Temporary Skill Shortage Visa (Subclass 482)">Work Visa - Temporary Skill Shortage Visa (Subclass 482)</option>
                                         <option value="Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)">Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)</option>
@@ -586,7 +599,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="student_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="student_country" id="student_country">
+                                    <select class="form-control select-picker height-35 f-14" name="student_country" id="student_country">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Australia">@lang('app.countryAustralia')</option>
                                         <option value="New Zealand">@lang('app.countryNewZealand')</option>
@@ -605,7 +618,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="student_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker" name="student_subclass" id="student_subclass">
+                                    <select class="form-control select-picker height-35 f-14" name="student_subclass" id="student_subclass">
                                         <option value="">@lang('app.select')</option>
                                         <option value="Student Visa (Subclass 500)">Student Visa (Subclass 500)</option>
                                         <option value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)">Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)</option>
@@ -618,7 +631,7 @@
                     <div class="tab-pane fade" id="nav-passport" role="tabpanel" aria-labelledby="nav-passport-tab">
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="passport_number" fieldLabel="Passport Number">
+                                <x-forms.label class="mt-3" fieldId="passport_number" fieldLabel="Passport Number" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="passport_number" id="passport_number">
                             </div>
@@ -641,11 +654,21 @@
                                 <x-forms.label class="mt-3" fieldId="expiration_date" fieldLabel="Expiration Date" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="expiration_date" id="expiration_date">
+                                <script>
+                                    $(document).ready(function() {
+                                        $('#issuance_date').on('change', function() {
+                                            const issuanceDate = $(this).val();
+                                            if (issuanceDate) {
+                                                $('#expiration_date').attr('min', issuanceDate);
+                                            }
+                                        });
+                                    });
+                                </script>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="passport_file_upload" fieldLabel="Add Passport" fieldRequired="true">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="passport_file_upload" name="passport_file_upload">
+                                <input class="form-control height-35 f-14" type="file" id="passport_file_upload" name="passport_file_upload" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3" fieldId="lost_passport_history" fieldLabel="Lost Passport History">
@@ -656,62 +679,73 @@
                     </div>
                     <!-- Relative Contact Information Tab -->
                     <div class="tab-pane fade" id="nav-relative" role="tabpanel" aria-labelledby="nav-relative-tab">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_surname" fieldLabel="Surname">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_surname" id="relative_surname">
+                        <!-- Initial Relative Contact Section -->
+                        <div class="relative-contact-section">
+                            <div class="relative-contact-section-header">
+                                <div class="relative-contact-section-title">Relative Contact 1</div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_given_name" fieldLabel="Given Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_given_name" id="relative_given_name">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_surname" fieldLabel="Surname">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="relative_surname" id="relative_surname">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_given_name" fieldLabel="Given Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="relative_given_name" id="relative_given_name">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_organization_name" fieldLabel="Organization Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="relative_organization_name" id="relative_organization_name">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_relationship" fieldLabel="Relationship To You">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="relative_relationship" id="relative_relationship">
+                                </div>
+                                <div class="col-md-12">
+                                    <x-forms.label class="mt-3" fieldId="relative_contact_address" fieldLabel="Contact Address">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="relative_contact_address" id="relative_contact_address">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_city" fieldLabel="City">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="relative_city" id="relative_city">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_state" fieldLabel="State">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="relative_state" id="relative_state">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_zip_code" fieldLabel="Zip Code">
+                                    </x-forms.label>
+                                    <input type="number" class="form-control height-35 f-14" name="relative_zip_code" id="relative_zip_code">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_email_address" fieldLabel="Email Address">
+                                    </x-forms.label>
+                                    <input type="email" class="form-control height-35 f-14" name="relative_email_address" id="relative_email_address">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="relative_phone_number" fieldLabel="Phone Number">
+                                    </x-forms.label>
+                                    <input type="number" maxlength="10" class="form-control height-35 f-14" name="relative_phone_number" id="relative_phone_number">
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_organization_name" fieldLabel="Organization Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_organization_name" id="relative_organization_name">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_relationship" fieldLabel="Relationship To You">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_relationship" id="relative_relationship">
-                            </div>
-                            <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="relative_contact_address" fieldLabel="Contact Address">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_contact_address" id="relative_contact_address">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_city" fieldLabel="City">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_city" id="relative_city">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_state" fieldLabel="State">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_state" id="relative_state">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_zip_code" fieldLabel="Zip Code">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_zip_code" id="relative_zip_code">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_email_address" fieldLabel="Email Address">
-                                </x-forms.label>
-                                <input type="email" class="form-control height-35 f-14" name="relative_email_address" id="relative_email_address">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_phone_number" fieldLabel="Phone Number">
-                                </x-forms.label>
-                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="relative_phone_number" id="relative_phone_number">
-                            </div>
-                            <div class="col-md-3 mt-3">
-                                <button type="button" class="btn btn-secondary btn-sm" id="add-more-relative">
-                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMore')
-                                </button>
-                            </div>
+                        </div>
+                        
+                        <!-- Dynamic Relative Contact Rows Container -->
+                        <div id="relative-contact-rows-container"></div>
+                        
+                        <!-- Add More Button -->
+                        <div class="mt-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-sm" id="add-more-relative">
+                                <i class="fa fa-plus mr-1"></i>@lang('app.addMore')
+                            </button>
                         </div>
                     </div>
                     <!-- Family Information Tab -->
@@ -732,7 +766,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="father_date_of_birth" fieldLabel="Father's Date of Birth" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="father_date_of_birth" id="father_date_of_birth">
+                                <input type="date" class="form-control height-35 f-14" name="father_date_of_birth" id="father_date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="father_occupation" fieldLabel="Father's Occupation" fieldRequired="true">
@@ -742,16 +776,16 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="father_have_passport" fieldLabel="Have Passport" fieldRequired="true">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="father_have_passport" id="father_have_passport">
+                                <select class="form-control select-picker height-35 f-14" name="father_have_passport" id="father_have_passport">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" id="father_passport_file_container" style="display: none;">
                                 <x-forms.label class="mt-3" fieldId="father_passport_file" fieldLabel="Add Father Passport">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="father_passport_file" name="father_passport_file">
+                                <input class="form-control height-35 f-14" type="file" id="father_passport_file" name="father_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -773,7 +807,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mother_date_of_birth" fieldLabel="Mother's Date of Birth" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="mother_date_of_birth" id="mother_date_of_birth">
+                                <input type="date" class="form-control height-35 f-14" name="mother_date_of_birth" id="mother_date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mother_occupation" fieldLabel="Mother's Occupation" fieldRequired="true">
@@ -783,16 +817,16 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mother_have_passport" fieldLabel="Have Passport" fieldRequired="true">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="mother_have_passport" id="mother_have_passport">
+                                <select class="form-control select-picker height-35 f-14" name="mother_have_passport" id="mother_have_passport">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" id="mother_passport_file_container" style="display: none;">
                                 <x-forms.label class="mt-3" fieldId="mother_passport_file" fieldLabel="Add Mother Passport" fieldRequired="true">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="mother_passport_file" name="mother_passport_file">
+                                <input class="form-control height-35 f-14" type="file" id="mother_passport_file" name="mother_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -829,7 +863,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_have_passport" fieldLabel="Have Passport">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="spouse_have_passport" id="spouse_have_passport">
+                                <select class="form-control select-picker height-35 f-14" name="spouse_have_passport" id="spouse_have_passport">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
@@ -838,7 +872,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_passport_file" fieldLabel="Add Spouse Passport">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="spouse_passport_file" name="spouse_passport_file">
+                                <input class="form-control height-35 f-14" type="file" id="spouse_passport_file" name="spouse_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3" fieldId="spouse_address" fieldLabel="Spouse's Address">
@@ -863,7 +897,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_phone_number" fieldLabel="Spouse's Phone Number">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="spouse_phone_number" id="spouse_phone_number">
+                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="spouse_phone_number" id="spouse_phone_number">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_education" fieldLabel="Spouse's Education">
@@ -878,69 +912,78 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_yearly_income" fieldLabel="Spouse's Yearly Income">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="spouse_yearly_income" id="spouse_yearly_income">
+                                <input type="number" class="form-control height-35 f-14" name="spouse_yearly_income" id="spouse_yearly_income">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_document_file" fieldLabel="Add Spouse Document">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="spouse_document_file" name="spouse_document_file">
+                                <input class="form-control height-35 f-14" type="file" id="spouse_document_file" name="spouse_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
                         <hr class="my-4">
 
                         <!-- Child Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.child') 1</h6>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_name" fieldLabel="Child's Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="child_name" id="child_name">
+                        <div class="child-section">
+                            <div class="child-section-header">
+                                <div class="child-section-title">@lang('app.child') 1</div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_age" fieldLabel="Child's Age">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="child_age" id="child_age">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="child_name" fieldLabel="Child's Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="child_name" id="child_name">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="child_age" fieldLabel="Child's Age">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="child_age" id="child_age">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="child_date_of_birth" fieldLabel="Date of Birth">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" name="child_date_of_birth" id="child_date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="child_city_of_birth" fieldLabel="City of Birth">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="child_city_of_birth" id="child_city_of_birth">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="child_have_passport" fieldLabel="Have Passport">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="child_have_passport" id="child_have_passport">
+                                        <option value="">@lang('app.select')</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="child_gender" fieldLabel="Gender">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="child_gender" id="child_gender">
+                                        <option value="">@lang('app.select')</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Prefer not to say">Prefer not to say</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="child_document_file" fieldLabel="Add Child Document">
+                                    </x-forms.label>
+                                    <input class="form-control height-35 f-14" type="file" id="child_document_file" name="child_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_date_of_birth" fieldLabel="Date of Birth">
-                                </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="child_date_of_birth" id="child_date_of_birth">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_city_of_birth" fieldLabel="City of Birth">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="child_city_of_birth" id="child_city_of_birth">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_have_passport" fieldLabel="Have Passport">
-                                </x-forms.label>
-                                <select class="form-control select-picker" name="child_have_passport" id="child_have_passport">
-                                    <option value="">@lang('app.select')</option>
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_gender" fieldLabel="Gender">
-                                </x-forms.label>
-                                <select class="form-control select-picker" name="child_gender" id="child_gender">
-                                    <option value="">@lang('app.select')</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Prefer not to say">Prefer not to say</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_document_file" fieldLabel="Add Child Document">
-                                </x-forms.label>
-                                <input class="form-control" type="file" id="child_document_file" name="child_document_file">
-                            </div>
-                            <div class="col-md-3 mt-3">
-                                <button type="button" class="btn btn-secondary btn-sm" id="add-more-child">
-                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMoreChild')
-                                </button>
-                            </div>
+                        </div>
+                        
+                        <!-- Dynamic Child Rows Container -->
+                        <div id="child-rows-container"></div>
+                        
+                        <!-- Add More Button -->
+                        <div class="mt-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-sm" id="add-more-child">
+                                <i class="fa fa-plus mr-1"></i>@lang('app.addMoreChild')
+                            </button>
                         </div>
                     </div>
                     <!-- Education Tab -->
@@ -951,7 +994,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="ielts_clear_or_not" :fieldLabel="__('app.ieltsPtcOetToeflExamDetails')">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="ielts_clear_or_not" id="ielts_clear_or_not">
+                                <select class="form-control select-picker height-35 f-14" name="ielts_clear_or_not" id="ielts_clear_or_not">
                                     <option value="">@lang('app.select')</option>
                                     <option value="IELTS">@lang('app.ielts')</option>
                                     <option value="PTE">@lang('app.pte')</option>
@@ -977,7 +1020,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="ielts_result_file" fieldLabel="Add IELTS/PTC/OET/TOEFL Result">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="ielts_result_file" name="ielts_result_file">
+                                <input class="form-control height-35 f-14" type="file" id="ielts_result_file" name="ielts_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -989,12 +1032,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_passing_year" fieldLabel="10th Passing Year" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="tenth_passing_year" id="tenth_passing_year">
+                                <input type="number" class="form-control height-35 f-14" name="tenth_passing_year" id="tenth_passing_year" min="1950" max="{{ date('Y') }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_percentage" fieldLabel="Percentage" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="tenth_percentage" id="tenth_percentage">
+                                <input type="number" class="form-control height-35 f-14" name="tenth_percentage" id="tenth_percentage" min="0" max="100" step="0.01">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_board_name" fieldLabel="Board Name" fieldRequired="true">
@@ -1007,9 +1050,9 @@
                                 <input type="text" class="form-control height-35 f-14" name="tenth_trial" id="tenth_trial">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="tenth_result_file" fieldLabel="Add 10th Result">
+                                <x-forms.label class="mt-3" fieldId="tenth_result_file" fieldLabel="Add 10th Result" fieldRequired="true">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="tenth_result_file" name="tenth_result_file">
+                                <input class="form-control height-35 f-14" type="file" id="tenth_result_file" name="tenth_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -1021,12 +1064,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_passing_year" fieldLabel="12th Passing Year">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="twelfth_passing_year" id="twelfth_passing_year">
+                                <input type="number" class="form-control height-35 f-14" name="twelfth_passing_year" id="twelfth_passing_year" min="1950" max="{{ date('Y') }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_stream" fieldLabel="Stream">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="twelfth_stream" id="twelfth_stream">
+                                <select class="form-control select-picker height-35 f-14" name="twelfth_stream" id="twelfth_stream">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Arts">Arts</option>
                                     <option value="Commerce">Commerce</option>
@@ -1037,7 +1080,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="twelfth_percentage" id="twelfth_percentage">
+                                <input type="number" class="form-control height-35 f-14" name="twelfth_percentage" id="twelfth_percentage" min="0" max="100" step="0.01">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_board_name" fieldLabel="Board Name">
@@ -1052,7 +1095,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_result_file" fieldLabel="Add 12th Result">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="twelfth_result_file" name="twelfth_result_file">
+                                <input class="form-control height-35 f-14" type="file" id="twelfth_result_file" name="twelfth_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -1064,7 +1107,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_degree" :fieldLabel="__('app.graduationDegree')">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="graduation_degree" id="graduation_degree" data-live-search="true" data-live-search-placeholder="@lang('app.search')">
+                                <select class="form-control select-picker height-35 f-14" name="graduation_degree" id="graduation_degree" data-live-search="true" data-live-search-placeholder="@lang('app.search')">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Bachelor of Arts (B.A. / B.A. Hons.)">@lang('app.gradDegreeBachelorOfArts')</option>
                                     <option value="Bachelor of Journalism & Mass Communication (BJMC)">@lang('app.gradDegreeBachelorOfJournalismMassCommunication')</option>
@@ -1107,12 +1150,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="graduation_percentage" id="graduation_percentage">
+                                <input type="number" class="form-control height-35 f-14" name="graduation_percentage" id="graduation_percentage" min="0" max="100" step="0.01">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_passing_year" fieldLabel="Passing Year">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="graduation_passing_year" id="graduation_passing_year">
+                                <input type="number" class="form-control height-35 f-14" name="graduation_passing_year" id="graduation_passing_year" min="1950" max="{{ date('Y') }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_trial" fieldLabel="Trial">
@@ -1122,7 +1165,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_result_file" fieldLabel="Add Graduation Result">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="graduation_result_file" name="graduation_result_file">
+                                <input class="form-control height-35 f-14" type="file" id="graduation_result_file" name="graduation_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -1134,7 +1177,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_degree" :fieldLabel="__('app.postGraduationDegree')">
                                 </x-forms.label>
-                                <select class="form-control select-picker" name="post_graduation_degree" id="post_graduation_degree" data-live-search="true" data-live-search-placeholder="@lang('app.search')">
+                                <select class="form-control select-picker height-35 f-14" name="post_graduation_degree" id="post_graduation_degree" data-live-search="true" data-live-search-placeholder="@lang('app.search')">
                                     <option value="">@lang('app.select')</option>
                                     <option value="Master of Business Administration (MBA)">@lang('app.postGradDegreeMBA')</option>
                                     <option value="Post Graduate Diploma in Management (PGDM)">@lang('app.postGradDegreePGDM')</option>
@@ -1162,12 +1205,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="post_graduation_percentage" id="post_graduation_percentage">
+                                <input type="number" class="form-control height-35 f-14" name="post_graduation_percentage" id="post_graduation_percentage" min="0" max="100" step="0.01">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_passing_year" fieldLabel="Passing Year">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="post_graduation_passing_year" id="post_graduation_passing_year">
+                                <input type="number" class="form-control height-35 f-14" name="post_graduation_passing_year" id="post_graduation_passing_year" min="1950" max="{{ date('Y') }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_trial" fieldLabel="Trial">
@@ -1177,107 +1220,125 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_result_file" fieldLabel="Add Post Graduation Result">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="post_graduation_result_file" name="post_graduation_result_file">
+                                <input class="form-control height-35 f-14" type="file" id="post_graduation_result_file" name="post_graduation_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
                         <hr class="my-4">
 
                         <!-- Other Degree Details Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.otherDegreeDetails')</h6>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree" fieldLabel="Other Degree">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="other_degree" id="other_degree">
+                        <div class="other-degree-section">
+                            <div class="other-degree-section-header">
+                                <div class="other-degree-section-title">@lang('app.otherDegreeDetails') 1</div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_university_name" fieldLabel="University Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="other_degree_university_name" id="other_degree_university_name">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="other_degree" fieldLabel="Other Degree">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="other_degree" id="other_degree">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="other_degree_university_name" fieldLabel="University Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="other_degree_university_name" id="other_degree_university_name">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="other_degree_percentage" fieldLabel="Percentage">
+                                    </x-forms.label>
+                                    <input type="number" class="form-control height-35 f-14" name="other_degree_percentage" id="other_degree_percentage" min="0" max="100" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="other_degree_passing_year" fieldLabel="Passing Year">
+                                    </x-forms.label>
+                                    <input type="number" class="form-control height-35 f-14" name="other_degree_passing_year" id="other_degree_passing_year" min="1950" max="{{ date('Y') }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="other_degree_trial" fieldLabel="Trial">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="other_degree_trial" id="other_degree_trial">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="other_degree_result_file" fieldLabel="Add Other Degree Result">
+                                    </x-forms.label>
+                                    <input class="form-control height-35 f-14" type="file" id="other_degree_result_file" name="other_degree_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_percentage" fieldLabel="Percentage">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="other_degree_percentage" id="other_degree_percentage">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_passing_year" fieldLabel="Passing Year">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="other_degree_passing_year" id="other_degree_passing_year">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_trial" fieldLabel="Trial">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="other_degree_trial" id="other_degree_trial">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_result_file" fieldLabel="Add Other Degree Result">
-                                </x-forms.label>
-                                <input class="form-control" type="file" id="other_degree_result_file" name="other_degree_result_file">
-                            </div>
-                            <div class="col-md-3 mt-3">
-                                <button type="button" class="btn btn-secondary btn-sm" id="add-more-education">
-                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMore')
-                                </button>
-                            </div>
+                        </div>
+                        
+                        <!-- Dynamic Other Degree Rows Container -->
+                        <div id="other-degree-rows-container"></div>
+                        
+                        <!-- Add More Button -->
+                        <div class="mt-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-sm" id="add-more-education">
+                                <i class="fa fa-plus mr-1"></i>@lang('app.addMore')
+                            </button>
                         </div>
                     </div>
                     <!-- Professional Experience Tab -->
                     <div class="tab-pane fade" id="nav-experience" role="tabpanel" aria-labelledby="nav-experience-tab">
                         <!-- Job 1 Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.job') 1</h6>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_duration_from" fieldLabel="Duration - From">
-                                </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="job_duration_from" id="job_duration_from">
+                        <div class="job-section">
+                            <div class="job-section-header">
+                                <div class="job-section-title">@lang('app.job') 1</div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_duration_to" fieldLabel="Duration - To">
-                                </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="job_duration_to" id="job_duration_to">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="job_duration_from" fieldLabel="Duration - From">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" name="job_duration_from" id="job_duration_from">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="job_duration_to" fieldLabel="Duration - To">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" name="job_duration_to" id="job_duration_to">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="job_country" fieldLabel="Country">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="job_country" id="job_country">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="job_designation" fieldLabel="Designation">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="job_designation" id="job_designation">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="job_company_name" fieldLabel="Company Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="job_company_name" id="job_company_name">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="job_salary" fieldLabel="Salary">
+                                    </x-forms.label>
+                                    <input type="number" class="form-control height-35 f-14" name="job_salary" id="job_salary">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="job_offer_letter_file" fieldLabel="Add Offerletter">
+                                    </x-forms.label>
+                                    <input class="form-control height-35 f-14" type="file" id="job_offer_letter_file" name="job_offer_letter_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="job_experience_letter_file" fieldLabel="Add Experience letter">
+                                    </x-forms.label>
+                                    <input class="form-control height-35 f-14" type="file" id="job_experience_letter_file" name="job_experience_letter_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                                </div>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_country" fieldLabel="Country">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_country" id="job_country">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_designation" fieldLabel="Designation">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_designation" id="job_designation">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_company_name" fieldLabel="Company Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_company_name" id="job_company_name">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_salary" fieldLabel="Salary">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_salary" id="job_salary">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_offer_letter_file" fieldLabel="Add Offerletter">
-                                </x-forms.label>
-                                <input class="form-control" type="file" id="job_offer_letter_file" name="job_offer_letter_file">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_experience_letter_file" fieldLabel="Add Experience letter">
-                                </x-forms.label>
-                                <input class="form-control" type="file" id="job_experience_letter_file" name="job_experience_letter_file">
-                            </div>
-                            <div class="col-md-3 mt-3">
-                                <button type="button" class="btn btn-secondary btn-sm" id="add-more-job">
-                                    <i class="fa fa-plus mr-1"></i>@lang('app.addMoreJob')
-                                </button>
-                            </div>
+                        </div>
+                        
+                        <!-- Dynamic Job Rows Container -->
+                        <div id="job-rows-container"></div>
+                        
+                        <!-- Add More Button -->
+                        <div class="mt-4 mb-3">
+                            <button type="button" class="btn btn-secondary btn-sm" id="add-more-job">
+                                <i class="fa fa-plus mr-1"></i>@lang('app.addMoreJob')
+                            </button>
                         </div>
                     </div>
                     <!-- Property Details Tab -->
                     <div class="tab-pane fade" id="nav-property" role="tabpanel" aria-labelledby="nav-property-tab">
-                        <p class="small-text mt-2 mb-3">@lang('app.enterValuationForEachProperty')</p>
+                        <p class="small-text mt-2 mb-3">Enter the valuation for each property type. The total valuation will be calculated automatically. If you do not have a property, enter a value of 0.</p>
                         
                         <!-- Property Valuation Inputs -->
                         <div class="row">
@@ -1351,7 +1412,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="valuation_report_file" fieldLabel="Add Valuation Report">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="valuation_report_file" name="valuation_report_file">
+                                <input class="form-control height-35 f-14" type="file" id="valuation_report_file" name="valuation_report_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
                     </div>
@@ -1384,22 +1445,22 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="father_income_document_file" fieldLabel="Add Father's Income Document">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="father_income_document_file" name="father_income_document_file">
+                                <input class="form-control height-35 f-14" type="file" id="father_income_document_file" name="father_income_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mother_income_document_file" fieldLabel="Add Mother's Income Document">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="mother_income_document_file" name="mother_income_document_file">
+                                <input class="form-control height-35 f-14" type="file" id="mother_income_document_file" name="mother_income_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="candidate_income_document_file" fieldLabel="Add Candidate's Income Document">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="candidate_income_document_file" name="candidate_income_document_file">
+                                <input class="form-control height-35 f-14" type="file" id="candidate_income_document_file" name="candidate_income_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_income_document_file" fieldLabel="Add Spouse Income Document">
                                 </x-forms.label>
-                                <input class="form-control" type="file" id="spouse_income_document_file" name="spouse_income_document_file">
+                                <input class="form-control height-35 f-14" type="file" id="spouse_income_document_file" name="spouse_income_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_income" fieldLabel="Total Income">
@@ -1471,17 +1532,26 @@
 
             // Handle visa status radio buttons
             $('input[name="visa_status"]').on('change', function() {
-                if ($(this).val() === 'granted') {
-                    $('#visa_rejection_date, #visa_refusal_category, #visa_refusal_reason').closest('.col-md-3, .col-md-12').hide();
-                    $('#visa_issue_date, #visa_expire_date, #visa_category').closest('.col-md-3').show();
-                } else if ($(this).val() === 'refusal') {
-                    $('#visa_issue_date, #visa_expire_date, #visa_category').closest('.col-md-3').hide();
-                    $('#visa_rejection_date, #visa_refusal_category, #visa_refusal_reason').closest('.col-md-3, .col-md-12').show();
+                const selectedValue = $(this).val();
+                
+                if (selectedValue === 'granted') {
+                    // Show Visa Granted fields, hide Visa Refusal fields
+                    $('#visa_granted_fields').show();
+                    $('#visa_refusal_fields').hide();
+                } else if (selectedValue === 'refusal') {
+                    // Show Visa Refusal fields, hide Visa Granted fields
+                    $('#visa_granted_fields').hide();
+                    $('#visa_refusal_fields').show();
                 } else {
-                    // If neither is selected, show all fields
-                    $('#visa_issue_date, #visa_expire_date, #visa_category, #visa_rejection_date, #visa_refusal_category, #visa_refusal_reason').closest('.col-md-3, .col-md-12').show();
+                    // If neither is selected, hide all fields
+                    $('#visa_granted_fields').hide();
+                    $('#visa_refusal_fields').hide();
                 }
             });
+            
+            // Initially hide all dependent fields
+            $('#visa_granted_fields').hide();
+            $('#visa_refusal_fields').hide();
 
             // Add more visa refusal functionality
             let visaRefusalCount = 0;
@@ -1495,42 +1565,30 @@
                 const newRow = `
                     <div class="row mt-3 visa-refusal-row" id="visa-refusal-row-${visaRefusalCount}">
                         <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="visa_rejection_date_${visaRefusalCount}">Visa Rejection Date</label>
+                            <x-forms.label class="mt-3" fieldId="visa_rejection_date_${visaRefusalCount}" :fieldLabel="__('app.visaRejectionDate')">
+                            </x-forms.label>
                             <input type="month" class="form-control height-35 f-14" name="visa_rejection_date[]" id="visa_rejection_date_${visaRefusalCount}">
                         </div>
                         <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="visa_refusal_category_${visaRefusalCount}">Visa Category</label>
+                            <x-forms.label class="mt-3" fieldId="visa_refusal_category_${visaRefusalCount}" :fieldLabel="__('app.visaCategory')">
+                            </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" name="visa_refusal_category[]" id="visa_refusal_category_${visaRefusalCount}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="visa_refusal_reason_${visaRefusalCount}">Reason</label>
+                        <div class="col-md-5">
+                            <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${visaRefusalCount}" :fieldLabel="__('app.reason')">
+                            </x-forms.label>
                             <textarea class="form-control f-14" rows="2" name="visa_refusal_reason[]" id="visa_refusal_reason_${visaRefusalCount}"></textarea>
                         </div>
-                        <div class="col-md-3 d-flex align-items-end">
+                        <div class="col-md-1 d-flex align-items-end">
                             <button type="button" class="btn btn-danger btn-sm remove-visa-refusal" data-row-id="${visaRefusalCount}">
-                                <i class="fa fa-trash mr-1"></i>Remove
+                                <i class="fa fa-trash"></i>
                             </button>
                         </div>
                     </div>
                 `;
                 
-                // Find the insertion point - the button is in a row, insert after that row
-                const $button = $(this);
-                const $buttonRow = $button.closest('.row');
-                
-                if ($buttonRow.length) {
-                    // Insert after the row containing the button
-                    $buttonRow.after(newRow);
-                } else {
-                    // Fallback: find the last visa-refusal-row or the button's parent container
-                    const $lastRefusalRow = $('.visa-refusal-row').last();
-                    if ($lastRefusalRow.length) {
-                        $lastRefusalRow.after(newRow);
-                    } else {
-                        // Insert after the button's parent div
-                        $button.parent().parent().after(newRow);
-                    }
-                }
+                // Append to the visa-refusal-rows-container
+                $('#visa-refusal-rows-container').append(newRow);
             });
 
             // Remove visa refusal row
@@ -1574,68 +1632,90 @@
             $('#pr_assessment_letter_file').on('change', function() {
                 const file = this.files[0];
                 if (file) {
-                    $('#pr_assessment_letter_file_name').text(file.name).show();
                     // Remove hidden input when new file is selected
                     $('#pr_assessment_letter_file_hidden').remove();
-                } else {
-                    $('#pr_assessment_letter_file_name').hide();
                 }
             });
 
             // Add More Relative Contact functionality
             let relativeContactCount = 0;
+            
+            // Function to get next relative contact number
+            function getNextRelativeContactNumber() {
+                const existingRows = $('.relative-contact-row').length;
+                return existingRows + 2; // +2 because we have initial section (1) and existing rows
+            }
+            
             $('#add-more-relative').on('click', function() {
                 relativeContactCount++;
+                const nextNumber = getNextRelativeContactNumber();
                 const newRow = `
-                    <div class="row mt-3 relative-contact-row" id="relative-contact-row-${relativeContactCount}">
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_surname_${relativeContactCount}">Surname</label>
-                            <input type="text" class="form-control height-35 f-14" name="relative_surname[]" id="relative_surname_${relativeContactCount}">
+                    <div class="relative-contact-row" id="relative-contact-row-${relativeContactCount}">
+                        <div class="relative-contact-row-header">
+                            <div class="relative-contact-row-number">Relative Contact ${nextNumber}</div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_given_name_${relativeContactCount}">Given Name</label>
-                            <input type="text" class="form-control height-35 f-14" name="relative_given_name[]" id="relative_given_name_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_organization_name_${relativeContactCount}">Organization Name</label>
-                            <input type="text" class="form-control height-35 f-14" name="relative_organization_name[]" id="relative_organization_name_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_relationship_${relativeContactCount}">Relationship To You</label>
-                            <input type="text" class="form-control height-35 f-14" name="relative_relationship[]" id="relative_relationship_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-12">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_contact_address_${relativeContactCount}">Contact Address</label>
-                            <input type="text" class="form-control height-35 f-14" name="relative_contact_address[]" id="relative_contact_address_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_city_${relativeContactCount}">City</label>
-                            <input type="text" class="form-control height-35 f-14" name="relative_city[]" id="relative_city_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_state_${relativeContactCount}">State</label>
-                            <input type="text" class="form-control height-35 f-14" name="relative_state[]" id="relative_state_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_zip_code_${relativeContactCount}">Zip Code</label>
-                            <input type="text" class="form-control height-35 f-14" name="relative_zip_code[]" id="relative_zip_code_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_email_address_${relativeContactCount}">Email Address</label>
-                            <input type="email" class="form-control height-35 f-14" name="relative_email_address[]" id="relative_email_address_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="relative_phone_number_${relativeContactCount}">Phone Number</label>
-                            <input type="tel" maxlength="10" class="form-control height-35 f-14" name="relative_phone_number[]" id="relative_phone_number_${relativeContactCount}">
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger btn-sm remove-relative-contact" data-row-id="${relativeContactCount}">
-                                <i class="fa fa-trash mr-1"></i>Remove
-                            </button>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_surname_${relativeContactCount}" fieldLabel="Surname">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_surname[]" id="relative_surname_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_given_name_${relativeContactCount}" fieldLabel="Given Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_given_name[]" id="relative_given_name_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_organization_name_${relativeContactCount}" fieldLabel="Organization Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_organization_name[]" id="relative_organization_name_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_relationship_${relativeContactCount}" fieldLabel="Relationship To You">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_relationship[]" id="relative_relationship_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-12">
+                                <x-forms.label class="mt-3" fieldId="relative_contact_address_${relativeContactCount}" fieldLabel="Contact Address">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_contact_address[]" id="relative_contact_address_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_city_${relativeContactCount}" fieldLabel="City">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_city[]" id="relative_city_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_state_${relativeContactCount}" fieldLabel="State">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_state[]" id="relative_state_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_zip_code_${relativeContactCount}" fieldLabel="Zip Code">
+                                </x-forms.label>
+                                <input type="number" class="form-control height-35 f-14" name="relative_zip_code[]" id="relative_zip_code_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_email_address_${relativeContactCount}" fieldLabel="Email Address">
+                                </x-forms.label>
+                                <input type="email" class="form-control height-35 f-14" name="relative_email_address[]" id="relative_email_address_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_phone_number_${relativeContactCount}" fieldLabel="Phone Number">
+                                </x-forms.label>
+                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="relative_phone_number[]" id="relative_phone_number_${relativeContactCount}">
+                            </div>
+                            <div class="col-md-12 mt-3">
+                                <button type="button" class="btn btn-danger btn-sm remove-relative-contact" data-row-id="${relativeContactCount}">
+                                    <i class="fa fa-trash mr-1"></i>Remove
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
-                $(this).closest('.row').after(newRow);
+                
+                // Append to the relative-contact-rows-container
+                $('#relative-contact-rows-container').append(newRow);
             });
 
             // Remove relative contact row
@@ -1645,59 +1725,75 @@
             });
 
             // Add More Child functionality
-            let childCount = 1; // Start from 1 since we already have Child 1
+            function getNextChildNumber() {
+                const existingRows = $('.child-row').length;
+                return existingRows + 2; // +2 because we have initial section (1) and existing rows
+            }
+            
             $('#add-more-child').on('click', function() {
-                childCount++;
+                const nextChildNum = getNextChildNumber();
                 const newRow = `
-                    <div class="row mt-3 child-row" id="child-row-${childCount}">
-                        <div class="col-md-12">
-                            <h6 class="mb-3 f-15 font-weight-bold">Child ${childCount}</h6>
+                    <div class="child-row" id="child-row-${nextChildNum}">
+                        <div class="child-row-header">
+                            <div class="child-row-number">Child ${nextChildNum}</div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="child_name_${childCount}">Child's Name</label>
-                            <input type="text" class="form-control height-35 f-14" name="child_name[]" id="child_name_${childCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="child_age_${childCount}">Child's Age</label>
-                            <input type="text" class="form-control height-35 f-14" name="child_age[]" id="child_age_${childCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="child_date_of_birth_${childCount}">Date of Birth</label>
-                            <input type="date" class="form-control height-35 f-14" name="child_date_of_birth[]" id="child_date_of_birth_${childCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="child_city_of_birth_${childCount}">City of Birth</label>
-                            <input type="text" class="form-control height-35 f-14" name="child_city_of_birth[]" id="child_city_of_birth_${childCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="child_have_passport_${childCount}">Have Passport</label>
-                            <select class="form-control select-picker" name="child_have_passport[]" id="child_have_passport_${childCount}">
-                                <option value="">@lang('app.select')</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="child_gender_${childCount}">Gender</label>
-                            <select class="form-control select-picker" name="child_gender[]" id="child_gender_${childCount}">
-                                <option value="">@lang('app.select')</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Prefer not to say">Prefer not to say</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="child_document_file_${childCount}">Add Child Document</label>
-                            <input class="form-control" type="file" name="child_document_file[]" id="child_document_file_${childCount}">
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger btn-sm remove-child" data-row-id="${childCount}">
-                                <i class="fa fa-trash mr-1"></i>Remove
-                            </button>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_name_${nextChildNum}" fieldLabel="Child's Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="child_name[]" id="child_name_${nextChildNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_age_${nextChildNum}" fieldLabel="Child's Age">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="child_age[]" id="child_age_${nextChildNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_date_of_birth_${nextChildNum}" fieldLabel="Date of Birth">
+                                </x-forms.label>
+                                <input type="date" class="form-control height-35 f-14" name="child_date_of_birth[]" id="child_date_of_birth_${nextChildNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_city_of_birth_${nextChildNum}" fieldLabel="City of Birth">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="child_city_of_birth[]" id="child_city_of_birth_${nextChildNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_have_passport_${nextChildNum}" fieldLabel="Have Passport">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="child_have_passport[]" id="child_have_passport_${nextChildNum}">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_gender_${nextChildNum}" fieldLabel="Gender">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="child_gender[]" id="child_gender_${nextChildNum}">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_document_file_${nextChildNum}" fieldLabel="Add Child Document">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="child_document_file[]" id="child_document_file_${nextChildNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                            </div>
+                            <div class="col-md-12 mt-3">
+                                <button type="button" class="btn btn-danger btn-sm remove-child" data-row-id="${nextChildNum}">
+                                    <i class="fa fa-trash mr-1"></i>Remove
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
-                $(this).closest('.row').after(newRow);
+                
+                // Append to the child-rows-container
+                $('#child-rows-container').append(newRow);
+                
                 // Reinitialize select picker for the new row
                 $('.select-picker').selectpicker('refresh');
             });
@@ -1709,46 +1805,60 @@
             });
 
             // Add More Education (Other Degree) functionality
-            let otherDegreeCount = 0;
+            function getNextOtherDegreeNumber() {
+                const existingRows = $('.other-degree-row').length;
+                return existingRows + 2; // +2 because we have initial section (1) and existing rows
+            }
+            
             $('#add-more-education').on('click', function() {
-                otherDegreeCount++;
+                const nextDegreeNum = getNextOtherDegreeNumber();
                 const newRow = `
-                    <div class="row mt-3 other-degree-row" id="other-degree-row-${otherDegreeCount}">
-                        <div class="col-md-12">
-                            <h6 class="mb-3 f-15 font-weight-bold">Other Degree ${otherDegreeCount + 1}</h6>
+                    <div class="other-degree-row" id="other-degree-row-${nextDegreeNum}">
+                        <div class="other-degree-row-header">
+                            <div class="other-degree-row-number">Other Degree ${nextDegreeNum}</div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="other_degree_${otherDegreeCount}">Other Degree</label>
-                            <input type="text" class="form-control height-35 f-14" name="other_degree[]" id="other_degree_${otherDegreeCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="other_degree_university_name_${otherDegreeCount}">University Name</label>
-                            <input type="text" class="form-control height-35 f-14" name="other_degree_university_name[]" id="other_degree_university_name_${otherDegreeCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="other_degree_percentage_${otherDegreeCount}">Percentage</label>
-                            <input type="text" class="form-control height-35 f-14" name="other_degree_percentage[]" id="other_degree_percentage_${otherDegreeCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="other_degree_passing_year_${otherDegreeCount}">Passing Year</label>
-                            <input type="text" class="form-control height-35 f-14" name="other_degree_passing_year[]" id="other_degree_passing_year_${otherDegreeCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="other_degree_trial_${otherDegreeCount}">Trial</label>
-                            <input type="text" class="form-control height-35 f-14" name="other_degree_trial[]" id="other_degree_trial_${otherDegreeCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="other_degree_result_file_${otherDegreeCount}">Add Other Degree Result</label>
-                            <input class="form-control" type="file" name="other_degree_result_file[]" id="other_degree_result_file_${otherDegreeCount}">
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger btn-sm remove-other-degree" data-row-id="${otherDegreeCount}">
-                                <i class="fa fa-trash mr-1"></i>Remove
-                            </button>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="other_degree_${nextDegreeNum}" fieldLabel="Other Degree">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="other_degree[]" id="other_degree_${nextDegreeNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="other_degree_university_name_${nextDegreeNum}" fieldLabel="University Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="other_degree_university_name[]" id="other_degree_university_name_${nextDegreeNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="other_degree_percentage_${nextDegreeNum}" fieldLabel="Percentage">
+                                </x-forms.label>
+                                <input type="number" class="form-control height-35 f-14" name="other_degree_percentage[]" id="other_degree_percentage_${nextDegreeNum}" min="0" max="100" step="0.01">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="other_degree_passing_year_${nextDegreeNum}" fieldLabel="Passing Year">
+                                </x-forms.label>
+                                <input type="number" class="form-control height-35 f-14" name="other_degree_passing_year[]" id="other_degree_passing_year_${nextDegreeNum}" min="1950" max="{{ date('Y') }}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="other_degree_trial_${nextDegreeNum}" fieldLabel="Trial">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="other_degree_trial[]" id="other_degree_trial_${nextDegreeNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="other_degree_result_file_${nextDegreeNum}" fieldLabel="Add Other Degree Result">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="other_degree_result_file[]" id="other_degree_result_file_${nextDegreeNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                            </div>
+                            <div class="col-md-12 mt-3">
+                                <button type="button" class="btn btn-danger btn-sm remove-other-degree" data-row-id="${nextDegreeNum}">
+                                    <i class="fa fa-trash mr-1"></i>Remove
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
-                $(this).closest('.row').after(newRow);
+                
+                // Append to the other-degree-rows-container
+                $('#other-degree-rows-container').append(newRow);
             });
 
             // Remove other degree row
@@ -1758,54 +1868,70 @@
             });
 
             // Add More Job functionality
-            let jobCount = 1; // Start from 1 since we already have Job 1
+            function getNextJobNumber() {
+                const existingRows = $('.job-row').length;
+                return existingRows + 2; // +2 because we have initial section (1) and existing rows
+            }
+            
             $('#add-more-job').on('click', function() {
-                jobCount++;
+                const nextJobNum = getNextJobNumber();
                 const newRow = `
-                    <div class="row mt-3 job-row" id="job-row-${jobCount}">
-                        <div class="col-md-12">
-                            <h6 class="mb-3 f-15 font-weight-bold">Job ${jobCount}</h6>
+                    <div class="job-row" id="job-row-${nextJobNum}">
+                        <div class="job-row-header">
+                            <div class="job-row-number">Job ${nextJobNum}</div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="job_duration_from_${jobCount}">Duration - From</label>
-                            <input type="date" class="form-control height-35 f-14" name="job_duration_from[]" id="job_duration_from_${jobCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="job_duration_to_${jobCount}">Duration - To</label>
-                            <input type="date" class="form-control height-35 f-14" name="job_duration_to[]" id="job_duration_to_${jobCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="job_country_${jobCount}">Country</label>
-                            <input type="text" class="form-control height-35 f-14" name="job_country[]" id="job_country_${jobCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="job_designation_${jobCount}">Designation</label>
-                            <input type="text" class="form-control height-35 f-14" name="job_designation[]" id="job_designation_${jobCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="job_company_name_${jobCount}">Company Name</label>
-                            <input type="text" class="form-control height-35 f-14" name="job_company_name[]" id="job_company_name_${jobCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="job_salary_${jobCount}">Salary</label>
-                            <input type="text" class="form-control height-35 f-14" name="job_salary[]" id="job_salary_${jobCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="job_offer_letter_file_${jobCount}">Add Offerletter</label>
-                            <input class="form-control" type="file" name="job_offer_letter_file[]" id="job_offer_letter_file_${jobCount}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="f-14 font-weight-bold mt-3" for="job_experience_letter_file_${jobCount}">Add Experience letter</label>
-                            <input class="form-control" type="file" name="job_experience_letter_file[]" id="job_experience_letter_file_${jobCount}">
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger btn-sm remove-job" data-row-id="${jobCount}">
-                                <i class="fa fa-trash mr-1"></i>Remove
-                            </button>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_duration_from_${nextJobNum}" fieldLabel="Duration - From">
+                                </x-forms.label>
+                                <input type="date" class="form-control height-35 f-14" name="job_duration_from[]" id="job_duration_from_${nextJobNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_duration_to_${nextJobNum}" fieldLabel="Duration - To">
+                                </x-forms.label>
+                                <input type="date" class="form-control height-35 f-14" name="job_duration_to[]" id="job_duration_to_${nextJobNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_country_${nextJobNum}" fieldLabel="Country">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="job_country[]" id="job_country_${nextJobNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_designation_${nextJobNum}" fieldLabel="Designation">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="job_designation[]" id="job_designation_${nextJobNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_company_name_${nextJobNum}" fieldLabel="Company Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="job_company_name[]" id="job_company_name_${nextJobNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_salary_${nextJobNum}" fieldLabel="Salary">
+                                </x-forms.label>
+                                <input type="number" class="form-control height-35 f-14" name="job_salary[]" id="job_salary_${nextJobNum}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_offer_letter_file_${nextJobNum}" fieldLabel="Add Offerletter">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="job_offer_letter_file[]" id="job_offer_letter_file_${nextJobNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_experience_letter_file_${nextJobNum}" fieldLabel="Add Experience letter">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="job_experience_letter_file[]" id="job_experience_letter_file_${nextJobNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                            </div>
+                            <div class="col-md-12 mt-3">
+                                <button type="button" class="btn btn-danger btn-sm remove-job" data-row-id="${nextJobNum}">
+                                    <i class="fa fa-trash mr-1"></i>Remove
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
-                $(this).closest('.row').after(newRow);
+                
+                // Append to the job-rows-container
+                $('#job-rows-container').append(newRow);
             });
 
             // Remove job row
@@ -1832,6 +1958,58 @@
                     total += val;
                 });
                 $('#total_income').val(total);
+            });
+            
+            // Handle Father Have Passport - show/hide passport file field
+            $('#father_have_passport').on('changed.bs.select', function() {
+                const havePassport = $(this).val();
+                if (havePassport === 'Yes') {
+                    $('#father_passport_file_container').show();
+                } else {
+                    $('#father_passport_file_container').hide();
+                    $('#father_passport_file').val('');
+                }
+            });
+            
+            // Handle Mother Have Passport - show/hide passport file field
+            $('#mother_have_passport').on('changed.bs.select', function() {
+                const havePassport = $(this).val();
+                if (havePassport === 'Yes') {
+                    $('#mother_passport_file_container').show();
+                } else {
+                    $('#mother_passport_file_container').hide();
+                    $('#mother_passport_file').val('');
+                }
+            });
+            
+            // Trigger on page load if values are already set
+            setTimeout(function() {
+                if ($('#father_have_passport').val() === 'Yes') {
+                    $('#father_passport_file_container').show();
+                }
+                if ($('#mother_have_passport').val() === 'Yes') {
+                    $('#mother_passport_file_container').show();
+                }
+            }, 500);
+            
+            // File size validation for all file inputs
+            $(document).on('change', 'input[type="file"][data-max-size]', function() {
+                const file = this.files[0];
+                const maxSize = $(this).data('max-size'); // 5242880 = 5MB
+                if (file && file.size > maxSize) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File too large',
+                            text: 'File size must be less than 5MB',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        alert('File size must be less than 5MB');
+                    }
+                    $(this).val('');
+                }
             });
 
             // Function to filter states based on selected country
@@ -1866,18 +2044,18 @@
                     const selectedCountry = $(this).val();
                     
                     if (selectedCountry) {
-                        // Hide all state options except the "Select" option
+                        // Show only matching states, hide others
                         stateSelect.find('option[value!=""]').each(function() {
                             const $option = $(this);
                             if ($option.data('country') === selectedCountry) {
-                                $option.prop('disabled', false);
+                                $option.prop('disabled', false).show();
                             } else {
-                                $option.prop('disabled', true);
+                                $option.prop('disabled', true).hide();
                             }
                         });
                     } else {
-                        // If no country selected, enable all states
-                        stateSelect.find('option').prop('disabled', false);
+                        // If no country selected, show all states
+                        stateSelect.find('option').prop('disabled', false).show();
                     }
                     
                     // Reset state selection and refresh selectpicker
@@ -2049,6 +2227,13 @@
                     // Visa status
                     if (data.visa_status) {
                         $('input[name="visa_status"][value="' + data.visa_status + '"]').prop('checked', true).trigger('change');
+                        
+                        // Populate visa granted fields if status is granted
+                        if (data.visa_status === 'granted') {
+                            $('#visa_issue_date').val(data.visa_issue_date || '');
+                            $('#visa_expire_date').val(data.visa_expire_date || '');
+                            $('#visa_category').val(data.visa_category || '');
+                        }
                     }
                     
                     // Visa refusals
@@ -2075,10 +2260,12 @@
                                 } else {
                                     // Add more refusal rows
                                     $('#add-more-visa-refusal').trigger('click');
-                                    const row = $('.visa-refusal-row').last();
-                                    row.find('input[name="visa_rejection_date[]"]').val(refusal.date || '');
-                                    row.find('input[name="visa_refusal_category[]"]').val(refusal.category || '');
-                                    row.find('textarea[name="visa_refusal_reason[]"]').val(refusal.reason || '');
+                                    setTimeout(function() {
+                                        const row = $('.visa-refusal-row').last();
+                                        row.find('input[name="visa_rejection_date[]"]').val(refusal.date || '');
+                                        row.find('input[name="visa_refusal_category[]"]').val(refusal.category || '');
+                                        row.find('textarea[name="visa_refusal_reason[]"]').val(refusal.reason || '');
+                                    }, 100);
                                 }
                             });
                         }
@@ -2099,10 +2286,9 @@
                             if (data.skill_assessment_letter) {
                                 $('#skill_assessment_letter').val(data.skill_assessment_letter).selectpicker('refresh');
                             }
-                            // Show uploaded assessment letter file name if exists
+                            // Store the file name in a hidden input for reference if exists
                             if (data.pr_assessment_letter_file) {
                                 const fileName = data.pr_assessment_letter_file;
-                                $('#pr_assessment_letter_file_name').text(fileName).show();
                                 
                                 // Store the file name in a hidden input for reference
                                 if ($('#pr_assessment_letter_file_hidden').length === 0) {
@@ -2400,15 +2586,64 @@
                 return $select.val();
             }
             
+            // Helper function to show error message below a field
+            function showFieldError(fieldId, errorMessage) {
+                const $field = $(fieldId);
+                
+                // Find the parent column container
+                const $parentColumn = $field.closest('.col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-12');
+                
+                // Check if it's a bootstrap-select field first
+                const $bootstrapSelect = $field.closest('.bootstrap-select');
+                
+                // Remove ALL existing error messages comprehensively
+                if ($parentColumn.length) {
+                    // Remove from entire parent column
+                    $parentColumn.find('.invalid-feedback').remove();
+                }
+                // Remove from field itself and siblings
+                $field.next('.invalid-feedback').remove();
+                $field.siblings('.invalid-feedback').remove();
+                
+                if ($bootstrapSelect.length) {
+                    // For bootstrap-select, add is-invalid to the wrapper
+                    // CSS will handle hiding the error styling on the select element
+                    $bootstrapSelect.addClass('is-invalid');
+                    
+                    // Remove errors from wrapper and its parent
+                    $bootstrapSelect.next('.invalid-feedback').remove();
+                    $bootstrapSelect.siblings('.invalid-feedback').remove();
+                    $bootstrapSelect.parent().find('.invalid-feedback').remove();
+                    
+                    // Add error after the wrapper (only once)
+                    $bootstrapSelect.after('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+                } else if ($field.attr('type') === 'file') {
+                    // For file inputs, add is-invalid to the field
+                    $field.addClass('is-invalid');
+                    // For file inputs, add error after the parent container
+                    if ($parentColumn.length) {
+                        $parentColumn.append('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+                    } else {
+                        $field.after('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+                    }
+                } else {
+                    // For regular inputs, add is-invalid to the field
+                    $field.addClass('is-invalid');
+                    // Add error message below the field
+                    $field.after('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+                }
+            }
+            
             // Validate current step before saving
             function validateCurrentStep() {
                 currentStep = getCurrentStep();
                 let isValid = true;
-                let errorMessages = [];
                 
-                // Remove previous error styling
+                // Remove previous error styling and messages
                 $('.form-control').removeClass('is-invalid');
                 $('.bootstrap-select').removeClass('is-invalid');
+                $('.form-check').removeClass('is-invalid');
+                $('.form-check-input').removeClass('is-invalid');
                 $('.invalid-feedback').remove();
                 
                 switch (currentStep) {
@@ -2417,156 +2652,133 @@
                         const surnameVal = $('#surname').val() || '';
                         if (!surnameVal.trim()) {
                             isValid = false;
-                            errorMessages.push('@lang('app.surname') @lang('validation.required')');
-                            $('#surname').addClass('is-invalid');
+                            showFieldError('#surname', '@lang('app.surname') is required');
                         }
                         const givenNameVal = $('#given_name').val() || '';
                         if (!givenNameVal.trim()) {
                             isValid = false;
-                            errorMessages.push('@lang('app.givenName') @lang('validation.required')');
-                            $('#given_name').addClass('is-invalid');
+                            showFieldError('#given_name', '@lang('app.givenName') is required');
                         }
                         // Gender validation (select field)
                         const genderVal = getSelectValue('#gender');
                         if (!genderVal || genderVal === '' || genderVal === null || (Array.isArray(genderVal) && genderVal.length === 0)) {
                             isValid = false;
-                            errorMessages.push('@lang('app.gender') @lang('validation.required')');
-                            $('#gender').addClass('is-invalid');
-                            $('#gender').closest('.bootstrap-select').addClass('is-invalid');
+                            showFieldError('#gender', '@lang('app.gender') is required');
                         }
                         // Marital Status validation (select field)
                         const maritalStatusVal = getSelectValue('#marital_status');
                         if (!maritalStatusVal || maritalStatusVal === '' || maritalStatusVal === null || (Array.isArray(maritalStatusVal) && maritalStatusVal.length === 0)) {
                             isValid = false;
-                            errorMessages.push('@lang('app.maritalStatus') @lang('validation.required')');
-                            $('#marital_status').addClass('is-invalid');
-                            $('#marital_status').closest('.bootstrap-select').addClass('is-invalid');
+                            showFieldError('#marital_status', '@lang('app.maritalStatus') is required');
                         }
                         if (!$('#date_of_birth').val()) {
                             isValid = false;
-                            errorMessages.push('@lang('app.dateOfBirth') @lang('validation.required')');
-                            $('#date_of_birth').addClass('is-invalid');
+                            showFieldError('#date_of_birth', '@lang('app.dateOfBirth') is required');
                         }
                         const countryOfOriginVal = $('#country_of_origin').val() || '';
                         if (!countryOfOriginVal.trim()) {
                             isValid = false;
-                            errorMessages.push('@lang('app.countryOfOrigin') @lang('validation.required')');
-                            $('#country_of_origin').addClass('is-invalid');
+                            showFieldError('#country_of_origin', '@lang('app.countryOfOrigin') is required');
                         }
                         // Lead Source validation (select field)
                         const leadSourceVal = getSelectValue('#lead_source');
                         if (!leadSourceVal || leadSourceVal === '' || leadSourceVal === null || (Array.isArray(leadSourceVal) && leadSourceVal.length === 0)) {
                             isValid = false;
-                            errorMessages.push('@lang('modules.lead.leadSource') @lang('validation.required')');
-                            $('#lead_source').addClass('is-invalid');
-                            $('#lead_source').closest('.bootstrap-select').addClass('is-invalid');
+                            showFieldError('#lead_source', '@lang('modules.lead.leadSource') is required');
                         }
                         // Lead Assign To validation (select field)
                         const leadAssignToVal = getSelectValue('#lead_assign_to');
                         if (!leadAssignToVal || leadAssignToVal === '' || leadAssignToVal === null || (Array.isArray(leadAssignToVal) && leadAssignToVal.length === 0)) {
                             isValid = false;
-                            errorMessages.push('@lang('app.leadAssignTo') @lang('validation.required')');
-                            $('#lead_assign_to').addClass('is-invalid');
-                            $('#lead_assign_to').closest('.bootstrap-select').addClass('is-invalid');
+                            showFieldError('#lead_assign_to', '@lang('app.leadAssignTo') is required');
                         }
                         const homeAddressVal = $('#home_address').val() || '';
                         if (!homeAddressVal.trim()) {
                             isValid = false;
-                            errorMessages.push('@lang('modules.lead.address') @lang('validation.required')');
-                            $('#home_address').addClass('is-invalid');
+                            showFieldError('#home_address', '@lang('modules.lead.address') is required');
                         }
                         const homeCityVal = $('#home_city').val() || '';
                         if (!homeCityVal.trim()) {
                             isValid = false;
-                            errorMessages.push('@lang('app.city') @lang('validation.required')');
-                            $('#home_city').addClass('is-invalid');
+                            showFieldError('#home_city', '@lang('app.city') is required');
                         }
                         const homeStateVal = $('#home_state').val() || '';
                         if (!homeStateVal.trim()) {
                             isValid = false;
-                            errorMessages.push('@lang('app.state') @lang('validation.required')');
-                            $('#home_state').addClass('is-invalid');
+                            showFieldError('#home_state', '@lang('app.state') is required');
                         }
                         const homePinCodeVal = $('#home_pin_code').val() || '';
                         if (!homePinCodeVal.trim()) {
                             isValid = false;
-                            errorMessages.push('@lang('app.pinCode') @lang('validation.required')');
-                            $('#home_pin_code').addClass('is-invalid');
+                            showFieldError('#home_pin_code', '@lang('app.pinCode') is required');
                         }
                         // Mailing address validation (only if not same as home)
                         if (!$('#mailing_same_as_home').is(':checked')) {
                             const mailingAddressVal = $('#mailing_address').val() || '';
                             if (!mailingAddressVal.trim()) {
                                 isValid = false;
-                                errorMessages.push('@lang('modules.lead.address') @lang('validation.required')');
-                                $('#mailing_address').addClass('is-invalid');
+                                showFieldError('#mailing_address', '@lang('modules.lead.address') is required');
                             }
                             const mailingCityVal = $('#mailing_city').val() || '';
                             if (!mailingCityVal.trim()) {
                                 isValid = false;
-                                errorMessages.push('@lang('app.city') @lang('validation.required')');
-                                $('#mailing_city').addClass('is-invalid');
+                                showFieldError('#mailing_city', '@lang('app.city') is required');
                             }
                             const mailingStateVal = $('#mailing_state').val() || '';
                             if (!mailingStateVal.trim()) {
                                 isValid = false;
-                                errorMessages.push('@lang('app.state') @lang('validation.required')');
-                                $('#mailing_state').addClass('is-invalid');
+                                showFieldError('#mailing_state', '@lang('app.state') is required');
                             }
                             const mailingPinCodeVal = $('#mailing_pin_code').val() || '';
                             if (!mailingPinCodeVal.trim()) {
                                 isValid = false;
-                                errorMessages.push('@lang('app.pinCode') @lang('validation.required')');
-                                $('#mailing_pin_code').addClass('is-invalid');
+                                showFieldError('#mailing_pin_code', '@lang('app.pinCode') is required');
                             }
                         }
                         // Primary phone validation
                         const primaryPhone = ($('#primary_phone').val() || '').trim();
                         if (!primaryPhone) {
                             isValid = false;
-                            errorMessages.push('@lang('app.primaryPhoneNo') @lang('validation.required')');
-                            $('#primary_phone').addClass('is-invalid');
+                            showFieldError('#primary_phone', '@lang('app.primaryPhoneNo') is required');
                         } else if (!/^[0-9]{10}$/.test(primaryPhone)) {
                             isValid = false;
-                            errorMessages.push('@lang('app.primaryPhoneNo') must be 10 digits');
-                            $('#primary_phone').addClass('is-invalid');
+                            showFieldError('#primary_phone', '@lang('app.primaryPhoneNo') must be 10 digits');
                         }
                         // Email validation
                         const emailAddress = ($('#email_address').val() || '').trim();
                         if (!emailAddress) {
                             isValid = false;
-                            errorMessages.push('@lang('modules.lead.email') @lang('validation.required')');
-                            $('#email_address').addClass('is-invalid');
+                            showFieldError('#email_address', '@lang('modules.lead.email') is required');
                         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress)) {
                             isValid = false;
-                            errorMessages.push('@lang('modules.lead.email') must be a valid email address');
-                            $('#email_address').addClass('is-invalid');
+                            showFieldError('#email_address', '@lang('modules.lead.email') must be a valid email address');
                         }
                         // Optional phone fields validation
                         const secondaryPhone = ($('#secondary_phone').val() || '').trim();
                         if (secondaryPhone && !/^[0-9]{10}$/.test(secondaryPhone)) {
                             isValid = false;
-                            errorMessages.push('@lang('app.secondaryPhoneNo') must be 10 digits');
-                            $('#secondary_phone').addClass('is-invalid');
+                            showFieldError('#secondary_phone', '@lang('app.secondaryPhoneNo') must be 10 digits');
                         }
                         const workPhone = ($('#work_phone').val() || '').trim();
                         if (workPhone && !/^[0-9]{10}$/.test(workPhone)) {
                             isValid = false;
-                            errorMessages.push('@lang('app.workPhoneNo') must be 10 digits');
-                            $('#work_phone').addClass('is-invalid');
+                            showFieldError('#work_phone', '@lang('app.workPhoneNo') must be 10 digits');
+                        }
+                        const otherPhone = ($('#other_phone').val() || '').trim();
+                        if (otherPhone && !/^[0-9]{10}$/.test(otherPhone)) {
+                            isValid = false;
+                            showFieldError('#other_phone', '@lang('app.otherPhoneNo') must be 10 digits');
                         }
                         const mobile = ($('#mobile').val() || '').trim();
                         if (mobile && !/^[0-9]{10}$/.test(mobile)) {
                             isValid = false;
-                            errorMessages.push('@lang('app.mobile') must be 10 digits');
-                            $('#mobile').addClass('is-invalid');
+                            showFieldError('#mobile', '@lang('app.mobile') must be 10 digits');
                         }
                         // Optional email validation
                         const otherEmail = ($('#other_email').val() || '').trim();
                         if (otherEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(otherEmail)) {
                             isValid = false;
-                            errorMessages.push('@lang('app.otherEmail') must be a valid email address');
-                            $('#other_email').addClass('is-invalid');
+                            showFieldError('#other_email', '@lang('app.otherEmail') must be a valid email address');
                         }
                         break;
                         
@@ -2574,7 +2786,11 @@
                         // Step 2 - Client Preference
                         if (!$('input[name="visa_type"]:checked').val()) {
                             isValid = false;
-                            errorMessages.push('@lang('app.selectVisaType') @lang('validation.required')');
+                            // Show error on visa type radio buttons container
+                            const $visaTypeContainer = $('input[name="visa_type"]').closest('.row').first();
+                            $visaTypeContainer.find('.invalid-feedback').remove();
+                            $visaTypeContainer.append('<div class="invalid-feedback d-block col-12">@lang('app.selectVisaType') is required</div>');
+                            $('input[name="visa_type"]').closest('.form-check').addClass('is-invalid');
                         } else {
                             const visaType = $('input[name="visa_type"]:checked').val();
                             
@@ -2583,22 +2799,17 @@
                                 const skillAssessmentLetterVal = getSelectValue('#skill_assessment_letter');
                                 if (!skillAssessmentLetterVal || skillAssessmentLetterVal === '' || skillAssessmentLetterVal === null || (Array.isArray(skillAssessmentLetterVal) && skillAssessmentLetterVal.length === 0)) {
                                     isValid = false;
-                                    errorMessages.push('@lang('app.skillAssessmentLetter') @lang('validation.required')');
-                                    $('#skill_assessment_letter').addClass('is-invalid');
-                                    $('#skill_assessment_letter').closest('.bootstrap-select').addClass('is-invalid');
+                                    showFieldError('#skill_assessment_letter', '@lang('app.skillAssessmentLetter') is required');
                                 }
                                 // pr_assessment_letter_file is required if not already uploaded
                                 if (!$('#pr_assessment_letter_file').val() && !$('#pr_assessment_letter_file_hidden').length) {
                                     isValid = false;
-                                    errorMessages.push('@lang('app.addAssessmentLetter') @lang('validation.required')');
-                                    $('#pr_assessment_letter_file').addClass('is-invalid');
+                                    showFieldError('#pr_assessment_letter_file', '@lang('app.addAssessmentLetter') is required');
                                 }
                                 const prFamilyVal = getSelectValue('#pr_family');
                                 if (!prFamilyVal || prFamilyVal === '' || prFamilyVal === null || (Array.isArray(prFamilyVal) && prFamilyVal.length === 0)) {
                                     isValid = false;
-                                    errorMessages.push('@lang('app.family') @lang('validation.required')');
-                                    $('#pr_family').addClass('is-invalid');
-                                    $('#pr_family').closest('.bootstrap-select').addClass('is-invalid');
+                                    showFieldError('#pr_family', '@lang('app.family') is required');
                                 }
                             }
                             
@@ -2607,15 +2818,12 @@
                                 const purposeOfVisitVal = $('#purpose_of_visit').val() || '';
                                 if (!purposeOfVisitVal.trim()) {
                                     isValid = false;
-                                    errorMessages.push('@lang('app.purposeOfVisit') @lang('validation.required')');
-                                    $('#purpose_of_visit').addClass('is-invalid');
+                                    showFieldError('#purpose_of_visit', '@lang('app.purposeOfVisit') is required');
                                 }
                                 const visitFamilyVal = getSelectValue('#visit_family');
                                 if (!visitFamilyVal || visitFamilyVal === '' || visitFamilyVal === null || (Array.isArray(visitFamilyVal) && visitFamilyVal.length === 0)) {
                                     isValid = false;
-                                    errorMessages.push('@lang('app.family') @lang('validation.required')');
-                                    $('#visit_family').addClass('is-invalid');
-                                    $('#visit_family').closest('.bootstrap-select').addClass('is-invalid');
+                                    showFieldError('#visit_family', '@lang('app.family') is required');
                                 }
                             }
                             
@@ -2624,8 +2832,7 @@
                                 const preferredDesignationVal = $('#preferred_designation').val() || '';
                                 if (!preferredDesignationVal.trim()) {
                                     isValid = false;
-                                    errorMessages.push('@lang('app.preferredDesignation') @lang('validation.required')');
-                                    $('#preferred_designation').addClass('is-invalid');
+                                    showFieldError('#preferred_designation', '@lang('app.preferredDesignation') is required');
                                 }
                             }
                             
@@ -2634,8 +2841,7 @@
                                 const termIntakeVal = ($('#term_intake').val() || '').trim();
                                 if (!termIntakeVal) {
                                     isValid = false;
-                                    errorMessages.push('@lang('app.termIntake') @lang('validation.required')');
-                                    $('#term_intake').addClass('is-invalid');
+                                    showFieldError('#term_intake', '@lang('app.termIntake') is required');
                                 }
                             }
                         }
@@ -2646,29 +2852,38 @@
                         const issuingCountryVal = $('#issuing_country').val() || '';
                         if (!issuingCountryVal.trim()) {
                             isValid = false;
-                            errorMessages.push('Issuing Country @lang('validation.required')');
-                            $('#issuing_country').addClass('is-invalid');
+                            showFieldError('#issuing_country', 'Issuing Country is required');
                         }
                         const cityWhereIssuedVal = $('#city_where_issued').val() || '';
                         if (!cityWhereIssuedVal.trim()) {
                             isValid = false;
-                            errorMessages.push('City Where Issued @lang('validation.required')');
-                            $('#city_where_issued').addClass('is-invalid');
+                            showFieldError('#city_where_issued', 'City Where Issued is required');
                         }
                         if (!$('#issuance_date').val()) {
                             isValid = false;
-                            errorMessages.push('Issuance Date @lang('validation.required')');
-                            $('#issuance_date').addClass('is-invalid');
+                            showFieldError('#issuance_date', 'Issuance Date is required');
                         }
                         if (!$('#expiration_date').val()) {
                             isValid = false;
-                            errorMessages.push('Expiration Date @lang('validation.required')');
-                            $('#expiration_date').addClass('is-invalid');
+                            showFieldError('#expiration_date', 'Expiration Date is required');
                         }
+                        // Passport Number validation
+                        const passportNumberVal = ($('#passport_number').val() || '').trim();
+                        if (!passportNumberVal) {
+                            isValid = false;
+                            showFieldError('#passport_number', 'Passport Number is required');
+                        }
+                        // Passport file validation
                         if (!$('#passport_file_upload').val() && !$('#passport_file_upload_hidden').length) {
                             isValid = false;
-                            errorMessages.push('Passport file @lang('validation.required')');
-                            $('#passport_file_upload').addClass('is-invalid');
+                            showFieldError('#passport_file_upload', 'Passport file is required');
+                        }
+                        // Expiration Date should be greater than Issuance Date
+                        const issuanceDate = $('#issuance_date').val();
+                        const expirationDate = $('#expiration_date').val();
+                        if (issuanceDate && expirationDate && expirationDate <= issuanceDate) {
+                            isValid = false;
+                            showFieldError('#expiration_date', 'Expiration Date must be greater than Issuance Date');
                         }
                         break;
                         
@@ -2681,94 +2896,92 @@
                         // Step 6 - Education
                         if (!$('#tenth_passing_year').val()) {
                             isValid = false;
-                            errorMessages.push('10th Passing Year @lang('validation.required')');
-                            $('#tenth_passing_year').addClass('is-invalid');
+                            showFieldError('#tenth_passing_year', '10th Passing Year is required');
                         }
                         if (!$('#tenth_percentage').val()) {
                             isValid = false;
-                            errorMessages.push('10th Percentage @lang('validation.required')');
-                            $('#tenth_percentage').addClass('is-invalid');
+                            showFieldError('#tenth_percentage', '10th Percentage is required');
                         }
                         const tenthBoardNameVal = ($('#tenth_board_name').val() || '').trim();
                         if (!tenthBoardNameVal) {
                             isValid = false;
-                            errorMessages.push('10th Board Name @lang('validation.required')');
-                            $('#tenth_board_name').addClass('is-invalid');
+                            showFieldError('#tenth_board_name', '10th Board Name is required');
                         }
                         const tenthTrialVal = ($('#tenth_trial').val() || '').trim();
                         if (!tenthTrialVal) {
                             isValid = false;
-                            errorMessages.push('10th Trial @lang('validation.required')');
-                            $('#tenth_trial').addClass('is-invalid');
+                            showFieldError('#tenth_trial', '10th Trial is required');
+                        }
+                        // 10th Result file is required
+                        if (!$('#tenth_result_file').val() && !$('#tenth_result_file_hidden').length) {
+                            isValid = false;
+                            showFieldError('#tenth_result_file', '10th Result file is required');
                         }
                         break;
                         
                     case 5:
-                        // Step 5 - Family Information (same as Step 4)
+                        // Step 5 - Family Information
                         const step5FatherSurnameVal = $('#father_surname').val() || '';
                         if (!step5FatherSurnameVal.trim()) {
                             isValid = false;
-                            errorMessages.push('Father\'s Surname @lang('validation.required')');
-                            $('#father_surname').addClass('is-invalid');
+                            showFieldError('#father_surname', 'Father\'s Surname is required');
                         }
                         const step5FatherGivenNameVal = $('#father_given_name').val() || '';
                         if (!step5FatherGivenNameVal.trim()) {
                             isValid = false;
-                            errorMessages.push('Father\'s Given Name @lang('validation.required')');
-                            $('#father_given_name').addClass('is-invalid');
+                            showFieldError('#father_given_name', 'Father\'s Given Name is required');
                         }
                         if (!$('#father_date_of_birth').val()) {
                             isValid = false;
-                            errorMessages.push('Father\'s Date of Birth @lang('validation.required')');
-                            $('#father_date_of_birth').addClass('is-invalid');
+                            showFieldError('#father_date_of_birth', 'Father\'s Date of Birth is required');
                         }
                         const step5FatherOccupationVal = $('#father_occupation').val() || '';
                         if (!step5FatherOccupationVal.trim()) {
                             isValid = false;
-                            errorMessages.push('Father\'s Occupation @lang('validation.required')');
-                            $('#father_occupation').addClass('is-invalid');
+                            showFieldError('#father_occupation', 'Father\'s Occupation is required');
                         }
                         const step5FatherHavePassportVal = getSelectValue('#father_have_passport');
                         if (!step5FatherHavePassportVal || step5FatherHavePassportVal === '' || step5FatherHavePassportVal === null || (Array.isArray(step5FatherHavePassportVal) && step5FatherHavePassportVal.length === 0)) {
                             isValid = false;
-                            errorMessages.push('Father\'s Have Passport @lang('validation.required')');
-                            $('#father_have_passport').addClass('is-invalid');
-                            $('#father_have_passport').closest('.bootstrap-select').addClass('is-invalid');
+                            showFieldError('#father_have_passport', 'Father\'s Have Passport is required');
                         }
                         const step5MotherSurnameVal = $('#mother_surname').val() || '';
                         if (!step5MotherSurnameVal.trim()) {
                             isValid = false;
-                            errorMessages.push('Mother\'s Surname @lang('validation.required')');
-                            $('#mother_surname').addClass('is-invalid');
+                            showFieldError('#mother_surname', 'Mother\'s Surname is required');
                         }
                         const step5MotherGivenNameVal = $('#mother_given_name').val() || '';
                         if (!step5MotherGivenNameVal.trim()) {
                             isValid = false;
-                            errorMessages.push('Mother\'s Given Name @lang('validation.required')');
-                            $('#mother_given_name').addClass('is-invalid');
+                            showFieldError('#mother_given_name', 'Mother\'s Given Name is required');
                         }
                         if (!$('#mother_date_of_birth').val()) {
                             isValid = false;
-                            errorMessages.push('Mother\'s Date of Birth @lang('validation.required')');
-                            $('#mother_date_of_birth').addClass('is-invalid');
+                            showFieldError('#mother_date_of_birth', 'Mother\'s Date of Birth is required');
                         }
                         const step5MotherOccupationVal = $('#mother_occupation').val() || '';
                         if (!step5MotherOccupationVal.trim()) {
                             isValid = false;
-                            errorMessages.push('Mother\'s Occupation @lang('validation.required')');
-                            $('#mother_occupation').addClass('is-invalid');
+                            showFieldError('#mother_occupation', 'Mother\'s Occupation is required');
                         }
                         const step5MotherHavePassportVal = getSelectValue('#mother_have_passport');
                         if (!step5MotherHavePassportVal || step5MotherHavePassportVal === '' || step5MotherHavePassportVal === null || (Array.isArray(step5MotherHavePassportVal) && step5MotherHavePassportVal.length === 0)) {
                             isValid = false;
-                            errorMessages.push('Mother\'s Have Passport @lang('validation.required')');
-                            $('#mother_have_passport').addClass('is-invalid');
-                            $('#mother_have_passport').closest('.bootstrap-select').addClass('is-invalid');
+                            showFieldError('#mother_have_passport', 'Mother\'s Have Passport is required');
                         }
-                        if (step5MotherHavePassportVal === 'Yes' && !$('#mother_passport_file').val() && !$('#mother_passport_file_hidden').length) {
-                            isValid = false;
-                            errorMessages.push('Mother\'s Passport file @lang('validation.required')');
-                            $('#mother_passport_file').addClass('is-invalid');
+                        // Mother passport file is required if mother has passport = Yes
+                        if (step5MotherHavePassportVal === 'Yes') {
+                            if (!$('#mother_passport_file').val() && !$('#mother_passport_file_hidden').length) {
+                                isValid = false;
+                                showFieldError('#mother_passport_file', 'Mother\'s Passport file is required');
+                            }
+                        }
+                        // Father passport file is required if father has passport = Yes
+                        if (step5FatherHavePassportVal === 'Yes') {
+                            if (!$('#father_passport_file').val() && !$('#father_passport_file_hidden').length) {
+                                isValid = false;
+                                showFieldError('#father_passport_file', 'Father\'s Passport file is required');
+                            }
                         }
                         break;
                         
@@ -2777,106 +2990,56 @@
                         const propertyHomeVal = $('#property_home').val();
                         if (propertyHomeVal === '' || propertyHomeVal === null || propertyHomeVal === undefined) {
                             isValid = false;
-                            errorMessages.push('Property Home @lang('validation.required')');
-                            $('#property_home').addClass('is-invalid');
+                            showFieldError('#property_home', 'Property Home is required');
                         }
                         const propertyLandVal = $('#property_land').val();
                         if (propertyLandVal === '' || propertyLandVal === null || propertyLandVal === undefined) {
                             isValid = false;
-                            errorMessages.push('Property Land @lang('validation.required')');
-                            $('#property_land').addClass('is-invalid');
+                            showFieldError('#property_land', 'Property Land is required');
                         }
                         const propertyPlotVal = $('#property_plot').val();
                         if (propertyPlotVal === '' || propertyPlotVal === null || propertyPlotVal === undefined) {
                             isValid = false;
-                            errorMessages.push('Property Plot @lang('validation.required')');
-                            $('#property_plot').addClass('is-invalid');
+                            showFieldError('#property_plot', 'Property Plot is required');
                         }
                         const propertyCommercialsVal = $('#property_commercials').val();
                         if (propertyCommercialsVal === '' || propertyCommercialsVal === null || propertyCommercialsVal === undefined) {
                             isValid = false;
-                            errorMessages.push('Property Commercials @lang('validation.required')');
-                            $('#property_commercials').addClass('is-invalid');
+                            showFieldError('#property_commercials', 'Property Commercials is required');
                         }
                         const propertyOtherVal = $('#property_other').val();
                         if (propertyOtherVal === '' || propertyOtherVal === null || propertyOtherVal === undefined) {
                             isValid = false;
-                            errorMessages.push('Property Other @lang('validation.required')');
-                            $('#property_other').addClass('is-invalid');
+                            showFieldError('#property_other', 'Property Other is required');
                         }
                         const propertyShopVal = $('#property_shop').val();
                         if (propertyShopVal === '' || propertyShopVal === null || propertyShopVal === undefined) {
                             isValid = false;
-                            errorMessages.push('Property Shop @lang('validation.required')');
-                            $('#property_shop').addClass('is-invalid');
+                            showFieldError('#property_shop', 'Property Shop is required');
                         }
                         const propertyGoldVal = $('#property_gold').val();
                         if (propertyGoldVal === '' || propertyGoldVal === null || propertyGoldVal === undefined) {
                             isValid = false;
-                            errorMessages.push('Property Gold @lang('validation.required')');
-                            $('#property_gold').addClass('is-invalid');
+                            showFieldError('#property_gold', 'Property Gold is required');
                         }
                         const propertySilverVal = $('#property_silver').val();
                         if (propertySilverVal === '' || propertySilverVal === null || propertySilverVal === undefined) {
                             isValid = false;
-                            errorMessages.push('Property Silver @lang('validation.required')');
-                            $('#property_silver').addClass('is-invalid');
+                            showFieldError('#property_silver', 'Property Silver is required');
                         }
                         break;
                 }
                 
                 if (!isValid) {
-                    // Show all validation errors in toast message
-                    let errorText = '';
-                    if (errorMessages.length === 0) {
-                        errorText = 'Please fill in all required fields';
-                    } else if (errorMessages.length === 1) {
-                        errorText = errorMessages[0];
-                    } else {
-                        errorText = errorMessages.slice(0, 3).join('<br>') + (errorMessages.length > 3 ? '<br>... and ' + (errorMessages.length - 3) + ' more' : '');
-                    }
-                    
-                    // Ensure we have an error message to show
-                    if (!errorText || errorText.trim() === '') {
-                        errorText = 'Please fill in all required fields';
-                    }
-                    
-                    // Use setTimeout to ensure Swal is ready
+                    // Scroll to first invalid field
                     setTimeout(function() {
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire({
-                                icon: 'error',
-                                html: errorText,
-                                toast: true,
-                                position: "top-end",
-                                timer: errorMessages.length > 1 ? 5000 : 3000,
-                                timerProgressBar: true,
-                                showConfirmButton: false,
-                                customClass: {
-                                    confirmButton: "btn btn-primary",
-                                },
-                                showClass: {
-                                    popup: "swal2-noanimation",
-                                    backdrop: "swal2-noanimation",
-                                },
-                            });
-                        } else {
-                            // Fallback to alert if Swal is not available
-                            alert(errorText.replace(/<br>/g, '\n'));
+                        const firstInvalid = $('.is-invalid').first();
+                        if (firstInvalid.length && firstInvalid.offset()) {
+                            $('html, body').animate({
+                                scrollTop: firstInvalid.offset().top - 100
+                            }, 500);
                         }
                     }, 100);
-                    
-                    // Scroll to first invalid field
-                    if ($('.is-invalid').length > 0) {
-                        setTimeout(function() {
-                            const firstInvalid = $('.is-invalid').first();
-                            if (firstInvalid.length && firstInvalid.offset()) {
-                                $('html, body').animate({
-                                    scrollTop: firstInvalid.offset().top - 100
-                                }, 500);
-                            }
-                        }, 200);
-                    }
                 }
                 
                 return isValid;

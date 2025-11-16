@@ -114,3 +114,217 @@
 .tabs .nav .nav-link-lead.active, .tabs .nav .nav-item-lead:hover {
     border-bottom: 0px solid var(--header_color) !important;
 }
+
+/* ============================================
+   Add Lead Page - Form Styling
+   ============================================
+   Note: All CSS for the add-lead page should be added here.
+   Do not add inline styles in index.blade.php
+   ============================================ */
+
+/* Hide number input arrows */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Error message styling */
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+}
+
+/* File input styling */
+input[type="file"].form-control {
+    padding: 0.375rem 0.75rem;
+    height: 35px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+input[type="file"].form-control.height-35 {
+    height: 35px;
+}
+
+/* Bootstrap-select error handling - hide error styling on select element */
+.bootstrap-select.is-invalid select.is-invalid,
+.bootstrap-select.is-invalid select {
+    border: none !important;
+    box-shadow: none !important;
+    padding-right: 0.75rem !important;
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 0 !important;
+}
+
+/* Only show error styling on the bootstrap-select wrapper, not on the button */
+.bootstrap-select.is-invalid {
+    border: 1px solid #dc3545 !important;
+    border-radius: 0.25rem;
+}
+
+/* Ensure error message appears below bootstrap-select */
+.bootstrap-select + .invalid-feedback {
+    display: block !important;
+}
+
+.bootstrap-select.is-invalid .dropdown-toggle {
+    border-color: transparent !important;
+    border-radius: 0.25rem;
+    padding: .45rem .5rem;
+}
+
+/* Relative Contact Information section styling */
+.relative-contact-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+.relative-contact-section-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+.relative-contact-section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #495057;
+}
+.relative-contact-row {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    position: relative;
+}
+.relative-contact-row-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+.relative-contact-row-number {
+    font-size: 14px;
+    font-weight: bold;
+    color: #495057;
+}
+
+/* Family Information - Child section styling */
+.child-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+.child-section-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+.child-section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #495057;
+}
+.child-row {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    position: relative;
+}
+.child-row-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+.child-row-number {
+    font-size: 14px;
+    font-weight: bold;
+    color: #495057;
+}
+
+/* Education - Other Degree Details section styling */
+.other-degree-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+.other-degree-section-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+.other-degree-section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #495057;
+}
+.other-degree-row {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    position: relative;
+}
+.other-degree-row-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+.other-degree-row-number {
+    font-size: 14px;
+    font-weight: bold;
+    color: #495057;
+}
+
+/* Professional Experience - Job section styling */
+.job-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+}
+.job-section-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dee2e6;
+}
+.job-section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #495057;
+}
+.job-row {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.25rem;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    position: relative;
+}
+.job-row-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+}
+.job-row-number {
+    font-size: 14px;
+    font-weight: bold;
+    color: #495057;
+}
