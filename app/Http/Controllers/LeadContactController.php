@@ -131,16 +131,17 @@ class LeadContactController extends AccountBaseController
         if ($leadId) {
             try {
                 $this->newLead = NewLead::with(['stepStatus', 'stepLogs'])->find($leadId);
-                if ($this->newLead) {
-                    $this->newLeadStepStatus = $this->newLead->stepStatus;
-                    if (!$this->newLeadStepStatus) {
-                        $this->newLeadStepStatus = LeadStepStatus::getOrCreateForLead($leadId);
-                    }
+                if (!$this->newLead) {
+                    // If lead_id is provided but doesn't exist, redirect to add-lead without lead_id
+                    return redirect()->route('add-lead.index');
+                }
+                $this->newLeadStepStatus = $this->newLead->stepStatus;
+                if (!$this->newLeadStepStatus) {
+                    $this->newLeadStepStatus = LeadStepStatus::getOrCreateForLead($leadId);
                 }
             } catch (\Exception $e) {
-                // If there's an error loading the lead, just continue without it
-                $this->newLead = null;
-                $this->newLeadStepStatus = null;
+                // If there's an error loading the lead, redirect to add-lead without lead_id
+                return redirect()->route('add-lead.index');
             }
         }
 
