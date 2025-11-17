@@ -1,73 +1,317 @@
 @extends('layouts.app')
 
+@push('datatable-styles')
+    @include('sections.datatable_css')
+@endpush
+
+@section('filter-section')
+
+    <x-filters.filter-box>
+        <!-- DATE START -->
+        <div class="select-box d-flex pr-2 border-right-grey border-right-grey-sm-0">
+            <p class="mb-0 pr-2 f-14 text-dark-grey d-flex align-items-center">@lang('app.duration')</p>
+            <div class="select-status d-flex">
+                <input type="text" class="position-relative text-dark form-control border-0 p-2 text-left f-14 f-w-500 border-additional-grey"
+                    id="datatableRange" placeholder="@lang('placeholders.dateRange')">
+            </div>
+        </div>
+        <!-- DATE END -->
+
+
+        <!-- SEARCH BY TASK START -->
+        <div class="task-search d-flex  py-1 px-lg-3 px-0 border-right-grey align-items-center">
+            <form class="w-100 mr-1 mr-lg-0 mr-md-1 ml-md-1 ml-0 ml-lg-0">
+                <div class="input-group bg-grey rounded">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text border-0 bg-additional-grey">
+                            <i class="fa fa-search f-13 text-dark-grey"></i>
+                        </span>
+                    </div>
+                    <input type="text" class="form-control f-14 p-1 border-additional-grey" id="search-text-field"
+                           placeholder="@lang('app.startTyping')">
+                </div>
+            </form>
+        </div>
+        <!-- SEARCH BY TASK END -->
+
+        <!-- RESET START -->
+        <div class="select-box d-flex py-1 px-lg-2 px-md-2 px-0">
+            <x-forms.button-secondary class="btn-xs d-none" id="reset-filters" icon="times-circle">
+                @lang('app.clearFilters')
+            </x-forms.button-secondary>
+        </div>
+        <!-- RESET END -->
+
+        <!-- MORE FILTERS START -->
+        <x-filters.more-filter-box>
+            <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('app.dateFilterOn')</label>
+                <div class="select-filter mb-4">
+                    <select class="form-control select-picker" name="date_filter_on" id="date_filter_on">
+                        <option value="created_at">@lang('app.createdOn')</option>
+                        <option value="updated_at">@lang('app.updatedOn')</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('modules.lead.leadSource')</label>
+                <div class="select-filter mb-4">
+                    <div class="select-others">
+                        <select class="form-control select-picker" id="filter_source_id" data-live-search="true" data-container="body" data-size="8">
+                            <option value="all">@lang('app.all')</option>
+                            @foreach ($sources as $source)
+                                <option value="{{ $source->id }}">{{ $source->type }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('app.addedBy')</label>
+                <div class="select-filter mb-4">
+                    <div class="select-others">
+                        <select class="form-control select-picker" id="filter_addedBy" data-live-search="true" data-container="body" data-size="8">
+                            <option value="all">@lang('app.all')</option>
+                            @foreach ($employees as $item)
+                                <x-user-option :user="$item" />
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </x-filters.more-filter-box>
+        <!-- MORE FILTERS END -->
+    </x-filters.filter-box>
+
+@endsection
+
+@php
+    $addLeadPermission = user()->permission('add_lead');
+@endphp
+
 @section('content')
     <!-- CONTENT WRAPPER START -->
     <div class="content-wrapper">
         <!-- Add Task Export Buttons Start -->
-        <div class="d-grid d-lg-flex d-md-flex action-bar">
-            <div id="table-actions" class="flex-grow-1 align-items-center">
-                <h4 class="mb-0 f-21 font-weight-normal text-capitalize">
-                    @lang('app.leadList')
-                </h4>
+        <div class="d-flex justify-content-between action-bar">
+
+            <div id="table-actions" class="d-block d-lg-flex align-items-center">
+                @if ($addLeadPermission == 'all' || $addLeadPermission == 'added')
+                    <x-forms.link-primary :link="route('add-lead.index')" class="mr-3 mb-2 mb-lg-0" icon="plus">
+                        @lang('app.addLead')
+                    </x-forms.link-primary>
+
+                    <x-forms.link-secondary :link="route('lead-contact.create')" class="mr-3 openRightModal mb-2 mb-lg-0" icon="plus">
+                        @lang('modules.leadContact.addLeadContact')
+                    </x-forms.link-secondary>
+                @endif
             </div>
+
+            <x-datatable.actions>
+                <div class="select-status mr-3 pl-3">
+                    <select name="action_type" class="form-control select-picker" id="quick-action-type" disabled>
+                        <option value="">@lang('app.selectAction')</option>
+                        <option value="delete">@lang('app.delete')</option>
+                    </select>
+                </div>
+            </x-datatable.actions>
+
         </div>
         <!-- Add Task Export Buttons End -->
+        <!-- Task Box Start -->
+        <div class="d-flex flex-column w-tables rounded mt-3 bg-white table-responsive">
 
-        <div class="d-flex flex-column w-100 rounded mt-3 bg-white">
-            {{-- <div class="p-20 border-bottom-grey">
-                <div class="row">
-                    <div class="col-lg-12 col-md-12">
-                        <h5 class="mb-0 f-18 font-weight-normal">
-                            Lead Details Overview
-                        </h5>
-                    </div>
-                </div>
-            </div> --}}
+            {!! $dataTable->table(['class' => 'table table-hover border-0 w-100']) !!}
 
-            {{-- <div class="p-20">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="alert alert-info">
-                            <i class="fa fa-info-circle"></i>
-                            <strong>@lang('app.leadDetails')</strong> - This page displays detailed information about leads.
-                        </div>
-                        
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body p-4">
-                                <h5 class="mb-3">Lead Details Overview</h5>
-                                <p class="text-muted mb-4">
-                                    This page will show comprehensive details about leads including contact information, 
-                                    status, notes, deals, and other related data. The detailed view will be implemented here.
-                                </p>
-                                
-                                <div class="mt-3">
-                                    <x-forms.link-primary :link="route('lead-contact.index')" icon="list">
-                                        @lang('app.view') @lang('app.leadContact')
-                                    </x-forms.link-primary>
-                                    
-                                    <x-forms.link-secondary :link="route('lead-list.index')" class="ml-2" icon="list">
-                                        @lang('app.view') @lang('app.leadList')
-                                    </x-forms.link-secondary>
-                                    
-                                    <x-forms.link-secondary :link="route('add-lead.index')" class="ml-2" icon="plus">
-                                        @lang('app.addLead')
-                                    </x-forms.link-secondary>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> --}}
         </div>
+        <!-- Task Box End -->
     </div>
     <!-- CONTENT WRAPPER END -->
+
 @endsection
 
 @push('scripts')
+    @include('sections.datatable_js')
+
     <script>
-        $(document).ready(function() {
-            // Lead Details page scripts will be added here
+        $('#new-leads-table').on('preXhr.dt', function(e, settings, data) {
+
+            var dateRangePicker = $('#datatableRange').data('daterangepicker');
+            var startDate = $('#datatableRange').val();
+
+            if (startDate == '') {
+                startDate = null;
+                endDate = null;
+            } else {
+                startDate = dateRangePicker.startDate.format('{{ company()->moment_date_format }}');
+                endDate = dateRangePicker.endDate.format('{{ company()->moment_date_format }}');
+            }
+
+            var searchText = $('#search-text-field').val();
+            var source_id = $('#filter_source_id').val();
+            var date_filter_on = $('#date_filter_on').val();
+            var filter_added_by = $('#filter_addedBy').val();
+
+            data['startDate'] = startDate;
+            data['filter_addedBy'] = filter_added_by;
+            data['endDate'] = endDate;
+            data['searchText'] = searchText;
+            data['source_id'] = source_id;
+            data['date_filter_on'] = date_filter_on;
         });
+
+        const showTable = () => {
+            window.LaravelDataTables["new-leads-table"].draw(true);
+        }
+
+        $('#filter_source_id, #date_filter_on, #filter_addedBy').on('change keyup',
+            function () {
+                if ($('#filter_source_id').val() != "all") {
+                    $('#reset-filters').removeClass('d-none');
+                } else if ($('#date_filter_on').val() != "created_at") {
+                    $('#reset-filters').removeClass('d-none');
+                } else if ($('#filter_addedBy').val() != "all") {
+                    $('#reset-filters').removeClass('d-none');
+                } else {
+                    $('#reset-filters').addClass('d-none');
+                }
+                showTable();
+            });
+
+        $('#search-text-field').on('keyup', function () {
+            if ($('#search-text-field').val() != "") {
+                $('#reset-filters').removeClass('d-none');
+                showTable();
+            }
+        });
+
+        $('#reset-filters, #reset-filters-2').click(function () {
+            $('#filter-form')[0].reset();
+            $('.filter-box .select-picker').selectpicker("refresh");
+            $('#reset-filters').addClass('d-none');
+            showTable();
+        });
+
+        $('#quick-action-type').change(function () {
+            const actionValue = $(this).val();
+            if (actionValue != '') {
+                $('#quick-action-apply').removeAttr('disabled');
+            } else {
+                $('#quick-action-apply').attr('disabled', true);
+            }
+        });
+
+        $('#quick-action-apply').click(function () {
+            const actionValue = $('#quick-action-type').val();
+            if (actionValue == 'delete') {
+                Swal.fire({
+                    title: "@lang('messages.sweetAlertTitle')",
+                    text: "@lang('messages.recoverRecord')",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    focusConfirm: false,
+                    confirmButtonText: "@lang('messages.confirmDelete')",
+                    cancelButtonText: "@lang('app.cancel')",
+                    customClass: {
+                        confirmButton: 'btn btn-primary mr-3',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    showClass: {
+                        popup: 'swal2-noanimation',
+                        backdrop: 'swal2-noanimation'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        applyQuickAction();
+                    }
+                });
+
+            } else {
+                applyQuickAction();
+            }
+        });
+
+        $('body').on('click', '.delete-table-row', function () {
+            var id = $(this).data('id');
+            Swal.fire({
+                title: "@lang('messages.sweetAlertTitle')",
+                text: "@lang('messages.recoverRecord')",
+                icon: 'warning',
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: "@lang('messages.confirmDelete')",
+                cancelButtonText: "@lang('app.cancel')",
+                customClass: {
+                    confirmButton: 'btn btn-primary mr-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                showClass: {
+                    popup: 'swal2-noanimation',
+                    backdrop: 'swal2-noanimation'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var url = "{{ route('new-leads.destroy', ':id') }}";
+                    url = url.replace(':id', id);
+
+                    var token = "{{ csrf_token() }}";
+
+                    $.easyAjax({
+                        type: 'POST',
+                        url: url,
+                        data: {
+                            '_token': token,
+                            '_method': 'DELETE'
+                        },
+                        success: function (response) {
+                            if (response.status == "success") {
+                                showTable();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        const applyQuickAction = () => {
+            var rowdIds = $("#new-leads-table input:checkbox:checked").map(function () {
+                return $(this).val();
+            }).get();
+
+            var url = "{{ route('new-leads.apply_quick_action') }}?row_ids=" + rowdIds;
+
+            $.easyAjax({
+                url: url,
+                container: '#quick-action-form',
+                type: "POST",
+                disableButton: true,
+                buttonSelector: "#quick-action-apply",
+                data: $('#quick-action-form').serialize(),
+                blockUI: true,
+                success: function (response) {
+                    if (response.status == 'success') {
+                        showTable();
+                        resetActionButtons();
+                        deSelectAll();
+                        $('#quick-action-form').hide();
+                    }
+                }
+            })
+        };
+
+        $( document ).ready(function() {
+            @if (!is_null(request('start')) && !is_null(request('end')))
+            $('#datatableRange').val('{{ request('start') }}' +
+            ' @lang("app.to") ' + '{{ request('end') }}');
+            $('#datatableRange').data('daterangepicker').setStartDate("{{ request('start') }}");
+            $('#datatableRange').data('daterangepicker').setEndDate("{{ request('end') }}");
+                showTable();
+            @endif
+        });
+
     </script>
 @endpush
-

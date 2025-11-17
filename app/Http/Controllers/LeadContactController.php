@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DataTables\DealsDataTable;
 use App\DataTables\LeadContactDataTable;
 use App\DataTables\LeadNotesDataTable;
+use App\DataTables\NewLeadDataTable;
 use App\Enums\Salutation;
 use App\Helper\Reply;
 use App\Http\Requests\Admin\Employee\ImportProcessRequest;
@@ -65,7 +66,7 @@ class LeadContactController extends AccountBaseController
 
     }
 
-    public function leadList(LeadContactDataTable $dataTable)
+    public function leadList(NewLeadDataTable $dataTable)
     {
         $this->destroySession();
         $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
@@ -515,6 +516,41 @@ class LeadContactController extends AccountBaseController
     public function applyQuickAction(Request $request)
     {
         Lead::whereIn('id', explode(',', $request->row_ids))->delete();
+
+        return Reply::success(__('messages.deleteSuccess'));
+    }
+
+    /**
+     * Remove the specified new lead from storage.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroyNewLead($id)
+    {
+        $newLead = NewLead::findOrFail($id);
+        $this->deletePermission = user()->permission('delete_lead');
+
+        abort_403(!($this->deletePermission == 'all'
+            || ($this->deletePermission == 'added' && $newLead->added_by == user()->id)
+            || ($this->deletePermission == 'owned' && $newLead->lead_owner == user()->id)
+            || ($this->deletePermission == 'both' && ($newLead->added_by == user()->id || $newLead->lead_owner == user()->id))
+        ));
+
+        NewLead::destroy($id);
+
+        return Reply::success(__('messages.deleteSuccess'));
+    }
+
+    /**
+     * Apply quick action on new leads
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function applyQuickActionNewLeads(Request $request)
+    {
+        NewLead::whereIn('id', explode(',', $request->row_ids))->delete();
 
         return Reply::success(__('messages.deleteSuccess'));
     }

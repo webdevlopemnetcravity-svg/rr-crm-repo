@@ -538,6 +538,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('lead-contact/apply-quick-action', [LeadContactController::class, 'applyQuickAction'])->name('lead-contact.apply_quick_action');
     Route::get('lead-list', [LeadContactController::class, 'leadList'])->name('lead-list.index');
     Route::get('add-lead', [LeadContactController::class, 'addLead'])->name('add-lead.index');
+    Route::delete('new-leads/{id}', [LeadContactController::class, 'destroyNewLead'])->name('new-leads.destroy');
+    Route::post('new-leads/apply-quick-action', [LeadContactController::class, 'applyQuickActionNewLeads'])->name('new-leads.apply_quick_action');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
     Route::get('lead-details', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
     
