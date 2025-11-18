@@ -86,6 +86,11 @@
                                 <input class="form-control height-35 f-14" type="file" id="passport_file" name="passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="upload_resume" fieldLabel="Upload Resume & Passport" fieldRequired="true">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" id="upload_resume" name="upload_resume" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                            </div>
+                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="surname" :fieldLabel="__('app.surname')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="surname" id="surname">
@@ -203,17 +208,17 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="secondary_phone" :fieldLabel="__('app.secondaryPhoneNo')">
                                 </x-forms.label>
-                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="secondary_phone" id="secondary_phone" pattern="[0-9]{10}">
+                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="secondary_phone" id="secondary_phone" pattern="[0-9]{10}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="work_phone" :fieldLabel="__('app.workPhoneNo')">
                                 </x-forms.label>
-                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="work_phone" id="work_phone" pattern="[0-9]{10}">
+                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="work_phone" id="work_phone" pattern="[0-9]{10}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_phone" :fieldLabel="__('app.otherPhoneNo')">
                                 </x-forms.label>
-                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="other_phone" id="other_phone" pattern="[0-9]{10}">
+                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="other_phone" id="other_phone" pattern="[0-9]{10}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="email_address" :fieldLabel="__('modules.lead.email')" fieldRequired="true">
@@ -225,24 +230,34 @@
                                 </x-forms.label>
                                 <input type="email" class="form-control height-35 f-14" name="other_email" id="other_email">
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="social_media_preference" :fieldLabel="__('app.socialMediaPreference')">
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Social Media Profile URLs Section -->
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.socialMediaPreference')</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <x-forms.label class="mt-3" fieldId="facebook_profile_url" fieldLabel="Facebook Profile URL">
                                 </x-forms.label>
-                                <select class="form-control select-picker height-35 f-14" name="social_media_preference" id="social_media_preference">
-                                    <option value="">@lang('app.select')</option>
-                                    <option value="Facebook">Facebook</option>
-                                    <option value="Instagram">Instagram</option>
-                                    <option value="LinkedIn">LinkedIn</option>
-                                    <option value="Twitter / X">Twitter / X</option>
-                                    <option value="Other">@lang('app.other')</option>
-                                </select>
+                                <input type="url" class="form-control height-35 f-14" name="facebook_profile_url" id="facebook_profile_url" placeholder="https://www.facebook.com/yourprofile">
+                            </div>
+                            <div class="col-md-4">
+                                <x-forms.label class="mt-3" fieldId="instagram_profile_url" fieldLabel="Instagram Profile URL">
+                                </x-forms.label>
+                                <input type="url" class="form-control height-35 f-14" name="instagram_profile_url" id="instagram_profile_url" placeholder="https://www.instagram.com/yourprofile">
+                            </div>
+                            <div class="col-md-4">
+                                <x-forms.label class="mt-3" fieldId="linkedin_profile_url" fieldLabel="LinkedIn Profile URL">
+                                </x-forms.label>
+                                <input type="url" class="form-control height-35 f-14" name="linkedin_profile_url" id="linkedin_profile_url" placeholder="https://www.linkedin.com/in/yourprofile">
                             </div>
                         </div>
 
                         <hr class="my-4">
 
                         <!-- Visa Status Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.lastFiveYearsVisaStatus')</h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.lastFiveYearsVisaStatus') <span class="text-danger">*</span></h6>
                         
                         <!-- Visa Status Radio Buttons -->
                         <div class="row mb-3">
@@ -265,17 +280,17 @@
                         <!-- Visa Granted Fields -->
                         <div class="row" id="visa_granted_fields" style="display: none;">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_issue_date" :fieldLabel="__('app.visaIssueDate')">
+                                <x-forms.label class="mt-3" fieldId="visa_issue_date" :fieldLabel="__('app.visaIssueDate')" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="month" class="form-control height-35 f-14" name="visa_issue_date" id="visa_issue_date">
+                                <input type="month" class="form-control height-35 f-14" name="visa_issue_date" id="visa_issue_date" max="{{ date('Y-m') }}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_expire_date" :fieldLabel="__('app.visaExpireDate')">
+                                <x-forms.label class="mt-3" fieldId="visa_expire_date" :fieldLabel="__('app.visaExpireDate')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_expire_date" id="visa_expire_date">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_category" :fieldLabel="__('app.visaCategory')">
+                                <x-forms.label class="mt-3" fieldId="visa_category" :fieldLabel="__('app.visaCategory')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="visa_category" id="visa_category">
                             </div>
@@ -286,17 +301,17 @@
                             <!-- Initial Visa Refusal Entry -->
                             <div class="row">
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visa_rejection_date" :fieldLabel="__('app.visaRejectionDate')">
+                                    <x-forms.label class="mt-3" fieldId="visa_rejection_date" :fieldLabel="__('app.visaRejectionDate')" fieldRequired="true">
                                     </x-forms.label>
-                                    <input type="month" class="form-control height-35 f-14" name="visa_rejection_date" id="visa_rejection_date">
+                                    <input type="month" class="form-control height-35 f-14" name="visa_rejection_date" id="visa_rejection_date" max="{{ date('Y-m') }}">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visa_refusal_category" :fieldLabel="__('app.visaCategory')">
+                                    <x-forms.label class="mt-3" fieldId="visa_refusal_category" :fieldLabel="__('app.visaCategory')" fieldRequired="true">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" name="visa_refusal_category" id="visa_refusal_category">
                                 </div>
                                 <div class="col-md-6">
-                                    <x-forms.label class="mt-3" fieldId="visa_refusal_reason" :fieldLabel="__('app.reason')">
+                                    <x-forms.label class="mt-3" fieldId="visa_refusal_reason" :fieldLabel="__('app.reason')" fieldRequired="true">
                                     </x-forms.label>
                                     <textarea class="form-control f-14" rows="2" name="visa_refusal_reason" id="visa_refusal_reason"></textarea>
                                 </div>
@@ -320,7 +335,7 @@
                         <!-- Languages Spoken Section -->
                 <div class="row">
                             <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="languages_spoken" :fieldLabel="__('app.languagesSpoken')">
+                                <x-forms.label class="mt-3" fieldId="languages_spoken" :fieldLabel="__('app.languagesSpoken')" fieldRequired="true">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="2" name="languages_spoken" id="languages_spoken"></textarea>
                             </div>
@@ -646,9 +661,9 @@
                                 <input type="text" class="form-control height-35 f-14" name="city_where_issued" id="city_where_issued">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="issuance_date" fieldLabel="Issuance Date" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="issuance_date" fieldLabel="Issue Date" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="issuance_date" id="issuance_date">
+                                <input type="date" class="form-control height-35 f-14" name="issuance_date" id="issuance_date" max="{{ date('Y-m-d') }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="expiration_date" fieldLabel="Expiration Date" fieldRequired="true">
@@ -728,12 +743,12 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="relative_email_address" fieldLabel="Email Address">
                                     </x-forms.label>
-                                    <input type="email" class="form-control height-35 f-14" name="relative_email_address" id="relative_email_address">
+                                    <input type="email" class="form-control height-35 f-14" name="relative_email_address" id="relative_email_address" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="relative_phone_number" fieldLabel="Phone Number">
                                     </x-forms.label>
-                                    <input type="number" maxlength="10" class="form-control height-35 f-14" name="relative_phone_number" id="relative_phone_number">
+                                    <input type="number" max="9999999999" class="form-control height-35 f-14" name="relative_phone_number" id="relative_phone_number" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);">
                                 </div>
                             </div>
                         </div>
@@ -845,11 +860,11 @@
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="spouse_given_name" id="spouse_given_name">
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="spouse_date_of_birth" fieldLabel="Spouse's Date of Birth">
-                                </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="spouse_date_of_birth" id="spouse_date_of_birth">
-                            </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="spouse_date_of_birth" fieldLabel="Spouse's Date of Birth">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" name="spouse_date_of_birth" id="spouse_date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
+                                </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_country" fieldLabel="Spouse's Country">
                                 </x-forms.label>
@@ -869,8 +884,8 @@
                                     <option value="No">No</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="spouse_passport_file" fieldLabel="Add Spouse Passport">
+                            <div class="col-md-3" id="spouse_passport_file_container" style="display: none;">
+                                <x-forms.label class="mt-3" fieldId="spouse_passport_file" fieldLabel="Add Spouse Passport" fieldRequired="true">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" id="spouse_passport_file" name="spouse_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
@@ -950,15 +965,6 @@
                                     <input type="text" class="form-control height-35 f-14" name="child_city_of_birth" id="child_city_of_birth">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="child_have_passport" fieldLabel="Have Passport">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="child_have_passport" id="child_have_passport">
-                                        <option value="">@lang('app.select')</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="child_gender" fieldLabel="Gender">
                                     </x-forms.label>
                                     <select class="form-control select-picker height-35 f-14" name="child_gender" id="child_gender">
@@ -972,6 +978,20 @@
                                     <x-forms.label class="mt-3" fieldId="child_document_file" fieldLabel="Add Child Document">
                                     </x-forms.label>
                                     <input class="form-control height-35 f-14" type="file" id="child_document_file" name="child_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="child_have_passport" fieldLabel="Have Passport">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="child_have_passport" id="child_have_passport">
+                                        <option value="">@lang('app.select')</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3" id="child_passport_file_container" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="child_passport_file" fieldLabel="Add Child Passport" fieldRequired="true">
+                                    </x-forms.label>
+                                    <input class="form-control height-35 f-14" type="file" id="child_passport_file" name="child_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                                 </div>
                             </div>
                         </div>
@@ -1005,7 +1025,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="ielts_passing_year" fieldLabel="Passing Year">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="ielts_passing_year" id="ielts_passing_year">
+                                <select class="form-control select-picker height-35 f-14" name="ielts_passing_year" id="ielts_passing_year">
+                                    <option value="">@lang('app.select')</option>
+                                    @for($year = date('Y'); $year >= 1950; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="ielts_score" fieldLabel="Score">
@@ -1015,7 +1040,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="ielts_trial" fieldLabel="Trial">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="ielts_trial" id="ielts_trial">
+                                <input type="number" class="form-control height-35 f-14" name="ielts_trial" id="ielts_trial">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="ielts_result_file" fieldLabel="Add IELTS/PTC/OET/TOEFL Result">
@@ -1032,12 +1057,17 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_passing_year" fieldLabel="10th Passing Year" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="tenth_passing_year" id="tenth_passing_year" min="1950" max="{{ date('Y') }}">
+                                <select class="form-control select-picker height-35 f-14" name="tenth_passing_year" id="tenth_passing_year">
+                                    <option value="">@lang('app.select')</option>
+                                    @for($year = date('Y'); $year >= 1950; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_percentage" fieldLabel="Percentage" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="tenth_percentage" id="tenth_percentage" min="0" max="100" step="0.01">
+                                <input type="number" class="form-control height-35 f-14" name="tenth_percentage" id="tenth_percentage" min="0" max="100" step="0.01" maxlength="5">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_board_name" fieldLabel="Board Name" fieldRequired="true">
@@ -1047,7 +1077,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_trial" fieldLabel="Trial" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="tenth_trial" id="tenth_trial">
+                                <input type="number" class="form-control height-35 f-14" name="tenth_trial" id="tenth_trial">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_result_file" fieldLabel="Add 10th Result" fieldRequired="true">
@@ -1064,7 +1094,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_passing_year" fieldLabel="12th Passing Year">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="twelfth_passing_year" id="twelfth_passing_year" min="1950" max="{{ date('Y') }}">
+                                <select class="form-control select-picker height-35 f-14" name="twelfth_passing_year" id="twelfth_passing_year">
+                                    <option value="">@lang('app.select')</option>
+                                    @for($year = date('Y'); $year >= 1950; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_stream" fieldLabel="Stream">
@@ -1080,7 +1115,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="twelfth_percentage" id="twelfth_percentage" min="0" max="100" step="0.01">
+                                <input type="number" class="form-control height-35 f-14" name="twelfth_percentage" id="twelfth_percentage" min="0" max="100" step="0.01" maxlength="5">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_board_name" fieldLabel="Board Name">
@@ -1090,7 +1125,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_trial" fieldLabel="Trial">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="twelfth_trial" id="twelfth_trial">
+                                <input type="number" class="form-control height-35 f-14" name="twelfth_trial" id="twelfth_trial">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_result_file" fieldLabel="Add 12th Result">
@@ -1150,17 +1185,22 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="graduation_percentage" id="graduation_percentage" min="0" max="100" step="0.01">
+                                <input type="number" class="form-control height-35 f-14" name="graduation_percentage" id="graduation_percentage" min="0" max="100" step="0.01" maxlength="5">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_passing_year" fieldLabel="Passing Year">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="graduation_passing_year" id="graduation_passing_year" min="1950" max="{{ date('Y') }}">
+                                <select class="form-control select-picker height-35 f-14" name="graduation_passing_year" id="graduation_passing_year">
+                                    <option value="">@lang('app.select')</option>
+                                    @for($year = date('Y'); $year >= 1950; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_trial" fieldLabel="Trial">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="graduation_trial" id="graduation_trial">
+                                <input type="number" class="form-control height-35 f-14" name="graduation_trial" id="graduation_trial">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_result_file" fieldLabel="Add Graduation Result">
@@ -1205,17 +1245,22 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="post_graduation_percentage" id="post_graduation_percentage" min="0" max="100" step="0.01">
+                                <input type="number" class="form-control height-35 f-14" name="post_graduation_percentage" id="post_graduation_percentage" min="0" max="100" step="0.01" maxlength="5">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_passing_year" fieldLabel="Passing Year">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="post_graduation_passing_year" id="post_graduation_passing_year" min="1950" max="{{ date('Y') }}">
+                                <select class="form-control select-picker height-35 f-14" name="post_graduation_passing_year" id="post_graduation_passing_year">
+                                    <option value="">@lang('app.select')</option>
+                                    @for($year = date('Y'); $year >= 1950; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_trial" fieldLabel="Trial">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="post_graduation_trial" id="post_graduation_trial">
+                                <input type="number" class="form-control height-35 f-14" name="post_graduation_trial" id="post_graduation_trial">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_result_file" fieldLabel="Add Post Graduation Result">
@@ -1245,17 +1290,22 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="other_degree_percentage" fieldLabel="Percentage">
                                     </x-forms.label>
-                                    <input type="number" class="form-control height-35 f-14" name="other_degree_percentage" id="other_degree_percentage" min="0" max="100" step="0.01">
+                                    <input type="number" class="form-control height-35 f-14" name="other_degree_percentage" id="other_degree_percentage" min="0" max="100" step="0.01" maxlength="5">
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="other_degree_passing_year" fieldLabel="Passing Year">
                                     </x-forms.label>
-                                    <input type="number" class="form-control height-35 f-14" name="other_degree_passing_year" id="other_degree_passing_year" min="1950" max="{{ date('Y') }}">
+                                    <select class="form-control select-picker height-35 f-14" name="other_degree_passing_year" id="other_degree_passing_year">
+                                        <option value="">@lang('app.select')</option>
+                                        @for($year = date('Y'); $year >= 1950; $year--)
+                                            <option value="{{ $year }}">{{ $year }}</option>
+                                        @endfor
+                                    </select>
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="other_degree_trial" fieldLabel="Trial">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="other_degree_trial" id="other_degree_trial">
+                                    <input type="number" class="form-control height-35 f-14" name="other_degree_trial" id="other_degree_trial">
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="other_degree_result_file" fieldLabel="Add Other Degree Result">
@@ -1286,12 +1336,12 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="job_duration_from" fieldLabel="Duration - From">
                                     </x-forms.label>
-                                    <input type="date" class="form-control height-35 f-14" name="job_duration_from" id="job_duration_from">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="job_duration_to" fieldLabel="Duration - To">
-                                    </x-forms.label>
-                                    <input type="date" class="form-control height-35 f-14" name="job_duration_to" id="job_duration_to">
+                                <input type="date" class="form-control height-35 f-14" name="job_duration_from" id="job_duration_from" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_duration_to" fieldLabel="Duration - To">
+                                </x-forms.label>
+                                <input type="date" class="form-control height-35 f-14" name="job_duration_to" id="job_duration_to" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="job_country" fieldLabel="Country">
@@ -1402,7 +1452,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="loan_years" fieldLabel="Loan Years">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="loan_years" id="loan_years">
+                                <select class="form-control select-picker height-35 f-14" name="loan_years" id="loan_years">
+                                    <option value="">@lang('app.select')</option>
+                                    @for($year = date('Y'); $year >= 1950; $year--)
+                                        <option value="{{ $year }}">{{ $year }}</option>
+                                    @endfor
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="loan_availed_on" fieldLabel="Loan Availed On">
@@ -1502,7 +1557,55 @@
     <script>
         $(document).ready(function() {
             // Initialize select picker
-            $('.select-picker').selectpicker();
+            function initializeSelectPickers() {
+                $('.select-picker').each(function() {
+                    if (!$(this).data('selectpicker')) {
+                        $(this).selectpicker();
+                    }
+                });
+            }
+            
+            // Initial initialization
+            initializeSelectPickers();
+            
+            // Re-initialize after a short delay to catch any dynamically loaded content
+            setTimeout(function() {
+                initializeSelectPickers();
+            }, 300);
+            
+            // Re-initialize after a longer delay for any late-loading content
+            setTimeout(function() {
+                initializeSelectPickers();
+            }, 1000);
+            
+            // Use MutationObserver to detect when new select fields are added
+            if (typeof MutationObserver !== 'undefined') {
+                const observer = new MutationObserver(function(mutations) {
+                    let shouldReinit = false;
+                    mutations.forEach(function(mutation) {
+                        if (mutation.addedNodes.length > 0) {
+                            mutation.addedNodes.forEach(function(node) {
+                                if (node.nodeType === 1) { // Element node
+                                    if ($(node).hasClass('select-picker') || $(node).find('.select-picker').length > 0) {
+                                        shouldReinit = true;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    if (shouldReinit) {
+                        setTimeout(function() {
+                            initializeSelectPickers();
+                        }, 100);
+                    }
+                });
+                
+                // Observe the document body for changes
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
 
             // Handle mailing address same as home address checkbox
             $('#mailing_same_as_home').on('change', function() {
@@ -1565,17 +1668,17 @@
                 const newRow = `
                     <div class="row mt-3 visa-refusal-row" id="visa-refusal-row-${visaRefusalCount}">
                         <div class="col-md-3">
-                            <x-forms.label class="mt-3" fieldId="visa_rejection_date_${visaRefusalCount}" :fieldLabel="__('app.visaRejectionDate')">
+                            <x-forms.label class="mt-3" fieldId="visa_rejection_date_${visaRefusalCount}" :fieldLabel="__('app.visaRejectionDate')" fieldRequired="true">
                             </x-forms.label>
-                            <input type="month" class="form-control height-35 f-14" name="visa_rejection_date[]" id="visa_rejection_date_${visaRefusalCount}">
+                            <input type="month" class="form-control height-35 f-14" name="visa_rejection_date[]" id="visa_rejection_date_${visaRefusalCount}" max="{{ date('Y-m') }}">
                         </div>
                         <div class="col-md-3">
-                            <x-forms.label class="mt-3" fieldId="visa_refusal_category_${visaRefusalCount}" :fieldLabel="__('app.visaCategory')">
+                            <x-forms.label class="mt-3" fieldId="visa_refusal_category_${visaRefusalCount}" :fieldLabel="__('app.visaCategory')" fieldRequired="true">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" name="visa_refusal_category[]" id="visa_refusal_category_${visaRefusalCount}">
                         </div>
                         <div class="col-md-5">
-                            <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${visaRefusalCount}" :fieldLabel="__('app.reason')">
+                            <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${visaRefusalCount}" :fieldLabel="__('app.reason')" fieldRequired="true">
                             </x-forms.label>
                             <textarea class="form-control f-14" rows="2" name="visa_refusal_reason[]" id="visa_refusal_reason_${visaRefusalCount}"></textarea>
                         </div>
@@ -1589,6 +1692,17 @@
                 
                 // Append to the visa-refusal-rows-container
                 $('#visa-refusal-rows-container').append(newRow);
+                
+                // Reinitialize select picker for the new row (if any)
+                setTimeout(function() {
+                    $('.select-picker').each(function() {
+                        if (!$(this).data('selectpicker')) {
+                            $(this).selectpicker();
+                        } else {
+                            $(this).selectpicker('refresh');
+                        }
+                    });
+                }, 100);
             });
 
             // Remove visa refusal row
@@ -1609,6 +1723,28 @@
             // Handle visa type radio buttons for Client Preference tab
             $('input[name="visa_type"]').on('change', function() {
                 const selectedValue = $(this).val();
+                const previousValue = $(this).data('previous-value');
+                
+                // Clear form data for other visa types when switching
+                if (previousValue && previousValue !== selectedValue) {
+                    if (previousValue === 'pr') {
+                        // Clear PR fields
+                        $('#skill_assessment_letter, #pr_preferred_country, #pr_preferred_state, #pr_family, #pr_subclass').val('').selectpicker('refresh');
+                        $('#pr_assessment_letter_file').val('');
+                    } else if (previousValue === 'visit') {
+                        // Clear Visit Visa fields
+                        $('#purpose_of_visit, #visit_family, #visit_preferred_country, #visit_preferred_state, #visit_subclass').val('').selectpicker('refresh');
+                    } else if (previousValue === 'work') {
+                        // Clear Work Permit fields
+                        $('#preferred_designation, #work_industry, #work_preferred_country, #work_preferred_state, #work_subclass').val('').selectpicker('refresh');
+                    } else if (previousValue === 'student') {
+                        // Clear Student Visa fields
+                        $('#preferred_course, #student_country, #university, #term_intake, #student_subclass').val('').selectpicker('refresh');
+                    }
+                }
+                
+                // Store current value as previous
+                $(this).data('previous-value', selectedValue);
                 
                 // Hide all sections
                 $('#prSection, #visitSection, #workSection, #studentSection').addClass('d-none');
@@ -1625,7 +1761,15 @@
                 }
                 
                 // Reinitialize select picker for the visible section
-                $('.select-picker').selectpicker('refresh');
+                setTimeout(function() {
+                    $('.select-picker').each(function() {
+                        if (!$(this).data('selectpicker')) {
+                            $(this).selectpicker();
+                        } else {
+                            $(this).selectpicker('refresh');
+                        }
+                    });
+                }, 100);
             });
             
             // Handle PR Assessment Letter file input change
@@ -1698,12 +1842,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_email_address_${relativeContactCount}" fieldLabel="Email Address">
                                 </x-forms.label>
-                                <input type="email" class="form-control height-35 f-14" name="relative_email_address[]" id="relative_email_address_${relativeContactCount}">
+                                <input type="email" class="form-control height-35 f-14" name="relative_email_address[]" id="relative_email_address_${relativeContactCount}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_phone_number_${relativeContactCount}" fieldLabel="Phone Number">
                                 </x-forms.label>
-                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="relative_phone_number[]" id="relative_phone_number_${relativeContactCount}">
+                                <input type="number" max="9999999999" class="form-control height-35 f-14" name="relative_phone_number[]" id="relative_phone_number_${relativeContactCount}" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);">
                             </div>
                             <div class="col-md-12 mt-3">
                                 <button type="button" class="btn btn-danger btn-sm remove-relative-contact" data-row-id="${relativeContactCount}">
@@ -1716,6 +1860,17 @@
                 
                 // Append to the relative-contact-rows-container
                 $('#relative-contact-rows-container').append(newRow);
+                
+                // Reinitialize select picker for the new row
+                setTimeout(function() {
+                    $('.select-picker').each(function() {
+                        if (!$(this).data('selectpicker')) {
+                            $(this).selectpicker();
+                        } else {
+                            $(this).selectpicker('refresh');
+                        }
+                    });
+                }, 100);
             });
 
             // Remove relative contact row
@@ -1782,6 +1937,11 @@
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" name="child_document_file[]" id="child_document_file_${nextChildNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
+                            <div class="col-md-3" id="child_passport_file_container_${nextChildNum}" style="display: none;">
+                                <x-forms.label class="mt-3" fieldId="child_passport_file_${nextChildNum}" fieldLabel="Add Child Passport" fieldRequired="true">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="child_passport_file[]" id="child_passport_file_${nextChildNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                            </div>
                             <div class="col-md-12 mt-3">
                                 <button type="button" class="btn btn-danger btn-sm remove-child" data-row-id="${nextChildNum}">
                                     <i class="fa fa-trash mr-1"></i>Remove
@@ -1795,7 +1955,15 @@
                 $('#child-rows-container').append(newRow);
                 
                 // Reinitialize select picker for the new row
-                $('.select-picker').selectpicker('refresh');
+                setTimeout(function() {
+                    $('.select-picker').each(function() {
+                        if (!$(this).data('selectpicker')) {
+                            $(this).selectpicker();
+                        } else {
+                            $(this).selectpicker('refresh');
+                        }
+                    });
+                }, 100);
             });
 
             // Remove child row
@@ -1831,17 +1999,27 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_degree_percentage_${nextDegreeNum}" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="other_degree_percentage[]" id="other_degree_percentage_${nextDegreeNum}" min="0" max="100" step="0.01">
+                                <input type="number" class="form-control height-35 f-14" name="other_degree_percentage[]" id="other_degree_percentage_${nextDegreeNum}" min="0" max="100" step="0.01" maxlength="5">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_degree_passing_year_${nextDegreeNum}" fieldLabel="Passing Year">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="other_degree_passing_year[]" id="other_degree_passing_year_${nextDegreeNum}" min="1950" max="{{ date('Y') }}">
+                                <select class="form-control select-picker height-35 f-14" name="other_degree_passing_year[]" id="other_degree_passing_year_${nextDegreeNum}">
+                                    <option value="">Select</option>
+                                    ${(() => {
+                                        let yearOptions = '';
+                                        const currentYear = new Date().getFullYear();
+                                        for (let year = currentYear; year >= 1950; year--) {
+                                            yearOptions += `<option value="${year}">${year}</option>`;
+                                        }
+                                        return yearOptions;
+                                    })()}
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_degree_trial_${nextDegreeNum}" fieldLabel="Trial">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="other_degree_trial[]" id="other_degree_trial_${nextDegreeNum}">
+                                <input type="number" class="form-control height-35 f-14" name="other_degree_trial[]" id="other_degree_trial_${nextDegreeNum}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_degree_result_file_${nextDegreeNum}" fieldLabel="Add Other Degree Result">
@@ -1859,6 +2037,17 @@
                 
                 // Append to the other-degree-rows-container
                 $('#other-degree-rows-container').append(newRow);
+                
+                // Reinitialize select picker for the new row
+                setTimeout(function() {
+                    $('.select-picker').each(function() {
+                        if (!$(this).data('selectpicker')) {
+                            $(this).selectpicker();
+                        } else {
+                            $(this).selectpicker('refresh');
+                        }
+                    });
+                }, 100);
             });
 
             // Remove other degree row
@@ -1884,12 +2073,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_duration_from_${nextJobNum}" fieldLabel="Duration - From">
                                 </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="job_duration_from[]" id="job_duration_from_${nextJobNum}">
+                                <input type="date" class="form-control height-35 f-14" name="job_duration_from[]" id="job_duration_from_${nextJobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_duration_to_${nextJobNum}" fieldLabel="Duration - To">
                                 </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="job_duration_to[]" id="job_duration_to_${nextJobNum}">
+                                <input type="date" class="form-control height-35 f-14" name="job_duration_to[]" id="job_duration_to_${nextJobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_country_${nextJobNum}" fieldLabel="Country">
@@ -1982,15 +2171,121 @@
                 }
             });
             
+            // Handle Spouse Have Passport - show/hide passport file field
+            $('#spouse_have_passport').on('changed.bs.select', function() {
+                const havePassport = $(this).val();
+                if (havePassport === 'Yes') {
+                    $('#spouse_passport_file_container').show();
+                } else {
+                    $('#spouse_passport_file_container').hide();
+                    $('#spouse_passport_file').val('');
+                }
+            });
+            
+            // Handle Child Have Passport - show/hide passport file field
+            $('#child_have_passport').on('changed.bs.select', function() {
+                const havePassport = $(this).val();
+                if (havePassport === 'Yes') {
+                    $('#child_passport_file_container').show();
+                } else {
+                    $('#child_passport_file_container').hide();
+                    $('#child_passport_file').val('');
+                }
+            });
+            
+            // Handle dynamic child passport fields
+            $(document).on('changed.bs.select', '[id^="child_have_passport"]', function() {
+                const havePassport = $(this).val();
+                const childNum = $(this).attr('id').replace('child_have_passport_', '').replace('child_have_passport', '');
+                const containerId = childNum ? `#child_passport_file_container_${childNum}` : '#child_passport_file_container';
+                const fileId = childNum ? `#child_passport_file_${childNum}` : '#child_passport_file';
+                
+                if (havePassport === 'Yes') {
+                    $(containerId).show();
+                } else {
+                    $(containerId).hide();
+                    $(fileId).val('');
+                }
+            });
+            
+            // Function to check and show passport fields based on "Have Passport" values
+            function checkAndShowPassportFields() {
+                // Check Father passport
+                const fatherHavePassport = getSelectValue('#father_have_passport');
+                if (fatherHavePassport === 'Yes') {
+                    $('#father_passport_file_container').show();
+                } else {
+                    $('#father_passport_file_container').hide();
+                }
+                
+                // Check Mother passport
+                const motherHavePassport = getSelectValue('#mother_have_passport');
+                if (motherHavePassport === 'Yes') {
+                    $('#mother_passport_file_container').show();
+                } else {
+                    $('#mother_passport_file_container').hide();
+                }
+                
+                // Check Spouse passport
+                const spouseHavePassport = getSelectValue('#spouse_have_passport');
+                if (spouseHavePassport === 'Yes') {
+                    $('#spouse_passport_file_container').show();
+                } else {
+                    $('#spouse_passport_file_container').hide();
+                }
+                
+                // Check Child passport
+                const childHavePassport = getSelectValue('#child_have_passport');
+                if (childHavePassport === 'Yes') {
+                    $('#child_passport_file_container').show();
+                } else {
+                    $('#child_passport_file_container').hide();
+                }
+                
+                // Check dynamic child passport fields
+                $('[id^="child_have_passport"]').each(function() {
+                    const childHavePassportVal = getSelectValue('#' + $(this).attr('id'));
+                    const childNum = $(this).attr('id').replace('child_have_passport_', '').replace('child_have_passport', '');
+                    const containerId = childNum ? `#child_passport_file_container_${childNum}` : '#child_passport_file_container';
+                    
+                    if (childHavePassportVal === 'Yes') {
+                        $(containerId).show();
+                    } else {
+                        $(containerId).hide();
+                    }
+                });
+            }
+            
             // Trigger on page load if values are already set
             setTimeout(function() {
-                if ($('#father_have_passport').val() === 'Yes') {
-                    $('#father_passport_file_container').show();
-                }
-                if ($('#mother_have_passport').val() === 'Yes') {
-                    $('#mother_passport_file_container').show();
-                }
+                checkAndShowPassportFields();
             }, 500);
+            
+            // Also trigger after selectpicker is initialized/refreshed
+            setTimeout(function() {
+                checkAndShowPassportFields();
+            }, 1000);
+            
+            // Also trigger on selectpicker refresh (for when data is loaded)
+            $(document).on('refreshed.bs.select', '.select-picker', function() {
+                setTimeout(function() {
+                    checkAndShowPassportFields();
+                }, 100);
+            });
+            
+            // Also trigger when tab is shown (in case user navigates to Step 5)
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                // Reinitialize selectpickers when tab is shown
+                setTimeout(function() {
+                    initializeSelectPickers();
+                }, 200);
+                
+                if ($(e.target).attr('id') === 'nav-family-tab') {
+                    setTimeout(function() {
+                        checkAndShowPassportFields();
+                    }, 300);
+                }
+            });
             
             // File size validation for all file inputs
             $(document).on('change', 'input[type="file"][data-max-size]', function() {
@@ -2780,6 +3075,81 @@
                             isValid = false;
                             showFieldError('#other_email', '@lang('app.otherEmail') must be a valid email address');
                         }
+                        // Upload Resume & Passport validation
+                        if (!$('#upload_resume').val() && !$('#upload_resume_hidden').length) {
+                            isValid = false;
+                            showFieldError('#upload_resume', 'Upload Resume & Passport is required');
+                        }
+                        // Visa Status validation
+                        if (!$('input[name="visa_status"]:checked').val()) {
+                            isValid = false;
+                            const $visaStatusContainer = $('input[name="visa_status"]').closest('.row').first();
+                            $visaStatusContainer.find('.invalid-feedback').remove();
+                            $visaStatusContainer.append('<div class="invalid-feedback d-block col-12">@lang('app.lastFiveYearsVisaStatus') is required</div>');
+                            $('input[name="visa_status"]').closest('.form-check').addClass('is-invalid');
+                        } else {
+                            const visaStatus = $('input[name="visa_status"]:checked').val();
+                            // Visa Granted fields validation
+                            if (visaStatus === 'granted') {
+                                if (!$('#visa_issue_date').val()) {
+                                    isValid = false;
+                                    showFieldError('#visa_issue_date', '@lang('app.visaIssueDate') is required');
+                                }
+                                if (!$('#visa_expire_date').val()) {
+                                    isValid = false;
+                                    showFieldError('#visa_expire_date', '@lang('app.visaExpireDate') is required');
+                                }
+                                const visaCategoryVal = ($('#visa_category').val() || '').trim();
+                                if (!visaCategoryVal) {
+                                    isValid = false;
+                                    showFieldError('#visa_category', '@lang('app.visaCategory') is required');
+                                }
+                            }
+                            // Visa Refusal fields validation
+                            if (visaStatus === 'refusal') {
+                                if (!$('#visa_rejection_date').val()) {
+                                    isValid = false;
+                                    showFieldError('#visa_rejection_date', '@lang('app.visaRejectionDate') is required');
+                                }
+                                const visaRefusalCategoryVal = ($('#visa_refusal_category').val() || '').trim();
+                                if (!visaRefusalCategoryVal) {
+                                    isValid = false;
+                                    showFieldError('#visa_refusal_category', '@lang('app.visaCategory') is required');
+                                }
+                                const visaRefusalReasonVal = ($('#visa_refusal_reason').val() || '').trim();
+                                if (!visaRefusalReasonVal) {
+                                    isValid = false;
+                                    showFieldError('#visa_refusal_reason', '@lang('app.reason') is required');
+                                }
+                                // Validate dynamic visa refusal rows
+                                $('[id^="visa_rejection_date_"]').each(function() {
+                                    if (!$(this).val()) {
+                                        isValid = false;
+                                        showFieldError('#' + $(this).attr('id'), '@lang('app.visaRejectionDate') is required');
+                                    }
+                                });
+                                $('[id^="visa_refusal_category_"]').each(function() {
+                                    const val = ($(this).val() || '').trim();
+                                    if (!val) {
+                                        isValid = false;
+                                        showFieldError('#' + $(this).attr('id'), '@lang('app.visaCategory') is required');
+                                    }
+                                });
+                                $('[id^="visa_refusal_reason_"]').each(function() {
+                                    const val = ($(this).val() || '').trim();
+                                    if (!val) {
+                                        isValid = false;
+                                        showFieldError('#' + $(this).attr('id'), '@lang('app.reason') is required');
+                                    }
+                                });
+                            }
+                        }
+                        // Languages Spoken validation
+                        const languagesSpokenVal = ($('#languages_spoken').val() || '').trim();
+                        if (!languagesSpokenVal) {
+                            isValid = false;
+                            showFieldError('#languages_spoken', '@lang('app.languagesSpoken') is required');
+                        }
                         break;
                         
                     case 2:
@@ -2861,7 +3231,7 @@
                         }
                         if (!$('#issuance_date').val()) {
                             isValid = false;
-                            showFieldError('#issuance_date', 'Issuance Date is required');
+                            showFieldError('#issuance_date', 'Issue Date is required');
                         }
                         if (!$('#expiration_date').val()) {
                             isValid = false;
@@ -2889,7 +3259,33 @@
                         
                     case 4:
                         // Step 4 - Relative Contact Information
-                        // No required fields - all fields are optional
+                        // Validate email format if provided
+                        const relativeEmail = ($('#relative_email_address').val() || '').trim();
+                        if (relativeEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(relativeEmail)) {
+                            isValid = false;
+                            showFieldError('#relative_email_address', 'Email Address must be a valid email address');
+                        }
+                        // Validate phone number max length
+                        const relativePhone = ($('#relative_phone_number').val() || '').trim();
+                        if (relativePhone && relativePhone.length > 10) {
+                            isValid = false;
+                            showFieldError('#relative_phone_number', 'Phone Number must be maximum 10 digits');
+                        }
+                        // Validate dynamic relative contact fields
+                        $('[id^="relative_email_address_"]').each(function() {
+                            const email = ($(this).val() || '').trim();
+                            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                                isValid = false;
+                                showFieldError('#' + $(this).attr('id'), 'Email Address must be a valid email address');
+                            }
+                        });
+                        $('[id^="relative_phone_number_"]').each(function() {
+                            const phone = ($(this).val() || '').trim();
+                            if (phone && phone.length > 10) {
+                                isValid = false;
+                                showFieldError('#' + $(this).attr('id'), 'Phone Number must be maximum 10 digits');
+                            }
+                        });
                         break;
                         
                     case 6:
@@ -2983,6 +3379,34 @@
                                 showFieldError('#father_passport_file', 'Father\'s Passport file is required');
                             }
                         }
+                        // Spouse passport file is required if spouse has passport = Yes
+                        const step5SpouseHavePassportVal = getSelectValue('#spouse_have_passport');
+                        if (step5SpouseHavePassportVal === 'Yes') {
+                            if (!$('#spouse_passport_file').val() && !$('#spouse_passport_file_hidden').length) {
+                                isValid = false;
+                                showFieldError('#spouse_passport_file', 'Spouse\'s Passport file is required');
+                            }
+                        }
+                        // Child passport file is required if child has passport = Yes
+                        const step5ChildHavePassportVal = getSelectValue('#child_have_passport');
+                        if (step5ChildHavePassportVal === 'Yes') {
+                            if (!$('#child_passport_file').val() && !$('#child_passport_file_hidden').length) {
+                                isValid = false;
+                                showFieldError('#child_passport_file', 'Child\'s Passport file is required');
+                            }
+                        }
+                        // Validate dynamic child passport fields
+                        $('[id^="child_have_passport"]').each(function() {
+                            const childHavePassport = getSelectValue('#' + $(this).attr('id'));
+                            if (childHavePassport === 'Yes') {
+                                const childNum = $(this).attr('id').replace('child_have_passport_', '').replace('child_have_passport', '');
+                                const fileId = childNum ? `#child_passport_file_${childNum}` : '#child_passport_file';
+                                if (!$(fileId).val() && !$(fileId + '_hidden').length) {
+                                    isValid = false;
+                                    showFieldError(fileId, 'Child\'s Passport file is required');
+                                }
+                            }
+                        });
                         break;
                         
                     case 8:
