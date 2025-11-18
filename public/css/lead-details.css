@@ -1,4 +1,7 @@
 /* Lead Details Page Styles */
+.content-wrapper{
+    padding: 0px;
+}
 .lead-details-container {
     width: 100%;
 }
@@ -9,23 +12,46 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 15px;
+    background-color: #FFFBF1 !important;
+}
+.lead-avatar-circle{
+    background-color: #F1EBFF !important;
+}
+.lead-id-header{
+    color: #713ED9;
 }
 
-.lead-nav-tab {
-    color: #6c757d;
-    border-bottom: 2px solid transparent;
-    transition: all 0.3s;
+.lead-contact-info{
+    display: flow !important;
 }
-
-.lead-nav-tab:hover {
-    color: #007bff;
-    border-bottom-color: #007bff;
+.Whatsapp{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #B6FFDD;
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
 }
+.Email{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #F1EBFF;
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+}
+.back-arrow{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFE7E7;
+    color: #F5213D;
+    border-radius: 4px;
 
-.lead-nav-tab.active {
-    color: #007bff;
-    border-bottom-color: #007bff;
-    font-weight: 600;
+    width: 40px;
+    height: 40px;
 }
 
 .tab-content {
@@ -36,11 +62,428 @@
     display: block;
 }
 
+/* FULL TAB BAR INLINE */
+.tabs .nav {
+    display: flex;
+    flex-wrap: nowrap !important;
+    gap: 20px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 8px 0;
+}
+
+/* SCROLLBAR */
+.tabs .nav::-webkit-scrollbar {
+    height: 6px;                     /* scrollbar height (horizontal) */
+}
+
+.tabs .nav::-webkit-scrollbar-track {
+    background: #F4F1FA;             /* very light lavender */
+    border-radius: 10px;
+}
+
+.tabs .nav::-webkit-scrollbar-thumb {
+    background: #CFC2F5;             /* light purple */
+    border-radius: 10px;
+}
+
+.tabs .nav::-webkit-scrollbar-thumb:hover {
+    background: #B8A7F0;             /* slightly darker on hover */
+}
+
+    /* Firefox Support */
+    .tabs .nav {
+        scrollbar-color: #CFC2F5 #F4F1FA;   /* thumb | track */
+        scrollbar-width: thin;
+    }
+
+/* TAB LINK */
+.tabs .nav-link-lead {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0px 8px 0px !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 14px;
+    font-weight: 400;
+    color: #676767;
+    transition: 0.25s ease;
+    border-bottom: 1px !important;
+}
+
+/* ICON BOX */
+.tabs .nav-link-lead .tab-item {
+    width: 36px;
+    height: 36px;
+    background: #F2EDF9;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: 0.25s ease;
+}
+
+/* DEFAULT ICON */
+.tabs .nav-link-lead img {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+    transition: 0.25s ease;
+}
+
+/* HOVER EFFECT */
+.tabs .nav-link-lead:hover .tab-item {
+    background: #E4D9FF;
+}
+
+.tabs .nav-link-lead:hover {
+    color: #000;
+}
+
+.tabs .nav-link-lead:hover img {
+    opacity: 1;
+}
+
+/* ACTIVE TAB */
+.tabs .nav-link-lead.active {
+    color: #000 !important;
+    font-weight: 500;
+}
+
+.tabs .nav-link-lead.active .tab-item {
+    background: #6A32FF !important;
+}
+
+.tabs .nav-link-lead.active img {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}
+
+/* NO BOOTSTRAP BORDER */
+.nav-tabs .nav-link-lead.active {
+    border: none !important;
+    background: transparent !important;
+}
+
+.tabs .nav .nav-link-lead.active, .tabs .nav .nav-item-lead:hover {
+    border-bottom: 0px solid var(--header_color) !important;
+}
+
+.tabs .nav .nav-link-lead.active, .tabs .nav .nav-item-lead:hover {
+    border-bottom: 0px solid var(--header_color) !important;
+}
+
+
+/* ===============================
+   SECTION TITLES
+=============================== */
+.info-section-title h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6A32FF;                 /* Purple heading */
+    margin-bottom: 10px;
+}
+
+/* Thin Grey Divider Under Titles */
+.info-section {
+    border-bottom: 1px solid #E9E6F5;
+    padding-bottom: 18px;
+    margin-bottom: 25px;
+}
+.info-section:last-child {
+    border-bottom: none;
+}
+
+/* ===============================
+   FIELD LAYOUT
+=============================== */
+.info-field {
+    display: flex;
+}
+
+.info-field .info-field-icon i {
+    font-size: 18px;
+    color: #A78BFA;                 /* Soft purple icons */
+}
+
+/* Label */
+.info-field-label {
+    font-size: 12px;
+    color: #6C6C6C;
+    line-height: 1.2;
+}
+
+/* Value Text */
+.info-field-value {
+    font-size: 14px;
+    color: #000;
+    font-weight: 400;
+}
+
+/* Space Between Icon & Text */
 .info-field-icon {
+    margin-right: 10px;
+    padding-top: 2px;
+}
+
+/* ===============================
+   GRID ALIGNMENT FIX (Perfect Like Screenshot)
+=============================== */
+.info-grid .info-field {
+    display: flex;
+    align-items: flex-start;
+}
+
+/* Ensure consistent spacing in rows */
+.candidate-info .info-field,
+.candidate-info-row2 .info-field,
+.personal-info .info-field,
+.personal-info-row2 .info-field {
+    margin-bottom: 18px;
+}
+
+/* ===============================
+   PERMANENT ADDRESS FIELD (Wider)
+=============================== */
+.address-field .info-field-value {
+    line-height: 1.4;
+}
+
+/* ===============================
+   GENERAL PAGE SPACING
+=============================== */
+.lead-content-area {
+    background: #FFFFFF;
+}
+
+/* Section Header "Client Info" */
+.content-section-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #6A32FF;
+}
+
+/* ===============================
+   IMPROVED ICON COLORS (Optional)
+=============================== */
+.info-field:nth-child(1) .info-field-icon i { color: #8B5CF6; }
+.info-field:nth-child(2) .info-field-icon i { color: #8B5CF6; }
+.info-field:nth-child(3) .info-field-icon i { color: #A78BFA; }
+.info-field:nth-child(4) .info-field-icon i { color: #8B5CF6; }
+
+/* Heart */
+.fa-heart { color: #F472B6 !important; }
+
+/* Address Icon */
+.fa-map-marker-alt { color: #6A32FF !important; }
+
+/* Link Icon */
+.fa-link { color: #6A32FF !important; }
+
+/* ===============================
+   TAB SECTION HEADER (All Tabs)
+=============================== */
+
+/* Tab Section Header - Applied to all tabs */
+.tab-section-header {
+    background-color: #F1EBFF; /* Light purple background */
+    padding: 12px 16px;
+    border-radius: 8px 8px 0 0;
+    margin: 0 -16px 0 -16px; /* Extend to edges */
+    border: 1px solid #E9E6F5;
+    border-bottom: none;
+    min-height: 56px; /* Consistent height matching File Notes */
+    display: flex;
+    align-items: center;
+}
+
+.tab-section-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-height: 32px; /* Ensure content area has minimum height */
+}
+
+.tab-section-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #713ED9; /* Darker purple text */
+    margin: 0;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    min-height: 24px; /* Ensure title has consistent height */
+}
+
+.tab-section-subtitle {
+    font-weight: 400;
+    color: #000000;
+}
+
+.tab-section-subtitle-text {
+    font-size: 14px;
+    color: #6C6C6C;
+    margin-top: 4px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+/* Ensure headers with subtitles maintain same height */
+.tab-section-header-content > div:first-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 32px;
+}
+
+/* Add Button - Square with darker purple background */
+.tab-section-add-btn {
+    width: 32px;
+    height: 32px;
+    background-color: #713ED9; /* Darker purple background */
+    border: none;
+    border-radius: 4px;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.tab-section-add-btn:hover {
+    background-color: #5A2DB8;
+}
+
+.tab-section-add-btn i {
+    font-size: 14px;
+    color: #FFFFFF;
+}
+
+/* Secondary Button for Travel Details */
+.tab-section-secondary-btn {
+    padding: 6px 12px;
+    background-color: #F5F5F5;
+    color: #000000;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-right: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.tab-section-secondary-btn:hover {
+    background-color: #EEEEEE;
+    border-color: #B8A7F0;
+    color: #000000;
+}
+
+/* Header Actions Container */
+.tab-section-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Tab Section Content Area - Applied to all tabs */
+.tab-section-content {
+    background-color: #FFFFFF;
+    padding: 20px;
+    border-radius: 0 0 8px 8px;
+    margin: 0 -16px -16px -16px; /* Extend to edges */
+    border: 1px solid #E9E6F5;
+    border-top: none;
+}
+
+/* ===============================
+   FILE NOTES SECTION (Specific Styles)
+=============================== */
+
+/* File Notes List */
+.file-notes-list {
+    position: relative;
+}
+
+/* File Note Item */
+.file-note-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.file-note-item:last-child {
+    margin-bottom: 0;
+}
+
+.file-note-item:last-child .timeline-line {
+    display: none;
+}
+
+/* Timeline Indicator */
+.file-note-timeline {
+    position: relative;
+    margin-right: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     min-width: 20px;
 }
 
-.info-field-value {
-    word-break: break-word;
+.timeline-dot {
+    width: 27px;
+    height: 27px;
+    background-color: #713ED9; /* Solid purple circle */
+    border-radius: 50%;
+    z-index: 2;
+    flex-shrink: 0;
 }
+
+.timeline-line {
+    position: absolute;
+    left: 13px;
+    top: 27px;
+    width: 1px;
+    height: calc(100% + 50px);
+    border-left: 2px dashed #7441DF;
+    z-index: 1;
+}
+
+/* File Note Box */
+.file-note-box {
+    background-color: #F5F5F5; /* Light grey background */
+    border-radius: 8px;
+    padding: 12px 16px;
+    flex: 1;
+    margin-top: -4px; /* Align with timeline dot */
+}
+
+/* File Note Text */
+.file-note-text {
+    font-size: 14px;
+    color: #000000;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+/* File Note Meta */
+.file-note-meta {
+    font-size: 12px;
+    color: #6C6C6C;
+    line-height: 1.4;
+    padding-left: 0;
+}
+
+.file-note-bullet {
+    color: #6C6C6C;
+    margin-right: 4px;
+}
+
 
