@@ -81,12 +81,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="passport_file" :fieldLabel="__('app.addPassport')">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="passport_file" name="passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="upload_resume" fieldLabel="Upload Resume & Passport" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="upload_resume" fieldLabel="Upload Resume" fieldRequired="true">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" id="upload_resume" name="upload_resume" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
@@ -203,22 +198,22 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="primary_phone" :fieldLabel="__('app.primaryPhoneNo')" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="tel" maxlength="10" class="form-control height-35 f-14" name="primary_phone" id="primary_phone" pattern="[0-9]{10}">
+                                <input type="number" max="9999999999" min="0" class="form-control height-35 f-14" name="primary_phone" id="primary_phone" oninput="this.value = this.value.slice(0, 10)">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="secondary_phone" :fieldLabel="__('app.secondaryPhoneNo')">
                                 </x-forms.label>
-                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="secondary_phone" id="secondary_phone" pattern="[0-9]{10}">
+                                <input type="number" max="9999999999" min="0" class="form-control height-35 f-14" name="secondary_phone" id="secondary_phone" oninput="this.value = this.value.slice(0, 10)">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="work_phone" :fieldLabel="__('app.workPhoneNo')">
                                 </x-forms.label>
-                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="work_phone" id="work_phone" pattern="[0-9]{10}">
+                                <input type="number" max="9999999999" min="0" class="form-control height-35 f-14" name="work_phone" id="work_phone" oninput="this.value = this.value.slice(0, 10)">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_phone" :fieldLabel="__('app.otherPhoneNo')">
                                 </x-forms.label>
-                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="other_phone" id="other_phone" pattern="[0-9]{10}">
+                                <input type="number" max="9999999999" min="0" class="form-control height-35 f-14" name="other_phone" id="other_phone" oninput="this.value = this.value.slice(0, 10)">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="email_address" :fieldLabel="__('modules.lead.email')" fieldRequired="true">
@@ -2494,10 +2489,16 @@
                     $('#country_of_origin').val(data.country_of_origin || '');
                     $('#email_address').val(data.email_address || data.email || '');
                     $('#mobile').val(data.mobile || '');
-                    $('#alternate_mobile').val(data.alternate_mobile || '');
                     $('#primary_phone').val(data.primary_phone || '');
                     $('#secondary_phone').val(data.secondary_phone || '');
                     $('#work_phone').val(data.work_phone || '');
+                    $('#other_phone').val(data.other_phone || '');
+                    // Other Email (Used in Last 5 Years)
+                    if (data.other_email !== undefined && data.other_email !== null) {
+                        $('#other_email').val(data.other_email);
+                    } else {
+                        $('#other_email').val('');
+                    }
                     $('#lead_source').val(data.lead_source || '').selectpicker('refresh');
                     $('#lead_assign_to').val(data.lead_assign_to || '').selectpicker('refresh');
                     
@@ -2565,6 +2566,14 @@
                             });
                         }
                     }
+                    
+                    // Languages Spoken
+                    $('#languages_spoken').val(data.languages_spoken || '');
+                    
+                    // Social Media Profile URLs
+                    $('#facebook_profile_url').val(data.facebook_profile_url || '');
+                    $('#instagram_profile_url').val(data.instagram_profile_url || '');
+                    $('#linkedin_profile_url').val(data.linkedin_profile_url || '');
                 }
                 
                 // Populate Step 2 data
@@ -3075,10 +3084,10 @@
                             isValid = false;
                             showFieldError('#other_email', '@lang('app.otherEmail') must be a valid email address');
                         }
-                        // Upload Resume & Passport validation
+                        // Upload Resume validation
                         if (!$('#upload_resume').val() && !$('#upload_resume_hidden').length) {
                             isValid = false;
-                            showFieldError('#upload_resume', 'Upload Resume & Passport is required');
+                            showFieldError('#upload_resume', 'Upload Resume is required');
                         }
                         // Visa Status validation
                         if (!$('input[name="visa_status"]:checked').val()) {
