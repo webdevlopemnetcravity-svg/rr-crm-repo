@@ -13,13 +13,13 @@
                 <!-- Left Section: Avatar + Priority + Lead ID -->
                 <div class="lead-header-left-group d-flex align-items-center">
                     <div class="lead-avatar-section d-flex align-items-center">
-                        <div class="lead-avatar-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
-                            <i class="fa fa-user"></i>
+                        <div class="lead-avatar-circle text-white rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                            <img src="{{ asset('img/icon/user.svg') }}">
                         </div>
                         <div class="lead-info-group">
                             <div class="lead-priority d-flex align-items-center mb-1">
-                                <i class="fa fa-star text-warning mr-1"></i>
-                                <span class="f-12">1st Priority</span>
+                                <img src="{{ asset('img/icon/1st_Priority.svg') }}">
+                                <span class="f-12 pl-1">1st Priority</span>
                             </div>
                             <div class="lead-id-header f-14 font-weight-bold">LEAD-0008</div>
                         </div>
@@ -27,39 +27,39 @@
                 </div>
 
                 <!-- Middle-Left Section: Contact Info -->
-                <div class="lead-contact-info d-flex align-items-center ml-4">
+                <div class="lead-contact-info d-flex align-items-center">
                     <div class="contact-info-item mr-4">
                         <a href="tel:+91123-456-7890" class="text-dark">
-                            <i class="fa fa-phone mr-1"></i>
-                            <span>+91 123 4567 890</span>
+                            <img src="{{ asset('img/icon/Phone.svg') }}">
+                            <span class="pl-1">+91 123 4567 890</span>
                         </a>
                     </div>
                     <div class="contact-info-item">
                         <a href="mailto:abc@gmail.com?subject=SUBJECT&body=Demo email" target="_blank" class="text-dark">
-                            <i class="fa fa-envelope mr-1"></i>
-                            <span>abc@gmail.com</span>
+                            <img src="{{ asset('img/icon/Mail.svg') }}">
+                            <span class="pl-1">abc@gmail.com</span>
                         </a>
                     </div>
                 </div>
 
                 <!-- View Resume Button -->
-                <button class="btn btn-secondary btn-sm ml-4">View Resume</button>
+                <button class="btn btn-success btn-sm">View Resume</button>
 
                 <!-- Service Name and Action Icons -->
-                <div class="lead-header-right-group ml-auto d-flex align-items-center">
+                <div class="lead-header-right-group d-flex align-items-center">
                     <div class="lead-service-actions-group d-flex align-items-center">
                         <div class="lead-service-section mr-3">
                             <div class="lead-service-name f-14 font-weight-bold">PR - Employer Nomination Scheme (ENS)(Subclass 186)</div>
                         </div>
                         <div class="lead-header-actions d-flex align-items-center">
-                            <a href="https://wa.me/911234567896?text=Hello%20I%20want%20help%20with%20my%20passport%20process" target="_blank" rel="noopener" class="btn btn-sm btn-success mr-2">
-                                <i class="fa fa-whatsapp"></i>
+                            <a class="Whatsapp mr-2" href="#">
+                                <img src="{{ asset('img/icon/Whatsapp_icon.svg') }}">
                             </a>
-                            <button class="btn btn-sm btn-primary mr-2">
-                                <i class="fa fa-envelope"></i>
-                            </button>
-                            <a href="{{ route('lead-list.index') }}" class="btn btn-sm btn-secondary">
-                                <i class="fa fa-arrow-left"></i>
+                            <a class="Email mr-2" href="#">
+                                <img src="{{ asset('img/icon/Mail_1.svg') }}">
+                            </a>
+                            <a class="back-arrow" href="{{ route('lead-list.index') }}">
+                                <img src="{{ asset('img/icon/Back_Arrow.svg') }}">
                             </a>
                         </div>
                     </div>
@@ -67,51 +67,50 @@
             </div>
 
             <!-- Navigation Tabs Bar -->
-            <div class="lead-nav-tabs bg-white border-bottom-grey">
-                <div class="d-flex">
-                    <a href="#" class="lead-nav-tab active px-4 py-3 text-decoration-none" data-tab="clientInfoTab">
-                        <i class="fa fa-id-card mr-2"></i>
-                        <span>Client Info</span>
-                    </a>
-                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="processTab">
-                        <i class="fa fa-list mr-2"></i>
-                        <span>Process</span>
-                    </a>
-                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="fileNotesTab">
-                        <i class="fa fa-file-text mr-2"></i>
-                        <span>File Notes</span>
-                    </a>
-                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="documentsTab">
-                        <i class="fa fa-file-alt mr-2"></i>
-                        <span>Documents</span>
-                    </a>
-                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="accountsTab">
-                        <i class="fa fa-receipt mr-2"></i>
-                        <span>Accounts</span>
-                    </a>
-                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="communicationTab">
-                        <i class="fa fa-comments mr-2"></i>
-                        <span>Communication</span>
-                    </a>
-                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="followUpTab">
-                        <i class="fa fa-redo mr-2"></i>
-                        <span>Follow Up</span>
-                    </a>
-                    <a href="#" class="lead-nav-tab px-4 py-3 text-decoration-none" data-tab="travelDetailsTab">
-                        <i class="fa fa-map-marker-alt mr-2"></i>
-                        <span>Travel Details</span>
-                    </a>
-                </div>
+                        <!-- Tabs Navigation -->
+            <div class="s-b-n-header bg-white" id="tabs">
+                <nav class="tabs px-4 border-bottom-grey">
+                    <div class="nav" id="nav-tab" role="tablist">
+                        <a class="nav-item-lead nav-link-lead f-14 active" data-tab="clientInfoTab" href="#">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Client_Info.svg') }}"></div>Client Info
+                        </a>
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="processTab" href="#">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Process.svg') }}"></div>Process
+                        </a>
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="fileNotesTab" href="#">
+                            <div class="tab-item"><img src="{{ asset('img/icon/File_Notes.svg') }}"></div>File Notes
+                        </a>
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="documentsTab" href="#">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Documents.svg') }}"></div>Documents
+                        </a>
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="accountsTab" href="#">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Accounts.svg') }}"></div>Accounts
+                        </a>
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="communicationTab" href="#">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Communication.svg') }}"></div>Communication
+                        </a>
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="followUpTab" href="#">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Follow_Up.svg') }}"></div>Follow Up
+                        </a>
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="travelDetailsTab" href="#">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Travel_Details.svg') }}"></div>Travel Details
+                        </a>
+                    </div>
+                </nav>
             </div>
 
             <!-- Main Content Area -->
             <div class="lead-content-area bg-white p-20" id="mainContentArea">
                 <!-- Client Info Tab Content -->
-                <div class="tab-content active" id="clientInfoTab">
-                    <div class="content-section-header mb-4">
-                        <h3 class="f-18 font-weight-bold">Client Info</h3>
+                <div class="tab-content px-4 pb-4 active" id="clientInfoTab">
+                    <!-- Tab Header -->
+                    <div class="tab-section-header">
+                        <div class="tab-section-header-content">
+                            <h3 class="tab-section-title">Client Info</h3>
+                        </div>
                     </div>
-                    <div class="content-section-body">
+                    <!-- Tab Content Area -->
+                    <div class="tab-section-content">
                         <!-- Candidate Information Section -->
                         <div class="info-section mb-4">
                             <div class="info-section-title mb-3">
@@ -272,11 +271,15 @@
                     </div>
                 </div>
                 <!-- Process Tab Content -->
-                <div class="tab-content" id="processTab">
-                    <div class="content-section-header mb-4">
-                        <h3 class="f-18 font-weight-bold">Process - <span style="font-weight: 400; color: #000000;">Registered Date: 05-09-2025</span></h3>
+                <div class="tab-content px-4 pb-4" id="processTab">
+                    <!-- Tab Header -->
+                    <div class="tab-section-header">
+                        <div class="tab-section-header-content">
+                            <h3 class="tab-section-title">Process - <span class="tab-section-subtitle">Registered Date: 05-09-2025</span></h3>
+                        </div>
                     </div>
-                    <div class="content-section-body">
+                    <!-- Tab Content Area -->
+                    <div class="tab-section-content">
                         <!-- Agent & Applicant Details Section -->
                         <div class="info-section mb-4">
                             <div class="info-section-title mb-3">
@@ -455,36 +458,56 @@
                     </div>
                 </div>
                 <!-- File Notes Tab Content -->
-                <div class="tab-content" id="fileNotesTab">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="f-18 font-weight-bold mb-0">File Notes</h3>
-                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addFileNoteModal">
-                            <i class="fa fa-plus mr-1"></i>
-                        </button>
+                <div class="tab-content px-4 pb-4" id="fileNotesTab">
+                    <!-- Tab Header -->
+                    <div class="tab-section-header">
+                        <div class="tab-section-header-content">
+                            <h3 class="tab-section-title">File Notes</h3>
+                            <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addFileNoteModal">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="content-section-body">
+                    <!-- Tab Content Area -->
+                    <div class="tab-section-content">
                         <div class="file-notes-list">
-                            <div class="file-note-item mb-3 p-3 bg-light rounded">
-                                <div class="file-note-text f-14 mb-2">Need student visa with admission service for Australia</div>
-                                <div class="file-note-meta f-12 text-dark-grey">
-                                    Created by: Samuel Parker - 17-07-2025 2:00 PM
+                            <div class="file-note-item">
+                                <div class="file-note-timeline">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-line"></div>
+                                </div>
+                                <div class="file-note-box">
+                                    <div class="file-note-text">Need student visa with admission service for Australia</div>
+                                    <div class="file-note-meta">
+                                        <span class="file-note-bullet">•</span> Created by: Samuel Parker - 17-07-2025 2:00 PM
+                                    </div>
                                 </div>
                             </div>
-                            <div class="file-note-item mb-3 p-3 bg-light rounded">
-                                <div class="file-note-text f-14 mb-2">Need student visa with admission service for Australia</div>
-                                <div class="file-note-meta f-12 text-dark-grey">
-                                    Created by: Samuel Parker - 17-07-2025 2:00 PM
+                            <div class="file-note-item">
+                                <div class="file-note-timeline">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-line"></div>
+                                </div>
+                                <div class="file-note-box">
+                                    <div class="file-note-text">Need student visa with admission service for Australia</div>
+                                    <div class="file-note-meta">
+                                        <span class="file-note-bullet">•</span> Created by: Samuel Parker - 17-07-2025 2:00 PM
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- Documents Tab Content -->
-                <div class="tab-content" id="documentsTab">
-                    <div class="content-section-header mb-4">
-                        <h3 class="f-18 font-weight-bold">Document Checklist - SIDDHARTH PATEL (MAIN APPLICANT)</h3>
+                <div class="tab-content px-4 pb-4" id="documentsTab">
+                    <!-- Tab Header -->
+                    <div class="tab-section-header">
+                        <div class="tab-section-header-content">
+                            <h3 class="tab-section-title">Document Checklist - <span class="info-field-value">SIDDHARTH PATEL (MAIN APPLICANT)</span></h3>
+                        </div>
                     </div>
-                    <div class="content-section-body">
+                    <!-- Tab Content Area -->
+                    <div class="tab-section-content">
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>
@@ -544,14 +567,18 @@
                     </div>
                 </div>
                 <!-- Accounts Tab Content -->
-                <div class="tab-content" id="accountsTab">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="f-18 font-weight-bold mb-0">ADD INVOICE</h3>
-                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addInvoiceModal">
-                            <i class="fa fa-plus mr-1"></i>
-                        </button>
+                <div class="tab-content px-4 pb-4" id="accountsTab">
+                    <!-- Tab Header -->
+                    <div class="tab-section-header">
+                        <div class="tab-section-header-content">
+                            <h3 class="tab-section-title">ADD INVOICE</h3>
+                            <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addInvoiceModal">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="content-section-body">
+                    <!-- Tab Content Area -->
+                    <div class="tab-section-content">
                         <div class="text-center p-5">
                             <p class="text-muted mb-3">No invoice has been created for this Lead.</p>
                             <p class="text-muted">To create an Invoice, click on <i class="fa fa-plus"></i> at the top right corner</p>
@@ -559,14 +586,18 @@
                     </div>
                 </div>
                 <!-- Communication Tab Content -->
-                <div class="tab-content" id="communicationTab">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="f-18 font-weight-bold mb-0">Communication History</h3>
-                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addCommunicationModal">
-                            <i class="fa fa-plus mr-1"></i>
-                        </button>
+                <div class="tab-content px-4 pb-4" id="communicationTab">
+                    <!-- Tab Header -->
+                    <div class="tab-section-header">
+                        <div class="tab-section-header-content">
+                            <h3 class="tab-section-title">Communication History</h3>
+                            <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addCommunicationModal">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="content-section-body">
+                    <!-- Tab Content Area -->
+                    <div class="tab-section-content">
                         <div class="communication-list">
                             <div class="communication-card mb-3 p-3 bg-light rounded">
                                 <div class="d-flex">
@@ -584,34 +615,42 @@
                     </div>
                 </div>
                 <!-- Follow Up Tab Content -->
-                <div class="tab-content" id="followUpTab">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h3 class="f-18 font-weight-bold mb-0">FOLLOW UP</h3>
-                            <div class="f-14 text-dark-grey mt-1">Next Follow-up: 09/09/2025 12:00 PM</div>
+                <div class="tab-content px-4 pb-4" id="followUpTab">
+                    <!-- Tab Header -->
+                    <div class="tab-section-header">
+                        <div class="tab-section-header-content">
+                            <div>
+                                <h3 class="tab-section-title">FOLLOW UP</h3>
+                                <div class="tab-section-subtitle-text">Next Follow-up: 09/09/2025 12:00 PM</div>
+                            </div>
+                            <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addFollowUpModal">
+                                <i class="fa fa-plus"></i>
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addFollowUpModal">
-                            <i class="fa fa-plus mr-1"></i>
-                        </button>
                     </div>
-                    <div class="content-section-body">
+                    <!-- Tab Content Area -->
+                    <div class="tab-section-content">
                         <div class="text-center p-5">
                             <p class="text-muted">No data found</p>
                         </div>
                     </div>
                 </div>
                 <!-- Travel Details Tab Content -->
-                <div class="tab-content" id="travelDetailsTab">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="f-18 font-weight-bold mb-0">Travel Details</h3>
-                        <div>
-                            <button type="button" class="btn btn-secondary btn-sm mr-2" data-toggle="modal" data-target="#notifyClientModal">Notify Client</button>
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addTravelDetailsModal">
-                                <i class="fa fa-pencil mr-1"></i>
-                            </button>
+                <div class="tab-content px-4 pb-4" id="travelDetailsTab">
+                    <!-- Tab Header -->
+                    <div class="tab-section-header">
+                        <div class="tab-section-header-content">
+                            <h3 class="tab-section-title">Travel Details</h3>
+                            <div class="tab-section-header-actions">
+                                <button type="button" class="tab-section-secondary-btn" data-toggle="modal" data-target="#notifyClientModal">Notify Client</button>
+                                <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addTravelDetailsModal">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="content-section-body">
+                    <!-- Tab Content Area -->
+                    <div class="tab-section-content">
                         <div class="text-center p-5">
                             <p class="text-muted mb-3">No data found</p>
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addTravelDetailsModal">Add Travel Details</button>
@@ -1073,11 +1112,11 @@
             $('.select-picker').selectpicker();
             
             // Tab Switching Functionality
-            $('.lead-nav-tab').on('click', function(e) {
+            $('.nav-item-lead').on('click', function(e) {
                 e.preventDefault();
                 
                 // Remove active class from all tabs
-                $('.lead-nav-tab').removeClass('active');
+                $('.nav-item-lead').removeClass('active');
                 // Add active class to clicked tab
                 $(this).addClass('active');
                 
