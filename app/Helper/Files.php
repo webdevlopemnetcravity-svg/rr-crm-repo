@@ -105,6 +105,27 @@ class Files
     }
 
     /**
+     * Generate filename with original name + unique ID
+     * Format: originalname_uniqueid.ext
+     * 
+     * @param string $currentFileName
+     * @return string
+     */
+    public static function generateFileNameWithOriginal($currentFileName)
+    {
+        $ext = strtolower(File::extension($currentFileName));
+        $nameWithoutExt = pathinfo($currentFileName, PATHINFO_FILENAME);
+        $uniqueId = md5(microtime() . uniqid());
+        
+        // Sanitize filename - remove special characters that might cause issues
+        $nameWithoutExt = preg_replace('/[^a-zA-Z0-9_-]/', '_', $nameWithoutExt);
+        // Limit length to avoid filesystem issues
+        $nameWithoutExt = substr($nameWithoutExt, 0, 100);
+        
+        return ($ext === '') ? $nameWithoutExt . '_' . $uniqueId : $nameWithoutExt . '_' . $uniqueId . '.' . $ext;
+    }
+
+    /**
      * @throws \Exception
      */
     public static function uploadLocalOrS3($uploadedFile, $dir, $width = null, int $height = 800)

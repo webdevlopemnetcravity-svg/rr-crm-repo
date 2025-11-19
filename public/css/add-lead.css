@@ -328,3 +328,31 @@ input[type="file"].form-control.height-35 {
     font-weight: bold;
     color: #495057;
 }
+
+/* File name display - single line with ellipsis */
+.file-name-display {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.file-name-display small,
+.file-name-display a {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+/* Percentage input group styling */
+.input-group .form-control.height-35 {
+    height: 35px;
+}
+.input-group .input-group-append .input-group-text {
+    height: 35px;
+    display: flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 14px;
+}

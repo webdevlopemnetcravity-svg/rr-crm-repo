@@ -46,7 +46,7 @@
             </div>
 
             <!-- Form Card -->
-            <x-form id="addLeadForm" class="ajax-form">
+            <x-form id="addLeadForm" class="ajax-form" enctype="multipart/form-data">
                 <input type="hidden" name="lead_id" id="lead_id" value="{{ $newLead->id ?? '' }}">
                 <div class="tab-content p-20" id="nav-tabContent">
                     <!-- Personal Details Tab -->
@@ -77,7 +77,13 @@
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="lead_assign_to" id="lead_assign_to">
                                     <option value="">@lang('app.select') @lang('app.leadAssignTo')</option>
-                                    <option value="{{ user()->id }}">{{ user()->name }}</option>
+                                    @if(isset($employees) && $employees)
+                                        @foreach($employees as $employee)
+                                            <option value="{{ $employee->id }}" {{ (isset($newLead) && $newLead->lead_owner == $employee->id) || (!isset($newLead) && user()->id == $employee->id) ? 'selected' : '' }}>{{ $employee->name }}</option>
+                                        @endforeach
+                                    @else
+                                        <option value="{{ user()->id }}">{{ user()->name }}</option>
+                                    @endif
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -151,7 +157,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="home_pin_code" :fieldLabel="__('app.pinCode')" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="home_pin_code" id="home_pin_code">
+                                <input type="text" class="form-control height-35 f-14" name="home_pin_code" id="home_pin_code" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
                             </div>
                         </div>
 
@@ -186,7 +192,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mailing_pin_code" :fieldLabel="__('app.pinCode')" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="mailing_pin_code" id="mailing_pin_code">
+                                <input type="text" class="form-control height-35 f-14" name="mailing_pin_code" id="mailing_pin_code" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
                             </div>
                         </div>
 
@@ -312,6 +318,9 @@
                                 </div>
                             </div>
                             
+                            <!-- Dynamic Visa Refusal Rows Container -->
+                            <div id="visa-refusal-rows-container"></div>
+
                             <!-- Add More Visa Refusal Button -->
                             <div class="row mt-3">
                                 <div class="col-md-12">
@@ -320,9 +329,6 @@
                                     </button>
                                 </div>
                             </div>
-                            
-                            <!-- Dynamic Visa Refusal Rows Container -->
-                            <div id="visa-refusal-rows-container"></div>
                         </div>
 
                         <hr class="my-4">
@@ -733,7 +739,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="relative_zip_code" fieldLabel="Zip Code">
                                     </x-forms.label>
-                                    <input type="number" class="form-control height-35 f-14" name="relative_zip_code" id="relative_zip_code">
+                                    <input type="text" class="form-control height-35 f-14" name="relative_zip_code" id="relative_zip_code" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="relative_email_address" fieldLabel="Email Address">
@@ -902,12 +908,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_postal_code" fieldLabel="Postal Code">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="spouse_postal_code" id="spouse_postal_code">
+                                <input type="text" class="form-control height-35 f-14" name="spouse_postal_code" id="spouse_postal_code" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_phone_number" fieldLabel="Spouse's Phone Number">
                                 </x-forms.label>
-                                <input type="number" maxlength="10" class="form-control height-35 f-14" name="spouse_phone_number" id="spouse_phone_number">
+                                <input type="text" maxlength="10" pattern="[0-9]{10}" title="Please enter exactly 10 digits" class="form-control height-35 f-14" name="spouse_phone_number" id="spouse_phone_number">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_education" fieldLabel="Spouse's Education">
@@ -947,7 +953,7 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="child_age" fieldLabel="Child's Age">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="child_age" id="child_age">
+                                    <input type="text" class="form-control height-35 f-14" name="child_age" id="child_age" pattern="[0-9]*" title="Please enter only numbers">
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="child_date_of_birth" fieldLabel="Date of Birth">
@@ -1062,7 +1068,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_percentage" fieldLabel="Percentage" fieldRequired="true">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="tenth_percentage" id="tenth_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                <div class="input-group">
+                                    <input type="number" class="form-control height-35 f-14" name="tenth_percentage" id="tenth_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="tenth_board_name" fieldLabel="Board Name" fieldRequired="true">
@@ -1110,7 +1121,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="twelfth_percentage" id="twelfth_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                <div class="input-group">
+                                    <input type="number" class="form-control height-35 f-14" name="twelfth_percentage" id="twelfth_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="twelfth_board_name" fieldLabel="Board Name">
@@ -1180,7 +1196,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="graduation_percentage" id="graduation_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                <div class="input-group">
+                                    <input type="number" class="form-control height-35 f-14" name="graduation_percentage" id="graduation_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="graduation_passing_year" fieldLabel="Passing Year">
@@ -1240,7 +1261,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="post_graduation_percentage" id="post_graduation_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                <div class="input-group">
+                                    <input type="number" class="form-control height-35 f-14" name="post_graduation_percentage" id="post_graduation_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="post_graduation_passing_year" fieldLabel="Passing Year">
@@ -1285,7 +1311,12 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="other_degree_percentage" fieldLabel="Percentage">
                                     </x-forms.label>
-                                    <input type="number" class="form-control height-35 f-14" name="other_degree_percentage" id="other_degree_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control height-35 f-14" name="other_degree_percentage" id="other_degree_percentage" min="0" max="100" step="0.01" maxlength="5">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="other_degree_passing_year" fieldLabel="Passing Year">
@@ -1832,7 +1863,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_zip_code_${relativeContactCount}" fieldLabel="Zip Code">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="relative_zip_code[]" id="relative_zip_code_${relativeContactCount}">
+                                <input type="text" class="form-control height-35 f-14" name="relative_zip_code[]" id="relative_zip_code_${relativeContactCount}" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_email_address_${relativeContactCount}" fieldLabel="Email Address">
@@ -1896,7 +1927,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="child_age_${nextChildNum}" fieldLabel="Child's Age">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="child_age[]" id="child_age_${nextChildNum}">
+                                <input type="text" class="form-control height-35 f-14" name="child_age[]" id="child_age_${nextChildNum}" pattern="[0-9]*" title="Please enter only numbers">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="child_date_of_birth_${nextChildNum}" fieldLabel="Date of Birth">
@@ -1907,15 +1938,6 @@
                                 <x-forms.label class="mt-3" fieldId="child_city_of_birth_${nextChildNum}" fieldLabel="City of Birth">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="child_city_of_birth[]" id="child_city_of_birth_${nextChildNum}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_have_passport_${nextChildNum}" fieldLabel="Have Passport">
-                                </x-forms.label>
-                                <select class="form-control select-picker height-35 f-14" name="child_have_passport[]" id="child_have_passport_${nextChildNum}">
-                                    <option value="">@lang('app.select')</option>
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="child_gender_${nextChildNum}" fieldLabel="Gender">
@@ -1931,6 +1953,15 @@
                                 <x-forms.label class="mt-3" fieldId="child_document_file_${nextChildNum}" fieldLabel="Add Child Document">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" name="child_document_file[]" id="child_document_file_${nextChildNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_have_passport_${nextChildNum}" fieldLabel="Have Passport">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="child_have_passport[]" id="child_have_passport_${nextChildNum}">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
                             </div>
                             <div class="col-md-3" id="child_passport_file_container_${nextChildNum}" style="display: none;">
                                 <x-forms.label class="mt-3" fieldId="child_passport_file_${nextChildNum}" fieldLabel="Add Child Passport" fieldRequired="true">
@@ -1994,7 +2025,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_degree_percentage_${nextDegreeNum}" fieldLabel="Percentage">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="other_degree_percentage[]" id="other_degree_percentage_${nextDegreeNum}" min="0" max="100" step="0.01" maxlength="5">
+                                <div class="input-group">
+                                    <input type="number" class="form-control height-35 f-14" name="other_degree_percentage[]" id="other_degree_percentage_${nextDegreeNum}" min="0" max="100" step="0.01" maxlength="5">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="other_degree_passing_year_${nextDegreeNum}" fieldLabel="Passing Year">
@@ -2282,10 +2318,114 @@
                 }
             });
             
-            // File size validation for all file inputs
+            // File path mapping for different file fields
+            const filePathMap = {
+                'upload_resume': 'lead-resume-files',
+                'pr_assessment_letter_file': 'lead-assessment-letters',
+                'passport_file_upload': 'lead-passport-files',
+                'father_passport_file': 'lead-family-passports',
+                'mother_passport_file': 'lead-family-passports',
+                'spouse_passport_file': 'lead-family-passports',
+                'spouse_document_file': 'lead-family-documents',
+                'child_passport_file': 'lead-family-passports',
+                'child_document_file': 'lead-family-documents',
+                'ielts_result_file': 'lead-education-files',
+                'tenth_result_file': 'lead-education-files',
+                'twelfth_result_file': 'lead-education-files',
+                'graduation_result_file': 'lead-education-files',
+                'post_graduation_result_file': 'lead-education-files',
+                'other_degree_result_file': 'lead-education-files',
+                'job_offer_letter_file': 'lead-job-files',
+                'job_experience_letter_file': 'lead-job-files',
+                'valuation_report_file': 'lead-property-files',
+                'father_income_document_file': 'lead-income-documents',
+                'mother_income_document_file': 'lead-income-documents',
+                'candidate_income_document_file': 'lead-income-documents',
+                'spouse_income_document_file': 'lead-income-documents'
+            };
+            
+            // Function to show file name below file input
+            function showFileName(fileInputId, fileName, fileUrl = null) {
+                const $fileInput = $('#' + fileInputId);
+                const $existingDisplay = $fileInput.next('.file-name-display');
+                
+                if ($existingDisplay.length > 0) {
+                    $existingDisplay.remove();
+                }
+                
+                if (fileName) {
+                    let displayHtml = '';
+                    if (fileUrl) {
+                        // Existing file - show as clickable link
+                        displayHtml = '<div class="file-name-display mt-1"><small><a href="' + fileUrl + '" target="_blank" class="text-primary">' + fileName + '</a></small></div>';
+                    } else {
+                        // Newly selected file - show name only
+                        displayHtml = '<div class="file-name-display mt-1"><small class="text-muted">' + fileName + '</small></div>';
+                    }
+                    $fileInput.after(displayHtml);
+                }
+            }
+            
+            // Function to get file URL for existing files
+            function getFileUrl(fieldId, fileName) {
+                if (!fileName) return null;
+                
+                const basePath = filePathMap[fieldId] || 'lead-files';
+                const leadId = $('#lead_id').val() || '';
+                let filePath = '';
+                
+                // upload_resume is stored directly in folder without lead_id subfolder
+                if (fieldId === 'upload_resume') {
+                    filePath = basePath + '/' + fileName;
+                } else if (leadId) {
+                    // All other files are stored in subfolder with lead_id
+                    filePath = basePath + '/' + leadId + '/' + fileName;
+                } else {
+                    // Fallback if no lead_id
+                    filePath = basePath + '/' + fileName;
+                }
+                
+                return '{{ url("user-uploads") }}/' + filePath;
+            }
+            
+            // Zip Code / Pin Code validation - only allow 6 digits
+            $(document).on('input', 'input[name="home_pin_code"], input[name="mailing_pin_code"], input[name="relative_zip_code"], input[name="relative_zip_code[]"], input[name="spouse_postal_code"]', function() {
+                let value = $(this).val();
+                // Remove any non-digit characters
+                value = value.replace(/\D/g, '');
+                // Limit to 6 digits
+                if (value.length > 6) {
+                    value = value.substring(0, 6);
+                }
+                $(this).val(value);
+            });
+            
+            // Phone Number validation - only allow 10 digits
+            $(document).on('input', 'input[name="spouse_phone_number"]', function() {
+                let value = $(this).val();
+                // Remove any non-digit characters
+                value = value.replace(/\D/g, '');
+                // Limit to 10 digits
+                if (value.length > 10) {
+                    value = value.substring(0, 10);
+                }
+                $(this).val(value);
+            });
+            
+            // Child Age validation - only allow numbers
+            $(document).on('input', 'input[name="child_age"], input[name="child_age[]"]', function() {
+                let value = $(this).val();
+                // Remove any non-digit characters
+                value = value.replace(/\D/g, '');
+                $(this).val(value);
+            });
+            
+            // File size validation and file name display for all file inputs
             $(document).on('change', 'input[type="file"][data-max-size]', function() {
                 const file = this.files[0];
                 const maxSize = $(this).data('max-size'); // 5242880 = 5MB
+                const fieldId = $(this).attr('id');
+                
                 if (file && file.size > maxSize) {
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
@@ -2299,6 +2439,13 @@
                         alert('File size must be less than 5MB');
                     }
                     $(this).val('');
+                    // Remove file display if exists
+                    $(this).next('.file-name-display').remove();
+                } else if (file) {
+                    // Show file name for newly selected file
+                    showFileName(fieldId, file.name);
+                    // Remove hidden field if exists (for existing files)
+                    $('#' + fieldId + '_hidden').remove();
                 }
             });
 
@@ -2416,7 +2563,6 @@
                     success: function(response) {
                         // Check if response has error (fail status)
                         if (response.status === 'fail' || response.status === 'error') {
-                            console.error('Error loading lead:', response.message || 'Unknown error');
                             return;
                         }
                         
@@ -2450,9 +2596,7 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error loading lead status:', error);
-                        console.error('Response:', xhr.responseText);
-                        // Don't show error to user, just log it
+                        // Silently fail - data might already be loaded
                     }
                 });
             }
@@ -2502,6 +2646,29 @@
                     $('#lead_source').val(data.lead_source || '').selectpicker('refresh');
                     $('#lead_assign_to').val(data.lead_assign_to || '').selectpicker('refresh');
                     
+                    // Handle upload_resume file - create hidden input if file exists
+                    if (data.upload_resume) {
+                        const fileName = data.upload_resume;
+                        // Store the file name in a hidden input for reference
+                        if ($('#upload_resume_hidden').length === 0) {
+                            $('<input>').attr({
+                                type: 'hidden',
+                                id: 'upload_resume_hidden',
+                                name: 'upload_resume_existing',
+                                value: fileName
+                            }).insertAfter('#upload_resume');
+                        } else {
+                            $('#upload_resume_hidden').val(fileName);
+                        }
+                        // Show file name with link
+                        const fileUrl = getFileUrl('upload_resume', fileName);
+                        showFileName('upload_resume', fileName, fileUrl);
+                    } else {
+                        // Remove hidden field if no file exists
+                        $('#upload_resume_hidden').remove();
+                        $('#upload_resume').next('.file-name-display').remove();
+                    }
+                    
                     // Home address
                     $('#home_address').val(data.home_address || '');
                     $('#home_city').val(data.home_city || '');
@@ -2540,7 +2707,6 @@
                             try {
                                 visaRefusals = JSON.parse(visaRefusals);
                             } catch (e) {
-                                console.error('Error parsing visa_refusals:', e);
                                 visaRefusals = [];
                             }
                         }
@@ -2605,6 +2771,13 @@
                                 } else {
                                     $('#pr_assessment_letter_file_hidden').val(fileName);
                                 }
+                                // Show file name with link - wait a bit more to ensure PR section is visible
+                                setTimeout(function() {
+                                    const fileUrl = getFileUrl('pr_assessment_letter_file', fileName);
+                                    showFileName('pr_assessment_letter_file', fileName, fileUrl);
+                                }, 100);
+                            } else {
+                                $('#pr_assessment_letter_file').next('.file-name-display').remove();
                             }
                             if (data.pr_preferred_country) {
                                 $('#pr_preferred_country').val(data.pr_preferred_country).selectpicker('refresh');
@@ -2711,12 +2884,113 @@
                     const stepKey = 'step_' + stepNum + '_data';
                     if (stepData[stepKey] && typeof stepData[stepKey] === 'object') {
                         const stepDataObj = stepData[stepKey];
+                        
+                        // Special handling for Step 5 - child data
+                        if (stepNum === 5 && stepDataObj.children && Array.isArray(stepDataObj.children)) {
+                            const children = stepDataObj.children;
+                            if (children.length > 0) {
+                                // Populate Child 1 (first child)
+                                const child1 = children[0];
+                                if (child1.child_name) $('#child_name').val(child1.child_name || '');
+                                if (child1.child_age) $('#child_age').val(child1.child_age || '');
+                                if (child1.child_date_of_birth) $('#child_date_of_birth').val(child1.child_date_of_birth || '');
+                                if (child1.child_city_of_birth) $('#child_city_of_birth').val(child1.child_city_of_birth || '');
+                                if (child1.child_gender) $('#child_gender').val(child1.child_gender || '').selectpicker('refresh');
+                                if (child1.child_have_passport) {
+                                    $('#child_have_passport').val(child1.child_have_passport || '').selectpicker('refresh');
+                                    // Trigger change to show/hide passport file field
+                                    setTimeout(function() {
+                                        $('#child_have_passport').trigger('changed.bs.select');
+                                    }, 100);
+                                }
+                                
+                                // Populate Child 2+ (remaining children) - do this sequentially
+                                if (children.length > 1) {
+                                    let childIndex = 1;
+                                    
+                                    function addAndPopulateNextChild() {
+                                        if (childIndex >= children.length) {
+                                            return; // All children processed
+                                        }
+                                        
+                                        const child = children[childIndex];
+                                        
+                                        // Get the next child number before clicking
+                                        const existingRows = $('.child-row').length;
+                                        const expectedChildNum = existingRows + 2; // +2 because Child 1 is index 0, and nextChildNum starts at 2
+                                        
+                                        // Trigger add more child button
+                                        $('#add-more-child').trigger('click');
+                                        
+                                        // Wait for the row to be created and selectpickers initialized
+                                        setTimeout(function() {
+                                            // Verify the row exists with the expected number
+                                            const $childRow = $('#child-row-' + expectedChildNum);
+                                            if ($childRow.length > 0) {
+                                                // Populate the fields
+                                                if (child.child_name) $('#child_name_' + expectedChildNum).val(child.child_name || '');
+                                                if (child.child_age) $('#child_age_' + expectedChildNum).val(child.child_age || '');
+                                                if (child.child_date_of_birth) $('#child_date_of_birth_' + expectedChildNum).val(child.child_date_of_birth || '');
+                                                if (child.child_city_of_birth) $('#child_city_of_birth_' + expectedChildNum).val(child.child_city_of_birth || '');
+                                                if (child.child_gender) {
+                                                    $('#child_gender_' + expectedChildNum).val(child.child_gender || '').selectpicker('refresh');
+                                                }
+                                                if (child.child_have_passport) {
+                                                    $('#child_have_passport_' + expectedChildNum).val(child.child_have_passport || '').selectpicker('refresh');
+                                                    // Trigger change to show/hide passport file field
+                                                    setTimeout(function() {
+                                                        $('#child_have_passport_' + expectedChildNum).trigger('changed.bs.select');
+                                                    }, 50);
+                                                }
+                                                
+                                                // Move to next child
+                                                childIndex++;
+                                                // Recursively process next child
+                                                setTimeout(addAndPopulateNextChild, 300);
+                                            } else {
+                                                // Row not found, try again after a short delay
+                                                setTimeout(addAndPopulateNextChild, 200);
+                                            }
+                                        }, 400); // Wait for row creation and selectpicker initialization
+                                    }
+                                    
+                                    // Start processing Child 2+
+                                    addAndPopulateNextChild();
+                                }
+                            }
+                        }
+                        
                         // Populate all fields for this step
                         Object.keys(stepDataObj).forEach(function(fieldName) {
+                            // Skip children field - it's handled above
+                            if (fieldName === 'children') {
+                                return;
+                            }
+                            
                             const $field = $('#' + fieldName + ', [name="' + fieldName + '"]').first();
                             if ($field.length) {
                                 const value = stepDataObj[fieldName];
-                                if ($field.is('select')) {
+                                
+                                // Check if this is a file field
+                                if ($field.is('input[type="file"]') && value) {
+                                    // Handle file field - create hidden input and show file name
+                                    const hiddenId = fieldName + '_hidden';
+                                    if ($('#' + hiddenId).length === 0) {
+                                        $('<input>').attr({
+                                            type: 'hidden',
+                                            id: hiddenId,
+                                            name: fieldName + '_existing',
+                                            value: value
+                                        }).insertAfter($field);
+                                    } else {
+                                        $('#' + hiddenId).val(value);
+                                    }
+                                    // Show file name with link - wait a bit for step 5 files to ensure containers are visible
+                                    setTimeout(function() {
+                                        const fileUrl = getFileUrl(fieldName, value);
+                                        showFileName(fieldName, value, fileUrl);
+                                    }, stepNum === 5 ? 300 : 0);
+                                } else if ($field.is('select')) {
                                     $field.val(value).selectpicker('refresh');
                                 } else if ($field.is(':checkbox') || $field.is(':radio')) {
                                     if ($field.is(':checkbox')) {
@@ -3489,6 +3763,142 @@
                 
                 const formData = new FormData($('#addLeadForm')[0]);
                 
+                // Ensure file is included if selected (for step 1)
+                if (currentStep === 1) {
+                    const uploadResumeInput = document.getElementById('upload_resume');
+                    if (uploadResumeInput && uploadResumeInput.files && uploadResumeInput.files.length > 0) {
+                        const file = uploadResumeInput.files[0];
+                        // Explicitly ensure file is in FormData
+                        formData.delete('upload_resume');
+                        formData.append('upload_resume', file);
+                        // Remove hidden field since new file is being uploaded
+                        $('#upload_resume_hidden').remove();
+                    } else {
+                        // If no new file but existing file exists, ensure hidden field is in FormData
+                        if ($('#upload_resume_hidden').length > 0) {
+                            const existingFileName = $('#upload_resume_hidden').val();
+                            if (existingFileName) {
+                                formData.append('upload_resume_existing', existingFileName);
+                            }
+                        }
+                    }
+                }
+                
+                // Ensure pr_assessment_letter_file is included if selected (for step 2)
+                if (currentStep === 2) {
+                    const prAssessmentLetterInput = document.getElementById('pr_assessment_letter_file');
+                    if (prAssessmentLetterInput && prAssessmentLetterInput.files && prAssessmentLetterInput.files.length > 0) {
+                        const file = prAssessmentLetterInput.files[0];
+                        // Explicitly ensure file is in FormData
+                        formData.delete('pr_assessment_letter_file');
+                        formData.append('pr_assessment_letter_file', file);
+                        // Remove hidden field since new file is being uploaded
+                        $('#pr_assessment_letter_file_hidden').remove();
+                    } else {
+                        // If no new file but existing file exists, ensure hidden field is in FormData
+                        if ($('#pr_assessment_letter_file_hidden').length > 0) {
+                            const existingFileName = $('#pr_assessment_letter_file_hidden').val();
+                            if (existingFileName) {
+                                formData.append('pr_assessment_letter_file_existing', existingFileName);
+                            }
+                        }
+                    }
+                }
+                
+                // Ensure passport_file_upload is included if selected (for step 3)
+                if (currentStep === 3) {
+                    const passportFileInput = document.getElementById('passport_file_upload');
+                    if (passportFileInput && passportFileInput.files && passportFileInput.files.length > 0) {
+                        const file = passportFileInput.files[0];
+                        // Explicitly ensure file is in FormData
+                        formData.delete('passport_file_upload');
+                        formData.append('passport_file_upload', file);
+                        // Remove hidden field since new file is being uploaded
+                        $('#passport_file_upload_hidden').remove();
+                    } else {
+                        // If no new file but existing file exists, ensure hidden field is in FormData
+                        if ($('#passport_file_upload_hidden').length > 0) {
+                            const existingFileName = $('#passport_file_upload_hidden').val();
+                            if (existingFileName) {
+                                formData.append('passport_file_upload_existing', existingFileName);
+                            }
+                        }
+                    }
+                }
+                
+                // Ensure step 5 file uploads are included if selected
+                if (currentStep === 5) {
+                    const step5FileFields = [
+                        'father_passport_file',
+                        'mother_passport_file',
+                        'spouse_passport_file',
+                        'spouse_document_file',
+                        'child_passport_file',
+                        'child_document_file'
+                    ];
+                    
+                    step5FileFields.forEach(function(fileField) {
+                        const fileInput = document.getElementById(fileField);
+                        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                            const file = fileInput.files[0];
+                            // Explicitly ensure file is in FormData
+                            formData.delete(fileField);
+                            formData.append(fileField, file);
+                            // Remove hidden field since new file is being uploaded
+                            $('#' + fileField + '_hidden').remove();
+                        } else {
+                            // If no new file but existing file exists, ensure hidden field is in FormData
+                            if ($('#' + fileField + '_hidden').length > 0) {
+                                const existingFileName = $('#' + fileField + '_hidden').val();
+                                if (existingFileName) {
+                                    formData.append(fileField + '_existing', existingFileName);
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Ensure step 6 file uploads are included if selected
+                if (currentStep === 6) {
+                    const step6FileFields = [
+                        'ielts_result_file',
+                        'tenth_result_file',
+                        'twelfth_result_file',
+                        'graduation_result_file',
+                        'post_graduation_result_file',
+                        'other_degree_result_file'
+                    ];
+                    
+                    step6FileFields.forEach(function(fileField) {
+                        const fileInput = document.getElementById(fileField);
+                        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                            const file = fileInput.files[0];
+                            // Explicitly ensure file is in FormData
+                            formData.delete(fileField);
+                            formData.append(fileField, file);
+                            // Remove hidden field since new file is being uploaded
+                            $('#' + fileField + '_hidden').remove();
+                        } else {
+                            // If no new file but existing file exists, ensure hidden field is in FormData
+                            if ($('#' + fileField + '_hidden').length > 0) {
+                                const existingFileName = $('#' + fileField + '_hidden').val();
+                                if (existingFileName) {
+                                    formData.append(fileField + '_existing', existingFileName);
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Handle other_degree_result_file[] (array for additional other degrees)
+                    $('input[type="file"][name="other_degree_result_file[]"]').each(function() {
+                        const fileInput = this;
+                        if (fileInput.files && fileInput.files.length > 0) {
+                            const file = fileInput.files[0];
+                            formData.append('other_degree_result_file[]', file);
+                        }
+                    });
+                }
+                
                 // Add lead_id if exists
                 if (currentLeadId) {
                     formData.append('lead_id', currentLeadId);
@@ -3532,7 +3942,6 @@
                     
                     formData.append('visa_refusals', JSON.stringify(visaRefusals));
                 }
-                
                 // Show loading
                 const $saveBtn = $('#save-lead-form');
                 const originalHtml = $saveBtn.html();
@@ -3817,6 +4226,15 @@
                     loadExistingLeadData(currentLeadId);
                 }, 500);
             }
+            
+            // Handle file input change - remove hidden field and existing file display when new file is selected
+            $(document).on('change', 'input[type="file"]', function() {
+                const fieldId = $(this).attr('id');
+                if (this.files && this.files.length > 0) {
+                    // New file selected - remove hidden field if exists
+                    $('#' + fieldId + '_hidden').remove();
+                }
+            });
             
             updateTabNavigation();
             updateFooterButtons();

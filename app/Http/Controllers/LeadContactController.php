@@ -32,6 +32,7 @@ use App\Models\User;
 use App\Traits\ImportExcel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class LeadContactController extends AccountBaseController
 {
@@ -122,6 +123,8 @@ class LeadContactController extends AccountBaseController
         $this->leadStages = PipelineStage::all();
         $this->leadAgentArray = $this->leadAgents->pluck('user_id')->toArray();
         $this->products = Product::all();
+        // Get employees from the same organization
+        $this->employees = User::allEmployees(null, 'active', null, company()->id);
 
         // Check if editing existing new lead
         $leadId = request('lead_id');
@@ -718,6 +721,26 @@ class LeadContactController extends AccountBaseController
                     $rules['other_email'] = 'nullable|email|max:255';
                 }
                 
+                // Upload resume validation
+                // Required if no existing file exists in the database
+                $leadId = $request->lead_id;
+                $hasExistingFile = false;
+                
+                if ($leadId) {
+                    $lead = \App\Models\NewLead::find($leadId);
+                    if ($lead && isset($lead->step_1_data['upload_resume']) && !empty($lead->step_1_data['upload_resume'])) {
+                        $hasExistingFile = true;
+                    }
+                }
+                
+                // If no existing file in database, require upload_resume (unless file is being uploaded in this request)
+                if (!$hasExistingFile && !$request->hasFile('upload_resume')) {
+                    $rules['upload_resume'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:5120'; // 5MB max
+                } else {
+                    // If existing file exists OR file is being uploaded, make it optional but validate if provided
+                    $rules['upload_resume'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
+                }
+                
                 $messages = [
                     'surname.required' => __('validation.required', ['attribute' => __('app.surname')]),
                     'given_name.required' => __('validation.required', ['attribute' => __('app.givenName')]),
@@ -739,6 +762,10 @@ class LeadContactController extends AccountBaseController
                     'primary_phone.regex' => __('validation.regex', ['attribute' => __('app.primaryPhoneNo')]),
                     'email_address.required' => __('validation.required', ['attribute' => __('modules.lead.email')]),
                     'email_address.email' => __('validation.email', ['attribute' => __('modules.lead.email')]),
+                    'upload_resume.required' => __('validation.required', ['attribute' => 'Upload Resume']),
+                    'upload_resume.file' => 'Upload Resume must be a valid file.',
+                    'upload_resume.mimes' => 'Upload Resume must be a file of type: pdf, jpg, jpeg, png.',
+                    'upload_resume.max' => 'Upload Resume may not be greater than 5MB.',
                 ];
                 break;
 
@@ -988,8 +1015,6 @@ class LeadContactController extends AccountBaseController
                 'final_status' => $stepStatus->final_status,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error saving step ' . $stepNumber . ': ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
             return Reply::error(__('messages.errorOccurred') . ': ' . $e->getMessage());
         }
     }
@@ -1135,6 +1160,8 @@ class LeadContactController extends AccountBaseController
                 'child_gender',
                 'child_have_passport',
                 'child_passport_file',
+                'child_document_file',
+                'spouse_document_file',
             ],
             6 => [
                 // Step 6 - Education
@@ -1142,30 +1169,36 @@ class LeadContactController extends AccountBaseController
                 'ielts_passing_year',
                 'ielts_score',
                 'ielts_trial',
+                'ielts_result_file',
                 'tenth_passing_year',
                 'tenth_percentage',
                 'tenth_board_name',
                 'tenth_trial',
+                'tenth_result_file',
                 'twelfth_passing_year',
                 'twelfth_stream',
                 'twelfth_percentage',
                 'twelfth_board_name',
                 'twelfth_trial',
+                'twelfth_result_file',
                 'graduation_degree',
                 'graduation_university_name',
                 'graduation_percentage',
                 'graduation_passing_year',
                 'graduation_trial',
+                'graduation_result_file',
                 'post_graduation_degree',
                 'post_graduation_university_name',
                 'post_graduation_percentage',
                 'post_graduation_passing_year',
                 'post_graduation_trial',
+                'post_graduation_result_file',
                 'other_degree',
                 'other_degree_university_name',
                 'other_degree_percentage',
                 'other_degree_passing_year',
                 'other_degree_trial',
+                'other_degree_result_file',
             ],
             7 => [
                 // Step 7 - Professional Experience
@@ -1175,6 +1208,8 @@ class LeadContactController extends AccountBaseController
                 'job_designation',
                 'job_company_name',
                 'job_salary',
+                'job_offer_letter_file',
+                'job_experience_letter_file',
             ],
             8 => [
                 // Step 8 - Property Details
@@ -1190,6 +1225,46 @@ class LeadContactController extends AccountBaseController
                 'total_loan_value',
                 'loan_years',
                 'loan_availed_on',
+                'valuation_report_file',
+            ],
+            5 => [
+                // Step 5 - Family Information
+                'father_surname',
+                'father_given_name',
+                'father_date_of_birth',
+                'father_occupation',
+                'father_have_passport',
+                'father_passport_file',
+                'mother_surname',
+                'mother_given_name',
+                'mother_date_of_birth',
+                'mother_occupation',
+                'mother_have_passport',
+                'mother_passport_file',
+                'spouse_surname',
+                'spouse_given_name',
+                'spouse_date_of_birth',
+                'spouse_country',
+                'spouse_city_of_birth',
+                'spouse_have_passport',
+                'spouse_passport_file',
+                'spouse_document_file',
+                'spouse_address',
+                'spouse_city',
+                'spouse_state',
+                'spouse_postal_code',
+                'spouse_phone_number',
+                'spouse_education',
+                'spouse_occupation',
+                'spouse_yearly_income',
+                'child_name',
+                'child_age',
+                'child_date_of_birth',
+                'child_city_of_birth',
+                'child_gender',
+                'child_have_passport',
+                'child_passport_file',
+                'child_document_file',
             ],
             9 => [
                 // Step 9 - Financial Status
@@ -1213,6 +1288,7 @@ class LeadContactController extends AccountBaseController
      */
     private function saveStepData(NewLead $lead, Request $request, $stepNumber)
     {
+        
         // Get only the fields that belong to this step
         $stepFields = $this->getStepFields($stepNumber);
         
@@ -1220,8 +1296,39 @@ class LeadContactController extends AccountBaseController
         $stepData = [];
         foreach ($stepFields as $field) {
             // Skip file fields - they will be handled separately in special cases
-            if ($request->hasFile($field)) {
+            // BUT: Don't skip upload_resume for step 1 - it's handled in special cases
+            if ($request->hasFile($field) && !($stepNumber == 1 && $field === 'upload_resume')) {
                 // Initialize file field as null, will be set in special handling
+                $stepData[$field] = null;
+                continue;
+            }
+            
+            // Skip pr_assessment_letter_file for step 2 - it's handled in special cases
+            if ($field === 'pr_assessment_letter_file' && $stepNumber == 2) {
+                $stepData[$field] = null;
+                continue;
+            }
+            
+            // Skip passport_file_upload for step 3 - it's handled in special cases
+            if ($field === 'passport_file_upload' && $stepNumber == 3) {
+                $stepData[$field] = null;
+                continue;
+            }
+            
+            // Skip step 5 file fields - they're handled in special cases
+            if ($stepNumber == 5 && in_array($field, ['father_passport_file', 'mother_passport_file', 'spouse_passport_file', 'spouse_document_file', 'child_passport_file', 'child_document_file'])) {
+                $stepData[$field] = null;
+                continue;
+            }
+            
+            // Skip step 6 file fields - they're handled in special cases
+            if ($stepNumber == 6 && in_array($field, ['ielts_result_file', 'tenth_result_file', 'twelfth_result_file', 'graduation_result_file', 'post_graduation_result_file', 'other_degree_result_file'])) {
+                $stepData[$field] = null;
+                continue;
+            }
+            
+            // Skip step 6 other_degree fields - they're handled in special cases (as arrays)
+            if ($stepNumber == 6 && in_array($field, ['other_degree', 'other_degree_university_name', 'other_degree_percentage', 'other_degree_passing_year', 'other_degree_trial'])) {
                 $stepData[$field] = null;
                 continue;
             }
@@ -1233,7 +1340,8 @@ class LeadContactController extends AccountBaseController
         }
         
         // Handle special cases for Step 1
-        if ($stepNumber === 1) {
+        // Use loose comparison to handle both string "1" and integer 1
+        if ($stepNumber == 1) {
             // Update lead basic info
             $lead->client_name = ($this->getRequestValue($request, 'surname', '') . ' ' . $this->getRequestValue($request, 'given_name', '')) ?: null;
             $lead->client_email = $this->getRequestValue($request, 'email_address') ?: $this->getRequestValue($request, 'email');
@@ -1276,134 +1384,71 @@ class LeadContactController extends AccountBaseController
             // Handle upload_resume file upload for step 1
             $existingStep1Data = is_array($lead->step_1_data) ? $lead->step_1_data : [];
             
-            // Debug: Check if file is in request - log all file-related info
-            \Log::info('=== UPLOAD RESUME DEBUG START ===');
-            \Log::info('Lead ID: ' . $lead->id);
-            \Log::info('hasFile(upload_resume): ' . ($request->hasFile('upload_resume') ? 'true' : 'false'));
-            \Log::info('has(upload_resume): ' . ($request->has('upload_resume') ? 'true' : 'false'));
-            \Log::info('All files in request: ' . implode(', ', array_keys($request->allFiles())));
-            
-            if ($request->hasFile('upload_resume')) {
-                $file = $request->file('upload_resume');
-                \Log::info('File detected - Name: ' . $file->getClientOriginalName() . ', Size: ' . $file->getSize() . ', Mime: ' . $file->getMimeType());
-            } else {
-                \Log::info('No file detected in request');
-            }
-            
-            // Always ensure upload_resume is in stepData
-            // Initialize it first
-            $stepData['upload_resume'] = $existingStep1Data['upload_resume'] ?? null;
+            // Try multiple ways to detect the file
+            $fileDetected = false;
+            $uploadedFile = null;
             
             if ($request->hasFile('upload_resume')) {
                 $uploadedFile = $request->file('upload_resume');
-                
-                \Log::info('Attempting to upload resume file for lead ' . $lead->id);
-                \Log::info('File details - Name: ' . $uploadedFile->getClientOriginalName() . ', Size: ' . $uploadedFile->getSize() . ', Valid: ' . ($uploadedFile->isValid() ? 'YES' : 'NO'));
-                
+                $fileDetected = true;
+            } elseif ($request->allFiles() && isset($request->allFiles()['upload_resume'])) {
+                $uploadedFile = $request->allFiles()['upload_resume'];
+                $fileDetected = true;
+            } elseif ($request->file('upload_resume')) {
+                $uploadedFile = $request->file('upload_resume');
+                $fileDetected = true;
+            }
+            
+            if ($fileDetected && $uploadedFile) {
                 // Delete old file if exists
                 if (isset($existingStep1Data['upload_resume']) && $existingStep1Data['upload_resume']) {
                     $oldFileName = $existingStep1Data['upload_resume'];
                     try {
-                        \App\Helper\Files::deleteFile($oldFileName, 'lead-resume-files/' . $lead->id);
-                        \Log::info('Deleted old resume file: ' . $oldFileName);
+                        \App\Helper\Files::deleteFile($oldFileName, 'lead-resume-files');
                     } catch (\Exception $e) {
-                        \Log::error('Error deleting old resume file: ' . $e->getMessage());
+                        // Silently fail if delete fails
                     }
                 }
                 
-                // Upload new file
+                // Upload new file directly to lead-resume-files folder with original name + unique ID
                 try {
-                    // Check if storage setting exists before uploading
-                    $storageSetting = \App\Models\StorageSetting::where('status', 'enabled')->first();
-                    if (!$storageSetting) {
-                        throw new \Exception('No storage setting found with status enabled. Please configure storage settings first.');
+                    $fileToUpload = $uploadedFile;
+                    if (!$fileToUpload) {
+                        $fileToUpload = $request->upload_resume;
                     }
-                    \Log::info('Storage setting found: ' . $storageSetting->filesystem);
-                    \Log::info('Filesystem default: ' . config('filesystems.default'));
                     
-                    // Ensure directory exists for local storage
-                    // Note: For 'local' disk, root is public/user-uploads (see config/filesystems.php)
+                    // Generate filename with original name + unique ID
+                    $customFileName = \App\Helper\Files::generateFileNameWithOriginal($fileToUpload->getClientOriginalName());
+                    \App\Helper\Files::fileStore($fileToUpload, 'lead-resume-files', $customFileName);
+                    
+                    $fileVisibility = [];
                     if (config('filesystems.default') == 'local') {
-                        $directoryPath = public_path('user-uploads/lead-resume-files/' . $lead->id);
-                        if (!\Illuminate\Support\Facades\File::exists($directoryPath)) {
-                            \Illuminate\Support\Facades\File::makeDirectory($directoryPath, 0755, true);
-                            \Log::info('Created directory: ' . $directoryPath);
-                        } else {
-                            \Log::info('Directory already exists: ' . $directoryPath);
-                        }
-                    } else {
-                        // For cloud storage, ensure directory exists in storage/app
-                        $directoryPath = storage_path('app/lead-resume-files/' . $lead->id);
-                        if (!\Illuminate\Support\Facades\File::exists($directoryPath)) {
-                            \Illuminate\Support\Facades\File::makeDirectory($directoryPath, 0755, true);
-                            \Log::info('Created directory: ' . $directoryPath);
-                        }
+                        $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
                     }
                     
-                    \Log::info('Calling uploadLocalOrS3 with file: ' . $uploadedFile->getClientOriginalName());
-                    $resumeFile = \App\Helper\Files::uploadLocalOrS3(
-                        $uploadedFile,
-                        'lead-resume-files/' . $lead->id
-                    );
-                    \Log::info('uploadLocalOrS3 returned: ' . ($resumeFile ? $resumeFile : 'NULL'));
+                    Storage::disk(config('filesystems.default'))->putFileAs('lead-resume-files', $fileToUpload, $customFileName, $fileVisibility);
                     
-                    // Verify file was actually saved
-                    if ($resumeFile) {
-                        $filePath = 'lead-resume-files/' . $lead->id . '/' . $resumeFile;
-                        $fileExists = \Illuminate\Support\Facades\Storage::disk(config('filesystems.default'))->exists($filePath);
-                        
-                        // Also check physical path for local storage
-                        $physicalPath = null;
-                        if (config('filesystems.default') == 'local') {
-                            $physicalPath = public_path('user-uploads/' . $filePath);
-                            $physicalExists = \Illuminate\Support\Facades\File::exists($physicalPath);
-                            $fileExists = $fileExists || $physicalExists;
-                            \Log::info('Physical file check: ' . $physicalPath . ' - ' . ($physicalExists ? 'EXISTS' : 'NOT FOUND'));
-                        }
-                        
-                        \Log::info('File exists check for ' . $filePath . ': ' . ($fileExists ? 'YES' : 'NO'));
-                        
-                        if ($fileExists) {
-                            $stepData['upload_resume'] = $resumeFile;
-                            \Log::info('Resume file uploaded successfully for lead ' . $lead->id . ': ' . $resumeFile);
-                            \Log::info('File path in database: ' . $resumeFile);
-                            \Log::info('Full file path: ' . ($physicalPath ?: $filePath));
-                        } else {
-                            \Log::error('File was not saved to disk even though uploadLocalOrS3 returned filename: ' . $resumeFile);
-                            \Log::error('Expected path: ' . ($physicalPath ?: $filePath));
-                            // Don't update stepData, keep existing or null
-                        }
-                    } else {
-                        \Log::error('Resume file upload returned null for lead ' . $lead->id);
-                        // Don't update stepData, keep existing or null
-                    }
+                    $stepData['upload_resume'] = $customFileName;
                 } catch (\Exception $e) {
-                    \Log::error('Exception uploading resume file for lead ' . $lead->id . ': ' . $e->getMessage());
-                    \Log::error('Exception class: ' . get_class($e));
-                    \Log::error('Stack trace: ' . $e->getTraceAsString());
-                    // Don't update stepData, keep existing or null
+                    // Preserve existing file if upload fails
+                    if (isset($existingStep1Data['upload_resume']) && $existingStep1Data['upload_resume']) {
+                        $stepData['upload_resume'] = $existingStep1Data['upload_resume'];
+                    }
                 }
-            } elseif ($request->has('upload_resume_existing') && $request->upload_resume_existing) {
-                // Keep existing file if no new file is uploaded and existing file is specified
-                $stepData['upload_resume'] = $request->upload_resume_existing;
-                \Log::info('Using existing resume file: ' . $request->upload_resume_existing);
+            } elseif ($request->has('upload_resume_existing')) {
+                // Keep existing file if no new file is uploaded
+                $stepData['upload_resume'] = $request->input('upload_resume_existing');
             } elseif (isset($existingStep1Data['upload_resume']) && $existingStep1Data['upload_resume']) {
                 // Keep existing file if no new file is uploaded and no removal signal
                 $stepData['upload_resume'] = $existingStep1Data['upload_resume'];
-                \Log::info('Preserving existing resume file: ' . $existingStep1Data['upload_resume']);
             } else {
-                // No file uploaded and no existing file - set to null but ensure field exists
+                // No file uploaded and no existing file
                 $stepData['upload_resume'] = null;
-                \Log::info('No resume file - setting to null');
             }
-            
-            // Debug: Log the upload_resume value being saved
-            \Log::info('Step 1 upload_resume FINAL value for lead ' . $lead->id . ': ' . ($stepData['upload_resume'] ?? 'null'));
-            \Log::info('=== UPLOAD RESUME DEBUG END ===');
         }
         
         // Handle special cases for Step 2
-        if ($stepNumber === 2) {
+        if ($stepNumber == 2) {
             // Handle PR Assessment Letter file upload
             $prAssessmentLetterFile = null;
             $existingStep2Data = is_array($lead->step_2_data) ? $lead->step_2_data : [];
@@ -1414,14 +1459,21 @@ class LeadContactController extends AccountBaseController
                     $oldFileName = $existingStep2Data['pr_assessment_letter_file'];
                     \App\Helper\Files::deleteFile($oldFileName, 'lead-assessment-letters/' . $lead->id);
                 }
-                // Upload new file
+                // Upload new file with original name + unique ID
                 try {
-                    $prAssessmentLetterFile = \App\Helper\Files::uploadLocalOrS3(
-                        $request->pr_assessment_letter_file,
-                        'lead-assessment-letters/' . $lead->id
-                    );
+                    // Generate filename with original name + unique ID
+                    $customFileName = \App\Helper\Files::generateFileNameWithOriginal($request->pr_assessment_letter_file->getClientOriginalName());
+                    \App\Helper\Files::fileStore($request->pr_assessment_letter_file, 'lead-assessment-letters/' . $lead->id, $customFileName);
+                    
+                    $fileVisibility = [];
+                    if (config('filesystems.default') == 'local') {
+                        $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                    }
+                    
+                    Storage::disk(config('filesystems.default'))->putFileAs('lead-assessment-letters/' . $lead->id, $request->pr_assessment_letter_file, $customFileName, $fileVisibility);
+                    $prAssessmentLetterFile = $customFileName;
                 } catch (\Exception $e) {
-                    \Log::error('Error uploading PR assessment letter file: ' . $e->getMessage());
+                    // Silently fail
                 }
             } elseif ($request->has('pr_assessment_letter_file_existing')) {
                 $prAssessmentLetterFile = $request->pr_assessment_letter_file_existing;
@@ -1431,7 +1483,7 @@ class LeadContactController extends AccountBaseController
                 try {
                     \App\Helper\Files::deleteFile($oldFileName, 'lead-assessment-letters/' . $lead->id);
                 } catch (\Exception $e) {
-                    \Log::error('Error deleting PR assessment letter file: ' . $e->getMessage());
+                    // Silently fail
                 }
                 $prAssessmentLetterFile = null;
             }
@@ -1439,7 +1491,7 @@ class LeadContactController extends AccountBaseController
         }
         
         // Handle file uploads for specific steps
-        if ($stepNumber === 3) {
+        if ($stepNumber == 3) {
             // Handle passport file upload for step 3
             if ($request->hasFile('passport_file_upload')) {
                 // Delete old file if exists
@@ -1447,15 +1499,21 @@ class LeadContactController extends AccountBaseController
                     $oldFileName = $lead->step_3_data['passport_file_upload'];
                     \App\Helper\Files::deleteFile($oldFileName, 'lead-passport-files/' . $lead->id);
                 }
-                // Upload new file
+                // Upload new file with original name + unique ID
                 try {
-                    $fileName = \App\Helper\Files::uploadLocalOrS3(
-                        $request->passport_file_upload,
-                        'lead-passport-files/' . $lead->id
-                    );
-                    $stepData['passport_file_upload'] = $fileName;
+                    // Generate filename with original name + unique ID
+                    $customFileName = \App\Helper\Files::generateFileNameWithOriginal($request->passport_file_upload->getClientOriginalName());
+                    \App\Helper\Files::fileStore($request->passport_file_upload, 'lead-passport-files/' . $lead->id, $customFileName);
+                    
+                    $fileVisibility = [];
+                    if (config('filesystems.default') == 'local') {
+                        $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                    }
+                    
+                    Storage::disk(config('filesystems.default'))->putFileAs('lead-passport-files/' . $lead->id, $request->passport_file_upload, $customFileName, $fileVisibility);
+                    $stepData['passport_file_upload'] = $customFileName;
                 } catch (\Exception $e) {
-                    \Log::error('Error uploading passport file: ' . $e->getMessage());
+                    // Silently fail
                 }
             } elseif ($request->has('passport_file_upload_existing')) {
                 // Keep existing file if no new file is uploaded
@@ -1466,51 +1524,429 @@ class LeadContactController extends AccountBaseController
                 try {
                     \App\Helper\Files::deleteFile($oldFileName, 'lead-passport-files/' . $lead->id);
                 } catch (\Exception $e) {
-                    \Log::error('Error deleting passport file: ' . $e->getMessage());
+                    // Silently fail
                 }
                 $stepData['passport_file_upload'] = null;
             }
         }
         
-        if ($stepNumber === 5) {
-            // Handle passport file uploads for family members in step 5
-            $familyPassportFields = [
+        if ($stepNumber == 5) {
+            // Handle child data arrays - combine Child 1 (single values) with Child 2+ (arrays)
+            $childFields = ['child_name', 'child_age', 'child_date_of_birth', 'child_city_of_birth', 'child_gender', 'child_have_passport'];
+            $childData = [];
+            
+            // Get Child 1 data (single values)
+            $child1Data = [];
+            foreach ($childFields as $field) {
+                $value = $this->getRequestValue($request, $field);
+                if ($value !== null && $value !== '') {
+                    $child1Data[$field] = $value;
+                }
+            }
+            
+            // If Child 1 has any data, add it to the array
+            if (!empty($child1Data)) {
+                $childData[] = $child1Data;
+            }
+            
+            // Get Child 2+ data (arrays)
+            $childArrays = [];
+            foreach ($childFields as $field) {
+                $arrayKey = $field . '[]';
+                $arrayValues = $request->input($arrayKey, []);
+                if (is_array($arrayValues)) {
+                    $childArrays[$field] = $arrayValues;
+                }
+            }
+            
+            // Combine Child 2+ data into proper structure
+            if (!empty($childArrays)) {
+                $maxCount = 0;
+                foreach ($childArrays as $field => $values) {
+                    if (count($values) > $maxCount) {
+                        $maxCount = count($values);
+                    }
+                }
+                
+                for ($i = 0; $i < $maxCount; $i++) {
+                    $childRow = [];
+                    foreach ($childFields as $field) {
+                        if (isset($childArrays[$field][$i]) && $childArrays[$field][$i] !== null && $childArrays[$field][$i] !== '') {
+                            $childRow[$field] = $childArrays[$field][$i];
+                        }
+                    }
+                    if (!empty($childRow)) {
+                        $childData[] = $childRow;
+                    }
+                }
+            }
+            
+            // Store child data as JSON array
+            if (!empty($childData)) {
+                $stepData['children'] = $childData;
+            } else {
+                $stepData['children'] = [];
+            }
+            
+            // Remove individual child fields from stepData (they're now in children array)
+            foreach ($childFields as $field) {
+                unset($stepData[$field]);
+            }
+            
+            // Handle file uploads for family members in step 5 - use same pattern as upload_resume
+            $familyFileFields = [
                 'father_passport_file',
                 'mother_passport_file',
                 'spouse_passport_file',
+                'spouse_document_file',
                 'child_passport_file',
+                'child_document_file',
             ];
             
-            foreach ($familyPassportFields as $fileField) {
+            foreach ($familyFileFields as $fileField) {
+                $folder = strpos($fileField, 'passport') !== false ? 'lead-family-passports' : 'lead-family-documents';
+                
+                // Safely get existing step 5 data
+                $existingStep5Data = [];
+                if ($lead->step_5_data) {
+                    if (is_string($lead->step_5_data)) {
+                        $decoded = json_decode($lead->step_5_data, true);
+                        $existingStep5Data = is_array($decoded) ? $decoded : [];
+                    } elseif (is_array($lead->step_5_data)) {
+                        $existingStep5Data = $lead->step_5_data;
+                    }
+                }
+                
                 if ($request->hasFile($fileField)) {
                     // Delete old file if exists
-                    if (isset($lead->step_5_data[$fileField]) && $lead->step_5_data[$fileField]) {
-                        $oldFileName = $lead->step_5_data[$fileField];
-                        \App\Helper\Files::deleteFile($oldFileName, 'lead-family-passports/' . $lead->id);
+                    if (isset($existingStep5Data[$fileField]) && $existingStep5Data[$fileField]) {
+                        $oldFileName = $existingStep5Data[$fileField];
+                        \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
+                    }
+                    // Upload new file with original name + unique ID
+                    try {
+                        $file = $request->file($fileField);
+                        // Handle both single file and array of files
+                        if (is_array($file)) {
+                            // If it's an array, take the first file (for child files, we handle them separately)
+                            $file = !empty($file) ? $file[0] : null;
+                        }
+                        if ($file && $file->isValid()) {
+                            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                            \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
+                            
+                            $fileVisibility = [];
+                            if (config('filesystems.default') == 'local') {
+                                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                            }
+                            
+                            Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                            $stepData[$fileField] = $customFileName;
+                        }
+                    } catch (\Exception $e) {
+                        // Preserve existing file if upload fails
+                        if (isset($existingStep5Data[$fileField]) && $existingStep5Data[$fileField]) {
+                            $stepData[$fileField] = $existingStep5Data[$fileField];
+                        }
+                    }
+                } elseif ($request->has($fileField . '_existing')) {
+                    // Keep existing file if no new file is uploaded
+                    $stepData[$fileField] = $request->input($fileField . '_existing');
+                } elseif (isset($existingStep5Data[$fileField]) && $existingStep5Data[$fileField]) {
+                    // If existing file input is not present, it means user removed it, so delete file
+                    $oldFileName = $existingStep5Data[$fileField];
+                    try {
+                        \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
+                    } catch (\Exception $e) {
+                        // Silently fail
+                    }
+                    $stepData[$fileField] = null;
+                }
+            }
+        }
+        
+        // Handle file uploads for step 6 (Education) - use same pattern as upload_resume
+        if ($stepNumber == 6) {
+            // Handle other_degree data arrays - combine Other Degree 1 (single values) with Other Degree 2+ (arrays)
+            $otherDegreeFields = ['other_degree', 'other_degree_university_name', 'other_degree_percentage', 'other_degree_passing_year', 'other_degree_trial'];
+            $otherDegreeData = [];
+            
+            // Get Other Degree 1 data (single values)
+            $otherDegree1Data = [];
+            foreach ($otherDegreeFields as $field) {
+                $value = $this->getRequestValue($request, $field);
+                if ($value !== null && $value !== '') {
+                    $otherDegree1Data[$field] = $value;
+                }
+            }
+            
+            // If Other Degree 1 has any data, add it to the array
+            if (!empty($otherDegree1Data)) {
+                $otherDegreeData[] = $otherDegree1Data;
+            }
+            
+            // Get Other Degree 2+ data (arrays)
+            $otherDegreeArrays = [];
+            foreach ($otherDegreeFields as $field) {
+                $arrayKey = $field . '[]';
+                $arrayValues = $request->input($arrayKey, []);
+                if (is_array($arrayValues)) {
+                    $otherDegreeArrays[$field] = $arrayValues;
+                }
+            }
+            
+            // Combine Other Degree 2+ data into proper structure
+            if (!empty($otherDegreeArrays)) {
+                $maxCount = 0;
+                foreach ($otherDegreeArrays as $field => $values) {
+                    if (count($values) > $maxCount) {
+                        $maxCount = count($values);
+                    }
+                }
+                
+                for ($i = 0; $i < $maxCount; $i++) {
+                    $otherDegreeRow = [];
+                    foreach ($otherDegreeFields as $field) {
+                        if (isset($otherDegreeArrays[$field][$i]) && $otherDegreeArrays[$field][$i] !== null && $otherDegreeArrays[$field][$i] !== '') {
+                            $otherDegreeRow[$field] = $otherDegreeArrays[$field][$i];
+                        }
+                    }
+                    if (!empty($otherDegreeRow)) {
+                        $otherDegreeData[] = $otherDegreeRow;
+                    }
+                }
+            }
+            
+            // Store other_degree data as JSON array
+            if (!empty($otherDegreeData)) {
+                $stepData['other_degrees'] = $otherDegreeData;
+            } else {
+                $stepData['other_degrees'] = [];
+            }
+            
+            // Remove individual other_degree fields from stepData (they're now in other_degrees array)
+            foreach ($otherDegreeFields as $field) {
+                unset($stepData[$field]);
+            }
+            
+            // Handle file uploads for step 6 - use same pattern as upload_resume
+            $educationFileFields = [
+                'ielts_result_file',
+                'tenth_result_file',
+                'twelfth_result_file',
+                'graduation_result_file',
+                'post_graduation_result_file',
+                'other_degree_result_file',
+            ];
+            
+            // Safely get existing step 6 data
+            $existingStep6Data = [];
+            if ($lead->step_6_data) {
+                if (is_string($lead->step_6_data)) {
+                    $decoded = json_decode($lead->step_6_data, true);
+                    $existingStep6Data = is_array($decoded) ? $decoded : [];
+                } elseif (is_array($lead->step_6_data)) {
+                    $existingStep6Data = $lead->step_6_data;
+                }
+            }
+            
+            foreach ($educationFileFields as $fileField) {
+                $folder = 'lead-education-files';
+                
+                // Handle other_degree_result_file as both single and array
+                if ($fileField === 'other_degree_result_file') {
+                    // Handle Other Degree 1 file (single)
+                    if ($request->hasFile('other_degree_result_file')) {
+                        // Delete old file if exists
+                        if (isset($existingStep6Data['other_degree_result_file']) && $existingStep6Data['other_degree_result_file']) {
+                            $oldFileName = $existingStep6Data['other_degree_result_file'];
+                            \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
+                        }
+                        // Upload new file with original name + unique ID
+                        try {
+                            $file = $request->file('other_degree_result_file');
+                            if (is_array($file)) {
+                                $file = !empty($file) ? $file[0] : null;
+                            }
+                            if ($file && $file->isValid()) {
+                                $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                                \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
+                                
+                                $fileVisibility = [];
+                                if (config('filesystems.default') == 'local') {
+                                    $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                                }
+                                
+                                Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                                $stepData['other_degree_result_file'] = $customFileName;
+                            }
+                        } catch (\Exception $e) {
+                            // Preserve existing file if upload fails
+                            if (isset($existingStep6Data['other_degree_result_file']) && $existingStep6Data['other_degree_result_file']) {
+                                $stepData['other_degree_result_file'] = $existingStep6Data['other_degree_result_file'];
+                            }
+                        }
+                    } elseif ($request->has('other_degree_result_file_existing')) {
+                        // Keep existing file if no new file is uploaded
+                        $stepData['other_degree_result_file'] = $request->input('other_degree_result_file_existing');
+                    } elseif (isset($existingStep6Data['other_degree_result_file']) && $existingStep6Data['other_degree_result_file']) {
+                        // If existing file input is not present, it means user removed it, so delete file
+                        $oldFileName = $existingStep6Data['other_degree_result_file'];
+                        try {
+                            \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
+                        } catch (\Exception $e) {
+                            // Silently fail
+                        }
+                        $stepData['other_degree_result_file'] = null;
+                    }
+                    
+                    // Handle Other Degree 2+ files (arrays)
+                    if ($request->hasFile('other_degree_result_file[]')) {
+                        $files = $request->file('other_degree_result_file[]');
+                        if (is_array($files)) {
+                            $otherDegreeFiles = [];
+                            foreach ($files as $index => $file) {
+                                if ($file && $file->isValid()) {
+                                    try {
+                                        $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                                        \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
+                                        
+                                        $fileVisibility = [];
+                                        if (config('filesystems.default') == 'local') {
+                                            $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                                        }
+                                        
+                                        Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                                        $otherDegreeFiles[] = $customFileName;
+                                    } catch (\Exception $e) {
+                                        // Skip this file if upload fails
+                                    }
+                                }
+                            }
+                            if (!empty($otherDegreeFiles)) {
+                                $stepData['other_degree_result_files'] = $otherDegreeFiles;
+                            }
+                        }
+                    }
+                } else {
+                    // Handle other single file fields
+                    if ($request->hasFile($fileField)) {
+                        // Delete old file if exists
+                        if (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
+                            $oldFileName = $existingStep6Data[$fileField];
+                            \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
+                        }
+                        // Upload new file with original name + unique ID
+                        try {
+                            $file = $request->file($fileField);
+                            if (is_array($file)) {
+                                $file = !empty($file) ? $file[0] : null;
+                            }
+                            if ($file && $file->isValid()) {
+                                $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                                \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
+                                
+                                $fileVisibility = [];
+                                if (config('filesystems.default') == 'local') {
+                                    $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                                }
+                                
+                                Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                                $stepData[$fileField] = $customFileName;
+                            }
+                        } catch (\Exception $e) {
+                            // Preserve existing file if upload fails
+                            if (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
+                                $stepData[$fileField] = $existingStep6Data[$fileField];
+                            }
+                        }
+                    } elseif ($request->has($fileField . '_existing')) {
+                        // Keep existing file if no new file is uploaded
+                        $stepData[$fileField] = $request->input($fileField . '_existing');
+                    } elseif (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
+                        // If existing file input is not present, it means user removed it, so delete file
+                        $oldFileName = $existingStep6Data[$fileField];
+                        try {
+                            \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
+                        } catch (\Exception $e) {
+                            // Silently fail
+                        }
+                        $stepData[$fileField] = null;
+                    }
+                }
+            }
+        }
+        
+        // Handle file uploads for step 7 (Professional Experience)
+        if ($stepNumber === 7) {
+            $jobFileFields = [
+                'job_offer_letter_file',
+                'job_experience_letter_file',
+            ];
+            
+            foreach ($jobFileFields as $fileField) {
+                if ($request->hasFile($fileField)) {
+                    // Delete old file if exists
+                    if (isset($lead->step_7_data[$fileField]) && $lead->step_7_data[$fileField]) {
+                        $oldFileName = $lead->step_7_data[$fileField];
+                        \App\Helper\Files::deleteFile($oldFileName, 'lead-job-files/' . $lead->id);
                     }
                     // Upload new file
                     try {
                         $fileName = \App\Helper\Files::uploadLocalOrS3(
                             $request->$fileField,
-                            'lead-family-passports/' . $lead->id
+                            'lead-job-files/' . $lead->id
                         );
                         $stepData[$fileField] = $fileName;
                     } catch (\Exception $e) {
-                        \Log::error('Error uploading ' . $fileField . ': ' . $e->getMessage());
+                        // Silently fail
                     }
                 } elseif ($request->has($fileField . '_existing')) {
                     // Keep existing file if no new file is uploaded
                     $stepData[$fileField] = $request->input($fileField . '_existing');
-                } elseif (isset($lead->step_5_data[$fileField]) && $lead->step_5_data[$fileField]) {
+                } elseif (isset($lead->step_7_data[$fileField]) && $lead->step_7_data[$fileField]) {
                     // If existing file input is not present, it means user removed it, so delete file
-                    $oldFileName = $lead->step_5_data[$fileField];
+                    $oldFileName = $lead->step_7_data[$fileField];
                     try {
-                        \App\Helper\Files::deleteFile($oldFileName, 'lead-family-passports/' . $lead->id);
+                        \App\Helper\Files::deleteFile($oldFileName, 'lead-job-files/' . $lead->id);
                     } catch (\Exception $e) {
-                        \Log::error('Error deleting ' . $fileField . ': ' . $e->getMessage());
+                        // Silently fail
                     }
                     $stepData[$fileField] = null;
                 }
+            }
+        }
+        
+        // Handle file uploads for step 8 (Property Details)
+        if ($stepNumber === 8) {
+            if ($request->hasFile('valuation_report_file')) {
+                // Delete old file if exists
+                if (isset($lead->step_8_data['valuation_report_file']) && $lead->step_8_data['valuation_report_file']) {
+                    $oldFileName = $lead->step_8_data['valuation_report_file'];
+                    \App\Helper\Files::deleteFile($oldFileName, 'lead-property-files/' . $lead->id);
+                }
+                // Upload new file
+                try {
+                    $fileName = \App\Helper\Files::uploadLocalOrS3(
+                        $request->valuation_report_file,
+                        'lead-property-files/' . $lead->id
+                    );
+                    $stepData['valuation_report_file'] = $fileName;
+                } catch (\Exception $e) {
+                    // Silently fail
+                }
+            } elseif ($request->has('valuation_report_file_existing')) {
+                // Keep existing file if no new file is uploaded
+                $stepData['valuation_report_file'] = $request->input('valuation_report_file_existing');
+            } elseif (isset($lead->step_8_data['valuation_report_file']) && $lead->step_8_data['valuation_report_file']) {
+                // If existing file input is not present, it means user removed it, so delete file
+                $oldFileName = $lead->step_8_data['valuation_report_file'];
+                try {
+                    \App\Helper\Files::deleteFile($oldFileName, 'lead-property-files/' . $lead->id);
+                } catch (\Exception $e) {
+                    // Silently fail
+                }
+                $stepData['valuation_report_file'] = null;
             }
         }
         
@@ -1539,7 +1975,7 @@ class LeadContactController extends AccountBaseController
                         );
                         $stepData[$fileField] = $fileName;
                     } catch (\Exception $e) {
-                        \Log::error('Error uploading ' . $fileField . ': ' . $e->getMessage());
+                        // Silently fail
                     }
                 } elseif ($request->has($fileField . '_existing')) {
                     // Keep existing file if no new file is uploaded
@@ -1550,7 +1986,7 @@ class LeadContactController extends AccountBaseController
                     try {
                         \App\Helper\Files::deleteFile($oldFileName, 'lead-income-documents/' . $lead->id);
                     } catch (\Exception $e) {
-                        \Log::error('Error deleting ' . $fileField . ': ' . $e->getMessage());
+                        // Silently fail
                     }
                     $stepData[$fileField] = null;
                 }
@@ -1558,7 +1994,8 @@ class LeadContactController extends AccountBaseController
         }
         
         // Ensure upload_resume is always in stepData for step 1 (even if null)
-        if ($stepNumber === 1 && !array_key_exists('upload_resume', $stepData)) {
+        // Use loose comparison since $stepNumber is a string "1" from route parameter
+        if ($stepNumber == 1 && !array_key_exists('upload_resume', $stepData)) {
             $stepData['upload_resume'] = null;
         }
         
@@ -1566,11 +2003,6 @@ class LeadContactController extends AccountBaseController
         $stepField = 'step_' . $stepNumber . '_data';
         $lead->$stepField = $stepData;
         $lead->save();
-        
-        // Debug: Log what was actually saved
-        if ($stepNumber === 1) {
-            \Log::info('Step 1 data saved for lead ' . $lead->id . ', upload_resume: ' . ($lead->step_1_data['upload_resume'] ?? 'NOT SET'));
-        }
     }
 
     /**
@@ -1682,3 +2114,4 @@ class LeadContactController extends AccountBaseController
     }
 
 }
+
