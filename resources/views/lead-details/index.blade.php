@@ -111,160 +111,611 @@
                     </div>
                     <!-- Tab Content Area -->
                     <div class="tab-section-content">
-                        <!-- Candidate Information Section -->
+                        <!-- Personal Details Section -->
                         <div class="info-section mb-4">
-                            <div class="info-section-title mb-3">
-                                <h4 class="f-16 font-weight-bold">Candidate Information</h4>
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Personal Details</h4>
+                                <div class="info-section-divider"></div>
                             </div>
-                            <!-- First Row: 4 fields -->
-                            <div class="info-grid candidate-info row mb-3">
-                                <div class="info-field col-md-3 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-user text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">First Name</div>
-                                            <div class="info-field-value f-14">Karan</div>
-                                        </div>
-                                    </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Lead Source</div>
+                                    <div class="info-field-value-text">Facebook</div>
                                 </div>
-                                <div class="info-field col-md-3 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-user text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Last Name</div>
-                                            <div class="info-field-value f-14">Sharma</div>
-                                        </div>
-                                    </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Lead Added by</div>
+                                    <div class="info-field-value-text">Vishal Gami</div>
                                 </div>
-                                <div class="info-field col-md-3 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-calendar text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Date of Birth</div>
-                                            <div class="info-field-value f-14">16-2-1994</div>
-                                        </div>
-                                    </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Lead Assign to</div>
+                                    <div class="info-field-value-text">Nishant Bhuva</div>
                                 </div>
-                                <div class="info-field col-md-3 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-user text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Gender</div>
-                                            <div class="info-field-value f-14">Male</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Second Row: 3 fields -->
-                            <div class="info-grid candidate-info-row2 row">
-                                <div class="info-field col-md-4 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-heart text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Marital Status</div>
-                                            <div class="info-field-value f-14">Unmarried</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="info-field col-md-4 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-calendar text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Visa Expiry Date</div>
-                                            <div class="info-field-value f-14">-</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="info-field col-md-4 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-id-card text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Passport Number</div>
-                                            <div class="info-field-value f-14">-</div>
-                                        </div>
-                                    </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Country Of Origin (Nationality)</div>
+                                    <div class="info-field-value-text">India</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Personal Information Section -->
+                        <!-- Last Five Years Visa Status Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Last Five Years Visa Status</h4>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Visa Status</div>
+                                    <div class="info-field-value-text">Visa Refusal</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Visa Rejection Date</div>
+                                    <div class="info-field-value-text">26/10/2025</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Visa Category</div>
+                                    <div class="info-field-value-text">Subclass 600</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Reason</div>
+                                    <div class="info-field-value-text">-</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Languages Spoken</div>
+                                    <div class="info-field-value-text">Visa Refusal</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Client Preference Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Client Preference</h4>
+                                <div class="info-section-divider"></div>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Preferred Designation</div>
+                                    <div class="info-field-value-text">UI/UX Designer</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Industry</div>
+                                    <div class="info-field-value-text">Information Technology / Software</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Role</div>
+                                    <div class="info-field-value-text">On Role</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Preferred Country</div>
+                                    <div class="info-field-value-text">Australia</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Work Category</div>
+                                    <div class="info-field-value-text">Skilid</div>
+                                </div>
+                                <div class="info-field-item col-md-9 mb-3">
+                                    <div class="info-field-label-text">Subclass</div>
+                                    <div class="info-field-value-text">Work Visa - Temporary Skill Shortage Visa (Subclass 482)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Passport Details Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Passport Details</h4>
+                                <div class="info-section-divider"></div>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passport Number</div>
+                                    <div class="info-field-value-text">Z4589217</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Issuing Country</div>
+                                    <div class="info-field-value-text">India</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">City Where Issued</div>
+                                    <div class="info-field-value-text">Ahmedabad</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Issuance Date</div>
+                                    <div class="info-field-value-text">14-Mar-2019</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Expiration Date</div>
+                                    <div class="info-field-value-text">13-Mar-2029</div>
+                                </div>
+                                <div class="info-field-item col-md-9 mb-3">
+                                    <div class="info-field-label-text">Lost Passport History</div>
+                                    <div class="info-field-value-text">No, I have never lost a passport.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Relative Contact Information Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Relative Contact Information</h4>
+                                <div class="info-section-divider"></div>
+                            </div>
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Relative Contact 1</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Surname</div>
+                                    <div class="info-field-value-text">Shah</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Given Name</div>
+                                    <div class="info-field-value-text">Karan</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Organization Name</div>
+                                    <div class="info-field-value-text">TechNova Solutions Pvt. Ltd.</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Relationship To You</div>
+                                    <div class="info-field-value-text">Former Manager</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-4 mb-3">
+                                    <div class="info-field-label-text">Contact Address</div>
+                                    <div class="info-field-value-text">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
+                                </div>
+                                <div class="info-field-item col-md-4 mb-3">
+                                    <div class="info-field-label-text">Email</div>
+                                    <div class="info-field-value-text">karan.shah@technova.com</div>
+                                </div>
+                                <div class="info-field-item col-md-4 mb-3">
+                                    <div class="info-field-label-text">Phone Number</div>
+                                    <div class="info-field-value-text">+91 98254 12345</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Family Information Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Family Information</h4>
+                                <div class="info-section-divider"></div>
+                            </div>
+                            
+                            <!-- Father Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Father Details</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Father's Surname</div>
+                                    <div class="info-field-value-text">Patel</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Father's Given Name</div>
+                                    <div class="info-field-value-text">Ramesh Kumar</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Father's Date of Birth</div>
+                                    <div class="info-field-value-text">12-Aug-1965</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Father's Occupation</div>
+                                    <div class="info-field-value-text">Business Owner</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Have Passport</div>
+                                    <div class="info-field-value-text">Yes</div>
+                                </div>
+                            </div>
+
+                            <!-- Mother Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Mother's Details</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Mother's Surname</div>
+                                    <div class="info-field-value-text">Patel</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Mother's Given Name</div>
+                                    <div class="info-field-value-text">Meena Ramesh</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Mother's Date of Birth</div>
+                                    <div class="info-field-value-text">25-Jan-1968</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Mother's Occupation</div>
+                                    <div class="info-field-value-text">Homemaker</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Have Passport</div>
+                                    <div class="info-field-value-text">No</div>
+                                </div>
+                            </div>
+
+                            <!-- Spouse Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Spouse Details</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Surname</div>
+                                    <div class="info-field-value-text">Patel</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Given Name</div>
+                                    <div class="info-field-value-text">Neha</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Date of Birth</div>
+                                    <div class="info-field-value-text">04-May-1995</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Country</div>
+                                    <div class="info-field-value-text">India</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's City of Birth</div>
+                                    <div class="info-field-value-text">Surat</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Have Passport</div>
+                                    <div class="info-field-value-text">Yes</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Address</div>
+                                    <div class="info-field-value-text">B-204, Navkar Residency, Vesu, Surat</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Phone Number</div>
+                                    <div class="info-field-value-text">+91 98765 44221</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Education</div>
+                                    <div class="info-field-value-text">Master's in Computer Applications (MCA)</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Occupation</div>
+                                    <div class="info-field-value-text">Software Engineer</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Spouse's Yearly Income</div>
+                                    <div class="info-field-value-text">9,50,000</div>
+                                </div>
+                            </div>
+
+                            <!-- Child 1 Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Child 1</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Child's Name</div>
+                                    <div class="info-field-value-text">Aarav Patel</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Child's Age</div>
+                                    <div class="info-field-value-text">4</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Date of Birth</div>
+                                    <div class="info-field-value-text">17-Jun-2021</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">City of Birth</div>
+                                    <div class="info-field-value-text">Ahmedabad</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Have Passport</div>
+                                    <div class="info-field-value-text">Yes</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Gender</div>
+                                    <div class="info-field-value-text">Male</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Experience Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Professional Experience</h4>
+                                <div class="info-section-divider"></div>
+                            </div>
+                            
+                            <!-- Experience 1 -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Experience 1</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Company Name</div>
+                                    <div class="info-field-value-text">TechNova Solutions Pvt. Ltd.</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Designation</div>
+                                    <div class="info-field-value-text">Senior UI/UX Designer</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Start Date</div>
+                                    <div class="info-field-value-text">01-Jan-2020</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">End Date</div>
+                                    <div class="info-field-value-text">Present</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-6 mb-3">
+                                    <div class="info-field-label-text">Job Description</div>
+                                    <div class="info-field-value-text">Responsible for designing user interfaces and user experiences for web and mobile applications. Collaborated with cross-functional teams to deliver high-quality design solutions.</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Location</div>
+                                    <div class="info-field-value-text">Ahmedabad, India</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Employment Type</div>
+                                    <div class="info-field-value-text">Full-time</div>
+                                </div>
+                            </div>
+
+                            <!-- Experience 2 -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Experience 2</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Company Name</div>
+                                    <div class="info-field-value-text">Digital Innovations Inc.</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Designation</div>
+                                    <div class="info-field-value-text">UI/UX Designer</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Start Date</div>
+                                    <div class="info-field-value-text">15-Jun-2018</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">End Date</div>
+                                    <div class="info-field-value-text">31-Dec-2019</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-6 mb-3">
+                                    <div class="info-field-label-text">Job Description</div>
+                                    <div class="info-field-value-text">Designed user interfaces for various client projects. Worked on wireframing, prototyping, and visual design.</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Location</div>
+                                    <div class="info-field-value-text">Mumbai, India</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Employment Type</div>
+                                    <div class="info-field-value-text">Full-time</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Property Details Section -->
+                        <div class="info-section mb-4">
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Property Details</h4>
+                                <div class="info-section-divider"></div>
+                            </div>
+                            
+                            <!-- Property 1 -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Property 1</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Property Type</div>
+                                    <div class="info-field-value-text">Residential</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Ownership Type</div>
+                                    <div class="info-field-value-text">Owned</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Property Value</div>
+                                    <div class="info-field-value-text">₹ 50,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Area (Sq. Ft.)</div>
+                                    <div class="info-field-value-text">1,200</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-6 mb-3">
+                                    <div class="info-field-label-text">Property Address</div>
+                                    <div class="info-field-value-text">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Purchase Date</div>
+                                    <div class="info-field-value-text">15-Mar-2019</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Mortgage/Loan</div>
+                                    <div class="info-field-value-text">Yes</div>
+                                </div>
+                            </div>
+
+                            <!-- Property 2 -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Property 2</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Property Type</div>
+                                    <div class="info-field-value-text">Commercial</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Ownership Type</div>
+                                    <div class="info-field-value-text">Owned</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Property Value</div>
+                                    <div class="info-field-value-text">₹ 1,20,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Area (Sq. Ft.)</div>
+                                    <div class="info-field-value-text">2,500</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-6 mb-3">
+                                    <div class="info-field-label-text">Property Address</div>
+                                    <div class="info-field-value-text">B-204, Navkar Residency, Vesu, Surat, Gujarat, 395007, India</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Purchase Date</div>
+                                    <div class="info-field-value-text">10-Aug-2021</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Mortgage/Loan</div>
+                                    <div class="info-field-value-text">No</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Status Section -->
                         <div class="info-section">
-                            <div class="info-section-title mb-3">
-                                <h4 class="f-16 font-weight-bold">Personal Information</h4>
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Financial Status</h4>
+                                <div class="info-section-divider"></div>
                             </div>
-                            <!-- First Row: 3 fields -->
-                            <div class="info-grid personal-info row mb-3">
-                                <div class="info-field col-md-3 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-phone text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Contact No.</div>
-                                            <div class="info-field-value f-14">+91 123 4567 890</div>
-                                        </div>
-                                    </div>
+                            
+                            <!-- Income Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Income Details</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Annual Income</div>
+                                    <div class="info-field-value-text">₹ 12,00,000</div>
                                 </div>
-                                <div class="info-field col-md-3 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-envelope text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Email Address</div>
-                                            <div class="info-field-value f-14">abc@gmail.com</div>
-                                        </div>
-                                    </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Monthly Income</div>
+                                    <div class="info-field-value-text">₹ 1,00,000</div>
                                 </div>
-                                <div class="info-field address-field col-md-6 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-map-marker-alt text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Permanent Address</div>
-                                            <div class="info-field-value f-14">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
-                                        </div>
-                                    </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Income Source</div>
+                                    <div class="info-field-value-text">Salary</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Additional Income</div>
+                                    <div class="info-field-value-text">₹ 2,00,000</div>
                                 </div>
                             </div>
-                            <!-- Second Row: 2 fields -->
-                            <div class="info-grid personal-info-row2 row">
-                                <div class="info-field col-md-6 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-link text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Social Links</div>
-                                            <div class="info-field-value f-14">-</div>
-                                        </div>
-                                    </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Additional Income Source</div>
+                                    <div class="info-field-value-text">Freelance Projects</div>
                                 </div>
-                                <div class="info-field col-md-6 mb-3">
-                                    <div class="d-flex align-items-start">
-                                        <div class="info-field-icon mr-2">
-                                            <i class="fa fa-user-tie text-primary"></i>
-                                        </div>
-                                        <div class="info-field-content">
-                                            <div class="info-field-label f-12 text-dark-grey mb-1">Sub Agent</div>
-                                            <div class="info-field-value f-14">-</div>
-                                        </div>
-                                    </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Total Annual Income</div>
+                                    <div class="info-field-value-text">₹ 14,00,000</div>
+                                </div>
+                            </div>
+
+                            <!-- Bank Accounts -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Bank Accounts</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Bank Name</div>
+                                    <div class="info-field-value-text">HDFC Bank</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Account Type</div>
+                                    <div class="info-field-value-text">Savings</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Account Number</div>
+                                    <div class="info-field-value-text">****1234</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Current Balance</div>
+                                    <div class="info-field-value-text">₹ 5,50,000</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Bank Name</div>
+                                    <div class="info-field-value-text">ICICI Bank</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Account Type</div>
+                                    <div class="info-field-value-text">Current</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Account Number</div>
+                                    <div class="info-field-value-text">****5678</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Current Balance</div>
+                                    <div class="info-field-value-text">₹ 2,30,000</div>
+                                </div>
+                            </div>
+
+                            <!-- Assets & Liabilities -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Assets & Liabilities</h5>
+                            </div>
+                            <div class="info-grid-row row mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Total Assets Value</div>
+                                    <div class="info-field-value-text">₹ 1,75,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Total Liabilities</div>
+                                    <div class="info-field-value-text">₹ 30,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Net Worth</div>
+                                    <div class="info-field-value-text">₹ 1,45,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Credit Score</div>
+                                    <div class="info-field-value-text">750</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-4 mb-3">
+                                    <div class="info-field-label-text">Investments (Stocks, Mutual Funds, etc.)</div>
+                                    <div class="info-field-value-text">₹ 15,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-4 mb-3">
+                                    <div class="info-field-label-text">Loans Outstanding</div>
+                                    <div class="info-field-value-text">₹ 30,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-4 mb-3">
+                                    <div class="info-field-label-text">Credit Cards</div>
+                                    <div class="info-field-value-text">2 Active Cards</div>
                                 </div>
                             </div>
                         </div>
@@ -598,16 +1049,122 @@
                     </div>
                     <!-- Tab Content Area -->
                     <div class="tab-section-content">
-                        <div class="communication-list">
-                            <div class="communication-card mb-3 p-3 bg-light rounded">
-                                <div class="d-flex">
-                                    <div class="communication-icon mr-3">
-                                        <i class="fa fa-phone text-primary"></i>
+
+                        <!-- Available Documents Section -->
+                        <div class="available-documents-section">
+                            <div class="info-section-title mb-3">
+                                <h4 class="f-16 font-weight-bold">Available Documents</h4>
+                            </div>
+                            <div class="documents-list">
+                                <div class="document-card mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center flex-grow-1">
+                                            <div class="document-icon mr-3">
+                                                <i class="fa fa-file-pdf text-danger"></i>
+                                            </div>
+                                            <div class="document-details flex-grow-1">
+                                                <div class="document-name f-14 font-weight-bold mb-1">Passport - Applicant</div>
+                                                <div class="document-meta f-12 text-dark-grey">
+                                                    <span class="mr-3">Size: 2.5 MB</span>
+                                                    <span>Uploaded: 09-09-2025 11:46 AM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="document-actions d-flex align-items-center">
+                                            <button class="btn btn-sm btn-info mr-2 document-view-btn" title="View Document">
+                                                <i class="fa fa-eye mr-1"></i> View
+                                            </button>
+                                            <button class="btn btn-sm document-email-btn mr-2" title="Send via Email">
+                                                <i class="fa fa-envelope mr-1"></i> Email
+                                            </button>
+                                            <button class="btn btn-sm document-whatsapp-btn" title="Send via WhatsApp">
+                                                <i class="fa fa-whatsapp mr-1"></i> WhatsApp
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="communication-details">
-                                        <div class="communication-type f-14 font-weight-bold mb-1">Call</div>
-                                        <div class="communication-description f-14 mb-2">The customer has shown interest in the Australian admission service but the candidate is asking for discount once that is approved we will again call him back after Diwali so that we can finalise</div>
-                                        <div class="communication-meta f-12 text-dark-grey">Created by : Shivani Patel - 09-09-2025 11:46 AM</div>
+                                </div>
+
+                                <div class="document-card mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center flex-grow-1">
+                                            <div class="document-icon mr-3">
+                                                <i class="fa fa-file-word text-primary"></i>
+                                            </div>
+                                            <div class="document-details flex-grow-1">
+                                                <div class="document-name f-14 font-weight-bold mb-1">Assessment Letter</div>
+                                                <div class="document-meta f-12 text-dark-grey">
+                                                    <span class="mr-3">Size: 1.8 MB</span>
+                                                    <span>Uploaded: 08-09-2025 10:30 AM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="document-actions d-flex align-items-center">
+                                            <button class="btn btn-sm btn-info mr-2 document-view-btn" title="View Document">
+                                                <i class="fa fa-eye mr-1"></i> View
+                                            </button>
+                                            <button class="btn btn-sm document-email-btn mr-2" title="Send via Email">
+                                                <i class="fa fa-envelope mr-1"></i> Email
+                                            </button>
+                                            <button class="btn btn-sm document-whatsapp-btn" title="Send via WhatsApp">
+                                                <i class="fa fa-whatsapp mr-1"></i> WhatsApp
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="document-card mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center flex-grow-1">
+                                            <div class="document-icon mr-3">
+                                                <i class="fa fa-file-image text-success"></i>
+                                            </div>
+                                            <div class="document-details flex-grow-1">
+                                                <div class="document-name f-14 font-weight-bold mb-1">Medical Certificate</div>
+                                                <div class="document-meta f-12 text-dark-grey">
+                                                    <span class="mr-3">Size: 3.2 MB</span>
+                                                    <span>Uploaded: 07-09-2025 03:15 PM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="document-actions d-flex align-items-center">
+                                            <button class="btn btn-sm btn-info mr-2 document-view-btn" title="View Document">
+                                                <i class="fa fa-eye mr-1"></i> View
+                                            </button>
+                                            <button class="btn btn-sm document-email-btn mr-2" title="Send via Email">
+                                                <i class="fa fa-envelope mr-1"></i> Email
+                                            </button>
+                                            <button class="btn btn-sm document-whatsapp-btn" title="Send via WhatsApp">
+                                                <i class="fa fa-whatsapp mr-1"></i> WhatsApp
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="document-card mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center flex-grow-1">
+                                            <div class="document-icon mr-3">
+                                                <i class="fa fa-file-pdf text-danger"></i>
+                                            </div>
+                                            <div class="document-details flex-grow-1">
+                                                <div class="document-name f-14 font-weight-bold mb-1">Contract Letter</div>
+                                                <div class="document-meta f-12 text-dark-grey">
+                                                    <span class="mr-3">Size: 1.5 MB</span>
+                                                    <span>Uploaded: 05-09-2025 09:20 AM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="document-actions d-flex align-items-center">
+                                            <button class="btn btn-sm btn-info mr-2 document-view-btn" title="View Document">
+                                                <i class="fa fa-eye mr-1"></i> View
+                                            </button>
+                                            <button class="btn btn-sm document-email-btn mr-2" title="Send via Email">
+                                                <i class="fa fa-envelope mr-1"></i> Email
+                                            </button>
+                                            <button class="btn btn-sm document-whatsapp-btn" title="Send via WhatsApp">
+                                                <i class="fa fa-whatsapp mr-1"></i> WhatsApp
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

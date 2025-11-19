@@ -1230,6 +1230,7 @@ return array(
     'leadList' => 'Lead List',
     'addLead' => 'Add Lead',
     'leadDetails' => 'Lead Details',
+    'leadDashboard' => 'Lead Dashboard',
     'deal' => 'Deals',
     'maritalStatus' => array(
         'single' => 'Single',

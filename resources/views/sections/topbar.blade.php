@@ -63,32 +63,6 @@
 
         @if (!in_array('client', user_roles()))
 
-            @if (in_array('timelogs', user_modules()) && (add_timelogs_permission() == 'all' || add_timelogs_permission() == 'added' || manage_active_timelogs() == 'all'))
-                <!-- START TIMER -->
-                    <li data-toggle="tooltip" data-placement="top" title="{{__('modules.timeLogs.startTimer')}}">
-                        <div class="add_box dropdown">
-                            <a class="d-block dropdown-toggle header-icon-box" type="link" id="show-active-timer"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fa fa-clock f-16 text-dark-grey"></i>
-                                    <span
-                                        class="badge badge-primary active-timer-count position-absolute {{ ($activeTimerCount == 0) ? 'd-none' : '' }}">{{ $activeTimerCount }}</span>
-                            </a>
-                        @if ($activeTimerCount == 0)
-                            <!-- DROPDOWN - INFORMATION -->
-                                <div class="dropdown-menu dropdown-menu-right" id="active-timer-list"
-                                     aria-labelledby="dropdownMenuLink" tabindex="0">
-                                    <a class="dropdown-item text-primary f-w-500" href="javascript:;"
-                                       id="start-timer-modal">
-                                        <i class="fa fa-play mr-2"></i>
-                                        @lang("modules.timeLogs.startTimer")
-                                    </a>
-                                </div>
-                            @endif
-                        </div>
-                    </li>
-                    <!-- START TIMER END -->
-            @endif
-
             <!-- ADD START -->
                 <li data-toggle="tooltip" data-placement="top" title="{{__('app.createNew')}}">
                     <div class="add_box dropdown">
@@ -114,11 +88,11 @@
                                 </a>
                             @endif
 
-                            @if (in_array('clients', user_modules()) && (add_clients_permission() == 'all' || add_clients_permission() == 'added'))
-                                <a class="dropdown-item f-14 text-dark openRightModal"
-                                   href="{{ route('clients.create') }}">
+                            @if (in_array('leads', user_modules()) && (user()->permission('add_lead') == 'all' || user()->permission('add_lead') == 'added'))
+                                <a class="dropdown-item f-14 text-dark"
+                                   href="{{ route('add-lead.index') }}">
                                     <i class="fa fa-plus f-w-500 mr-2 f-11"></i>
-                                    @lang('app.addClient')
+                                    @lang('app.addLead')
                                 </a>
                             @endif
 
@@ -231,13 +205,6 @@
 
         }
         @endif
-
-
-        $('#start-timer-modal').click(function () {
-            const url = "{{ route('timelogs.show_timer') }}";
-            $(MODAL_XL + ' ' + MODAL_HEADING).html('...');
-            $.ajaxModal(MODAL_XL, url);
-        });
 
         $('.open-search').click(function () {
             const url = "{{ route('search.index') }}";
