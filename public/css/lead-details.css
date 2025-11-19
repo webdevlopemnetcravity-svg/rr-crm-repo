@@ -177,78 +177,96 @@
 
 
 /* ===============================
-   SECTION TITLES
+   SECTION HEADERS (Figma Design)
 =============================== */
-.info-section-title h4 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #6A32FF;                 /* Purple heading */
-    margin-bottom: 10px;
+.info-section-header {
+    margin-bottom: 16px;
 }
 
-/* Thin Grey Divider Under Titles */
-.info-section {
-    border-bottom: 1px solid #E9E6F5;
-    padding-bottom: 18px;
-    margin-bottom: 25px;
+.info-section-title-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #713ED9;                 /* Purple heading from Figma */
+    margin: 0;
+    margin-bottom: 8px;
+    line-height: 1.4;
 }
-.info-section:last-child {
-    border-bottom: none;
+
+.info-section-divider {
+    height: 1px;
+    background-color: #E9E6F5;
+    width: 100%;
+    margin-top: 8px;
 }
 
 /* ===============================
-   FIELD LAYOUT
+   INFO SECTIONS
 =============================== */
-.info-field {
+.info-section {
+    border-bottom: 1px solid #E9E6F5;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+}
+
+.info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* ===============================
+   SUBSECTION TITLES
+=============================== */
+.info-subsection-title {
+    margin-bottom: 12px;
+    margin-top: 16px;
+}
+
+.info-subsection-title:first-child {
+    margin-top: 0;
+}
+
+.info-subsection-title-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000000;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ===============================
+   INFO GRID ROW
+=============================== */
+.info-grid-row {
     display: flex;
+    flex-wrap: wrap;
+    margin-left: -15px;
+    margin-right: -15px;
 }
 
-.info-field .info-field-icon i {
-    font-size: 18px;
-    color: #A78BFA;                 /* Soft purple icons */
+/* ===============================
+   INFO FIELD ITEM
+=============================== */
+.info-field-item {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-bottom: 16px;
 }
 
-/* Label */
-.info-field-label {
+.info-field-label-text {
     font-size: 12px;
     color: #6C6C6C;
-    line-height: 1.2;
-}
-
-/* Value Text */
-.info-field-value {
-    font-size: 14px;
-    color: #000;
+    line-height: 1.4;
+    margin-bottom: 4px;
     font-weight: 400;
 }
 
-/* Space Between Icon & Text */
-.info-field-icon {
-    margin-right: 10px;
-    padding-top: 2px;
-}
-
-/* ===============================
-   GRID ALIGNMENT FIX (Perfect Like Screenshot)
-=============================== */
-.info-grid .info-field {
-    display: flex;
-    align-items: flex-start;
-}
-
-/* Ensure consistent spacing in rows */
-.candidate-info .info-field,
-.candidate-info-row2 .info-field,
-.personal-info .info-field,
-.personal-info-row2 .info-field {
-    margin-bottom: 18px;
-}
-
-/* ===============================
-   PERMANENT ADDRESS FIELD (Wider)
-=============================== */
-.address-field .info-field-value {
-    line-height: 1.4;
+.info-field-value-text {
+    font-size: 14px;
+    color: #000000;
+    line-height: 1.5;
+    font-weight: 400;
+    word-wrap: break-word;
 }
 
 /* ===============================
@@ -484,6 +502,190 @@
 .file-note-bullet {
     color: #6C6C6C;
     margin-right: 4px;
+}
+
+/* ===============================
+   COMMUNICATION SECTION (Specific Styles)
+=============================== */
+
+/* Communication List */
+.communication-list {
+    position: relative;
+}
+
+/* Communication Card */
+.communication-card {
+    background-color: #F5F5F5;
+    border: 1px solid #E9E6F5;
+    transition: all 0.2s ease;
+}
+
+.communication-card:hover {
+    box-shadow: 0 2px 8px rgba(106, 50, 255, 0.1);
+}
+
+.communication-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #F1EBFF;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.communication-icon i {
+    font-size: 18px;
+}
+
+.communication-details {
+    flex: 1;
+}
+
+.communication-type {
+    color: #713ED9;
+}
+
+.communication-description {
+    color: #000000;
+    line-height: 1.5;
+}
+
+.communication-meta {
+    color: #6C6C6C;
+}
+
+/* ===============================
+   AVAILABLE DOCUMENTS SECTION
+=============================== */
+
+
+/* Documents List */
+.documents-list {
+    position: relative;
+}
+
+/* Document Card */
+.document-card {
+    background-color: #F5F5F5;
+    border: 1px solid #E9E6F5;
+    transition: all 0.2s ease;
+}
+
+.document-card:hover {
+    box-shadow: 0 2px 8px rgba(106, 50, 255, 0.1);
+    border-color: #CFC2F5;
+}
+
+/* Document Icon */
+.document-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    flex-shrink: 0;
+    border: 1px solid #E9E6F5;
+}
+
+.document-icon i {
+    font-size: 24px;
+}
+
+/* Document Details */
+.document-details {
+    flex: 1;
+    min-width: 0; /* Allow text truncation */
+}
+
+.document-name {
+    color: #000000;
+    line-height: 1.4;
+}
+
+.document-meta {
+    color: #6C6C6C;
+    line-height: 1.4;
+}
+
+/* Document Actions */
+.document-actions {
+    flex-shrink: 0;
+    margin-left: 15px;
+}
+
+.document-view-btn {
+    background-color: #17A2B8;
+    color: #FFFFFF;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.document-view-btn:hover {
+    background-color: #138496;
+    color: #FFFFFF;
+}
+
+.document-email-btn {
+    background-color: #F1EBFF;
+    color: #5A2DB8;
+    border: 1px solid #CFC2F5;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.document-email-btn:hover {
+    background-color: #E4D9FF;
+    border-color: #B8A7F0;
+    color: #4A1D9A;
+}
+
+.document-whatsapp-btn {
+    background-color: #B6FFDD;
+    color: #128C7E;
+    border: 1px solid #7DF0B0;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.document-whatsapp-btn:hover {
+    background-color: #9DF5C8;
+    border-color: #5DE8A8;
+    color: #0F6B5F;
+}
+
+/* Responsive Design for Document Cards */
+@media (max-width: 768px) {
+    .document-card .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .document-actions {
+        margin-left: 0;
+        margin-top: 12px;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .document-actions .btn {
+        flex: 1;
+        margin-right: 8px !important;
+    }
+    
+    .document-actions .btn:last-child {
+        margin-right: 0 !important;
+    }
 }
 
 

@@ -164,6 +164,22 @@ class LeadContactController extends AccountBaseController
         return view('lead-details.index', $this->data);
     }
 
+    public function leadDashboard()
+    {
+        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
+        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+
+        $this->pageTitle = 'app.leadDashboard';
+
+        if (!request()->ajax()) {
+            $this->categories = LeadCategory::get();
+            $this->sources = LeadSource::get();
+            $this->employees = User::allEmployees(null, 'active');
+        }
+
+        return view('lead-dashboard.index', $this->data);
+    }
+
     public function show($id)
     {
         $this->leadContact = Lead::findOrFail($id)->withCustomFields();

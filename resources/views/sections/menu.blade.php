@@ -42,6 +42,7 @@
             </x-slot>
             @if ($sidebarUserPermissions['view_lead'] != 5 && $sidebarUserPermissions['view_lead'] != 'none')
             <div class="accordionItemContent ">
+                <x-sub-menu-item :link="route('lead-dashboard.index')" :text="__('app.leadDashboard')" />
                 <x-sub-menu-item :link="route('lead-contact.index')" :text="__('app.leadContact')" />
                 <x-sub-menu-item :link="route('lead-list.index')" :text="__('app.leadList')" />
                 @if (in_array(user()->permission('add_lead'), ['all', 'added']))

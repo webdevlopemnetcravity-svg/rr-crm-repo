@@ -542,6 +542,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('new-leads/apply-quick-action', [LeadContactController::class, 'applyQuickActionNewLeads'])->name('new-leads.apply_quick_action');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
     Route::get('lead-details', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
+    Route::get('lead-dashboard', [LeadContactController::class, 'leadDashboard'])->name('lead-dashboard.index');
     
     // Step-by-step lead saving routes
     Route::post('add-lead/save-step/{stepNumber}', [LeadContactController::class, 'saveStep'])->name('add-lead.save-step');
