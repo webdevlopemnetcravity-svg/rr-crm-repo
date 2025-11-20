@@ -695,64 +695,8 @@
                     </div>
                     <!-- Relative Contact Information Tab -->
                     <div class="tab-pane fade" id="nav-relative" role="tabpanel" aria-labelledby="nav-relative-tab">
-                        <!-- Initial Relative Contact Section -->
-                        <div class="relative-contact-section">
-                            <div class="relative-contact-section-header">
-                                <div class="relative-contact-section-title">Relative Contact 1</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_surname" fieldLabel="Surname">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="relative_surname" id="relative_surname">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_given_name" fieldLabel="Given Name">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="relative_given_name" id="relative_given_name">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_organization_name" fieldLabel="Organization Name">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="relative_organization_name" id="relative_organization_name">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_relationship" fieldLabel="Relationship To You">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="relative_relationship" id="relative_relationship">
-                                </div>
-                                <div class="col-md-12">
-                                    <x-forms.label class="mt-3" fieldId="relative_contact_address" fieldLabel="Contact Address">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="relative_contact_address" id="relative_contact_address">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_city" fieldLabel="City">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="relative_city" id="relative_city">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_state" fieldLabel="State">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="relative_state" id="relative_state">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_zip_code" fieldLabel="Zip Code">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="relative_zip_code" id="relative_zip_code" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_email_address" fieldLabel="Email Address">
-                                    </x-forms.label>
-                                    <input type="email" class="form-control height-35 f-14" name="relative_email_address" id="relative_email_address" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="relative_phone_number" fieldLabel="Phone Number">
-                                    </x-forms.label>
-                                    <input type="number" max="9999999999" class="form-control height-35 f-14" name="relative_phone_number" id="relative_phone_number" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);">
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Relative Contact Details Section -->
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.relativeContactInformation')</h6>
                         
                         <!-- Dynamic Relative Contact Rows Container -->
                         <div id="relative-contact-rows-container"></div>
@@ -1752,82 +1696,131 @@
                 }
             });
 
-            // Add More Relative Contact functionality
-            let relativeContactCount = 0;
+            // Relative Contact functionality - Dynamic relative contacts management
+            let relativeContactCounter = 0;
             
             // Function to get next relative contact number
             function getNextRelativeContactNumber() {
-                const existingRows = $('.relative-contact-row').length;
-                return existingRows + 2; // +2 because we have initial section (1) and existing rows
+                relativeContactCounter++;
+                return relativeContactCounter;
             }
             
-            $('#add-more-relative').on('click', function() {
-                relativeContactCount++;
-                const nextNumber = getNextRelativeContactNumber();
-                const newRow = `
-                    <div class="relative-contact-row" id="relative-contact-row-${relativeContactCount}">
-                        <div class="relative-contact-row-header">
-                            <div class="relative-contact-row-number">Relative Contact ${nextNumber}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_surname_${relativeContactCount}" fieldLabel="Surname">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_surname[]" id="relative_surname_${relativeContactCount}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_given_name_${relativeContactCount}" fieldLabel="Given Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_given_name[]" id="relative_given_name_${relativeContactCount}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_organization_name_${relativeContactCount}" fieldLabel="Organization Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_organization_name[]" id="relative_organization_name_${relativeContactCount}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_relationship_${relativeContactCount}" fieldLabel="Relationship To You">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_relationship[]" id="relative_relationship_${relativeContactCount}">
-                            </div>
-                            <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="relative_contact_address_${relativeContactCount}" fieldLabel="Contact Address">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_contact_address[]" id="relative_contact_address_${relativeContactCount}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_city_${relativeContactCount}" fieldLabel="City">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_city[]" id="relative_city_${relativeContactCount}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_state_${relativeContactCount}" fieldLabel="State">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_state[]" id="relative_state_${relativeContactCount}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_zip_code_${relativeContactCount}" fieldLabel="Zip Code">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_zip_code[]" id="relative_zip_code_${relativeContactCount}" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_email_address_${relativeContactCount}" fieldLabel="Email Address">
-                                </x-forms.label>
-                                <input type="email" class="form-control height-35 f-14" name="relative_email_address[]" id="relative_email_address_${relativeContactCount}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_phone_number_${relativeContactCount}" fieldLabel="Phone Number">
-                                </x-forms.label>
-                                <input type="number" max="9999999999" class="form-control height-35 f-14" name="relative_phone_number[]" id="relative_phone_number_${relativeContactCount}" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);">
-                            </div>
-                            <div class="col-md-12 mt-3">
-                                <button type="button" class="btn btn-danger btn-sm remove-relative-contact" data-row-id="${relativeContactCount}">
+            // Function to update relative contact row numbers based on their index
+            function updateRelativeContactRowNumbers() {
+                const relativeContactRows = $('.relative-contact-row');
+                relativeContactRows.each(function(index) {
+                    const $row = $(this);
+                    const contactNumber = index + 1; // Start from 1, not 0
+                    const $contactNumberElement = $row.find('.relative-contact-row-number');
+                    $contactNumberElement.text('Relative Contact ' + contactNumber);
+                });
+            }
+            
+            // Function to update remove button visibility based on relative contact count
+            function updateRelativeContactRemoveButtons() {
+                const relativeContactRows = $('.relative-contact-row');
+                const contactCount = relativeContactRows.length;
+                
+                // Simple logic: 
+                // - If there's only 1 contact, hide all remove buttons
+                // - If there are 2+ contacts, show all remove buttons
+                relativeContactRows.each(function() {
+                    const $row = $(this);
+                    const $removeBtn = $row.find('.remove-relative-contact');
+                    
+                    if (contactCount <= 1) {
+                        // Only one contact - hide remove button
+                        $removeBtn.hide();
+                    } else {
+                        // Two or more contacts - show remove button
+                        $removeBtn.show();
+                    }
+                });
+            }
+            
+            // Function to generate relative contact row HTML
+            function generateRelativeContactRow(contactNum, contactData = null) {
+                const surname = contactData && contactData.relative_surname ? contactData.relative_surname : '';
+                const givenName = contactData && contactData.relative_given_name ? contactData.relative_given_name : '';
+                const orgName = contactData && contactData.relative_organization_name ? contactData.relative_organization_name : '';
+                const relationship = contactData && contactData.relative_relationship ? contactData.relative_relationship : '';
+                const address = contactData && contactData.relative_contact_address ? contactData.relative_contact_address : '';
+                const city = contactData && contactData.relative_city ? contactData.relative_city : '';
+                const state = contactData && contactData.relative_state ? contactData.relative_state : '';
+                const zipCode = contactData && contactData.relative_zip_code ? contactData.relative_zip_code : '';
+                const email = contactData && contactData.relative_email_address ? contactData.relative_email_address : '';
+                const phone = contactData && contactData.relative_phone_number ? contactData.relative_phone_number : '';
+                
+                return `
+                    <div class="relative-contact-row mb-4" id="relative-contact-row-${contactNum}" data-contact-index="${contactNum}">
+                        <div class="relative-contact-row-header mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="relative-contact-row-number f-15 font-weight-bold">Relative Contact ${contactNum}</div>
+                                <button type="button" class="btn btn-danger btn-sm remove-relative-contact" data-row-id="${contactNum}" style="display: none;">
                                     <i class="fa fa-trash mr-1"></i>Remove
                                 </button>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_surname_${contactNum}" fieldLabel="Surname">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_surname_${contactNum}" id="relative_surname_${contactNum}" value="${surname}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_given_name_${contactNum}" fieldLabel="Given Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_given_name_${contactNum}" id="relative_given_name_${contactNum}" value="${givenName}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_organization_name_${contactNum}" fieldLabel="Organization Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_organization_name_${contactNum}" id="relative_organization_name_${contactNum}" value="${orgName}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_relationship_${contactNum}" fieldLabel="Relationship To You">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_relationship_${contactNum}" id="relative_relationship_${contactNum}" value="${relationship}">
+                            </div>
+                            <div class="col-md-12">
+                                <x-forms.label class="mt-3" fieldId="relative_contact_address_${contactNum}" fieldLabel="Contact Address">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_contact_address_${contactNum}" id="relative_contact_address_${contactNum}" value="${address}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_city_${contactNum}" fieldLabel="City">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_city_${contactNum}" id="relative_city_${contactNum}" value="${city}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_state_${contactNum}" fieldLabel="State">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_state_${contactNum}" id="relative_state_${contactNum}" value="${state}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_zip_code_${contactNum}" fieldLabel="Zip Code">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_zip_code_${contactNum}" id="relative_zip_code_${contactNum}" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits" value="${zipCode}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_email_address_${contactNum}" fieldLabel="Email Address">
+                                </x-forms.label>
+                                <input type="email" class="form-control height-35 f-14" name="relative_email_address_${contactNum}" id="relative_email_address_${contactNum}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value="${email}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_phone_number_${contactNum}" fieldLabel="Phone Number">
+                                </x-forms.label>
+                                <input type="number" max="9999999999" class="form-control height-35 f-14" name="relative_phone_number_${contactNum}" id="relative_phone_number_${contactNum}" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);" value="${phone}">
+                            </div>
+                        </div>
                     </div>
                 `;
+            }
+            
+            // Function to add a relative contact row
+            function addRelativeContactRow(contactData = null) {
+                const contactNum = getNextRelativeContactNumber();
+                const newRow = generateRelativeContactRow(contactNum, contactData);
                 
                 // Append to the relative-contact-rows-container
                 $('#relative-contact-rows-container').append(newRow);
@@ -1841,13 +1834,46 @@
                             $(this).selectpicker('refresh');
                         }
                     });
+                    
+                    // Update remove buttons visibility and contact row numbers
+                    updateRelativeContactRemoveButtons();
+                    updateRelativeContactRowNumbers();
                 }, 100);
+            }
+            
+            // Add More Relative Contact button click handler
+            $('#add-more-relative').on('click', function() {
+                addRelativeContactRow();
             });
 
             // Remove relative contact row
             $(document).on('click', '.remove-relative-contact', function() {
                 const rowId = $(this).data('row-id');
+                const contactRows = $('.relative-contact-row');
+                const contactCount = contactRows.length;
+                
+                // Prevent deletion if it's the only contact
+                if (contactCount <= 1) {
+                    Swal.fire({
+                        icon: 'warning',
+                        text: 'At least one relative contact is required. You cannot delete the only contact.',
+                        toast: true,
+                        position: "top-end",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                    return;
+                }
+                
+                // If there are 2+ contacts, allow deletion
+                // Remove the contact row
                 $(`#relative-contact-row-${rowId}`).remove();
+                
+                // Update remove buttons and contact row numbers after deletion
+                // This will hide buttons if only 1 contact remains
+                updateRelativeContactRemoveButtons();
+                updateRelativeContactRowNumbers();
             });
 
             // Child functionality - Dynamic children management
@@ -2421,6 +2447,19 @@
                 setTimeout(function() {
                     initializeSelectPickers();
                 }, 200);
+                
+                if ($(e.target).attr('id') === 'nav-relative-tab') {
+                    setTimeout(function() {
+                        // Initialize one blank relative contact if no contacts exist
+                        if ($('#relative-contact-rows-container .relative-contact-row').length === 0) {
+                            addRelativeContactRow();
+                        }
+                        
+                        // Update remove buttons visibility and contact row numbers
+                        updateRelativeContactRemoveButtons();
+                        updateRelativeContactRowNumbers();
+                    }, 300);
+                }
                 
                 if ($(e.target).attr('id') === 'nav-family-tab') {
                     setTimeout(function() {
@@ -3005,6 +3044,40 @@
                     if (stepData[stepKey] && typeof stepData[stepKey] === 'object') {
                         const stepDataObj = stepData[stepKey];
                         
+                        // Special handling for Step 4 - relative contacts data
+                        if (stepNum === 4 && stepDataObj.relative_contacts && Array.isArray(stepDataObj.relative_contacts)) {
+                            const relativeContacts = stepDataObj.relative_contacts;
+                            // Clear any existing relative contacts
+                            $('#relative-contact-rows-container').empty();
+                            relativeContactCounter = 0;
+                            
+                            if (relativeContacts.length > 0) {
+                                // Populate all relative contacts
+                                relativeContacts.forEach(function(contact) {
+                                    addRelativeContactRow(contact);
+                                });
+                            } else {
+                                // If no relative contacts data, add one blank contact
+                                addRelativeContactRow();
+                            }
+                            
+                            // Update remove buttons and contact row numbers after a delay to ensure DOM is ready
+                            setTimeout(function() {
+                                updateRelativeContactRemoveButtons();
+                                updateRelativeContactRowNumbers();
+                            }, 500);
+                        } else if (stepNum === 4) {
+                            // Step 4 but no relative contacts data - add one blank contact
+                            $('#relative-contact-rows-container').empty();
+                            relativeContactCounter = 0;
+                            addRelativeContactRow();
+                            // Update remove buttons and contact row numbers after a delay
+                            setTimeout(function() {
+                                updateRelativeContactRemoveButtons();
+                                updateRelativeContactRowNumbers();
+                            }, 300);
+                        }
+                        
                         // Special handling for Step 5 - child data
                         if (stepNum === 5 && stepDataObj.children && Array.isArray(stepDataObj.children)) {
                             const children = stepDataObj.children;
@@ -3044,6 +3117,10 @@
                         Object.keys(stepDataObj).forEach(function(fieldName) {
                             // Skip children field - it's handled above
                             if (fieldName === 'children') {
+                                return;
+                            }
+                            // Skip relative_contacts field - it's handled above
+                            if (fieldName === 'relative_contacts') {
                                 return;
                             }
                             
@@ -3930,6 +4007,45 @@
                             }
                         }
                     }
+                }
+                
+                // Ensure step 4 relative contacts data is collected
+                if (currentStep === 4) {
+                    // Collect relative contacts data
+                    const relativeContacts = [];
+                    $('.relative-contact-row').each(function() {
+                        const contactIndex = $(this).data('contact-index');
+                        const surname = $('#relative_surname_' + contactIndex).val() || '';
+                        const givenName = $('#relative_given_name_' + contactIndex).val() || '';
+                        const orgName = $('#relative_organization_name_' + contactIndex).val() || '';
+                        const relationship = $('#relative_relationship_' + contactIndex).val() || '';
+                        const address = $('#relative_contact_address_' + contactIndex).val() || '';
+                        const city = $('#relative_city_' + contactIndex).val() || '';
+                        const state = $('#relative_state_' + contactIndex).val() || '';
+                        const zipCode = $('#relative_zip_code_' + contactIndex).val() || '';
+                        const email = $('#relative_email_address_' + contactIndex).val() || '';
+                        const phone = $('#relative_phone_number_' + contactIndex).val() || '';
+                        
+                        // Only add contact if at least one field has a value
+                        if (surname || givenName || orgName || relationship || address || city || state || zipCode || email || phone) {
+                            const contactData = {
+                                relative_surname: surname,
+                                relative_given_name: givenName,
+                                relative_organization_name: orgName,
+                                relative_relationship: relationship,
+                                relative_contact_address: address,
+                                relative_city: city,
+                                relative_state: state,
+                                relative_zip_code: zipCode,
+                                relative_email_address: email,
+                                relative_phone_number: phone
+                            };
+                            relativeContacts.push(contactData);
+                        }
+                    });
+                    
+                    // Add relative contacts data as JSON
+                    formData.append('relative_contacts', JSON.stringify(relativeContacts));
                 }
                 
                 // Ensure step 5 file uploads are included if selected

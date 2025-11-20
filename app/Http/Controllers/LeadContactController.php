@@ -1546,6 +1546,83 @@ class LeadContactController extends AccountBaseController
             }
         }
         
+        if ($stepNumber == 4) {
+            // Handle relative contacts data - check if sent as JSON string
+            $relativeContactData = [];
+            
+            if ($request->has('relative_contacts')) {
+                $relativeContactsJson = $request->input('relative_contacts');
+                if (is_string($relativeContactsJson)) {
+                    $decoded = json_decode($relativeContactsJson, true);
+                    if (is_array($decoded)) {
+                        $relativeContactData = $decoded;
+                    }
+                } elseif (is_array($relativeContactsJson)) {
+                    $relativeContactData = $relativeContactsJson;
+                }
+            }
+            
+            // If no relative contacts from JSON, try old format (backward compatibility)
+            if (empty($relativeContactData)) {
+                $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
+                
+                // Get Relative Contact 1 data (single values)
+                $relative1Data = [];
+                foreach ($relativeFields as $field) {
+                    $value = $this->getRequestValue($request, $field);
+                    if ($value !== null && $value !== '') {
+                        $relative1Data[$field] = $value;
+                    }
+                }
+                
+                // If Relative Contact 1 has any data, add it to the array
+                if (!empty($relative1Data)) {
+                    $relativeContactData[] = $relative1Data;
+                }
+                
+                // Get Relative Contact 2+ data (arrays)
+                $relativeArrays = [];
+                foreach ($relativeFields as $field) {
+                    $arrayKey = $field . '[]';
+                    $arrayValues = $request->input($arrayKey, []);
+                    if (is_array($arrayValues)) {
+                        $relativeArrays[$field] = $arrayValues;
+                    }
+                }
+                
+                // Combine Relative Contact 2+ data into proper structure
+                if (!empty($relativeArrays)) {
+                    $maxCount = 0;
+                    foreach ($relativeArrays as $field => $values) {
+                        if (count($values) > $maxCount) {
+                            $maxCount = count($values);
+                        }
+                    }
+                    
+                    for ($i = 0; $i < $maxCount; $i++) {
+                        $relativeRow = [];
+                        foreach ($relativeFields as $field) {
+                            if (isset($relativeArrays[$field][$i]) && $relativeArrays[$field][$i] !== null && $relativeArrays[$field][$i] !== '') {
+                                $relativeRow[$field] = $relativeArrays[$field][$i];
+                            }
+                        }
+                        if (!empty($relativeRow)) {
+                            $relativeContactData[] = $relativeRow;
+                        }
+                    }
+                }
+            }
+            
+            // Store relative contacts data as JSON array
+            $stepData['relative_contacts'] = $relativeContactData;
+            
+            // Remove individual relative contact fields from stepData (they're now in relative_contacts array)
+            $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
+            foreach ($relativeFields as $field) {
+                unset($stepData[$field]);
+            }
+        }
+        
         if ($stepNumber == 5) {
             // Handle children data - check if sent as JSON string
             $childData = [];
