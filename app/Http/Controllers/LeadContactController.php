@@ -1394,6 +1394,12 @@ class LeadContactController extends AccountBaseController
             }
             $stepData['visa_refusals'] = $visaRefusals;
             
+            // Remove individual visa refusal fields from stepData (they're now in visa_refusals array)
+            $visaRefusalFields = ['visa_rejection_date', 'visa_refusal_category', 'visa_refusal_reason'];
+            foreach ($visaRefusalFields as $field) {
+                unset($stepData[$field]);
+            }
+            
             // Handle mailing_same_as_home as boolean
             $stepData['mailing_same_as_home'] = $request->has('mailing_same_as_home') ? (bool)$request->mailing_same_as_home : false;
             

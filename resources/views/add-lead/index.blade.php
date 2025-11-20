@@ -299,25 +299,6 @@
                         
                         <!-- Visa Refusal Fields -->
                         <div id="visa_refusal_fields" style="display: none;">
-                            <!-- Initial Visa Refusal Entry -->
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visa_rejection_date" :fieldLabel="__('app.visaRejectionDate')" fieldRequired="true">
-                                    </x-forms.label>
-                                    <input type="month" class="form-control height-35 f-14" name="visa_rejection_date" id="visa_rejection_date" max="{{ date('Y-m') }}">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visa_refusal_category" :fieldLabel="__('app.visaCategory')" fieldRequired="true">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="visa_refusal_category" id="visa_refusal_category">
-                                </div>
-                                <div class="col-md-6">
-                                    <x-forms.label class="mt-3" fieldId="visa_refusal_reason" :fieldLabel="__('app.reason')" fieldRequired="true">
-                                    </x-forms.label>
-                                    <textarea class="form-control f-14" rows="2" name="visa_refusal_reason" id="visa_refusal_reason"></textarea>
-                                </div>
-                            </div>
-                            
                             <!-- Dynamic Visa Refusal Rows Container -->
                             <div id="visa-refusal-rows-container"></div>
 
@@ -1556,14 +1537,41 @@
                     // Show Visa Granted fields, hide Visa Refusal fields
                     $('#visa_granted_fields').show();
                     $('#visa_refusal_fields').hide();
+                    
+                    // Clear all Visa Refusal fields
+                    $('#visa-refusal-rows-container').empty();
+                    $('#visa_rejection_date').val('');
+                    $('#visa_refusal_category').val('');
+                    $('#visa_refusal_reason').val('');
+                    visaRefusalCounter = 0;
                 } else if (selectedValue === 'refusal') {
                     // Show Visa Refusal fields, hide Visa Granted fields
                     $('#visa_granted_fields').hide();
                     $('#visa_refusal_fields').show();
+                    
+                    // Clear all Visa Granted fields
+                    $('#visa_issue_date').val('');
+                    $('#visa_expire_date').val('');
+                    $('#visa_category').val('');
+                    
+                    // Initialize with one blank visa refusal if none exist
+                    if ($('#visa-refusal-rows-container .visa-refusal-row').length === 0) {
+                        addVisaRefusalRow();
+                    }
                 } else {
                     // If neither is selected, hide all fields
                     $('#visa_granted_fields').hide();
                     $('#visa_refusal_fields').hide();
+                    
+                    // Clear all fields
+                    $('#visa_issue_date').val('');
+                    $('#visa_expire_date').val('');
+                    $('#visa_category').val('');
+                    $('#visa-refusal-rows-container').empty();
+                    $('#visa_rejection_date').val('');
+                    $('#visa_refusal_category').val('');
+                    $('#visa_refusal_reason').val('');
+                    visaRefusalCounter = 0;
                 }
             });
             
@@ -1571,59 +1579,135 @@
             $('#visa_granted_fields').hide();
             $('#visa_refusal_fields').hide();
 
-            // Add more visa refusal functionality
-            let visaRefusalCount = 0;
+            // Visa Refusal functionality - Dynamic visa refusals management
+            let visaRefusalCounter = 0;
             
-            // Use event delegation to handle dynamically added buttons
-            $(document).on('click', '#add-more-visa-refusal', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
+            // Function to get next visa refusal number
+            function getNextVisaRefusalNumber() {
+                visaRefusalCounter++;
+                return visaRefusalCounter;
+            }
+            
+            // Function to update visa refusal row numbers based on their index
+            function updateVisaRefusalRowNumbers() {
+                const visaRefusalRows = $('.visa-refusal-row');
+                visaRefusalRows.each(function(index) {
+                    const $row = $(this);
+                    const refusalNumber = index + 1; // Start from 1, not 0
+                    const $refusalNumberElement = $row.find('.visa-refusal-row-number');
+                    if ($refusalNumberElement.length > 0) {
+                        $refusalNumberElement.text('Visa Refusal ' + refusalNumber);
+                    }
+                });
+            }
+            
+            // Function to update remove button visibility based on visa refusal count
+            function updateVisaRefusalRemoveButtons() {
+                const visaRefusalRows = $('.visa-refusal-row');
+                const refusalCount = visaRefusalRows.length;
                 
-                visaRefusalCount++;
-                const newRow = `
-                    <div class="row mt-3 visa-refusal-row" id="visa-refusal-row-${visaRefusalCount}">
-                        <div class="col-md-3">
-                            <x-forms.label class="mt-3" fieldId="visa_rejection_date_${visaRefusalCount}" :fieldLabel="__('app.visaRejectionDate')" fieldRequired="true">
-                            </x-forms.label>
-                            <input type="month" class="form-control height-35 f-14" name="visa_rejection_date[]" id="visa_rejection_date_${visaRefusalCount}" max="{{ date('Y-m') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <x-forms.label class="mt-3" fieldId="visa_refusal_category_${visaRefusalCount}" :fieldLabel="__('app.visaCategory')" fieldRequired="true">
-                            </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="visa_refusal_category[]" id="visa_refusal_category_${visaRefusalCount}">
-                        </div>
-                        <div class="col-md-5">
-                            <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${visaRefusalCount}" :fieldLabel="__('app.reason')" fieldRequired="true">
-                            </x-forms.label>
-                            <textarea class="form-control f-14" rows="2" name="visa_refusal_reason[]" id="visa_refusal_reason_${visaRefusalCount}"></textarea>
-                        </div>
-                        <div class="col-md-1 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger btn-sm remove-visa-refusal" data-row-id="${visaRefusalCount}">
-                                <i class="fa fa-trash"></i>
+                // Simple logic: 
+                // - If there's only 1 refusal, hide all remove buttons
+                // - If there are 2+ refusals, show all remove buttons
+                visaRefusalRows.each(function() {
+                    const $row = $(this);
+                    const $removeBtn = $row.find('.remove-visa-refusal');
+                    
+                    if (refusalCount <= 1) {
+                        // Only one refusal - hide remove button
+                        $removeBtn.hide();
+                    } else {
+                        // Two or more refusals - show remove button
+                        $removeBtn.show();
+                    }
+                });
+            }
+            
+            // Function to generate visa refusal row HTML
+            function generateVisaRefusalRow(refusalNum, refusalData = null) {
+                const date = refusalData && refusalData.date ? refusalData.date : '';
+                const category = refusalData && refusalData.category ? refusalData.category : '';
+                const reason = refusalData && refusalData.reason ? refusalData.reason : '';
+                
+                return `
+                    <div class="visa-refusal-row mb-3" id="visa-refusal-row-${refusalNum}" data-refusal-index="${refusalNum}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="visa-refusal-row-number f-15 font-weight-bold">Visa Refusal ${refusalNum}</div>
+                            <button type="button" class="btn btn-danger btn-sm remove-visa-refusal" data-row-id="${refusalNum}" style="display: none;">
+                                <i class="fa fa-trash mr-1"></i>Remove
                             </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="visa_rejection_date_${refusalNum}" :fieldLabel="__('app.visaRejectionDate')" fieldRequired="true">
+                                </x-forms.label>
+                                <input type="month" class="form-control height-35 f-14" name="visa_rejection_date_${refusalNum}" id="visa_rejection_date_${refusalNum}" max="{{ date('Y-m') }}" value="${date}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_category_${refusalNum}" :fieldLabel="__('app.visaCategory')" fieldRequired="true">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="visa_refusal_category_${refusalNum}" id="visa_refusal_category_${refusalNum}" value="${category}">
+                            </div>
+                            <div class="col-md-5">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${refusalNum}" :fieldLabel="__('app.reason')" fieldRequired="true">
+                                </x-forms.label>
+                                <textarea class="form-control f-14" rows="2" name="visa_refusal_reason_${refusalNum}" id="visa_refusal_reason_${refusalNum}">${reason}</textarea>
+                            </div>
                         </div>
                     </div>
                 `;
+            }
+            
+            // Function to add a visa refusal row
+            function addVisaRefusalRow(refusalData = null) {
+                const refusalNum = getNextVisaRefusalNumber();
+                const newRow = generateVisaRefusalRow(refusalNum, refusalData);
                 
                 // Append to the visa-refusal-rows-container
                 $('#visa-refusal-rows-container').append(newRow);
                 
-                // Reinitialize select picker for the new row (if any)
+                // Update remove buttons visibility and refusal row numbers
                 setTimeout(function() {
-                    $('.select-picker').each(function() {
-                        if (!$(this).data('selectpicker')) {
-                            $(this).selectpicker();
-                        } else {
-                            $(this).selectpicker('refresh');
-                        }
-                    });
+                    updateVisaRefusalRemoveButtons();
+                    updateVisaRefusalRowNumbers();
                 }, 100);
+            }
+            
+            // Add More Visa Refusal button click handler
+            $('#add-more-visa-refusal').on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                addVisaRefusalRow();
             });
 
             // Remove visa refusal row
             $(document).on('click', '.remove-visa-refusal', function() {
                 const rowId = $(this).data('row-id');
+                const refusalRows = $('.visa-refusal-row');
+                const refusalCount = refusalRows.length;
+                
+                // Prevent deletion if it's the only refusal
+                if (refusalCount <= 1) {
+                    Swal.fire({
+                        icon: 'warning',
+                        text: 'At least one visa refusal is required. You cannot delete the only refusal.',
+                        toast: true,
+                        position: "top-end",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                    return;
+                }
+                
+                // If there are 2+ refusals, allow deletion
+                // Remove the refusal row
                 $(`#visa-refusal-row-${rowId}`).remove();
+                
+                // Update remove buttons and refusal row numbers after deletion
+                // This will hide buttons if only 1 refusal remains
+                updateVisaRefusalRemoveButtons();
+                updateVisaRefusalRowNumbers();
             });
 
             // Form submission
@@ -1638,28 +1722,32 @@
             // Handle visa type radio buttons for Client Preference tab
             $('input[name="visa_type"]').on('change', function() {
                 const selectedValue = $(this).val();
-                const previousValue = $(this).data('previous-value');
                 
-                // Clear form data for other visa types when switching
-                if (previousValue && previousValue !== selectedValue) {
-                    if (previousValue === 'pr') {
-                        // Clear PR fields
-                        $('#skill_assessment_letter, #pr_preferred_country, #pr_preferred_state, #pr_family, #pr_subclass').val('').selectpicker('refresh');
-                        $('#pr_assessment_letter_file').val('');
-                    } else if (previousValue === 'visit') {
-                        // Clear Visit Visa fields
-                        $('#purpose_of_visit, #visit_family, #visit_preferred_country, #visit_preferred_state, #visit_subclass').val('').selectpicker('refresh');
-                    } else if (previousValue === 'work') {
-                        // Clear Work Permit fields
-                        $('#preferred_designation, #work_industry, #work_preferred_country, #work_preferred_state, #work_subclass').val('').selectpicker('refresh');
-                    } else if (previousValue === 'student') {
-                        // Clear Student Visa fields
-                        $('#preferred_course, #student_country, #university, #term_intake, #student_subclass').val('').selectpicker('refresh');
-                    }
+                // Clear ALL other visa type forms when any visa type is selected
+                // Clear PR fields (if not selected)
+                if (selectedValue !== 'pr') {
+                    $('#skill_assessment_letter, #pr_preferred_country, #pr_preferred_state, #pr_family, #pr_subclass').val('').selectpicker('refresh');
+                    $('#pr_assessment_letter_file').val('');
+                    // Remove hidden file input if exists
+                    $('#pr_assessment_letter_file_hidden').remove();
+                    // Remove file display if exists
+                    $('#pr_assessment_letter_file').next('.file-name-display').remove();
                 }
                 
-                // Store current value as previous
-                $(this).data('previous-value', selectedValue);
+                // Clear Visit Visa fields (if not selected)
+                if (selectedValue !== 'visit') {
+                    $('#purpose_of_visit, #visit_family, #visit_preferred_country, #visit_preferred_state, #visit_subclass').val('').selectpicker('refresh');
+                }
+                
+                // Clear Work Permit fields (if not selected)
+                if (selectedValue !== 'work') {
+                    $('#preferred_designation, #work_industry, #on_role_off_role, #work_preferred_country, #work_preferred_state, #work_category, #work_subclass').val('').selectpicker('refresh');
+                }
+                
+                // Clear Student Visa fields (if not selected)
+                if (selectedValue !== 'student') {
+                    $('#preferred_course, #student_country, #university, #term_intake, #student_subclass').val('').selectpicker('refresh');
+                }
                 
                 // Hide all sections
                 $('#prSection, #visitSection, #workSection, #studentSection').addClass('d-none');
@@ -2870,26 +2958,27 @@
                             }
                         }
                         
+                        // Clear any existing visa refusals
+                        $('#visa-refusal-rows-container').empty();
+                        visaRefusalCounter = 0;
+                        
                         // Ensure it's an array
                         if (Array.isArray(visaRefusals) && visaRefusals.length > 0) {
-                            visaRefusals.forEach(function(refusal, index) {
-                                if (index === 0) {
-                                    // Use existing fields
-                                    $('#visa_rejection_date').val(refusal.date || '');
-                                    $('#visa_refusal_category').val(refusal.category || '');
-                                    $('#visa_refusal_reason').val(refusal.reason || '');
-                                } else {
-                                    // Add more refusal rows
-                                    $('#add-more-visa-refusal').trigger('click');
-                                    setTimeout(function() {
-                                        const row = $('.visa-refusal-row').last();
-                                        row.find('input[name="visa_rejection_date[]"]').val(refusal.date || '');
-                                        row.find('input[name="visa_refusal_category[]"]').val(refusal.category || '');
-                                        row.find('textarea[name="visa_refusal_reason[]"]').val(refusal.reason || '');
-                                    }, 100);
-                                }
+                            // Populate all visa refusals
+                            visaRefusals.forEach(function(refusal) {
+                                addVisaRefusalRow(refusal);
                             });
+                        } else {
+                            // If no visa refusals data and status is refusal, add one blank refusal
+                            if (data.visa_status === 'refusal') {
+                                addVisaRefusalRow();
+                            }
                         }
+                    } else if (data.visa_status === 'refusal') {
+                        // No visa refusals data but status is refusal - add one blank refusal
+                        $('#visa-refusal-rows-container').empty();
+                        visaRefusalCounter = 0;
+                        addVisaRefusalRow();
                     }
                     
                     // Languages Spoken
@@ -3547,41 +3636,32 @@
                             }
                             // Visa Refusal fields validation
                             if (visaStatus === 'refusal') {
-                                if (!$('#visa_rejection_date').val()) {
-                                    isValid = false;
-                                    showFieldError('#visa_rejection_date', '@lang('app.visaRejectionDate') is required');
-                                }
-                                const visaRefusalCategoryVal = ($('#visa_refusal_category').val() || '').trim();
-                                if (!visaRefusalCategoryVal) {
-                                    isValid = false;
-                                    showFieldError('#visa_refusal_category', '@lang('app.visaCategory') is required');
-                                }
-                                const visaRefusalReasonVal = ($('#visa_refusal_reason').val() || '').trim();
-                                if (!visaRefusalReasonVal) {
-                                    isValid = false;
-                                    showFieldError('#visa_refusal_reason', '@lang('app.reason') is required');
-                                }
-                                // Validate dynamic visa refusal rows
-                                $('[id^="visa_rejection_date_"]').each(function() {
-                                    if (!$(this).val()) {
+                                // Validate all dynamic visa refusal rows
+                                $('.visa-refusal-row').each(function() {
+                                    const refusalIndex = $(this).data('refusal-index');
+                                    const date = $('#visa_rejection_date_' + refusalIndex).val();
+                                    const category = $('#visa_refusal_category_' + refusalIndex).val() || '';
+                                    const reason = $('#visa_refusal_reason_' + refusalIndex).val() || '';
+                                    
+                                    if (!date) {
                                         isValid = false;
-                                        showFieldError('#' + $(this).attr('id'), '@lang('app.visaRejectionDate') is required');
+                                        showFieldError('#visa_rejection_date_' + refusalIndex, '@lang('app.visaRejectionDate') is required');
+                                    }
+                                    if (!category.trim()) {
+                                        isValid = false;
+                                        showFieldError('#visa_refusal_category_' + refusalIndex, '@lang('app.visaCategory') is required');
+                                    }
+                                    if (!reason.trim()) {
+                                        isValid = false;
+                                        showFieldError('#visa_refusal_reason_' + refusalIndex, '@lang('app.reason') is required');
                                     }
                                 });
-                                $('[id^="visa_refusal_category_"]').each(function() {
-                                    const val = ($(this).val() || '').trim();
-                                    if (!val) {
-                                        isValid = false;
-                                        showFieldError('#' + $(this).attr('id'), '@lang('app.visaCategory') is required');
-                                    }
-                                });
-                                $('[id^="visa_refusal_reason_"]').each(function() {
-                                    const val = ($(this).val() || '').trim();
-                                    if (!val) {
-                                        isValid = false;
-                                        showFieldError('#' + $(this).attr('id'), '@lang('app.reason') is required');
-                                    }
-                                });
+                                
+                                // Ensure at least one visa refusal exists
+                                if ($('.visa-refusal-row').length === 0) {
+                                    isValid = false;
+                                    showFieldError('#visa_refusal_fields', 'At least one visa refusal entry is required');
+                                }
                             }
                         }
                         // Languages Spoken validation
@@ -4204,38 +4284,24 @@
                 if (currentStep === 1) {
                     const visaRefusals = [];
                     
-                    // Check if visa status is "refusal" and collect the first refusal entry
-                    if ($('input[name="visa_status"]:checked').val() === 'refusal') {
-                        const firstDate = $('#visa_rejection_date').val();
-                        const firstCategory = $('#visa_refusal_category').val();
-                        const firstReason = $('#visa_refusal_reason').val();
-                        
-                        // Only add first entry if at least one field has a value
-                        if (firstDate || firstCategory || firstReason) {
-                            visaRefusals.push({
-                                date: firstDate || '',
-                                category: firstCategory || '',
-                                reason: firstReason || ''
-                            });
-                        }
-                    }
-                    
-                    // Collect additional refusal rows
+                    // Collect all visa refusal rows (all are dynamic now)
                     $('.visa-refusal-row').each(function() {
-                        const date = $(this).find('input[name="visa_rejection_date[]"]').val();
-                        const category = $(this).find('input[name="visa_refusal_category[]"]').val();
-                        const reason = $(this).find('textarea[name="visa_refusal_reason[]"]').val();
+                        const refusalIndex = $(this).data('refusal-index');
+                        const date = $('#visa_rejection_date_' + refusalIndex).val() || '';
+                        const category = $('#visa_refusal_category_' + refusalIndex).val() || '';
+                        const reason = $('#visa_refusal_reason_' + refusalIndex).val() || '';
                         
                         // Only add if at least one field has a value
                         if (date || category || reason) {
                             visaRefusals.push({
-                                date: date || '',
-                                category: category || '',
-                                reason: reason || ''
+                                date: date,
+                                category: category,
+                                reason: reason
                             });
                         }
                     });
                     
+                    // Add visa refusals data as JSON
                     formData.append('visa_refusals', JSON.stringify(visaRefusals));
                 }
                 // Show loading
