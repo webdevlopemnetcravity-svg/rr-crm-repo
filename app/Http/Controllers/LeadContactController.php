@@ -1547,76 +1547,206 @@ class LeadContactController extends AccountBaseController
         }
         
         if ($stepNumber == 5) {
-            // Handle child data arrays - combine Child 1 (single values) with Child 2+ (arrays)
-            $childFields = ['child_name', 'child_age', 'child_date_of_birth', 'child_city_of_birth', 'child_gender', 'child_have_passport'];
+            // Handle children data - check if sent as JSON string
             $childData = [];
             
-            // Get Child 1 data (single values)
-            $child1Data = [];
-            foreach ($childFields as $field) {
-                $value = $this->getRequestValue($request, $field);
-                if ($value !== null && $value !== '') {
-                    $child1Data[$field] = $value;
+            if ($request->has('children')) {
+                $childrenJson = $request->input('children');
+                if (is_string($childrenJson)) {
+                    $decoded = json_decode($childrenJson, true);
+                    if (is_array($decoded)) {
+                        $childData = $decoded;
+                    }
+                } elseif (is_array($childrenJson)) {
+                    $childData = $childrenJson;
                 }
             }
             
-            // If Child 1 has any data, add it to the array
-            if (!empty($child1Data)) {
-                $childData[] = $child1Data;
-            }
-            
-            // Get Child 2+ data (arrays)
-            $childArrays = [];
-            foreach ($childFields as $field) {
-                $arrayKey = $field . '[]';
-                $arrayValues = $request->input($arrayKey, []);
-                if (is_array($arrayValues)) {
-                    $childArrays[$field] = $arrayValues;
-                }
-            }
-            
-            // Combine Child 2+ data into proper structure
-            if (!empty($childArrays)) {
-                $maxCount = 0;
-                foreach ($childArrays as $field => $values) {
-                    if (count($values) > $maxCount) {
-                        $maxCount = count($values);
+            // If no children from JSON, try old format (backward compatibility)
+            if (empty($childData)) {
+                $childFields = ['child_name', 'child_age', 'child_date_of_birth', 'child_city_of_birth', 'child_gender', 'child_have_passport'];
+                
+                // Get Child 1 data (single values)
+                $child1Data = [];
+                foreach ($childFields as $field) {
+                    $value = $this->getRequestValue($request, $field);
+                    if ($value !== null && $value !== '') {
+                        $child1Data[$field] = $value;
                     }
                 }
                 
-                for ($i = 0; $i < $maxCount; $i++) {
-                    $childRow = [];
-                    foreach ($childFields as $field) {
-                        if (isset($childArrays[$field][$i]) && $childArrays[$field][$i] !== null && $childArrays[$field][$i] !== '') {
-                            $childRow[$field] = $childArrays[$field][$i];
+                // If Child 1 has any data, add it to the array
+                if (!empty($child1Data)) {
+                    $childData[] = $child1Data;
+                }
+                
+                // Get Child 2+ data (arrays)
+                $childArrays = [];
+                foreach ($childFields as $field) {
+                    $arrayKey = $field . '[]';
+                    $arrayValues = $request->input($arrayKey, []);
+                    if (is_array($arrayValues)) {
+                        $childArrays[$field] = $arrayValues;
+                    }
+                }
+                
+                // Combine Child 2+ data into proper structure
+                if (!empty($childArrays)) {
+                    $maxCount = 0;
+                    foreach ($childArrays as $field => $values) {
+                        if (count($values) > $maxCount) {
+                            $maxCount = count($values);
                         }
                     }
-                    if (!empty($childRow)) {
-                        $childData[] = $childRow;
+                    
+                    for ($i = 0; $i < $maxCount; $i++) {
+                        $childRow = [];
+                        foreach ($childFields as $field) {
+                            if (isset($childArrays[$field][$i]) && $childArrays[$field][$i] !== null && $childArrays[$field][$i] !== '') {
+                                $childRow[$field] = $childArrays[$field][$i];
+                            }
+                        }
+                        if (!empty($childRow)) {
+                            $childData[] = $childRow;
+                        }
                     }
                 }
             }
             
             // Store child data as JSON array
-            if (!empty($childData)) {
-                $stepData['children'] = $childData;
-            } else {
-                $stepData['children'] = [];
-            }
+            $stepData['children'] = $childData;
             
             // Remove individual child fields from stepData (they're now in children array)
+            $childFields = ['child_name', 'child_age', 'child_date_of_birth', 'child_city_of_birth', 'child_gender', 'child_have_passport'];
             foreach ($childFields as $field) {
                 unset($stepData[$field]);
             }
             
-            // Handle file uploads for family members in step 5 - use same pattern as upload_resume
+            // Safely get existing step 5 data first
+            $existingStep5Data = [];
+            if ($lead->step_5_data) {
+                if (is_string($lead->step_5_data)) {
+                    $decoded = json_decode($lead->step_5_data, true);
+                    $existingStep5Data = is_array($decoded) ? $decoded : [];
+                } elseif (is_array($lead->step_5_data)) {
+                    $existingStep5Data = $lead->step_5_data;
+                }
+            }
+            
+            // Handle child file uploads first (with new naming convention: child_passport_file_1, child_document_file_1, etc.)
+            $passportFolder = 'lead-family-passports';
+            $documentFolder = 'lead-family-documents';
+            
+            // Get existing children data for file reference
+            $existingChildren = [];
+            if (isset($existingStep5Data['children']) && is_array($existingStep5Data['children'])) {
+                $existingChildren = $existingStep5Data['children'];
+            }
+            
+            // Process child files and update children array
+            foreach ($childData as $index => $child) {
+                $childIndex = $index + 1; // Child index starts from 1
+                
+                // Handle child passport file
+                $passportFileKey = 'child_passport_file_' . $childIndex;
+                $passportFileExistingKey = $passportFileKey . '_existing';
+                
+                if ($request->hasFile($passportFileKey)) {
+                    try {
+                        $file = $request->file($passportFileKey);
+                        if ($file && $file->isValid()) {
+                            // Delete old file if exists
+                            if (isset($child['child_passport_file']) && $child['child_passport_file']) {
+                                \App\Helper\Files::deleteFile($child['child_passport_file'], $passportFolder . '/' . $lead->id);
+                            }
+                            
+                            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                            \App\Helper\Files::fileStore($file, $passportFolder . '/' . $lead->id, $customFileName);
+                            
+                            $fileVisibility = [];
+                            if (config('filesystems.default') == 'local') {
+                                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                            }
+                            
+                            Storage::disk(config('filesystems.default'))->putFileAs($passportFolder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                            $childData[$index]['child_passport_file'] = $customFileName;
+                        }
+                    } catch (\Exception $e) {
+                        // Preserve existing file if upload fails
+                        if (isset($child['child_passport_file']) && $child['child_passport_file']) {
+                            $childData[$index]['child_passport_file'] = $child['child_passport_file'];
+                        }
+                    }
+                } elseif ($request->has($passportFileExistingKey)) {
+                    // Keep existing file
+                    $childData[$index]['child_passport_file'] = $request->input($passportFileExistingKey);
+                } elseif (isset($child['child_passport_file']) && $child['child_passport_file'] && 
+                          (!isset($existingChildren[$index]) || !isset($existingChildren[$index]['child_passport_file']) || 
+                           $existingChildren[$index]['child_passport_file'] !== $child['child_passport_file'])) {
+                    // File was removed, delete it
+                    try {
+                        \App\Helper\Files::deleteFile($child['child_passport_file'], $passportFolder . '/' . $lead->id);
+                    } catch (\Exception $e) {
+                        // Silently fail
+                    }
+                    $childData[$index]['child_passport_file'] = null;
+                }
+                
+                // Handle child document file
+                $documentFileKey = 'child_document_file_' . $childIndex;
+                $documentFileExistingKey = $documentFileKey . '_existing';
+                
+                if ($request->hasFile($documentFileKey)) {
+                    try {
+                        $file = $request->file($documentFileKey);
+                        if ($file && $file->isValid()) {
+                            // Delete old file if exists
+                            if (isset($child['child_document_file']) && $child['child_document_file']) {
+                                \App\Helper\Files::deleteFile($child['child_document_file'], $documentFolder . '/' . $lead->id);
+                            }
+                            
+                            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                            \App\Helper\Files::fileStore($file, $documentFolder . '/' . $lead->id, $customFileName);
+                            
+                            $fileVisibility = [];
+                            if (config('filesystems.default') == 'local') {
+                                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                            }
+                            
+                            Storage::disk(config('filesystems.default'))->putFileAs($documentFolder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                            $childData[$index]['child_document_file'] = $customFileName;
+                        }
+                    } catch (\Exception $e) {
+                        // Preserve existing file if upload fails
+                        if (isset($child['child_document_file']) && $child['child_document_file']) {
+                            $childData[$index]['child_document_file'] = $child['child_document_file'];
+                        }
+                    }
+                } elseif ($request->has($documentFileExistingKey)) {
+                    // Keep existing file
+                    $childData[$index]['child_document_file'] = $request->input($documentFileExistingKey);
+                } elseif (isset($child['child_document_file']) && $child['child_document_file'] && 
+                          (!isset($existingChildren[$index]) || !isset($existingChildren[$index]['child_document_file']) || 
+                           $existingChildren[$index]['child_document_file'] !== $child['child_document_file'])) {
+                    // File was removed, delete it
+                    try {
+                        \App\Helper\Files::deleteFile($child['child_document_file'], $documentFolder . '/' . $lead->id);
+                    } catch (\Exception $e) {
+                        // Silently fail
+                    }
+                    $childData[$index]['child_document_file'] = null;
+                }
+            }
+            
+            // Update stepData with updated children array
+            $stepData['children'] = $childData;
+            
+            // Handle file uploads for other family members in step 5 - use same pattern as upload_resume
             $familyFileFields = [
                 'father_passport_file',
                 'mother_passport_file',
                 'spouse_passport_file',
                 'spouse_document_file',
-                'child_passport_file',
-                'child_document_file',
             ];
             
             foreach ($familyFileFields as $fileField) {

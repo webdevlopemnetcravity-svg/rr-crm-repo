@@ -940,62 +940,7 @@
                         <hr class="my-4">
 
                         <!-- Child Details Section -->
-                        <div class="child-section">
-                            <div class="child-section-header">
-                                <div class="child-section-title">@lang('app.child') 1</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="child_name" fieldLabel="Child's Name">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="child_name" id="child_name">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="child_age" fieldLabel="Child's Age">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="child_age" id="child_age" pattern="[0-9]*" title="Please enter only numbers">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="child_date_of_birth" fieldLabel="Date of Birth">
-                                    </x-forms.label>
-                                    <input type="date" class="form-control height-35 f-14" name="child_date_of_birth" id="child_date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="child_city_of_birth" fieldLabel="City of Birth">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="child_city_of_birth" id="child_city_of_birth">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="child_gender" fieldLabel="Gender">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="child_gender" id="child_gender">
-                                        <option value="">@lang('app.select')</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Prefer not to say">Prefer not to say</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="child_document_file" fieldLabel="Add Child Document">
-                                    </x-forms.label>
-                                    <input class="form-control height-35 f-14" type="file" id="child_document_file" name="child_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="child_have_passport" fieldLabel="Have Passport">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="child_have_passport" id="child_have_passport">
-                                        <option value="">@lang('app.select')</option>
-                                        <option value="Yes">Yes</option>
-                                        <option value="No">No</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3" id="child_passport_file_container" style="display: none;">
-                                    <x-forms.label class="mt-3" fieldId="child_passport_file" fieldLabel="Add Child Passport" fieldRequired="true">
-                                    </x-forms.label>
-                                    <input class="form-control height-35 f-14" type="file" id="child_passport_file" name="child_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                                </div>
-                            </div>
-                        </div>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.child') Details</h6>
                         
                         <!-- Dynamic Child Rows Container -->
                         <div id="child-rows-container"></div>
@@ -1905,80 +1850,122 @@
                 $(`#relative-contact-row-${rowId}`).remove();
             });
 
-            // Add More Child functionality
+            // Child functionality - Dynamic children management
+            let childCounter = 0;
+            
+            // Function to get next child number
             function getNextChildNumber() {
-                const existingRows = $('.child-row').length;
-                return existingRows + 2; // +2 because we have initial section (1) and existing rows
+                childCounter++;
+                return childCounter;
             }
             
-            $('#add-more-child').on('click', function() {
-                const nextChildNum = getNextChildNumber();
-                const newRow = `
-                    <div class="child-row" id="child-row-${nextChildNum}">
-                        <div class="child-row-header">
-                            <div class="child-row-number">Child ${nextChildNum}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_name_${nextChildNum}" fieldLabel="Child's Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="child_name[]" id="child_name_${nextChildNum}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_age_${nextChildNum}" fieldLabel="Child's Age">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="child_age[]" id="child_age_${nextChildNum}" pattern="[0-9]*" title="Please enter only numbers">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_date_of_birth_${nextChildNum}" fieldLabel="Date of Birth">
-                                </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="child_date_of_birth[]" id="child_date_of_birth_${nextChildNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_city_of_birth_${nextChildNum}" fieldLabel="City of Birth">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="child_city_of_birth[]" id="child_city_of_birth_${nextChildNum}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_gender_${nextChildNum}" fieldLabel="Gender">
-                                </x-forms.label>
-                                <select class="form-control select-picker height-35 f-14" name="child_gender[]" id="child_gender_${nextChildNum}">
-                                    <option value="">@lang('app.select')</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Prefer not to say">Prefer not to say</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_document_file_${nextChildNum}" fieldLabel="Add Child Document">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="child_document_file[]" id="child_document_file_${nextChildNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_have_passport_${nextChildNum}" fieldLabel="Have Passport">
-                                </x-forms.label>
-                                <select class="form-control select-picker height-35 f-14" name="child_have_passport[]" id="child_have_passport_${nextChildNum}">
-                                    <option value="">@lang('app.select')</option>
-                                    <option value="Yes">Yes</option>
-                                    <option value="No">No</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3" id="child_passport_file_container_${nextChildNum}" style="display: none;">
-                                <x-forms.label class="mt-3" fieldId="child_passport_file_${nextChildNum}" fieldLabel="Add Child Passport" fieldRequired="true">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="child_passport_file[]" id="child_passport_file_${nextChildNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                            </div>
-                            <div class="col-md-12 mt-3">
-                                <button type="button" class="btn btn-danger btn-sm remove-child" data-row-id="${nextChildNum}">
+            // Function to generate child row HTML
+            function generateChildRow(childNum, childData = null) {
+                const childName = childData && childData.child_name ? childData.child_name : '';
+                const childAge = childData && childData.child_age ? childData.child_age : '';
+                const childDob = childData && childData.child_date_of_birth ? childData.child_date_of_birth : '';
+                const childCity = childData && childData.child_city_of_birth ? childData.child_city_of_birth : '';
+                const childGender = childData && childData.child_gender ? childData.child_gender : '';
+                const childHavePassport = childData && childData.child_have_passport ? childData.child_have_passport : '';
+                const showPassportContainer = childHavePassport === 'Yes' ? '' : 'style="display: none;"';
+                
+                return `
+                    <div class="child-row mb-4" id="child-row-${childNum}" data-child-index="${childNum}">
+                        <div class="child-row-header mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="child-row-number f-15 font-weight-bold">Child ${childNum}</div>
+                                <button type="button" class="btn btn-danger btn-sm remove-child" data-row-id="${childNum}">
                                     <i class="fa fa-trash mr-1"></i>Remove
                                 </button>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_name_${childNum}" fieldLabel="Child's Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="child_name_${childNum}" id="child_name_${childNum}" value="${childName}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_age_${childNum}" fieldLabel="Child's Age">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="child_age_${childNum}" id="child_age_${childNum}" pattern="[0-9]*" title="Please enter only numbers" value="${childAge}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_date_of_birth_${childNum}" fieldLabel="Date of Birth">
+                                </x-forms.label>
+                                <input type="date" class="form-control height-35 f-14" name="child_date_of_birth_${childNum}" id="child_date_of_birth_${childNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}" value="${childDob}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_city_of_birth_${childNum}" fieldLabel="City of Birth">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="child_city_of_birth_${childNum}" id="child_city_of_birth_${childNum}" value="${childCity}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_gender_${childNum}" fieldLabel="Gender">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="child_gender_${childNum}" id="child_gender_${childNum}">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Male" ${childGender === 'Male' ? 'selected' : ''}>Male</option>
+                                    <option value="Female" ${childGender === 'Female' ? 'selected' : ''}>Female</option>
+                                    <option value="Prefer not to say" ${childGender === 'Prefer not to say' ? 'selected' : ''}>Prefer not to say</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_document_file_${childNum}" fieldLabel="Add Child Document">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="child_document_file_${childNum}" id="child_document_file_${childNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-child-index="${childNum}">
+                                ${childData && childData.child_document_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${childData.child_document_file}" target="_blank">${childData.child_document_file}</a></small></div>` : ''}
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="child_have_passport_${childNum}" fieldLabel="Have Passport">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="child_have_passport_${childNum}" id="child_have_passport_${childNum}">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Yes" ${childHavePassport === 'Yes' ? 'selected' : ''}>Yes</option>
+                                    <option value="No" ${childHavePassport === 'No' ? 'selected' : ''}>No</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3" id="child_passport_file_container_${childNum}" ${showPassportContainer}>
+                                <x-forms.label class="mt-3" fieldId="child_passport_file_${childNum}" fieldLabel="Add Child Passport" fieldRequired="true">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="child_passport_file_${childNum}" id="child_passport_file_${childNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-child-index="${childNum}">
+                                ${childData && childData.child_passport_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${childData.child_passport_file}" target="_blank">${childData.child_passport_file}</a></small></div>` : ''}
+                            </div>
+                        </div>
                     </div>
                 `;
+            }
+            
+            // Function to add a child row
+            function addChildRow(childData = null) {
+                const childNum = getNextChildNumber();
+                const newRow = generateChildRow(childNum, childData);
                 
                 // Append to the child-rows-container
                 $('#child-rows-container').append(newRow);
+                
+                // Update file URLs for existing files if childData is provided
+                if (childData) {
+                    const $childRow = $('#child-row-' + childNum);
+                    
+                    // Update passport file link
+                    if (childData.child_passport_file) {
+                        const passportFileUrl = getFileUrl('child_passport_file', childData.child_passport_file);
+                        const $passportLink = $childRow.find('.existing-file-link[data-file="' + childData.child_passport_file + '"]');
+                        if ($passportLink.length > 0 && passportFileUrl) {
+                            $passportLink.attr('href', passportFileUrl).attr('target', '_blank');
+                        }
+                    }
+                    
+                    // Update document file link
+                    if (childData.child_document_file) {
+                        const documentFileUrl = getFileUrl('child_document_file', childData.child_document_file);
+                        const $documentLink = $childRow.find('.existing-file-link[data-file="' + childData.child_document_file + '"]');
+                        if ($documentLink.length > 0 && documentFileUrl) {
+                            $documentLink.attr('href', documentFileUrl).attr('target', '_blank');
+                        }
+                    }
+                }
                 
                 // Reinitialize select picker for the new row
                 setTimeout(function() {
@@ -1989,13 +1976,95 @@
                             $(this).selectpicker('refresh');
                         }
                     });
+                    
+                    // Trigger change event for passport field if needed
+                    if (childData && childData.child_have_passport === 'Yes') {
+                        $('#child_have_passport_' + childNum).trigger('changed.bs.select');
+                    }
                 }, 100);
+            }
+            
+            // Add More Child button click handler
+            $('#add-more-child').on('click', function() {
+                addChildRow();
             });
 
             // Remove child row
             $(document).on('click', '.remove-child', function() {
                 const rowId = $(this).data('row-id');
                 $(`#child-row-${rowId}`).remove();
+            });
+            
+            // Function to update all existing file links with proper URLs
+            function updateChildFileLinks() {
+                $('.child-row').each(function() {
+                    const $childRow = $(this);
+                    const childNum = $childRow.data('child-index');
+                    
+                    // Update passport file link
+                    const $passportLink = $childRow.find('#child_passport_file_container_' + childNum + ' .existing-file-link[data-file]');
+                    if ($passportLink.length > 0) {
+                        const fileName = $passportLink.attr('data-file');
+                        if (fileName) {
+                            const fileUrl = getFileUrl('child_passport_file', fileName);
+                            if (fileUrl) {
+                                $passportLink.attr('href', fileUrl).attr('target', '_blank');
+                            }
+                        }
+                    }
+                    
+                    // Update document file link
+                    const $documentLink = $childRow.find('#child_document_file_' + childNum).closest('.col-md-3').find('.existing-file-link[data-file]');
+                    if ($documentLink.length > 0) {
+                        const fileName = $documentLink.attr('data-file');
+                        if (fileName) {
+                            const fileUrl = getFileUrl('child_document_file', fileName);
+                            if (fileUrl) {
+                                $documentLink.attr('href', fileUrl).attr('target', '_blank');
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Handle clicks on existing file links to ensure they open properly
+            $(document).on('click', '.existing-file-link', function(e) {
+                const href = $(this).attr('href');
+                // If href is still "#", try to get the URL from data-file attribute
+                if (!href || href === '#') {
+                    const fileName = $(this).attr('data-file');
+                    if (fileName) {
+                        // Determine file type from context
+                        const $container = $(this).closest('.col-md-3');
+                        let fileType = 'child_document_file';
+                        // Check if this is in a passport file container
+                        if ($container.attr('id') && $container.attr('id').includes('passport_file_container')) {
+                            fileType = 'child_passport_file';
+                        } else {
+                            // Check if there's a passport file input in the same container
+                            const $passportInput = $container.find('input[id^="child_passport_file_"]');
+                            if ($passportInput.length > 0) {
+                                fileType = 'child_passport_file';
+                            }
+                        }
+                        const fileUrl = getFileUrl(fileType, fileName);
+                        if (fileUrl) {
+                            $(this).attr('href', fileUrl).attr('target', '_blank');
+                            window.open(fileUrl, '_blank');
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                    // Prevent default if we couldn't set a proper URL
+                    e.preventDefault();
+                    return false;
+                }
+                // Link has proper URL, let it open normally (target="_blank" is already set)
+            });
+            
+            // Initialize with one blank child on page load
+            $(document).ready(function() {
+                // This will be handled after data loading check
             });
 
             // Add More Education (Other Degree) functionality
@@ -2213,23 +2282,12 @@
                 }
             });
             
-            // Handle Child Have Passport - show/hide passport file field
-            $('#child_have_passport').on('changed.bs.select', function() {
-                const havePassport = $(this).val();
-                if (havePassport === 'Yes') {
-                    $('#child_passport_file_container').show();
-                } else {
-                    $('#child_passport_file_container').hide();
-                    $('#child_passport_file').val('');
-                }
-            });
-            
             // Handle dynamic child passport fields
-            $(document).on('changed.bs.select', '[id^="child_have_passport"]', function() {
+            $(document).on('changed.bs.select', '[id^="child_have_passport_"]', function() {
                 const havePassport = $(this).val();
-                const childNum = $(this).attr('id').replace('child_have_passport_', '').replace('child_have_passport', '');
-                const containerId = childNum ? `#child_passport_file_container_${childNum}` : '#child_passport_file_container';
-                const fileId = childNum ? `#child_passport_file_${childNum}` : '#child_passport_file';
+                const childNum = $(this).attr('id').replace('child_have_passport_', '');
+                const containerId = `#child_passport_file_container_${childNum}`;
+                const fileId = `#child_passport_file_${childNum}`;
                 
                 if (havePassport === 'Yes') {
                     $(containerId).show();
@@ -2265,19 +2323,11 @@
                     $('#spouse_passport_file_container').hide();
                 }
                 
-                // Check Child passport
-                const childHavePassport = getSelectValue('#child_have_passport');
-                if (childHavePassport === 'Yes') {
-                    $('#child_passport_file_container').show();
-                } else {
-                    $('#child_passport_file_container').hide();
-                }
-                
                 // Check dynamic child passport fields
-                $('[id^="child_have_passport"]').each(function() {
+                $('[id^="child_have_passport_"]').each(function() {
                     const childHavePassportVal = getSelectValue('#' + $(this).attr('id'));
-                    const childNum = $(this).attr('id').replace('child_have_passport_', '').replace('child_have_passport', '');
-                    const containerId = childNum ? `#child_passport_file_container_${childNum}` : '#child_passport_file_container';
+                    const childNum = $(this).attr('id').replace('child_have_passport_', '');
+                    const containerId = `#child_passport_file_container_${childNum}`;
                     
                     if (childHavePassportVal === 'Yes') {
                         $(containerId).show();
@@ -2314,6 +2364,11 @@
                 if ($(e.target).attr('id') === 'nav-family-tab') {
                     setTimeout(function() {
                         checkAndShowPassportFields();
+                        
+                        // Initialize one blank child if no children exist
+                        if ($('#child-rows-container .child-row').length === 0) {
+                            addChildRow();
+                        }
                     }, 300);
                 }
             });
@@ -2888,76 +2943,29 @@
                         // Special handling for Step 5 - child data
                         if (stepNum === 5 && stepDataObj.children && Array.isArray(stepDataObj.children)) {
                             const children = stepDataObj.children;
+                            // Clear any existing children
+                            $('#child-rows-container').empty();
+                            childCounter = 0;
+                            
                             if (children.length > 0) {
-                                // Populate Child 1 (first child)
-                                const child1 = children[0];
-                                if (child1.child_name) $('#child_name').val(child1.child_name || '');
-                                if (child1.child_age) $('#child_age').val(child1.child_age || '');
-                                if (child1.child_date_of_birth) $('#child_date_of_birth').val(child1.child_date_of_birth || '');
-                                if (child1.child_city_of_birth) $('#child_city_of_birth').val(child1.child_city_of_birth || '');
-                                if (child1.child_gender) $('#child_gender').val(child1.child_gender || '').selectpicker('refresh');
-                                if (child1.child_have_passport) {
-                                    $('#child_have_passport').val(child1.child_have_passport || '').selectpicker('refresh');
-                                    // Trigger change to show/hide passport file field
-                                    setTimeout(function() {
-                                        $('#child_have_passport').trigger('changed.bs.select');
-                                    }, 100);
-                                }
-                                
-                                // Populate Child 2+ (remaining children) - do this sequentially
-                                if (children.length > 1) {
-                                    let childIndex = 1;
-                                    
-                                    function addAndPopulateNextChild() {
-                                        if (childIndex >= children.length) {
-                                            return; // All children processed
-                                        }
-                                        
-                                        const child = children[childIndex];
-                                        
-                                        // Get the next child number before clicking
-                                        const existingRows = $('.child-row').length;
-                                        const expectedChildNum = existingRows + 2; // +2 because Child 1 is index 0, and nextChildNum starts at 2
-                                        
-                                        // Trigger add more child button
-                                        $('#add-more-child').trigger('click');
-                                        
-                                        // Wait for the row to be created and selectpickers initialized
-                                        setTimeout(function() {
-                                            // Verify the row exists with the expected number
-                                            const $childRow = $('#child-row-' + expectedChildNum);
-                                            if ($childRow.length > 0) {
-                                                // Populate the fields
-                                                if (child.child_name) $('#child_name_' + expectedChildNum).val(child.child_name || '');
-                                                if (child.child_age) $('#child_age_' + expectedChildNum).val(child.child_age || '');
-                                                if (child.child_date_of_birth) $('#child_date_of_birth_' + expectedChildNum).val(child.child_date_of_birth || '');
-                                                if (child.child_city_of_birth) $('#child_city_of_birth_' + expectedChildNum).val(child.child_city_of_birth || '');
-                                                if (child.child_gender) {
-                                                    $('#child_gender_' + expectedChildNum).val(child.child_gender || '').selectpicker('refresh');
-                                                }
-                                                if (child.child_have_passport) {
-                                                    $('#child_have_passport_' + expectedChildNum).val(child.child_have_passport || '').selectpicker('refresh');
-                                                    // Trigger change to show/hide passport file field
-                                                    setTimeout(function() {
-                                                        $('#child_have_passport_' + expectedChildNum).trigger('changed.bs.select');
-                                                    }, 50);
-                                                }
-                                                
-                                                // Move to next child
-                                                childIndex++;
-                                                // Recursively process next child
-                                                setTimeout(addAndPopulateNextChild, 300);
-                                            } else {
-                                                // Row not found, try again after a short delay
-                                                setTimeout(addAndPopulateNextChild, 200);
-                                            }
-                                        }, 400); // Wait for row creation and selectpicker initialization
-                                    }
-                                    
-                                    // Start processing Child 2+
-                                    addAndPopulateNextChild();
-                                }
+                                // Populate all children
+                                children.forEach(function(child) {
+                                    addChildRow(child);
+                                });
+                            } else {
+                                // If no children data, add one blank child
+                                addChildRow();
                             }
+                            
+                            // Update file links after a delay to ensure DOM is ready
+                            setTimeout(function() {
+                                updateChildFileLinks();
+                            }, 500);
+                        } else if (stepNum === 5) {
+                            // Step 5 but no children data - add one blank child
+                            $('#child-rows-container').empty();
+                            childCounter = 0;
+                            addChildRow();
                         }
                         
                         // Populate all fields for this step
@@ -3670,23 +3678,49 @@
                                 showFieldError('#spouse_passport_file', 'Spouse\'s Passport file is required');
                             }
                         }
-                        // Child passport file is required if child has passport = Yes
-                        const step5ChildHavePassportVal = getSelectValue('#child_have_passport');
-                        if (step5ChildHavePassportVal === 'Yes') {
-                            if (!$('#child_passport_file').val() && !$('#child_passport_file_hidden').length) {
-                                isValid = false;
-                                showFieldError('#child_passport_file', 'Child\'s Passport file is required');
-                            }
-                        }
-                        // Validate dynamic child passport fields
-                        $('[id^="child_have_passport"]').each(function() {
+                        // Validate dynamic child passport and document fields
+                        $('[id^="child_have_passport_"]').each(function() {
+                            const childNum = $(this).attr('id').replace('child_have_passport_', '');
                             const childHavePassport = getSelectValue('#' + $(this).attr('id'));
+                            const $childRow = $(this).closest('.child-row');
+                            
+                            // Validate passport file if child has passport
                             if (childHavePassport === 'Yes') {
-                                const childNum = $(this).attr('id').replace('child_have_passport_', '').replace('child_have_passport', '');
-                                const fileId = childNum ? `#child_passport_file_${childNum}` : '#child_passport_file';
-                                if (!$(fileId).val() && !$(fileId + '_hidden').length) {
-                                    isValid = false;
-                                    showFieldError(fileId, 'Child\'s Passport file is required');
+                                const passportFileId = `#child_passport_file_${childNum}`;
+                                const passportFileInput = document.getElementById('child_passport_file_' + childNum);
+                                
+                                // Check for existing passport file link in the same row
+                                const $passportFileContainer = $childRow.find('#child_passport_file_container_' + childNum);
+                                const hasExistingPassportFile = $passportFileContainer.find('.existing-file-link[data-file]').length > 0;
+                                
+                                if (!passportFileInput || !passportFileInput.files || passportFileInput.files.length === 0) {
+                                    if (!hasExistingPassportFile) {
+                                        isValid = false;
+                                        showFieldError(passportFileId, 'Child\'s Passport file is required');
+                                    }
+                                }
+                            }
+                            
+                            // Validate document file (always required for each child with data)
+                            const documentFileId = `#child_document_file_${childNum}`;
+                            const documentFileInput = document.getElementById('child_document_file_' + childNum);
+                            
+                            // Check for existing document file link in the same row
+                            const $documentFileContainer = $childRow.find('#child_document_file_' + childNum).closest('.col-md-3');
+                            const hasExistingDocumentFile = $documentFileContainer.find('.existing-file-link[data-file]').length > 0;
+                            
+                            // Check if child has any data (name, age, etc.) - if yes, document file is required
+                            const childName = $('#child_name_' + childNum).val() || '';
+                            const childAge = $('#child_age_' + childNum).val() || '';
+                            const childDob = $('#child_date_of_birth_' + childNum).val() || '';
+                            
+                            if (childName || childAge || childDob) {
+                                // Child has data, so document file is required
+                                if (!documentFileInput || !documentFileInput.files || documentFileInput.files.length === 0) {
+                                    if (!hasExistingDocumentFile) {
+                                        isValid = false;
+                                        showFieldError(documentFileId, 'Child\'s Document file is required');
+                                    }
                                 }
                             }
                         });
@@ -3828,13 +3862,87 @@
                 
                 // Ensure step 5 file uploads are included if selected
                 if (currentStep === 5) {
+                    // Collect children data
+                    const children = [];
+                    $('.child-row').each(function() {
+                        const childIndex = $(this).data('child-index');
+                        const childName = $('#child_name_' + childIndex).val() || '';
+                        const childAge = $('#child_age_' + childIndex).val() || '';
+                        const childDob = $('#child_date_of_birth_' + childIndex).val() || '';
+                        const childCity = $('#child_city_of_birth_' + childIndex).val() || '';
+                        const childGender = getSelectValue('#child_gender_' + childIndex) || '';
+                        const childHavePassport = getSelectValue('#child_have_passport_' + childIndex) || '';
+                        
+                        // Get child passport file
+                        const childPassportFileInput = document.getElementById('child_passport_file_' + childIndex);
+                        let childPassportFile = '';
+                        if (childPassportFileInput && childPassportFileInput.files && childPassportFileInput.files.length > 0) {
+                            // File will be handled separately in FormData
+                            childPassportFile = 'NEW_FILE_' + childIndex;
+                        } else {
+                            // Check for existing file
+                            const existingPassportLink = $(this).find('.existing-file-link[data-file]').filter(function() {
+                                return $(this).closest('.col-md-3').find('#child_passport_file_' + childIndex).length > 0;
+                            });
+                            if (existingPassportLink.length > 0) {
+                                childPassportFile = existingPassportLink.attr('data-file');
+                            }
+                        }
+                        
+                        // Get child document file
+                        const childDocumentFileInput = document.getElementById('child_document_file_' + childIndex);
+                        let childDocumentFile = '';
+                        if (childDocumentFileInput && childDocumentFileInput.files && childDocumentFileInput.files.length > 0) {
+                            // File will be handled separately in FormData
+                            childDocumentFile = 'NEW_FILE_' + childIndex;
+                        } else {
+                            // Check for existing file
+                            const existingDocumentLink = $(this).find('.existing-file-link[data-file]').filter(function() {
+                                return $(this).closest('.col-md-3').find('#child_document_file_' + childIndex).length > 0;
+                            });
+                            if (existingDocumentLink.length > 0) {
+                                childDocumentFile = existingDocumentLink.attr('data-file');
+                            }
+                        }
+                        
+                        // Only add child if at least one field has a value
+                        if (childName || childAge || childDob || childCity || childGender || childHavePassport) {
+                            const childData = {
+                                child_name: childName,
+                                child_age: childAge,
+                                child_date_of_birth: childDob,
+                                child_city_of_birth: childCity,
+                                child_gender: childGender,
+                                child_have_passport: childHavePassport,
+                                child_passport_file: childPassportFile,
+                                child_document_file: childDocumentFile
+                            };
+                            children.push(childData);
+                            
+                            // Handle file uploads for this child
+                            if (childPassportFileInput && childPassportFileInput.files && childPassportFileInput.files.length > 0) {
+                                formData.append('child_passport_file_' + childIndex, childPassportFileInput.files[0]);
+                            } else if (childPassportFile && childPassportFile !== 'NEW_FILE_' + childIndex) {
+                                formData.append('child_passport_file_' + childIndex + '_existing', childPassportFile);
+                            }
+                            
+                            if (childDocumentFileInput && childDocumentFileInput.files && childDocumentFileInput.files.length > 0) {
+                                formData.append('child_document_file_' + childIndex, childDocumentFileInput.files[0]);
+                            } else if (childDocumentFile && childDocumentFile !== 'NEW_FILE_' + childIndex) {
+                                formData.append('child_document_file_' + childIndex + '_existing', childDocumentFile);
+                            }
+                        }
+                    });
+                    
+                    // Add children data as JSON
+                    formData.append('children', JSON.stringify(children));
+                    
+                    // Handle other step 5 file fields (father, mother, spouse)
                     const step5FileFields = [
                         'father_passport_file',
                         'mother_passport_file',
                         'spouse_passport_file',
-                        'spouse_document_file',
-                        'child_passport_file',
-                        'child_document_file'
+                        'spouse_document_file'
                     ];
                     
                     step5FileFields.forEach(function(fileField) {
