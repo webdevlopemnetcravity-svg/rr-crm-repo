@@ -1859,6 +1859,39 @@
                 return childCounter;
             }
             
+            // Function to update child row numbers based on their index
+            function updateChildRowNumbers() {
+                const childRows = $('.child-row');
+                childRows.each(function(index) {
+                    const $row = $(this);
+                    const childNumber = index + 1; // Start from 1, not 0
+                    const $childNumberElement = $row.find('.child-row-number');
+                    $childNumberElement.text('Child ' + childNumber);
+                });
+            }
+            
+            // Function to update remove button visibility based on child count
+            function updateRemoveButtons() {
+                const childRows = $('.child-row');
+                const childCount = childRows.length;
+                
+                // Simple logic: 
+                // - If there's only 1 child, hide all remove buttons
+                // - If there are 2+ children, show all remove buttons
+                childRows.each(function() {
+                    const $row = $(this);
+                    const $removeBtn = $row.find('.remove-child');
+                    
+                    if (childCount <= 1) {
+                        // Only one child - hide remove button
+                        $removeBtn.hide();
+                    } else {
+                        // Two or more children - show remove button
+                        $removeBtn.show();
+                    }
+                });
+            }
+            
             // Function to generate child row HTML
             function generateChildRow(childNum, childData = null) {
                 const childName = childData && childData.child_name ? childData.child_name : '';
@@ -1874,7 +1907,7 @@
                         <div class="child-row-header mb-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="child-row-number f-15 font-weight-bold">Child ${childNum}</div>
-                                <button type="button" class="btn btn-danger btn-sm remove-child" data-row-id="${childNum}">
+                                <button type="button" class="btn btn-danger btn-sm remove-child" data-row-id="${childNum}" style="display: none;">
                                     <i class="fa fa-trash mr-1"></i>Remove
                                 </button>
                             </div>
@@ -1981,6 +2014,10 @@
                     if (childData && childData.child_have_passport === 'Yes') {
                         $('#child_have_passport_' + childNum).trigger('changed.bs.select');
                     }
+                    
+                    // Update remove buttons visibility and child row numbers
+                    updateRemoveButtons();
+                    updateChildRowNumbers();
                 }, 100);
             }
             
@@ -1992,7 +2029,31 @@
             // Remove child row
             $(document).on('click', '.remove-child', function() {
                 const rowId = $(this).data('row-id');
+                const childRows = $('.child-row');
+                const childCount = childRows.length;
+                
+                // Prevent deletion if it's the only child
+                if (childCount <= 1) {
+                    Swal.fire({
+                        icon: 'warning',
+                        text: 'At least one child is required. You cannot delete the only child.',
+                        toast: true,
+                        position: "top-end",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                    return;
+                }
+                
+                // If there are 2+ children, allow deletion
+                // Remove the child row
                 $(`#child-row-${rowId}`).remove();
+                
+                // Update remove buttons and child row numbers after deletion
+                // This will hide buttons if only 1 child remains
+                updateRemoveButtons();
+                updateChildRowNumbers();
             });
             
             // Function to update all existing file links with proper URLs
@@ -2369,6 +2430,10 @@
                         if ($('#child-rows-container .child-row').length === 0) {
                             addChildRow();
                         }
+                        
+                        // Update remove buttons visibility and child row numbers
+                        updateRemoveButtons();
+                        updateChildRowNumbers();
                     }, 300);
                 }
             });
@@ -2957,15 +3022,22 @@
                                 addChildRow();
                             }
                             
-                            // Update file links after a delay to ensure DOM is ready
+                            // Update file links, remove buttons, and child row numbers after a delay to ensure DOM is ready
                             setTimeout(function() {
                                 updateChildFileLinks();
+                                updateRemoveButtons();
+                                updateChildRowNumbers();
                             }, 500);
                         } else if (stepNum === 5) {
                             // Step 5 but no children data - add one blank child
                             $('#child-rows-container').empty();
                             childCounter = 0;
                             addChildRow();
+                            // Update remove buttons and child row numbers after a delay
+                            setTimeout(function() {
+                                updateRemoveButtons();
+                                updateChildRowNumbers();
+                            }, 300);
                         }
                         
                         // Populate all fields for this step
