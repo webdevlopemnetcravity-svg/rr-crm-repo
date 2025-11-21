@@ -1163,54 +1163,6 @@
                         <hr class="my-4">
 
                         <!-- Other Degree Details Section -->
-                        <div class="other-degree-section">
-                            <div class="other-degree-section-header">
-                                <div class="other-degree-section-title">@lang('app.otherDegreeDetails') 1</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="other_degree" fieldLabel="Other Degree">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="other_degree" id="other_degree">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="other_degree_university_name" fieldLabel="University Name">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="other_degree_university_name" id="other_degree_university_name">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="other_degree_percentage" fieldLabel="Percentage">
-                                    </x-forms.label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control height-35 f-14" name="other_degree_percentage" id="other_degree_percentage" min="0" max="100" step="0.01" maxlength="5">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="other_degree_passing_year" fieldLabel="Passing Year">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="other_degree_passing_year" id="other_degree_passing_year">
-                                        <option value="">@lang('app.select')</option>
-                                        @for($year = date('Y'); $year >= 1950; $year--)
-                                            <option value="{{ $year }}">{{ $year }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="other_degree_trial" fieldLabel="Trial">
-                                    </x-forms.label>
-                                    <input type="number" class="form-control height-35 f-14" name="other_degree_trial" id="other_degree_trial">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="other_degree_result_file" fieldLabel="Add Other Degree Result">
-                                    </x-forms.label>
-                                    <input class="form-control height-35 f-14" type="file" id="other_degree_result_file" name="other_degree_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- Dynamic Other Degree Rows Container -->
                         <div id="other-degree-rows-container"></div>
                         
@@ -1223,55 +1175,6 @@
                     </div>
                     <!-- Professional Experience Tab -->
                     <div class="tab-pane fade" id="nav-experience" role="tabpanel" aria-labelledby="nav-experience-tab">
-                        <!-- Job 1 Section -->
-                        <div class="job-section">
-                            <div class="job-section-header">
-                                <div class="job-section-title">@lang('app.job') 1</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="job_duration_from" fieldLabel="Duration - From">
-                                    </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="job_duration_from" id="job_duration_from" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_duration_to" fieldLabel="Duration - To">
-                                </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="job_duration_to" id="job_duration_to" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="job_country" fieldLabel="Country">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="job_country" id="job_country">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="job_designation" fieldLabel="Designation">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="job_designation" id="job_designation">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="job_company_name" fieldLabel="Company Name">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="job_company_name" id="job_company_name">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="job_salary" fieldLabel="Salary">
-                                    </x-forms.label>
-                                    <input type="number" class="form-control height-35 f-14" name="job_salary" id="job_salary">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="job_offer_letter_file" fieldLabel="Add Offerletter">
-                                    </x-forms.label>
-                                    <input class="form-control height-35 f-14" type="file" id="job_offer_letter_file" name="job_offer_letter_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="job_experience_letter_file" fieldLabel="Add Experience letter">
-                                    </x-forms.label>
-                                    <input class="form-control height-35 f-14" type="file" id="job_experience_letter_file" name="job_experience_letter_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- Dynamic Job Rows Container -->
                         <div id="job-rows-container"></div>
                         
@@ -1329,7 +1232,7 @@
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_silver" id="property_silver">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="total_valuation" fieldLabel="Total Valuation">
+                                <x-forms.label class="mt-3" fieldId="total_valuation" fieldLabel="Total Asset Valuation">
                                 </x-forms.label>
                                 <input type="number" id="total_valuation" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_valuation">
                             </div>
@@ -1348,12 +1251,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="loan_years" fieldLabel="Loan Years">
                                 </x-forms.label>
-                                <select class="form-control select-picker height-35 f-14" name="loan_years" id="loan_years">
-                                    <option value="">@lang('app.select')</option>
-                                    @for($year = date('Y'); $year >= 1950; $year--)
-                                        <option value="{{ $year }}">{{ $year }}</option>
-                                    @endfor
-                                </select>
+                                <input type="number" class="form-control height-35 f-14" name="loan_years" id="loan_years" min="0" step="1">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="loan_availed_on" fieldLabel="Loan Availed On">
@@ -2202,6 +2100,25 @@
                 });
             }
             
+            function updateOtherDegreeFileLinks() {
+                $('.other-degree-row').each(function() {
+                    const $degreeRow = $(this);
+                    const degreeNum = $degreeRow.data('degree-index');
+                    
+                    // Update result file link
+                    const $resultLink = $degreeRow.find('#other_degree_result_file_' + degreeNum).closest('.col-md-3').find('.existing-file-link[data-file]');
+                    if ($resultLink.length > 0) {
+                        const fileName = $resultLink.attr('data-file');
+                        if (fileName) {
+                            const fileUrl = getFileUrl('other_degree_result_file', fileName);
+                            if (fileUrl) {
+                                $resultLink.attr('href', fileUrl).attr('target', '_blank');
+                            }
+                        }
+                    }
+                });
+            }
+            
             // Handle clicks on existing file links to ensure they open properly
             $(document).on('click', '.existing-file-link', function(e) {
                 const href = $(this).attr('href');
@@ -2242,76 +2159,135 @@
                 // This will be handled after data loading check
             });
 
-            // Add More Education (Other Degree) functionality
+            // Other Degree functionality (similar to children)
+            let otherDegreeCounter = 0;
+            
+            // Function to get next other degree number
             function getNextOtherDegreeNumber() {
-                const existingRows = $('.other-degree-row').length;
-                return existingRows + 2; // +2 because we have initial section (1) and existing rows
+                otherDegreeCounter++;
+                return otherDegreeCounter;
             }
             
-            $('#add-more-education').on('click', function() {
-                const nextDegreeNum = getNextOtherDegreeNumber();
-                const newRow = `
-                    <div class="other-degree-row" id="other-degree-row-${nextDegreeNum}">
-                        <div class="other-degree-row-header">
-                            <div class="other-degree-row-number">Other Degree ${nextDegreeNum}</div>
+            // Function to update other degree row numbers
+            function updateOtherDegreeRowNumbers() {
+                const otherDegreeRows = $('.other-degree-row');
+                otherDegreeRows.each(function(index) {
+                    const $row = $(this);
+                    const degreeNumber = index + 1; // Start from 1, not 0
+                    const $degreeNumberElement = $row.find('.other-degree-row-number');
+                    if ($degreeNumberElement.length > 0) {
+                        $degreeNumberElement.text('Other Degree ' + degreeNumber);
+                    }
+                });
+            }
+            
+            // Function to update remove buttons visibility
+            function updateOtherDegreeRemoveButtons() {
+                const otherDegreeRows = $('.other-degree-row');
+                const otherDegreeCount = otherDegreeRows.length;
+                
+                // Simple logic: 
+                // - If there's only 1 other degree, hide all remove buttons
+                // - If there are 2+ other degrees, show all remove buttons
+                if (otherDegreeCount <= 1) {
+                    otherDegreeRows.find('.remove-other-degree').hide();
+                } else {
+                    otherDegreeRows.find('.remove-other-degree').show();
+                }
+            }
+            
+            // Function to generate other degree row HTML
+            function generateOtherDegreeRow(degreeNum, degreeData = null) {
+                const otherDegree = degreeData && degreeData.other_degree ? degreeData.other_degree : '';
+                const universityName = degreeData && degreeData.other_degree_university_name ? degreeData.other_degree_university_name : '';
+                const percentage = degreeData && degreeData.other_degree_percentage ? degreeData.other_degree_percentage : '';
+                const passingYear = degreeData && degreeData.other_degree_passing_year ? degreeData.other_degree_passing_year : '';
+                const trial = degreeData && degreeData.other_degree_trial ? degreeData.other_degree_trial : '';
+                
+                return `
+                    <div class="other-degree-row mb-4" id="other-degree-row-${degreeNum}" data-degree-index="${degreeNum}">
+                        <div class="other-degree-row-header mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="other-degree-row-number f-15 font-weight-bold">Other Degree ${degreeNum}</div>
+                                <button type="button" class="btn btn-danger btn-sm remove-other-degree" data-row-id="${degreeNum}" style="display: none;">
+                                    <i class="fa fa-trash mr-1"></i>Remove
+                                </button>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_${nextDegreeNum}" fieldLabel="Other Degree">
+                                <x-forms.label class="mt-3" fieldId="other_degree_${degreeNum}" fieldLabel="Other Degree">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="other_degree[]" id="other_degree_${nextDegreeNum}">
+                                <input type="text" class="form-control height-35 f-14" name="other_degree_${degreeNum}" id="other_degree_${degreeNum}" value="${otherDegree}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_university_name_${nextDegreeNum}" fieldLabel="University Name">
+                                <x-forms.label class="mt-3" fieldId="other_degree_university_name_${degreeNum}" fieldLabel="University Name">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="other_degree_university_name[]" id="other_degree_university_name_${nextDegreeNum}">
+                                <input type="text" class="form-control height-35 f-14" name="other_degree_university_name_${degreeNum}" id="other_degree_university_name_${degreeNum}" value="${universityName}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_percentage_${nextDegreeNum}" fieldLabel="Percentage">
+                                <x-forms.label class="mt-3" fieldId="other_degree_percentage_${degreeNum}" fieldLabel="Percentage">
                                 </x-forms.label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control height-35 f-14" name="other_degree_percentage[]" id="other_degree_percentage_${nextDegreeNum}" min="0" max="100" step="0.01" maxlength="5">
+                                    <input type="number" class="form-control height-35 f-14" name="other_degree_percentage_${degreeNum}" id="other_degree_percentage_${degreeNum}" min="0" max="100" step="0.01" maxlength="5" value="${percentage}">
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_passing_year_${nextDegreeNum}" fieldLabel="Passing Year">
+                                <x-forms.label class="mt-3" fieldId="other_degree_passing_year_${degreeNum}" fieldLabel="Passing Year">
                                 </x-forms.label>
-                                <select class="form-control select-picker height-35 f-14" name="other_degree_passing_year[]" id="other_degree_passing_year_${nextDegreeNum}">
-                                    <option value="">Select</option>
+                                <select class="form-control select-picker height-35 f-14" name="other_degree_passing_year_${degreeNum}" id="other_degree_passing_year_${degreeNum}">
+                                    <option value="">@lang('app.select')</option>
                                     ${(() => {
                                         let yearOptions = '';
                                         const currentYear = new Date().getFullYear();
                                         for (let year = currentYear; year >= 1950; year--) {
-                                            yearOptions += `<option value="${year}">${year}</option>`;
+                                            const selected = passingYear == year ? 'selected' : '';
+                                            yearOptions += `<option value="${year}" ${selected}>${year}</option>`;
                                         }
                                         return yearOptions;
                                     })()}
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_trial_${nextDegreeNum}" fieldLabel="Trial">
+                                <x-forms.label class="mt-3" fieldId="other_degree_trial_${degreeNum}" fieldLabel="Trial">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="other_degree_trial[]" id="other_degree_trial_${nextDegreeNum}">
+                                <input type="number" class="form-control height-35 f-14" name="other_degree_trial_${degreeNum}" id="other_degree_trial_${degreeNum}" value="${trial}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_result_file_${nextDegreeNum}" fieldLabel="Add Other Degree Result">
+                                <x-forms.label class="mt-3" fieldId="other_degree_result_file_${degreeNum}" fieldLabel="Add Other Degree Result">
                                 </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="other_degree_result_file[]" id="other_degree_result_file_${nextDegreeNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                            </div>
-                            <div class="col-md-12 mt-3">
-                                <button type="button" class="btn btn-danger btn-sm remove-other-degree" data-row-id="${nextDegreeNum}">
-                                    <i class="fa fa-trash mr-1"></i>Remove
-                                </button>
+                                <input class="form-control height-35 f-14" type="file" name="other_degree_result_file_${degreeNum}" id="other_degree_result_file_${degreeNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-degree-index="${degreeNum}">
+                                ${degreeData && degreeData.other_degree_result_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${degreeData.other_degree_result_file}" target="_blank">${degreeData.other_degree_result_file}</a></small></div>` : ''}
                             </div>
                         </div>
                     </div>
                 `;
+            }
+            
+            // Function to add an other degree row
+            function addOtherDegreeRow(degreeData = null) {
+                const degreeNum = getNextOtherDegreeNumber();
+                const newRow = generateOtherDegreeRow(degreeNum, degreeData);
                 
                 // Append to the other-degree-rows-container
                 $('#other-degree-rows-container').append(newRow);
+                
+                // Update file URLs for existing files if degreeData is provided
+                if (degreeData) {
+                    const $degreeRow = $('#other-degree-row-' + degreeNum);
+                    
+                    // Update result file link
+                    if (degreeData.other_degree_result_file) {
+                        const resultFileUrl = getFileUrl('other_degree_result_file', degreeData.other_degree_result_file);
+                        const $resultLink = $degreeRow.find('.existing-file-link[data-file="' + degreeData.other_degree_result_file + '"]');
+                        if ($resultLink.length > 0 && resultFileUrl) {
+                            $resultLink.attr('href', resultFileUrl).attr('target', '_blank');
+                        }
+                    }
+                }
                 
                 // Reinitialize select picker for the new row
                 setTimeout(function() {
@@ -2323,86 +2299,248 @@
                         }
                     });
                 }, 100);
+                
+                // Update remove buttons visibility and row numbers
+                updateOtherDegreeRemoveButtons();
+                updateOtherDegreeRowNumbers();
+            }
+            
+            // Add More Education (Other Degree) button handler
+            $('#add-more-education').on('click', function() {
+                addOtherDegreeRow();
             });
 
             // Remove other degree row
             $(document).on('click', '.remove-other-degree', function() {
                 const rowId = $(this).data('row-id');
+                const otherDegreeCount = $('.other-degree-row').length;
+                
+                // Prevent deletion if only 1 other degree remains
+                if (otherDegreeCount <= 1) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Cannot Remove',
+                            text: 'At least one other degree must be present.',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        alert('At least one other degree must be present.');
+                    }
+                    return;
+                }
+                
                 $(`#other-degree-row-${rowId}`).remove();
+                
+                // Update remove buttons visibility and row numbers
+                updateOtherDegreeRemoveButtons();
+                updateOtherDegreeRowNumbers();
             });
 
-            // Add More Job functionality
+            // Job functionality (similar to children)
+            let jobCounter = 0;
+            
+            // Function to get next job number
             function getNextJobNumber() {
-                const existingRows = $('.job-row').length;
-                return existingRows + 2; // +2 because we have initial section (1) and existing rows
+                jobCounter++;
+                return jobCounter;
             }
             
-            $('#add-more-job').on('click', function() {
-                const nextJobNum = getNextJobNumber();
-                const newRow = `
-                    <div class="job-row" id="job-row-${nextJobNum}">
-                        <div class="job-row-header">
-                            <div class="job-row-number">Job ${nextJobNum}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_duration_from_${nextJobNum}" fieldLabel="Duration - From">
-                                </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="job_duration_from[]" id="job_duration_from_${nextJobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_duration_to_${nextJobNum}" fieldLabel="Duration - To">
-                                </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="job_duration_to[]" id="job_duration_to_${nextJobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_country_${nextJobNum}" fieldLabel="Country">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_country[]" id="job_country_${nextJobNum}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_designation_${nextJobNum}" fieldLabel="Designation">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_designation[]" id="job_designation_${nextJobNum}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_company_name_${nextJobNum}" fieldLabel="Company Name">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_company_name[]" id="job_company_name_${nextJobNum}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_salary_${nextJobNum}" fieldLabel="Salary">
-                                </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="job_salary[]" id="job_salary_${nextJobNum}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_offer_letter_file_${nextJobNum}" fieldLabel="Add Offerletter">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="job_offer_letter_file[]" id="job_offer_letter_file_${nextJobNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_experience_letter_file_${nextJobNum}" fieldLabel="Add Experience letter">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="job_experience_letter_file[]" id="job_experience_letter_file_${nextJobNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                            </div>
-                            <div class="col-md-12 mt-3">
-                                <button type="button" class="btn btn-danger btn-sm remove-job" data-row-id="${nextJobNum}">
+            // Function to update job row numbers
+            function updateJobRowNumbers() {
+                const jobRows = $('.job-row');
+                jobRows.each(function(index) {
+                    const $row = $(this);
+                    const jobNumber = index + 1; // Start from 1, not 0
+                    const $jobNumberElement = $row.find('.job-row-number');
+                    if ($jobNumberElement.length > 0) {
+                        $jobNumberElement.text('Job ' + jobNumber);
+                    }
+                });
+            }
+            
+            // Function to update remove buttons visibility
+            function updateJobRemoveButtons() {
+                const jobRows = $('.job-row');
+                const jobCount = jobRows.length;
+                
+                // Simple logic: 
+                // - If there's only 1 job, hide all remove buttons
+                // - If there are 2+ jobs, show all remove buttons
+                if (jobCount <= 1) {
+                    jobRows.find('.remove-job').hide();
+                } else {
+                    jobRows.find('.remove-job').show();
+                }
+            }
+            
+            // Function to generate job row HTML
+            function generateJobRow(jobNum, jobData = null) {
+                const durationFrom = jobData && jobData.job_duration_from ? jobData.job_duration_from : '';
+                const durationTo = jobData && jobData.job_duration_to ? jobData.job_duration_to : '';
+                const country = jobData && jobData.job_country ? jobData.job_country : '';
+                const designation = jobData && jobData.job_designation ? jobData.job_designation : '';
+                const companyName = jobData && jobData.job_company_name ? jobData.job_company_name : '';
+                const salary = jobData && jobData.job_salary ? jobData.job_salary : '';
+                
+                return `
+                    <div class="job-row mb-4" id="job-row-${jobNum}" data-job-index="${jobNum}">
+                        <div class="job-row-header mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="job-row-number f-15 font-weight-bold">Job ${jobNum}</div>
+                                <button type="button" class="btn btn-danger btn-sm remove-job" data-row-id="${jobNum}" style="display: none;">
                                     <i class="fa fa-trash mr-1"></i>Remove
                                 </button>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_duration_from_${jobNum}" fieldLabel="Duration - From">
+                                </x-forms.label>
+                                <input type="date" class="form-control height-35 f-14" name="job_duration_from_${jobNum}" id="job_duration_from_${jobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}" value="${durationFrom}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_duration_to_${jobNum}" fieldLabel="Duration - To">
+                                </x-forms.label>
+                                <input type="date" class="form-control height-35 f-14" name="job_duration_to_${jobNum}" id="job_duration_to_${jobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}" value="${durationTo}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_country_${jobNum}" fieldLabel="Country">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="job_country_${jobNum}" id="job_country_${jobNum}" value="${country}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_designation_${jobNum}" fieldLabel="Designation">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="job_designation_${jobNum}" id="job_designation_${jobNum}" value="${designation}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_company_name_${jobNum}" fieldLabel="Company Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="job_company_name_${jobNum}" id="job_company_name_${jobNum}" value="${companyName}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_salary_${jobNum}" fieldLabel="Salary">
+                                </x-forms.label>
+                                <input type="number" class="form-control height-35 f-14" name="job_salary_${jobNum}" id="job_salary_${jobNum}" value="${salary}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_offer_letter_file_${jobNum}" fieldLabel="Add Offerletter">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="job_offer_letter_file_${jobNum}" id="job_offer_letter_file_${jobNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-job-index="${jobNum}">
+                                ${jobData && jobData.job_offer_letter_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${jobData.job_offer_letter_file}" target="_blank">${jobData.job_offer_letter_file}</a></small></div>` : ''}
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_experience_letter_file_${jobNum}" fieldLabel="Add Experience letter">
+                                </x-forms.label>
+                                <input class="form-control height-35 f-14" type="file" name="job_experience_letter_file_${jobNum}" id="job_experience_letter_file_${jobNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-job-index="${jobNum}">
+                                ${jobData && jobData.job_experience_letter_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${jobData.job_experience_letter_file}" target="_blank">${jobData.job_experience_letter_file}</a></small></div>` : ''}
+                            </div>
+                        </div>
                     </div>
                 `;
+            }
+            
+            // Function to add a job row
+            function addJobRow(jobData = null) {
+                const jobNum = getNextJobNumber();
+                const newRow = generateJobRow(jobNum, jobData);
                 
                 // Append to the job-rows-container
                 $('#job-rows-container').append(newRow);
+                
+                // Update file URLs for existing files if jobData is provided
+                if (jobData) {
+                    const $jobRow = $('#job-row-' + jobNum);
+                    
+                    // Update offer letter file link
+                    if (jobData.job_offer_letter_file) {
+                        const offerFileUrl = getFileUrl('job_offer_letter_file', jobData.job_offer_letter_file);
+                        const $offerLink = $jobRow.find('.existing-file-link[data-file="' + jobData.job_offer_letter_file + '"]');
+                        if ($offerLink.length > 0 && offerFileUrl) {
+                            $offerLink.attr('href', offerFileUrl).attr('target', '_blank');
+                        }
+                    }
+                    
+                    // Update experience letter file link
+                    if (jobData.job_experience_letter_file) {
+                        const experienceFileUrl = getFileUrl('job_experience_letter_file', jobData.job_experience_letter_file);
+                        const $experienceLink = $jobRow.find('.existing-file-link[data-file="' + jobData.job_experience_letter_file + '"]');
+                        if ($experienceLink.length > 0 && experienceFileUrl) {
+                            $experienceLink.attr('href', experienceFileUrl).attr('target', '_blank');
+                        }
+                    }
+                }
+                
+                // Update remove buttons visibility and row numbers
+                updateJobRemoveButtons();
+                updateJobRowNumbers();
+            }
+            
+            // Add More Job button handler
+            $('#add-more-job').on('click', function() {
+                addJobRow();
             });
 
             // Remove job row
             $(document).on('click', '.remove-job', function() {
                 const rowId = $(this).data('row-id');
+                const jobCount = $('.job-row').length;
+                
+                // Prevent deletion if only 1 job remains
+                if (jobCount <= 1) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Cannot Remove',
+                            text: 'At least one job must be present.',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        alert('At least one job must be present.');
+                    }
+                    return;
+                }
+                
                 $(`#job-row-${rowId}`).remove();
+                
+                // Update remove buttons visibility and row numbers
+                updateJobRemoveButtons();
+                updateJobRowNumbers();
             });
+            
+            function updateJobFileLinks() {
+                $('.job-row').each(function() {
+                    const $jobRow = $(this);
+                    const jobNum = $jobRow.data('job-index');
+                    
+                    // Update offer letter file link
+                    const $offerLink = $jobRow.find('#job_offer_letter_file_' + jobNum).closest('.col-md-3').find('.existing-file-link[data-file]');
+                    if ($offerLink.length > 0) {
+                        const fileName = $offerLink.attr('data-file');
+                        if (fileName) {
+                            const fileUrl = getFileUrl('job_offer_letter_file', fileName);
+                            if (fileUrl) {
+                                $offerLink.attr('href', fileUrl).attr('target', '_blank');
+                            }
+                        }
+                    }
+                    
+                    // Update experience letter file link
+                    const $experienceLink = $jobRow.find('#job_experience_letter_file_' + jobNum).closest('.col-md-3').find('.existing-file-link[data-file]');
+                    if ($experienceLink.length > 0) {
+                        const fileName = $experienceLink.attr('data-file');
+                        if (fileName) {
+                            const fileUrl = getFileUrl('job_experience_letter_file', fileName);
+                            if (fileUrl) {
+                                $experienceLink.attr('href', fileUrl).attr('target', '_blank');
+                            }
+                        }
+                    }
+                });
+            }
 
             // Auto-calculate total valuation for Property Details
             $('.valuation-input').on('input', function() {
@@ -2561,6 +2699,32 @@
                         // Update remove buttons visibility and child row numbers
                         updateRemoveButtons();
                         updateChildRowNumbers();
+                    }, 300);
+                }
+                
+                if ($(e.target).attr('id') === 'nav-education-tab') {
+                    setTimeout(function() {
+                        // Initialize one blank other degree if no other degrees exist
+                        if ($('#other-degree-rows-container .other-degree-row').length === 0) {
+                            addOtherDegreeRow();
+                        }
+                        
+                        // Update remove buttons visibility and other degree row numbers
+                        updateOtherDegreeRemoveButtons();
+                        updateOtherDegreeRowNumbers();
+                    }, 300);
+                }
+                
+                if ($(e.target).attr('id') === 'nav-experience-tab') {
+                    setTimeout(function() {
+                        // Initialize one blank job if no jobs exist
+                        if ($('#job-rows-container .job-row').length === 0) {
+                            addJobRow();
+                        }
+                        
+                        // Update remove buttons visibility and job row numbers
+                        updateJobRemoveButtons();
+                        updateJobRowNumbers();
                     }, 300);
                 }
             });
@@ -3202,6 +3366,76 @@
                             }, 300);
                         }
                         
+                        // Special handling for Step 6 - other degrees data
+                        if (stepNum === 6 && stepDataObj.other_degrees && Array.isArray(stepDataObj.other_degrees)) {
+                            const otherDegrees = stepDataObj.other_degrees;
+                            // Clear any existing other degrees
+                            $('#other-degree-rows-container').empty();
+                            otherDegreeCounter = 0;
+                            
+                            if (otherDegrees.length > 0) {
+                                // Populate all other degrees
+                                otherDegrees.forEach(function(degree) {
+                                    addOtherDegreeRow(degree);
+                                });
+                            } else {
+                                // If no other degrees data, add one blank other degree
+                                addOtherDegreeRow();
+                            }
+                            
+                            // Update file links, remove buttons, and other degree row numbers after a delay to ensure DOM is ready
+                            setTimeout(function() {
+                                updateOtherDegreeFileLinks();
+                                updateOtherDegreeRemoveButtons();
+                                updateOtherDegreeRowNumbers();
+                            }, 500);
+                        } else if (stepNum === 6) {
+                            // Step 6 but no other degrees data - add one blank other degree
+                            $('#other-degree-rows-container').empty();
+                            otherDegreeCounter = 0;
+                            addOtherDegreeRow();
+                            // Update remove buttons and other degree row numbers after a delay
+                            setTimeout(function() {
+                                updateOtherDegreeRemoveButtons();
+                                updateOtherDegreeRowNumbers();
+                            }, 300);
+                        }
+                        
+                        // Special handling for Step 7 - jobs data
+                        if (stepNum === 7 && stepDataObj.jobs && Array.isArray(stepDataObj.jobs)) {
+                            const jobs = stepDataObj.jobs;
+                            // Clear any existing jobs
+                            $('#job-rows-container').empty();
+                            jobCounter = 0;
+                            
+                            if (jobs.length > 0) {
+                                // Populate all jobs
+                                jobs.forEach(function(job) {
+                                    addJobRow(job);
+                                });
+                            } else {
+                                // If no jobs data, add one blank job
+                                addJobRow();
+                            }
+                            
+                            // Update file links, remove buttons, and job row numbers after a delay to ensure DOM is ready
+                            setTimeout(function() {
+                                updateJobFileLinks();
+                                updateJobRemoveButtons();
+                                updateJobRowNumbers();
+                            }, 500);
+                        } else if (stepNum === 7) {
+                            // Step 7 but no jobs data - add one blank job
+                            $('#job-rows-container').empty();
+                            jobCounter = 0;
+                            addJobRow();
+                            // Update remove buttons and job row numbers after a delay
+                            setTimeout(function() {
+                                updateJobRemoveButtons();
+                                updateJobRowNumbers();
+                            }, 300);
+                        }
+                        
                         // Populate all fields for this step
                         Object.keys(stepDataObj).forEach(function(fieldName) {
                             // Skip children field - it's handled above
@@ -3210,6 +3444,14 @@
                             }
                             // Skip relative_contacts field - it's handled above
                             if (fieldName === 'relative_contacts') {
+                                return;
+                            }
+                            // Skip other_degrees field - it's handled above
+                            if (fieldName === 'other_degrees') {
+                                return;
+                            }
+                            // Skip jobs field - it's handled above
+                            if (fieldName === 'jobs') {
                                 return;
                             }
                             
@@ -4236,13 +4478,63 @@
                 
                 // Ensure step 6 file uploads are included if selected
                 if (currentStep === 6) {
+                    // Collect other degrees data
+                    const otherDegrees = [];
+                    $('.other-degree-row').each(function() {
+                        const degreeIndex = $(this).data('degree-index');
+                        const otherDegree = $('#other_degree_' + degreeIndex).val() || '';
+                        const universityName = $('#other_degree_university_name_' + degreeIndex).val() || '';
+                        const percentage = $('#other_degree_percentage_' + degreeIndex).val() || '';
+                        const passingYear = getSelectValue('#other_degree_passing_year_' + degreeIndex) || '';
+                        const trial = $('#other_degree_trial_' + degreeIndex).val() || '';
+                        
+                        // Get other degree result file
+                        const otherDegreeResultFileInput = document.getElementById('other_degree_result_file_' + degreeIndex);
+                        let otherDegreeResultFile = '';
+                        if (otherDegreeResultFileInput && otherDegreeResultFileInput.files && otherDegreeResultFileInput.files.length > 0) {
+                            // File will be handled separately in FormData
+                            otherDegreeResultFile = 'NEW_FILE_' + degreeIndex;
+                        } else {
+                            // Check for existing file
+                            const existingResultLink = $(this).find('.existing-file-link[data-file]').filter(function() {
+                                return $(this).closest('.col-md-3').find('#other_degree_result_file_' + degreeIndex).length > 0;
+                            });
+                            if (existingResultLink.length > 0) {
+                                otherDegreeResultFile = existingResultLink.attr('data-file');
+                            }
+                        }
+                        
+                        // Only add other degree if at least one field has a value
+                        if (otherDegree || universityName || percentage || passingYear || trial) {
+                            const degreeData = {
+                                other_degree: otherDegree,
+                                other_degree_university_name: universityName,
+                                other_degree_percentage: percentage,
+                                other_degree_passing_year: passingYear,
+                                other_degree_trial: trial,
+                                other_degree_result_file: otherDegreeResultFile
+                            };
+                            otherDegrees.push(degreeData);
+                            
+                            // Handle file uploads for this other degree
+                            if (otherDegreeResultFileInput && otherDegreeResultFileInput.files && otherDegreeResultFileInput.files.length > 0) {
+                                formData.append('other_degree_result_file_' + degreeIndex, otherDegreeResultFileInput.files[0]);
+                            } else if (otherDegreeResultFile && otherDegreeResultFile !== 'NEW_FILE_' + degreeIndex) {
+                                formData.append('other_degree_result_file_' + degreeIndex + '_existing', otherDegreeResultFile);
+                            }
+                        }
+                    });
+                    
+                    // Add other degrees data as JSON
+                    formData.append('other_degrees', JSON.stringify(otherDegrees));
+                    
+                    // Handle other step 6 file fields
                     const step6FileFields = [
                         'ielts_result_file',
                         'tenth_result_file',
                         'twelfth_result_file',
                         'graduation_result_file',
-                        'post_graduation_result_file',
-                        'other_degree_result_file'
+                        'post_graduation_result_file'
                     ];
                     
                     step6FileFields.forEach(function(fileField) {
@@ -4264,13 +4556,133 @@
                             }
                         }
                     });
+                }
+                
+                // Ensure step 7 file uploads are included if selected
+                if (currentStep === 7) {
+                    // Collect jobs data
+                    const jobs = [];
+                    $('.job-row').each(function() {
+                        const jobIndex = $(this).data('job-index');
+                        const durationFrom = $('#job_duration_from_' + jobIndex).val() || '';
+                        const durationTo = $('#job_duration_to_' + jobIndex).val() || '';
+                        const country = $('#job_country_' + jobIndex).val() || '';
+                        const designation = $('#job_designation_' + jobIndex).val() || '';
+                        const companyName = $('#job_company_name_' + jobIndex).val() || '';
+                        const salary = $('#job_salary_' + jobIndex).val() || '';
+                        
+                        // Get job offer letter file
+                        const jobOfferLetterFileInput = document.getElementById('job_offer_letter_file_' + jobIndex);
+                        let jobOfferLetterFile = '';
+                        if (jobOfferLetterFileInput && jobOfferLetterFileInput.files && jobOfferLetterFileInput.files.length > 0) {
+                            // File will be handled separately in FormData
+                            jobOfferLetterFile = 'NEW_FILE_' + jobIndex;
+                        } else {
+                            // Check for existing file
+                            const existingOfferLink = $(this).find('.existing-file-link[data-file]').filter(function() {
+                                return $(this).closest('.col-md-3').find('#job_offer_letter_file_' + jobIndex).length > 0;
+                            });
+                            if (existingOfferLink.length > 0) {
+                                jobOfferLetterFile = existingOfferLink.attr('data-file');
+                            }
+                        }
+                        
+                        // Get job experience letter file
+                        const jobExperienceLetterFileInput = document.getElementById('job_experience_letter_file_' + jobIndex);
+                        let jobExperienceLetterFile = '';
+                        if (jobExperienceLetterFileInput && jobExperienceLetterFileInput.files && jobExperienceLetterFileInput.files.length > 0) {
+                            // File will be handled separately in FormData
+                            jobExperienceLetterFile = 'NEW_FILE_' + jobIndex;
+                        } else {
+                            // Check for existing file
+                            const existingExperienceLink = $(this).find('.existing-file-link[data-file]').filter(function() {
+                                return $(this).closest('.col-md-3').find('#job_experience_letter_file_' + jobIndex).length > 0;
+                            });
+                            if (existingExperienceLink.length > 0) {
+                                jobExperienceLetterFile = existingExperienceLink.attr('data-file');
+                            }
+                        }
+                        
+                        // Only add job if at least one field has a value
+                        if (durationFrom || durationTo || country || designation || companyName || salary) {
+                            const jobData = {
+                                job_duration_from: durationFrom,
+                                job_duration_to: durationTo,
+                                job_country: country,
+                                job_designation: designation,
+                                job_company_name: companyName,
+                                job_salary: salary,
+                                job_offer_letter_file: jobOfferLetterFile,
+                                job_experience_letter_file: jobExperienceLetterFile
+                            };
+                            jobs.push(jobData);
+                            
+                            // Handle file uploads for this job
+                            if (jobOfferLetterFileInput && jobOfferLetterFileInput.files && jobOfferLetterFileInput.files.length > 0) {
+                                formData.append('job_offer_letter_file_' + jobIndex, jobOfferLetterFileInput.files[0]);
+                            } else if (jobOfferLetterFile && jobOfferLetterFile !== 'NEW_FILE_' + jobIndex) {
+                                formData.append('job_offer_letter_file_' + jobIndex + '_existing', jobOfferLetterFile);
+                            }
+                            
+                            if (jobExperienceLetterFileInput && jobExperienceLetterFileInput.files && jobExperienceLetterFileInput.files.length > 0) {
+                                formData.append('job_experience_letter_file_' + jobIndex, jobExperienceLetterFileInput.files[0]);
+                            } else if (jobExperienceLetterFile && jobExperienceLetterFile !== 'NEW_FILE_' + jobIndex) {
+                                formData.append('job_experience_letter_file_' + jobIndex + '_existing', jobExperienceLetterFile);
+                            }
+                        }
+                    });
                     
-                    // Handle other_degree_result_file[] (array for additional other degrees)
-                    $('input[type="file"][name="other_degree_result_file[]"]').each(function() {
-                        const fileInput = this;
-                        if (fileInput.files && fileInput.files.length > 0) {
+                    // Add jobs data as JSON
+                    formData.append('jobs', JSON.stringify(jobs));
+                }
+                
+                // Ensure valuation_report_file is included if selected (for step 8)
+                if (currentStep === 8) {
+                    const valuationReportInput = document.getElementById('valuation_report_file');
+                    if (valuationReportInput && valuationReportInput.files && valuationReportInput.files.length > 0) {
+                        const file = valuationReportInput.files[0];
+                        // Explicitly ensure file is in FormData
+                        formData.delete('valuation_report_file');
+                        formData.append('valuation_report_file', file);
+                        // Remove hidden field since new file is being uploaded
+                        $('#valuation_report_file_hidden').remove();
+                    } else {
+                        // If no new file but existing file exists, ensure hidden field is in FormData
+                        if ($('#valuation_report_file_hidden').length > 0) {
+                            const existingFileName = $('#valuation_report_file_hidden').val();
+                            if (existingFileName) {
+                                formData.append('valuation_report_file_existing', existingFileName);
+                            }
+                        }
+                    }
+                }
+                
+                // Ensure step 9 file uploads are included if selected
+                if (currentStep === 9) {
+                    const step9FileFields = [
+                        'father_income_document_file',
+                        'mother_income_document_file',
+                        'candidate_income_document_file',
+                        'spouse_income_document_file'
+                    ];
+                    
+                    step9FileFields.forEach(function(fileField) {
+                        const fileInput = document.getElementById(fileField);
+                        if (fileInput && fileInput.files && fileInput.files.length > 0) {
                             const file = fileInput.files[0];
-                            formData.append('other_degree_result_file[]', file);
+                            // Explicitly ensure file is in FormData
+                            formData.delete(fileField);
+                            formData.append(fileField, file);
+                            // Remove hidden field since new file is being uploaded
+                            $('#' + fileField + '_hidden').remove();
+                        } else {
+                            // If no new file but existing file exists, ensure hidden field is in FormData
+                            if ($('#' + fileField + '_hidden').length > 0) {
+                                const existingFileName = $('#' + fileField + '_hidden').val();
+                                if (existingFileName) {
+                                    formData.append(fileField + '_existing', existingFileName);
+                                }
+                            }
                         }
                     });
                 }
