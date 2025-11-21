@@ -33,7 +33,7 @@ class NewLeadDataTable extends BaseDataTable
 
         $datatables = datatables()->eloquent($query);
         $datatables->addIndexColumn();
-        $datatables->addColumn('check', fn($row) => $this->checkBox($row));
+        // Keep old action column for backward compatibility (hidden)
         $datatables->addColumn('action', function ($row) {
             $action = '<div class="task_view">
 
@@ -77,6 +77,191 @@ class NewLeadDataTable extends BaseDataTable
             return $action;
         });
 
+        // LEAD Column: ID in format "LEAD-0001", date of creation, and Lead Source
+        $datatables->addColumn('lead', function ($row) {
+            $leadId = 'LEAD-' . str_pad($row->id, 4, '0', STR_PAD_LEFT);
+            $createdDate = $row->created_at ? $row->created_at->translatedFormat($this->company->date_format) : '--';
+            $leadSource = $row->lead_source ?? '--';
+            
+            return '<div class="lead-info">
+                        <div class="lead-id f-14 f-w-500 text-darkest-grey">' . $leadId . '</div>
+                        <div class="lead-date f-12 text-dark-grey">' . $createdDate . '</div>
+                        <div class="lead-source f-12 text-dark-grey">' . $leadSource . '</div>
+                    </div>';
+        });
+
+        // CLIENT Column: Priority dropdown, mobile number, and email
+        $datatables->addColumn('client', function ($row) {
+            $priorityOptions = ['Select Priority', '1st Priority', '2nd Priority', '3rd Priority', '4th Priority', '5th Priority'];
+            $currentPriority = $row->priority ?? 'Select Priority';
+            
+            $prioritySelect = '<select class="form-control select-picker priority-select f-14" data-lead-id="' . $row->id . '" data-size="8">';
+            foreach ($priorityOptions as $option) {
+                $selected = ($currentPriority == $option) ? 'selected' : '';
+                $prioritySelect .= '<option value="' . $option . '" ' . $selected . '>' . $option . '</option>';
+            }
+            $prioritySelect .= '</select>';
+            
+            $mobile = $row->mobile ?? '--';
+            $email = $row->client_email ?? '--';
+            
+            // Get email from step_1_data if not in main field
+            if ($email == '--' && $row->step_1_data) {
+                $step1Data = is_array($row->step_1_data) ? $row->step_1_data : json_decode($row->step_1_data, true);
+                $email = $step1Data['email_address'] ?? '--';
+            }
+            
+            // Get mobile from step_1_data if not in main field
+            if ($mobile == '--' && $row->step_1_data) {
+                $step1Data = is_array($row->step_1_data) ? $row->step_1_data : json_decode($row->step_1_data, true);
+                $mobile = $step1Data['primary_phone'] ?? '--';
+            }
+            
+            return '<div class="client-info">
+                        <div class="priority-dropdown mb-2">' . $prioritySelect . '</div>
+                        <div class="client-mobile f-12 text-dark-grey mb-1">' . $mobile . '</div>
+                        <div class="client-email f-12 text-dark-grey">' . $email . '</div>
+                    </div>';
+        });
+
+        // SERVICES Column: Subclass from step 2 data
+        $datatables->addColumn('services', function ($row) {
+            $subclass = '--';
+            if ($row->step_2_data) {
+                $step2Data = is_array($row->step_2_data) ? $row->step_2_data : json_decode($row->step_2_data, true);
+                if ($step2Data) {
+                    // Check for different visa type subclasses
+                    if (isset($step2Data['pr_subclass']) && !empty($step2Data['pr_subclass'])) {
+                        $subclass = $step2Data['pr_subclass'];
+                    } elseif (isset($step2Data['visit_subclass']) && !empty($step2Data['visit_subclass'])) {
+                        $subclass = $step2Data['visit_subclass'];
+                    } elseif (isset($step2Data['work_subclass']) && !empty($step2Data['work_subclass'])) {
+                        $subclass = $step2Data['work_subclass'];
+                    } elseif (isset($step2Data['student_subclass']) && !empty($step2Data['student_subclass'])) {
+                        $subclass = $step2Data['student_subclass'];
+                    }
+                }
+            }
+            return '<div class="services-info f-14 text-darkest-grey">' . $subclass . '</div>';
+        });
+
+        // STATUS Column: Show "draft" if final_status is draft, otherwise show dropdown
+        $datatables->addColumn('status', function ($row) {
+            $isDraft = false;
+            if ($row->stepStatus && $row->stepStatus->final_status == 'draft') {
+                $isDraft = true;
+            }
+            
+            if ($isDraft) {
+                return '<div class="status-draft f-14 text-darkest-grey">Draft</div>';
+            }
+            
+            $statusOptions = [
+                'Untouched', 'Introduction', 'Info Collected', 'Consultation Call 1', 
+                'Consultation Call 2', 'Consultation Meet 1', 'Consultation Meet 2', 
+                'Documentation', 'Final Discussion', 'Estimation', 'Payment', 'MOU', 
+                'File in Process', 'File Submission', 'Visa Process', 
+                'Flying Date Received', 'Join/Move/Admissions', 'Follow Up', 'Lead Close'
+            ];
+            
+            $currentStatus = $row->lead_status ?? 'Untouched';
+            
+            $statusSelect = '<select class="form-control select-picker status-select f-14" data-lead-id="' . $row->id . '" data-size="8">';
+            foreach ($statusOptions as $option) {
+                $selected = ($currentStatus == $option) ? 'selected' : '';
+                $statusSelect .= '<option value="' . $option . '" ' . $selected . '>' . $option . '</option>';
+            }
+            $statusSelect .= '</select>';
+            
+            return '<div class="status-dropdown">' . $statusSelect . '</div>';
+        });
+
+        // LEAD QUALITY Column: Show "-" if draft, otherwise show dropdown
+        $datatables->addColumn('lead_quality', function ($row) {
+            $isDraft = false;
+            if ($row->stepStatus && $row->stepStatus->final_status == 'draft') {
+                $isDraft = true;
+            }
+            
+            if ($isDraft) {
+                return '<div class="lead-quality-draft f-14 text-darkest-grey">-</div>';
+            }
+            
+            $qualityOptions = [
+                'Assigned', 'In-Process', 'On Hold', 'Plan Dropped', 
+                'Negotiation', 'Future Prospect', 'Ringing', 
+                'Dead/Junk Lead', 'Not Interested', 'Rejected'
+            ];
+            
+            $currentQuality = $row->lead_quality ?? 'Assigned';
+            
+            $qualitySelect = '<select class="form-control select-picker quality-select f-14" data-lead-id="' . $row->id . '" data-size="8">';
+            foreach ($qualityOptions as $option) {
+                $selected = ($currentQuality == $option) ? 'selected' : '';
+                $qualitySelect .= '<option value="' . $option . '" ' . $selected . '>' . $option . '</option>';
+            }
+            $qualitySelect .= '</select>';
+            
+            return '<div class="lead-quality-dropdown">' . $qualitySelect . '</div>';
+        });
+
+        // FOLLOW-UP Column: Leave blank
+        $datatables->addColumn('follow_up', function ($row) {
+            return '<div class="follow-up-info"></div>';
+        });
+
+        // ACTION Column: Lead owner image/placeholder with 2 letters and view button
+        $datatables->addColumn('action_new', function ($row) {
+            $action = '<div class="action-info d-flex align-items-center justify-content-end">';
+            
+            if ($row->leadOwner) {
+                $ownerImage = $row->leadOwner->image_url;
+                $ownerName = $row->leadOwner->name;
+                $action .= '<img src="' . $ownerImage . '" class="rounded-circle mr-2" style="width: 32px; height: 32px; object-fit: cover;" alt="' . $ownerName . '" title="' . $ownerName . '">';
+            } else {
+                // Get 2 letters from client name
+                $clientName = $row->client_name ?? 'NA';
+                $initials = strtoupper(substr($clientName, 0, 2));
+                if (strlen($clientName) > 1) {
+                    // Try to get first letter of first and last word
+                    $nameParts = explode(' ', trim($clientName));
+                    if (count($nameParts) > 1) {
+                        $initials = strtoupper(substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts) - 1], 0, 1));
+                    } else {
+                        $initials = strtoupper(substr($clientName, 0, 2));
+                    }
+                }
+                $action .= '<div class="rounded-circle bg-light-grey d-flex align-items-center justify-content-center mr-2" style="width: 32px; height: 32px;">
+                                <span class="f-12 text-dark-grey f-w-500">' . $initials . '</span>
+                            </div>';
+            }
+            
+            // Add view/edit button - show edit icon if status is draft, view icon if complete
+            $isComplete = false;
+            if ($row->stepStatus && $row->stepStatus->final_status == 'complete') {
+                $isComplete = true;
+            }
+            
+            if ($isComplete) {
+                // Complete status - show view icon and redirect to lead-details
+                $viewUrl = route('lead-details.index', ['id' => $row->id]);
+                $action .= '<a href="' . $viewUrl . '" class="btn btn-sm btn-secondary" title="' . __('app.view') . '">
+                                <i class="fa fa-eye"></i>
+                            </a>';
+            } else {
+                // Draft status - show edit icon and redirect to add-lead
+                $editUrl = route('add-lead.index', ['lead_id' => $row->id]);
+                $action .= '<a href="' . $editUrl . '" class="btn btn-sm btn-secondary" title="' . __('app.edit') . '">
+                                <i class="fa fa-edit"></i>
+                            </a>';
+            }
+            
+            $action .= '</div>';
+            
+            return $action;
+        });
+
+        // Keep old columns for export compatibility
         $datatables->addColumn('export_email', fn($row) => $row->client_email);
         $datatables->addColumn('name', fn($row) => $row->client_name);
         $datatables->editColumn('added_by', fn($row) => $row->added_by ? view('components.employee', ['user' => $row->addedBy]) : '--');
@@ -85,24 +270,11 @@ class NewLeadDataTable extends BaseDataTable
         $datatables->addColumn('export_mobile', fn($row) => $row->mobile ?? '--');
         $datatables->addColumn('lead_source', fn($row) => $row->lead_source ?? '--');
 
-        $datatables->editColumn('client_name', function ($row) {
-            $client_name = $row->client_name ?? '--';
-
-            return '
-                        <div class="media-body">
-                    <h5 class="mb-0 f-13 "><a href="' . route('add-lead.index', ['lead_id' => $row->id]) . '">' . $client_name . '</a></h5>
-                    <p class="mb-0 f-12 text-dark-grey text-truncate">
-                    ' . ($row->client_email ?? '--') . '
-                </p>
-                    </div>
-                  ';
-        });
-
         $datatables->editColumn('created_at', fn($row) => $row->created_at?->translatedFormat($this->company->date_format));
         $datatables->smart(false);
         $datatables->setRowId(fn($row) => 'row-' . $row->id);
 
-        $datatables->rawColumns(['action', 'client_name', 'check']);
+        $datatables->rawColumns(['action', 'action_new', 'lead', 'client', 'services', 'status', 'lead_quality', 'follow_up']);
 
         return $datatables;
     }
@@ -113,7 +285,7 @@ class NewLeadDataTable extends BaseDataTable
      */
     public function query(NewLead $model)
     {
-        $newLead = $model->with(['addedBy', 'leadOwner'])
+        $newLead = $model->with(['addedBy', 'leadOwner', 'stepStatus'])
             ->select(
                 'new_leads.id',
                 'new_leads.added_by',
@@ -122,6 +294,11 @@ class NewLeadDataTable extends BaseDataTable
                 'new_leads.client_email',
                 'new_leads.mobile',
                 'new_leads.lead_source',
+                'new_leads.priority',
+                'new_leads.lead_status',
+                'new_leads.lead_quality',
+                'new_leads.step_1_data',
+                'new_leads.step_2_data',
                 'new_leads.created_at',
                 'new_leads.updated_at',
             );
@@ -195,12 +372,14 @@ class NewLeadDataTable extends BaseDataTable
             ->parameters([
                 'initComplete' => 'function () {
                    window.LaravelDataTables["new-leads-table"].buttons().container()
-                    .appendTo("#table-actions")
+                    .appendTo("#table-actions");
+                   $(".priority-select, .status-select, .quality-select").selectpicker();
                 }',
                 'fnDrawCallback' => 'function( oSettings ) {
                     $("body").tooltip({
                         selector: \'[data-toggle="tooltip"]\'
                     });
+                    $(".priority-select, .status-select, .quality-select").selectpicker();
                 }',
             ]);
 
@@ -218,30 +397,57 @@ class NewLeadDataTable extends BaseDataTable
      */
     protected function getColumns()
     {
-
-        $data = [
-
-            'check' => [
-                'title' => '<input type="checkbox" name="select_all_table" id="select-all-table" onclick="selectAllTable(this)">',
+        // New column structure
+        $newColumns = [
+            __('modules.lead.lead') => [
+                'data' => 'lead',
+                'name' => 'lead',
+                'title' => __('modules.lead.lead'),
                 'exportable' => false,
                 'orderable' => false,
                 'searchable' => false
             ],
-            '#' => ['data' => 'DT_RowIndex', 'orderable' => false, 'searchable' => false, 'visible' => false, 'title' => '#'],
-            __('app.id') => ['data' => 'id', 'name' => 'id', 'title' => __('app.id'), 'visible' => showId()],
-            __('app.name') => ['data' => 'client_name', 'name' => 'name', 'exportable' => true, 'visible' => false,'title' => __('app.name')],
-            __('modules.leadContact.contactName') => ['data' => 'client_name', 'name' => 'new_leads.client_name', 'exportable' => false, 'title' => __('modules.leadContact.contactName')],
-            __('app.email') . ' ' . __('modules.lead.email') => ['data' => 'export_email', 'name' => 'email', 'title' => __('app.lead') . ' ' . __('modules.lead.email'), 'exportable' => true, 'visible' => false],
-            __('modules.lead.email') => ['data' => 'email', 'name' => 'new_leads.client_email', 'exportable' => false, 'title' => __('modules.lead.email')],
-            __('app.lead') . ' ' . __('modules.lead.mobile') => ['data' => 'export_mobile', 'name' => 'mobile', 'title' => __('app.lead') . ' ' . __('modules.lead.mobile'), 'exportable' => true, 'visible' => false],
-            __('modules.lead.leadSource') => ['data' => 'lead_source', 'name' => 'new_leads.lead_source', 'exportable' => true, 'title' => __('modules.lead.leadSource')],
-            __('app.owner') => ['data' => 'lead_owner', 'name' => 'lead_owner', 'exportable' => true, 'title' => __('app.owner')],
-            __('app.addedBy') => ['data' => 'added_by', 'name' => 'added_by', 'exportable' => true, 'title' => __('app.addedBy')],
-            __('app.createdOn') => ['data' => 'created_at', 'name' => 'new_leads.created_at', 'title' => __('app.createdOn')],
-        ];
-
-        $action = [
-            Column::computed('action', __('app.action'))
+            __('app.client') => [
+                'data' => 'client',
+                'name' => 'client',
+                'title' => __('app.client'),
+                'exportable' => false,
+                'orderable' => false,
+                'searchable' => false
+            ],
+            __('app.services') => [
+                'data' => 'services',
+                'name' => 'services',
+                'title' => __('app.services'),
+                'exportable' => false,
+                'orderable' => false,
+                'searchable' => false
+            ],
+            __('app.status') => [
+                'data' => 'status',
+                'name' => 'status',
+                'title' => __('app.status'),
+                'exportable' => false,
+                'orderable' => false,
+                'searchable' => false
+            ],
+            __('modules.lead.leadQuality') => [
+                'data' => 'lead_quality',
+                'name' => 'lead_quality',
+                'title' => __('modules.lead.leadQuality'),
+                'exportable' => false,
+                'orderable' => false,
+                'searchable' => false
+            ],
+            __('modules.lead.followUp') => [
+                'data' => 'follow_up',
+                'name' => 'follow_up',
+                'title' => __('modules.lead.followUp'),
+                'exportable' => false,
+                'orderable' => false,
+                'searchable' => false
+            ],
+            Column::computed('action_new', __('app.action'))
                 ->exportable(false)
                 ->printable(false)
                 ->orderable(false)
@@ -249,7 +455,19 @@ class NewLeadDataTable extends BaseDataTable
                 ->addClass('text-right pr-20')
         ];
 
-        return array_merge($data, $action);
+        // Keep old columns hidden for export compatibility
+        $hiddenColumns = [
+            '#' => ['data' => 'DT_RowIndex', 'orderable' => false, 'searchable' => false, 'visible' => false, 'title' => '#'],
+            __('app.name') => ['data' => 'client_name', 'name' => 'name', 'exportable' => true, 'visible' => false, 'title' => __('app.name')],
+            __('app.email') . ' ' . __('modules.lead.email') => ['data' => 'export_email', 'name' => 'email', 'title' => __('app.lead') . ' ' . __('modules.lead.email'), 'exportable' => true, 'visible' => false],
+            __('app.lead') . ' ' . __('modules.lead.mobile') => ['data' => 'export_mobile', 'name' => 'mobile', 'title' => __('app.lead') . ' ' . __('modules.lead.mobile'), 'exportable' => true, 'visible' => false],
+            __('modules.lead.leadSource') => ['data' => 'lead_source', 'name' => 'new_leads.lead_source', 'exportable' => true, 'visible' => false],
+            __('app.owner') => ['data' => 'lead_owner', 'name' => 'lead_owner', 'exportable' => true, 'visible' => false],
+            __('app.addedBy') => ['data' => 'added_by', 'name' => 'added_by', 'exportable' => true, 'visible' => false],
+            __('app.createdOn') => ['data' => 'created_at', 'name' => 'new_leads.created_at', 'title' => __('app.createdOn'), 'visible' => false],
+        ];
+
+        return array_merge($newColumns, $hiddenColumns);
 
     }
 

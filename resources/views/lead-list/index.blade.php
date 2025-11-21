@@ -2,6 +2,7 @@
 
 @push('datatable-styles')
     @include('sections.datatable_css')
+    <link rel="stylesheet" href="{{ asset('css/lead-list.css') }}">
 @endpush
 
 @section('filter-section')
@@ -102,10 +103,6 @@
                     <x-forms.link-primary :link="route('add-lead.index')" class="mr-3 mb-2 mb-lg-0" icon="plus">
                         @lang('app.addLead')
                     </x-forms.link-primary>
-
-                    <x-forms.link-secondary :link="route('lead-contact.create')" class="mr-3 openRightModal mb-2 mb-lg-0" icon="plus">
-                        @lang('modules.leadContact.addLeadContact')
-                    </x-forms.link-secondary>
                 @endif
             </div>
 
@@ -311,6 +308,119 @@
             $('#datatableRange').data('daterangepicker').setEndDate("{{ request('end') }}");
                 showTable();
             @endif
+
+            // Initialize select pickers after table draw
+            $('#new-leads-table').on('draw.dt', function() {
+                $('.priority-select, .status-select, .quality-select').selectpicker();
+            });
+        });
+
+        // Track previous values to prevent duplicate calls
+        var previousValues = {};
+
+        // Handle priority dropdown change
+        $(document).on('changed.bs.select', '.priority-select', function(e, clickedIndex, isSelected, previousValue) {
+            e.stopImmediatePropagation();
+            var $select = $(this);
+            var leadId = $select.data('lead-id');
+            var priority = $select.val();
+            var key = 'priority_' + leadId;
+            
+            // Prevent duplicate calls and validate value
+            if (!priority || priority === '' || previousValues[key] === priority) {
+                return;
+            }
+            
+            previousValues[key] = priority;
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.update_priority') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    lead_id: leadId,
+                    priority: priority
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
+                        // Optionally show a success message
+                    }
+                },
+                error: function() {
+                    // Reset previous value on error
+                    delete previousValues[key];
+                }
+            });
+        });
+
+        // Handle status dropdown change
+        $(document).on('changed.bs.select', '.status-select', function(e, clickedIndex, isSelected, previousValue) {
+            e.stopImmediatePropagation();
+            var $select = $(this);
+            var leadId = $select.data('lead-id');
+            var status = $select.val();
+            var key = 'status_' + leadId;
+            
+            // Prevent duplicate calls and validate value
+            if (!status || status === '' || previousValues[key] === status) {
+                return;
+            }
+            
+            previousValues[key] = status;
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.update_status') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    lead_id: leadId,
+                    status: status
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
+                        // Optionally show a success message
+                    }
+                },
+                error: function() {
+                    // Reset previous value on error
+                    delete previousValues[key];
+                }
+            });
+        });
+
+        // Handle lead quality dropdown change
+        $(document).on('changed.bs.select', '.quality-select', function(e, clickedIndex, isSelected, previousValue) {
+            e.stopImmediatePropagation();
+            var $select = $(this);
+            var leadId = $select.data('lead-id');
+            var quality = $select.val();
+            var key = 'quality_' + leadId;
+            
+            // Prevent duplicate calls and validate value
+            if (!quality || quality === '' || previousValues[key] === quality) {
+                return;
+            }
+            
+            previousValues[key] = quality;
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.update_quality') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    lead_id: leadId,
+                    quality: quality
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
+                        // Optionally show a success message
+                    }
+                },
+                error: function() {
+                    // Reset previous value on error
+                    delete previousValues[key];
+                }
+            });
         });
 
     </script>

@@ -575,6 +575,75 @@ class LeadContactController extends AccountBaseController
         return Reply::success(__('messages.deleteSuccess'));
     }
 
+    /**
+     * Update lead priority
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateLeadPriority(Request $request)
+    {
+        $lead = NewLead::findOrFail($request->lead_id);
+        $this->editPermission = user()->permission('edit_lead');
+
+        abort_403(!($this->editPermission == 'all'
+            || ($this->editPermission == 'added' && $lead->added_by == user()->id)
+            || ($this->editPermission == 'owned' && $lead->lead_owner == user()->id)
+            || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
+        ));
+
+        $lead->priority = $request->priority;
+        $lead->save();
+
+        return Reply::success(__('messages.updateSuccess'));
+    }
+
+    /**
+     * Update lead status
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateLeadStatus(Request $request)
+    {
+        $lead = NewLead::findOrFail($request->lead_id);
+        $this->editPermission = user()->permission('edit_lead');
+
+        abort_403(!($this->editPermission == 'all'
+            || ($this->editPermission == 'added' && $lead->added_by == user()->id)
+            || ($this->editPermission == 'owned' && $lead->lead_owner == user()->id)
+            || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
+        ));
+
+        $lead->lead_status = $request->status;
+        $lead->save();
+
+        return Reply::success(__('messages.updateSuccess'));
+    }
+
+    /**
+     * Update lead quality
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function updateLeadQuality(Request $request)
+    {
+        $lead = NewLead::findOrFail($request->lead_id);
+        $this->editPermission = user()->permission('edit_lead');
+
+        abort_403(!($this->editPermission == 'all'
+            || ($this->editPermission == 'added' && $lead->added_by == user()->id)
+            || ($this->editPermission == 'owned' && $lead->lead_owner == user()->id)
+            || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
+        ));
+
+        $lead->lead_quality = $request->quality;
+        $lead->save();
+
+        return Reply::success(__('messages.updateSuccess'));
+    }
+
     public function importLead()
     {
         $this->pageTitle = __('app.importExcel') . ' ' . __('app.menu.lead');

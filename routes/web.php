@@ -540,8 +540,11 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::get('add-lead', [LeadContactController::class, 'addLead'])->name('add-lead.index');
     Route::delete('new-leads/{id}', [LeadContactController::class, 'destroyNewLead'])->name('new-leads.destroy');
     Route::post('new-leads/apply-quick-action', [LeadContactController::class, 'applyQuickActionNewLeads'])->name('new-leads.apply_quick_action');
+    Route::post('new-leads/update-priority', [LeadContactController::class, 'updateLeadPriority'])->name('new-leads.update_priority');
+    Route::post('new-leads/update-status', [LeadContactController::class, 'updateLeadStatus'])->name('new-leads.update_status');
+    Route::post('new-leads/update-quality', [LeadContactController::class, 'updateLeadQuality'])->name('new-leads.update_quality');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
-    Route::get('lead-details', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
+    Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
     Route::get('lead-dashboard', [LeadContactController::class, 'leadDashboard'])->name('lead-dashboard.index');
     
     // Step-by-step lead saving routes

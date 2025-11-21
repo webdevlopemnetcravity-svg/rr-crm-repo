@@ -1,0 +1,116 @@
+/* Lead List Table Styles */
+
+.lead-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lead-id {
+    font-weight: 500;
+    color: #171f29;
+}
+
+.lead-date,
+.lead-source {
+    color: #6c757d;
+    font-size: 12px;
+}
+
+.client-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.priority-dropdown {
+    margin-bottom: 8px;
+}
+
+.priority-dropdown .select-picker,
+.status-dropdown .select-picker,
+.lead-quality-dropdown .select-picker {
+    font-size: 14px;
+    padding: 4px 8px;
+    min-width: 150px;
+}
+
+.client-mobile,
+.client-email {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.services-info {
+    color: #171f29;
+    font-size: 14px;
+}
+
+.status-draft,
+.lead-quality-draft {
+    color: #171f29;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.follow-up-info {
+    min-height: 20px;
+}
+
+.action-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.lead-owner-info {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.lead-owner-info img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.lead-owner-info .rounded-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f2f4f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.view-icon {
+    margin-left: 8px;
+    color: #6c757d;
+    transition: color 0.2s;
+}
+
+.view-icon:hover {
+    color: #171f29;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .priority-dropdown .select-picker,
+    .status-dropdown .select-picker,
+    .lead-quality-dropdown .select-picker {
+        min-width: 120px;
+        font-size: 12px;
+    }
+    
+    .lead-owner-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+

@@ -23,6 +23,9 @@ return new class extends Migration
             $table->string('client_email')->nullable();
             $table->string('mobile')->nullable();
             $table->string('lead_source')->nullable();
+            $table->enum('priority', ['Select Priority', '1st Priority', '2nd Priority', '3rd Priority', '4th Priority', '5th Priority'])->default('Select Priority');
+            $table->string('lead_status')->default('Untouched');
+            $table->string('lead_quality')->default('Assigned');
             $table->unsignedInteger('lead_owner')->nullable();
             $table->foreign('lead_owner')->references('id')->on('users')->onDelete('set null');
             $table->unsignedInteger('added_by')->nullable();
