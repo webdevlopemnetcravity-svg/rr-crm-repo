@@ -1209,23 +1209,11 @@ class LeadContactController extends AccountBaseController
                 'post_graduation_passing_year',
                 'post_graduation_trial',
                 'post_graduation_result_file',
-                'other_degree',
-                'other_degree_university_name',
-                'other_degree_percentage',
-                'other_degree_passing_year',
-                'other_degree_trial',
-                'other_degree_result_file',
+                'other_degrees',
             ],
             7 => [
                 // Step 7 - Professional Experience
-                'job_duration_from',
-                'job_duration_to',
-                'job_country',
-                'job_designation',
-                'job_company_name',
-                'job_salary',
-                'job_offer_letter_file',
-                'job_experience_letter_file',
+                'jobs',
             ],
             8 => [
                 // Step 8 - Property Details
@@ -1896,79 +1884,82 @@ class LeadContactController extends AccountBaseController
         
         // Handle file uploads for step 6 (Education) - use same pattern as upload_resume
         if ($stepNumber == 6) {
-            // Handle other_degree data arrays - combine Other Degree 1 (single values) with Other Degree 2+ (arrays)
-            $otherDegreeFields = ['other_degree', 'other_degree_university_name', 'other_degree_percentage', 'other_degree_passing_year', 'other_degree_trial'];
+            // Handle other_degrees data - check if sent as JSON string
             $otherDegreeData = [];
             
-            // Get Other Degree 1 data (single values)
-            $otherDegree1Data = [];
-            foreach ($otherDegreeFields as $field) {
-                $value = $this->getRequestValue($request, $field);
-                if ($value !== null && $value !== '') {
-                    $otherDegree1Data[$field] = $value;
+            if ($request->has('other_degrees')) {
+                $otherDegreesJson = $request->input('other_degrees');
+                if (is_string($otherDegreesJson)) {
+                    $decoded = json_decode($otherDegreesJson, true);
+                    if (is_array($decoded)) {
+                        $otherDegreeData = $decoded;
+                    }
+                } elseif (is_array($otherDegreesJson)) {
+                    $otherDegreeData = $otherDegreesJson;
                 }
             }
             
-            // If Other Degree 1 has any data, add it to the array
-            if (!empty($otherDegree1Data)) {
-                $otherDegreeData[] = $otherDegree1Data;
-            }
-            
-            // Get Other Degree 2+ data (arrays)
-            $otherDegreeArrays = [];
-            foreach ($otherDegreeFields as $field) {
-                $arrayKey = $field . '[]';
-                $arrayValues = $request->input($arrayKey, []);
-                if (is_array($arrayValues)) {
-                    $otherDegreeArrays[$field] = $arrayValues;
-                }
-            }
-            
-            // Combine Other Degree 2+ data into proper structure
-            if (!empty($otherDegreeArrays)) {
-                $maxCount = 0;
-                foreach ($otherDegreeArrays as $field => $values) {
-                    if (count($values) > $maxCount) {
-                        $maxCount = count($values);
+            // If no other_degrees from JSON, try old format (backward compatibility)
+            if (empty($otherDegreeData)) {
+                $otherDegreeFields = ['other_degree', 'other_degree_university_name', 'other_degree_percentage', 'other_degree_passing_year', 'other_degree_trial'];
+                
+                // Get Other Degree 1 data (single values)
+                $otherDegree1Data = [];
+                foreach ($otherDegreeFields as $field) {
+                    $value = $this->getRequestValue($request, $field);
+                    if ($value !== null && $value !== '') {
+                        $otherDegree1Data[$field] = $value;
                     }
                 }
                 
-                for ($i = 0; $i < $maxCount; $i++) {
-                    $otherDegreeRow = [];
-                    foreach ($otherDegreeFields as $field) {
-                        if (isset($otherDegreeArrays[$field][$i]) && $otherDegreeArrays[$field][$i] !== null && $otherDegreeArrays[$field][$i] !== '') {
-                            $otherDegreeRow[$field] = $otherDegreeArrays[$field][$i];
+                // If Other Degree 1 has any data, add it to the array
+                if (!empty($otherDegree1Data)) {
+                    $otherDegreeData[] = $otherDegree1Data;
+                }
+                
+                // Get Other Degree 2+ data (arrays)
+                $otherDegreeArrays = [];
+                foreach ($otherDegreeFields as $field) {
+                    $arrayKey = $field . '[]';
+                    $arrayValues = $request->input($arrayKey, []);
+                    if (is_array($arrayValues)) {
+                        $otherDegreeArrays[$field] = $arrayValues;
+                    }
+                }
+                
+                // Combine Other Degree 2+ data into proper structure
+                if (!empty($otherDegreeArrays)) {
+                    $maxCount = 0;
+                    foreach ($otherDegreeArrays as $field => $values) {
+                        if (count($values) > $maxCount) {
+                            $maxCount = count($values);
                         }
                     }
-                    if (!empty($otherDegreeRow)) {
-                        $otherDegreeData[] = $otherDegreeRow;
+                    
+                    for ($i = 0; $i < $maxCount; $i++) {
+                        $otherDegreeRow = [];
+                        foreach ($otherDegreeFields as $field) {
+                            if (isset($otherDegreeArrays[$field][$i]) && $otherDegreeArrays[$field][$i] !== null && $otherDegreeArrays[$field][$i] !== '') {
+                                $otherDegreeRow[$field] = $otherDegreeArrays[$field][$i];
+                            }
+                        }
+                        if (!empty($otherDegreeRow)) {
+                            $otherDegreeData[] = $otherDegreeRow;
+                        }
                     }
                 }
             }
             
             // Store other_degree data as JSON array
-            if (!empty($otherDegreeData)) {
-                $stepData['other_degrees'] = $otherDegreeData;
-            } else {
-                $stepData['other_degrees'] = [];
-            }
+            $stepData['other_degrees'] = $otherDegreeData;
             
             // Remove individual other_degree fields from stepData (they're now in other_degrees array)
+            $otherDegreeFields = ['other_degree', 'other_degree_university_name', 'other_degree_percentage', 'other_degree_passing_year', 'other_degree_trial'];
             foreach ($otherDegreeFields as $field) {
                 unset($stepData[$field]);
             }
             
-            // Handle file uploads for step 6 - use same pattern as upload_resume
-            $educationFileFields = [
-                'ielts_result_file',
-                'tenth_result_file',
-                'twelfth_result_file',
-                'graduation_result_file',
-                'post_graduation_result_file',
-                'other_degree_result_file',
-            ];
-            
-            // Safely get existing step 6 data
+            // Safely get existing step 6 data first
             $existingStep6Data = [];
             if ($lead->step_6_data) {
                 if (is_string($lead->step_6_data)) {
@@ -1979,165 +1970,116 @@ class LeadContactController extends AccountBaseController
                 }
             }
             
-            foreach ($educationFileFields as $fileField) {
-                $folder = 'lead-education-files';
-                
-                // Handle other_degree_result_file as both single and array
-                if ($fileField === 'other_degree_result_file') {
-                    // Handle Other Degree 1 file (single)
-                    if ($request->hasFile('other_degree_result_file')) {
-                        // Delete old file if exists
-                        if (isset($existingStep6Data['other_degree_result_file']) && $existingStep6Data['other_degree_result_file']) {
-                            $oldFileName = $existingStep6Data['other_degree_result_file'];
-                            \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
-                        }
-                        // Upload new file with original name + unique ID
-                        try {
-                            $file = $request->file('other_degree_result_file');
-                            if (is_array($file)) {
-                                $file = !empty($file) ? $file[0] : null;
-                            }
-                            if ($file && $file->isValid()) {
-                                $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
-                                \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
-                                
-                                $fileVisibility = [];
-                                if (config('filesystems.default') == 'local') {
-                                    $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
-                                }
-                                
-                                Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
-                                $stepData['other_degree_result_file'] = $customFileName;
-                            }
-                        } catch (\Exception $e) {
-                            // Preserve existing file if upload fails
-                            if (isset($existingStep6Data['other_degree_result_file']) && $existingStep6Data['other_degree_result_file']) {
-                                $stepData['other_degree_result_file'] = $existingStep6Data['other_degree_result_file'];
-                            }
-                        }
-                    } elseif ($request->has('other_degree_result_file_existing')) {
-                        // Keep existing file if no new file is uploaded
-                        $stepData['other_degree_result_file'] = $request->input('other_degree_result_file_existing');
-                    } elseif (isset($existingStep6Data['other_degree_result_file']) && $existingStep6Data['other_degree_result_file']) {
-                        // If existing file input is not present, it means user removed it, so delete file
-                        $oldFileName = $existingStep6Data['other_degree_result_file'];
-                        try {
-                            \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
-                        } catch (\Exception $e) {
-                            // Silently fail
-                        }
-                        $stepData['other_degree_result_file'] = null;
-                    }
-                    
-                    // Handle Other Degree 2+ files (arrays)
-                    if ($request->hasFile('other_degree_result_file[]')) {
-                        $files = $request->file('other_degree_result_file[]');
-                        if (is_array($files)) {
-                            $otherDegreeFiles = [];
-                            foreach ($files as $index => $file) {
-                                if ($file && $file->isValid()) {
-                                    try {
-                                        $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
-                                        \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
-                                        
-                                        $fileVisibility = [];
-                                        if (config('filesystems.default') == 'local') {
-                                            $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
-                                        }
-                                        
-                                        Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
-                                        $otherDegreeFiles[] = $customFileName;
-                                    } catch (\Exception $e) {
-                                        // Skip this file if upload fails
-                                    }
-                                }
-                            }
-                            if (!empty($otherDegreeFiles)) {
-                                $stepData['other_degree_result_files'] = $otherDegreeFiles;
-                            }
-                        }
-                    }
-                } else {
-                    // Handle other single file fields
-                    if ($request->hasFile($fileField)) {
-                        // Delete old file if exists
-                        if (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
-                            $oldFileName = $existingStep6Data[$fileField];
-                            \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
-                        }
-                        // Upload new file with original name + unique ID
-                        try {
-                            $file = $request->file($fileField);
-                            if (is_array($file)) {
-                                $file = !empty($file) ? $file[0] : null;
-                            }
-                            if ($file && $file->isValid()) {
-                                $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
-                                \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
-                                
-                                $fileVisibility = [];
-                                if (config('filesystems.default') == 'local') {
-                                    $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
-                                }
-                                
-                                Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
-                                $stepData[$fileField] = $customFileName;
-                            }
-                        } catch (\Exception $e) {
-                            // Preserve existing file if upload fails
-                            if (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
-                                $stepData[$fileField] = $existingStep6Data[$fileField];
-                            }
-                        }
-                    } elseif ($request->has($fileField . '_existing')) {
-                        // Keep existing file if no new file is uploaded
-                        $stepData[$fileField] = $request->input($fileField . '_existing');
-                    } elseif (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
-                        // If existing file input is not present, it means user removed it, so delete file
-                        $oldFileName = $existingStep6Data[$fileField];
-                        try {
-                            \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
-                        } catch (\Exception $e) {
-                            // Silently fail
-                        }
-                        $stepData[$fileField] = null;
-                    }
-                }
-            }
-        }
-        
-        // Handle file uploads for step 7 (Professional Experience)
-        if ($stepNumber === 7) {
-            $jobFileFields = [
-                'job_offer_letter_file',
-                'job_experience_letter_file',
-            ];
+            // Handle other degree file uploads first (with new naming convention: other_degree_result_file_1, etc.)
+            $folder = 'lead-education-files';
             
-            foreach ($jobFileFields as $fileField) {
-                if ($request->hasFile($fileField)) {
-                    // Delete old file if exists
-                    if (isset($lead->step_7_data[$fileField]) && $lead->step_7_data[$fileField]) {
-                        $oldFileName = $lead->step_7_data[$fileField];
-                        \App\Helper\Files::deleteFile($oldFileName, 'lead-job-files/' . $lead->id);
-                    }
-                    // Upload new file
+            // Get existing other degrees data for file reference
+            $existingOtherDegrees = [];
+            if (isset($existingStep6Data['other_degrees']) && is_array($existingStep6Data['other_degrees'])) {
+                $existingOtherDegrees = $existingStep6Data['other_degrees'];
+            }
+            
+            // Process other degree files and update other_degrees array
+            foreach ($otherDegreeData as $index => $degree) {
+                $degreeIndex = $index + 1; // Degree index starts from 1
+                
+                // Handle other degree result file
+                $resultFileKey = 'other_degree_result_file_' . $degreeIndex;
+                $resultFileExistingKey = $resultFileKey . '_existing';
+                
+                if ($request->hasFile($resultFileKey)) {
                     try {
-                        $fileName = \App\Helper\Files::uploadLocalOrS3(
-                            $request->$fileField,
-                            'lead-job-files/' . $lead->id
-                        );
-                        $stepData[$fileField] = $fileName;
+                        $file = $request->file($resultFileKey);
+                        if ($file && $file->isValid()) {
+                            // Delete old file if exists
+                            if (isset($degree['other_degree_result_file']) && $degree['other_degree_result_file']) {
+                                \App\Helper\Files::deleteFile($degree['other_degree_result_file'], $folder . '/' . $lead->id);
+                            }
+                            
+                            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                            \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
+                            
+                            $fileVisibility = [];
+                            if (config('filesystems.default') == 'local') {
+                                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                            }
+                            
+                            Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                            $otherDegreeData[$index]['other_degree_result_file'] = $customFileName;
+                        }
+                    } catch (\Exception $e) {
+                        // Preserve existing file if upload fails
+                        if (isset($degree['other_degree_result_file']) && $degree['other_degree_result_file']) {
+                            $otherDegreeData[$index]['other_degree_result_file'] = $degree['other_degree_result_file'];
+                        }
+                    }
+                } elseif ($request->has($resultFileExistingKey)) {
+                    // Keep existing file
+                    $otherDegreeData[$index]['other_degree_result_file'] = $request->input($resultFileExistingKey);
+                } elseif (isset($degree['other_degree_result_file']) && $degree['other_degree_result_file'] && 
+                          (!isset($existingOtherDegrees[$index]) || !isset($existingOtherDegrees[$index]['other_degree_result_file']) || 
+                           $existingOtherDegrees[$index]['other_degree_result_file'] !== $degree['other_degree_result_file'])) {
+                    // File was removed, delete it
+                    try {
+                        \App\Helper\Files::deleteFile($degree['other_degree_result_file'], $folder . '/' . $lead->id);
                     } catch (\Exception $e) {
                         // Silently fail
+                    }
+                    $otherDegreeData[$index]['other_degree_result_file'] = null;
+                }
+            }
+            
+            // Update stepData with processed other_degrees array
+            $stepData['other_degrees'] = $otherDegreeData;
+            
+            // Handle other step 6 file fields
+            $educationFileFields = [
+                'ielts_result_file',
+                'tenth_result_file',
+                'twelfth_result_file',
+                'graduation_result_file',
+                'post_graduation_result_file',
+            ];
+            
+            foreach ($educationFileFields as $fileField) {
+                if ($request->hasFile($fileField)) {
+                    // Delete old file if exists
+                    if (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
+                        $oldFileName = $existingStep6Data[$fileField];
+                        \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
+                    }
+                    // Upload new file with original name + unique ID
+                    try {
+                        $file = $request->file($fileField);
+                        if (is_array($file)) {
+                            $file = !empty($file) ? $file[0] : null;
+                        }
+                        if ($file && $file->isValid()) {
+                            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                            \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
+                            
+                            $fileVisibility = [];
+                            if (config('filesystems.default') == 'local') {
+                                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                            }
+                            
+                            Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                            $stepData[$fileField] = $customFileName;
+                        }
+                    } catch (\Exception $e) {
+                        // Preserve existing file if upload fails
+                        if (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
+                            $stepData[$fileField] = $existingStep6Data[$fileField];
+                        }
                     }
                 } elseif ($request->has($fileField . '_existing')) {
                     // Keep existing file if no new file is uploaded
                     $stepData[$fileField] = $request->input($fileField . '_existing');
-                } elseif (isset($lead->step_7_data[$fileField]) && $lead->step_7_data[$fileField]) {
+                } elseif (isset($existingStep6Data[$fileField]) && $existingStep6Data[$fileField]) {
                     // If existing file input is not present, it means user removed it, so delete file
-                    $oldFileName = $lead->step_7_data[$fileField];
+                    $oldFileName = $existingStep6Data[$fileField];
                     try {
-                        \App\Helper\Files::deleteFile($oldFileName, 'lead-job-files/' . $lead->id);
+                        \App\Helper\Files::deleteFile($oldFileName, $folder . '/' . $lead->id);
                     } catch (\Exception $e) {
                         // Silently fail
                     }
@@ -2146,41 +2088,291 @@ class LeadContactController extends AccountBaseController
             }
         }
         
-        // Handle file uploads for step 8 (Property Details)
-        if ($stepNumber === 8) {
-            if ($request->hasFile('valuation_report_file')) {
-                // Delete old file if exists
-                if (isset($lead->step_8_data['valuation_report_file']) && $lead->step_8_data['valuation_report_file']) {
-                    $oldFileName = $lead->step_8_data['valuation_report_file'];
-                    \App\Helper\Files::deleteFile($oldFileName, 'lead-property-files/' . $lead->id);
+        // Handle file uploads for step 7 (Professional Experience)
+        if ($stepNumber == 7) {
+            // Handle jobs data - check if sent as JSON string
+            $jobData = [];
+            
+            if ($request->has('jobs')) {
+                $jobsJson = $request->input('jobs');
+                if (is_string($jobsJson)) {
+                    $decoded = json_decode($jobsJson, true);
+                    if (is_array($decoded)) {
+                        $jobData = $decoded;
+                    }
+                } elseif (is_array($jobsJson)) {
+                    $jobData = $jobsJson;
                 }
-                // Upload new file
+            }
+            
+            // If no jobs from JSON, try old format (backward compatibility)
+            if (empty($jobData)) {
+                $jobFields = ['job_duration_from', 'job_duration_to', 'job_country', 'job_designation', 'job_company_name', 'job_salary'];
+                
+                // Get Job 1 data (single values)
+                $job1Data = [];
+                foreach ($jobFields as $field) {
+                    $value = $this->getRequestValue($request, $field);
+                    if ($value !== null && $value !== '') {
+                        $job1Data[$field] = $value;
+                    }
+                }
+                
+                // If Job 1 has any data, add it to the array
+                if (!empty($job1Data)) {
+                    $jobData[] = $job1Data;
+                }
+                
+                // Get Job 2+ data (arrays)
+                $jobArrays = [];
+                foreach ($jobFields as $field) {
+                    $arrayKey = $field . '[]';
+                    $arrayValues = $request->input($arrayKey, []);
+                    if (is_array($arrayValues)) {
+                        $jobArrays[$field] = $arrayValues;
+                    }
+                }
+                
+                // Combine Job 2+ data into proper structure
+                if (!empty($jobArrays)) {
+                    $maxCount = 0;
+                    foreach ($jobArrays as $field => $values) {
+                        if (count($values) > $maxCount) {
+                            $maxCount = count($values);
+                        }
+                    }
+                    
+                    for ($i = 0; $i < $maxCount; $i++) {
+                        $jobRow = [];
+                        foreach ($jobFields as $field) {
+                            if (isset($jobArrays[$field][$i]) && $jobArrays[$field][$i] !== null && $jobArrays[$field][$i] !== '') {
+                                $jobRow[$field] = $jobArrays[$field][$i];
+                            }
+                        }
+                        if (!empty($jobRow)) {
+                            $jobData[] = $jobRow;
+                        }
+                    }
+                }
+            }
+            
+            // Store job data as JSON array
+            $stepData['jobs'] = $jobData;
+            
+            // Remove individual job fields from stepData (they're now in jobs array)
+            $jobFields = ['job_duration_from', 'job_duration_to', 'job_country', 'job_designation', 'job_company_name', 'job_salary'];
+            foreach ($jobFields as $field) {
+                unset($stepData[$field]);
+            }
+            
+            // Safely get existing step 7 data first
+            $existingStep7Data = [];
+            if ($lead->step_7_data) {
+                if (is_string($lead->step_7_data)) {
+                    $decoded = json_decode($lead->step_7_data, true);
+                    $existingStep7Data = is_array($decoded) ? $decoded : [];
+                } elseif (is_array($lead->step_7_data)) {
+                    $existingStep7Data = $lead->step_7_data;
+                }
+            }
+            
+            // Handle job file uploads first (with new naming convention: job_offer_letter_file_1, job_experience_letter_file_1, etc.)
+            $folder = 'lead-job-files';
+            
+            // Get existing jobs data for file reference
+            $existingJobs = [];
+            if (isset($existingStep7Data['jobs']) && is_array($existingStep7Data['jobs'])) {
+                $existingJobs = $existingStep7Data['jobs'];
+            }
+            
+            // Process job files and update jobs array
+            foreach ($jobData as $index => $job) {
+                $jobIndex = $index + 1; // Job index starts from 1
+                
+                // Handle job offer letter file
+                $offerFileKey = 'job_offer_letter_file_' . $jobIndex;
+                $offerFileExistingKey = $offerFileKey . '_existing';
+                
+                if ($request->hasFile($offerFileKey)) {
+                    try {
+                        $file = $request->file($offerFileKey);
+                        if ($file && $file->isValid()) {
+                            // Delete old file if exists
+                            if (isset($job['job_offer_letter_file']) && $job['job_offer_letter_file']) {
+                                \App\Helper\Files::deleteFile($job['job_offer_letter_file'], $folder . '/' . $lead->id);
+                            }
+                            
+                            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                            \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
+                            
+                            $fileVisibility = [];
+                            if (config('filesystems.default') == 'local') {
+                                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                            }
+                            
+                            Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                            $jobData[$index]['job_offer_letter_file'] = $customFileName;
+                        }
+                    } catch (\Exception $e) {
+                        // Preserve existing file if upload fails
+                        if (isset($job['job_offer_letter_file']) && $job['job_offer_letter_file']) {
+                            $jobData[$index]['job_offer_letter_file'] = $job['job_offer_letter_file'];
+                        }
+                    }
+                } elseif ($request->has($offerFileExistingKey)) {
+                    // Keep existing file
+                    $jobData[$index]['job_offer_letter_file'] = $request->input($offerFileExistingKey);
+                } elseif (isset($job['job_offer_letter_file']) && $job['job_offer_letter_file'] && 
+                          (!isset($existingJobs[$index]) || !isset($existingJobs[$index]['job_offer_letter_file']) || 
+                           $existingJobs[$index]['job_offer_letter_file'] !== $job['job_offer_letter_file'])) {
+                    // File was removed, delete it
+                    try {
+                        \App\Helper\Files::deleteFile($job['job_offer_letter_file'], $folder . '/' . $lead->id);
+                    } catch (\Exception $e) {
+                        // Silently fail
+                    }
+                    $jobData[$index]['job_offer_letter_file'] = null;
+                }
+                
+                // Handle job experience letter file
+                $experienceFileKey = 'job_experience_letter_file_' . $jobIndex;
+                $experienceFileExistingKey = $experienceFileKey . '_existing';
+                
+                if ($request->hasFile($experienceFileKey)) {
+                    try {
+                        $file = $request->file($experienceFileKey);
+                        if ($file && $file->isValid()) {
+                            // Delete old file if exists
+                            if (isset($job['job_experience_letter_file']) && $job['job_experience_letter_file']) {
+                                \App\Helper\Files::deleteFile($job['job_experience_letter_file'], $folder . '/' . $lead->id);
+                            }
+                            
+                            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                            \App\Helper\Files::fileStore($file, $folder . '/' . $lead->id, $customFileName);
+                            
+                            $fileVisibility = [];
+                            if (config('filesystems.default') == 'local') {
+                                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                            }
+                            
+                            Storage::disk(config('filesystems.default'))->putFileAs($folder . '/' . $lead->id, $file, $customFileName, $fileVisibility);
+                            $jobData[$index]['job_experience_letter_file'] = $customFileName;
+                        }
+                    } catch (\Exception $e) {
+                        // Preserve existing file if upload fails
+                        if (isset($job['job_experience_letter_file']) && $job['job_experience_letter_file']) {
+                            $jobData[$index]['job_experience_letter_file'] = $job['job_experience_letter_file'];
+                        }
+                    }
+                } elseif ($request->has($experienceFileExistingKey)) {
+                    // Keep existing file
+                    $jobData[$index]['job_experience_letter_file'] = $request->input($experienceFileExistingKey);
+                } elseif (isset($job['job_experience_letter_file']) && $job['job_experience_letter_file'] && 
+                          (!isset($existingJobs[$index]) || !isset($existingJobs[$index]['job_experience_letter_file']) || 
+                           $existingJobs[$index]['job_experience_letter_file'] !== $job['job_experience_letter_file'])) {
+                    // File was removed, delete it
+                    try {
+                        \App\Helper\Files::deleteFile($job['job_experience_letter_file'], $folder . '/' . $lead->id);
+                    } catch (\Exception $e) {
+                        // Silently fail
+                    }
+                    $jobData[$index]['job_experience_letter_file'] = null;
+                }
+            }
+            
+            // Update stepData with processed jobs array
+            $stepData['jobs'] = $jobData;
+        }
+        
+        // Handle file uploads for step 8 (Property Details)
+        if ($stepNumber == 8) {
+            // Safely get existing step 8 data
+            $existingStep8Data = [];
+            if ($lead->step_8_data) {
+                if (is_string($lead->step_8_data)) {
+                    $decoded = json_decode($lead->step_8_data, true);
+                    $existingStep8Data = is_array($decoded) ? $decoded : [];
+                } elseif (is_array($lead->step_8_data)) {
+                    $existingStep8Data = $lead->step_8_data;
+                }
+            }
+            
+            // Handle valuation_report_file similar to upload_resume
+            $uploadedFile = null;
+            $fileDetected = false;
+            
+            if ($request->hasFile('valuation_report_file')) {
+                $uploadedFile = $request->file('valuation_report_file');
+                $fileDetected = true;
+            } elseif ($request->allFiles() && isset($request->allFiles()['valuation_report_file'])) {
+                $uploadedFile = $request->allFiles()['valuation_report_file'];
+                $fileDetected = true;
+            } elseif ($request->file('valuation_report_file')) {
+                $uploadedFile = $request->file('valuation_report_file');
+                $fileDetected = true;
+            }
+            
+            if ($fileDetected && $uploadedFile) {
+                // Delete old file if exists
+                if (isset($existingStep8Data['valuation_report_file']) && $existingStep8Data['valuation_report_file']) {
+                    $oldFileName = $existingStep8Data['valuation_report_file'];
+                    try {
+                        \App\Helper\Files::deleteFile($oldFileName, 'lead-property-files/' . $lead->id);
+                    } catch (\Exception $e) {
+                        // Silently fail if delete fails
+                    }
+                }
+                
+                // Upload new file with original name + unique ID
                 try {
-                    $fileName = \App\Helper\Files::uploadLocalOrS3(
-                        $request->valuation_report_file,
-                        'lead-property-files/' . $lead->id
-                    );
-                    $stepData['valuation_report_file'] = $fileName;
+                    $fileToUpload = $uploadedFile;
+                    if (!$fileToUpload) {
+                        $fileToUpload = $request->valuation_report_file;
+                    }
+                    
+                    // Generate filename with original name + unique ID
+                    $customFileName = \App\Helper\Files::generateFileNameWithOriginal($fileToUpload->getClientOriginalName());
+                    \App\Helper\Files::fileStore($fileToUpload, 'lead-property-files/' . $lead->id, $customFileName);
+                    
+                    $fileVisibility = [];
+                    if (config('filesystems.default') == 'local') {
+                        $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                    }
+                    
+                    Storage::disk(config('filesystems.default'))->putFileAs('lead-property-files/' . $lead->id, $fileToUpload, $customFileName, $fileVisibility);
+                    
+                    $stepData['valuation_report_file'] = $customFileName;
                 } catch (\Exception $e) {
-                    // Silently fail
+                    // Preserve existing file if upload fails
+                    if (isset($existingStep8Data['valuation_report_file']) && $existingStep8Data['valuation_report_file']) {
+                        $stepData['valuation_report_file'] = $existingStep8Data['valuation_report_file'];
+                    }
                 }
             } elseif ($request->has('valuation_report_file_existing')) {
                 // Keep existing file if no new file is uploaded
                 $stepData['valuation_report_file'] = $request->input('valuation_report_file_existing');
-            } elseif (isset($lead->step_8_data['valuation_report_file']) && $lead->step_8_data['valuation_report_file']) {
-                // If existing file input is not present, it means user removed it, so delete file
-                $oldFileName = $lead->step_8_data['valuation_report_file'];
-                try {
-                    \App\Helper\Files::deleteFile($oldFileName, 'lead-property-files/' . $lead->id);
-                } catch (\Exception $e) {
-                    // Silently fail
-                }
+            } elseif (isset($existingStep8Data['valuation_report_file']) && $existingStep8Data['valuation_report_file']) {
+                // Keep existing file if no new file is uploaded and no removal signal
+                $stepData['valuation_report_file'] = $existingStep8Data['valuation_report_file'];
+            } else {
+                // No file uploaded and no existing file
                 $stepData['valuation_report_file'] = null;
             }
         }
         
         // Handle file uploads for step 9 (Financial Status)
-        if ($stepNumber === 9) {
+        if ($stepNumber == 9) {
+            // Safely get existing step 9 data
+            $existingStep9Data = [];
+            if ($lead->step_9_data) {
+                if (is_string($lead->step_9_data)) {
+                    $decoded = json_decode($lead->step_9_data, true);
+                    $existingStep9Data = is_array($decoded) ? $decoded : [];
+                } elseif (is_array($lead->step_9_data)) {
+                    $existingStep9Data = $lead->step_9_data;
+                }
+            }
+            
             // Handle income document file uploads
             $fileFields = [
                 'father_income_document_file',
@@ -2190,33 +2382,64 @@ class LeadContactController extends AccountBaseController
             ];
             
             foreach ($fileFields as $fileField) {
+                $uploadedFile = null;
+                $fileDetected = false;
+                
                 if ($request->hasFile($fileField)) {
+                    $uploadedFile = $request->file($fileField);
+                    $fileDetected = true;
+                } elseif ($request->allFiles() && isset($request->allFiles()[$fileField])) {
+                    $uploadedFile = $request->allFiles()[$fileField];
+                    $fileDetected = true;
+                } elseif ($request->file($fileField)) {
+                    $uploadedFile = $request->file($fileField);
+                    $fileDetected = true;
+                }
+                
+                if ($fileDetected && $uploadedFile) {
                     // Delete old file if exists
-                    if (isset($lead->step_9_data[$fileField]) && $lead->step_9_data[$fileField]) {
-                        $oldFileName = $lead->step_9_data[$fileField];
-                        \App\Helper\Files::deleteFile($oldFileName, 'lead-income-documents/' . $lead->id);
+                    if (isset($existingStep9Data[$fileField]) && $existingStep9Data[$fileField]) {
+                        $oldFileName = $existingStep9Data[$fileField];
+                        try {
+                            \App\Helper\Files::deleteFile($oldFileName, 'lead-income-documents/' . $lead->id);
+                        } catch (\Exception $e) {
+                            // Silently fail if delete fails
+                        }
                     }
-                    // Upload new file
+                    
+                    // Upload new file with original name + unique ID
                     try {
-                        $fileName = \App\Helper\Files::uploadLocalOrS3(
-                            $request->$fileField,
-                            'lead-income-documents/' . $lead->id
-                        );
-                        $stepData[$fileField] = $fileName;
+                        $fileToUpload = $uploadedFile;
+                        if (!$fileToUpload) {
+                            $fileToUpload = $request->$fileField;
+                        }
+                        
+                        // Generate filename with original name + unique ID
+                        $customFileName = \App\Helper\Files::generateFileNameWithOriginal($fileToUpload->getClientOriginalName());
+                        \App\Helper\Files::fileStore($fileToUpload, 'lead-income-documents/' . $lead->id, $customFileName);
+                        
+                        $fileVisibility = [];
+                        if (config('filesystems.default') == 'local') {
+                            $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                        }
+                        
+                        Storage::disk(config('filesystems.default'))->putFileAs('lead-income-documents/' . $lead->id, $fileToUpload, $customFileName, $fileVisibility);
+                        
+                        $stepData[$fileField] = $customFileName;
                     } catch (\Exception $e) {
-                        // Silently fail
+                        // Preserve existing file if upload fails
+                        if (isset($existingStep9Data[$fileField]) && $existingStep9Data[$fileField]) {
+                            $stepData[$fileField] = $existingStep9Data[$fileField];
+                        }
                     }
                 } elseif ($request->has($fileField . '_existing')) {
                     // Keep existing file if no new file is uploaded
                     $stepData[$fileField] = $request->input($fileField . '_existing');
-                } elseif (isset($lead->step_9_data[$fileField]) && $lead->step_9_data[$fileField]) {
-                    // If existing file input is not present, it means user removed it, so delete file
-                    $oldFileName = $lead->step_9_data[$fileField];
-                    try {
-                        \App\Helper\Files::deleteFile($oldFileName, 'lead-income-documents/' . $lead->id);
-                    } catch (\Exception $e) {
-                        // Silently fail
-                    }
+                } elseif (isset($existingStep9Data[$fileField]) && $existingStep9Data[$fileField]) {
+                    // Keep existing file if no new file is uploaded and no removal signal
+                    $stepData[$fileField] = $existingStep9Data[$fileField];
+                } else {
+                    // No file uploaded and no existing file
                     $stepData[$fileField] = null;
                 }
             }
