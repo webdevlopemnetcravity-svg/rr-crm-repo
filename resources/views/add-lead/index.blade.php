@@ -4825,8 +4825,8 @@
                                             confirmButton: "btn btn-primary",
                                         },
                                     }).then(function() {
-                                        // Redirect to new lead form (without lead_id)
-                                        window.location.href = '{{ route("add-lead.index") }}';
+                                        // Redirect to lead list page
+                                        window.location.href = '{{ route("lead-list.index") }}';
                                     });
                                 } else {
                                     // Step 9 saved but not all steps complete yet, just show regular success
