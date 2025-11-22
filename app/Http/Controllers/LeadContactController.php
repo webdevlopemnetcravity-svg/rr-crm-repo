@@ -174,12 +174,6 @@ class LeadContactController extends AccountBaseController
 
         $this->pageTitle = 'app.leadDashboard';
 
-        if (!request()->ajax()) {
-            $this->categories = LeadCategory::get();
-            $this->sources = LeadSource::get();
-            $this->employees = User::allEmployees(null, 'active');
-        }
-
         return view('lead-dashboard.index', $this->data);
     }
 
