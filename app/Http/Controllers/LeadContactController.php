@@ -30,7 +30,10 @@ use App\Models\LeadStatus;
 use App\Models\Product;
 use App\Models\User;
 use App\Traits\ImportExcel;
+use App\Mail\LeadConfirmation;
+use App\Mail\LeadCreatedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
@@ -1087,6 +1090,13 @@ class LeadContactController extends AccountBaseController
 
             // Log step completion
             $this->logStepCompletion($leadId, $stepNumber);
+
+            // Send emails when step 9 is completed
+            // Use loose comparison to handle both string "9" and integer 9
+            if ($stepNumber == 9 || $stepNumber === 9 || (string)$stepNumber === '9') {
+                \Log::info('Step 9 completed, triggering email sending for lead ID: ' . $lead->id);
+                $this->sendLeadEmails($lead);
+            }
 
             return Reply::successWithData(__('messages.recordSaved'), [
                 'lead_id' => $leadId,
@@ -2543,6 +2553,87 @@ class LeadContactController extends AccountBaseController
                 'completed_at' => now(),
                 'completed_by' => user()->id,
             ]);
+        }
+    }
+
+    /**
+     * Send confirmation and notification emails when lead is completed
+     */
+    private function sendLeadEmails(NewLead $lead)
+    {
+        try {
+            // Reload lead with relationships
+            $lead->refresh();
+            $lead->load(['addedBy', 'leadOwner', 'company']);
+
+            \Log::info('Sending lead emails for lead ID: ' . $lead->id);
+            \Log::info('Step 1 data: ' . json_encode($lead->step_1_data));
+            \Log::info('Lead owner: ' . $lead->lead_owner);
+            \Log::info('Client email: ' . $lead->client_email);
+
+            // Get lead email from step 1 data (contact details)
+            $leadEmail = null;
+            if ($lead->step_1_data) {
+                if (is_string($lead->step_1_data)) {
+                    $step1Data = json_decode($lead->step_1_data, true);
+                } else {
+                    $step1Data = $lead->step_1_data;
+                }
+                
+                if (is_array($step1Data)) {
+                    $leadEmail = $step1Data['email_address'] ?? null;
+                }
+            }
+            
+            // Fallback to client_email if step_1_data email is not available
+            if (empty($leadEmail)) {
+                $leadEmail = $lead->client_email;
+            }
+
+            \Log::info('Lead email to send confirmation: ' . ($leadEmail ?? 'NOT FOUND'));
+
+            // Get assigned user (lead owner) from lead_assign_to field
+            $assignedUser = null;
+            if ($lead->lead_owner) {
+                $assignedUser = User::find($lead->lead_owner);
+                \Log::info('Assigned user found: ' . ($assignedUser ? $assignedUser->email : 'NOT FOUND'));
+            } else {
+                \Log::warning('Lead owner is not set for lead ID: ' . $lead->id);
+            }
+
+            // Send confirmation email to lead's email address (from step 1)
+            if ($leadEmail && filter_var($leadEmail, FILTER_VALIDATE_EMAIL)) {
+                try {
+                    \Log::info('Attempting to send confirmation email to: ' . $leadEmail);
+                    Mail::to($leadEmail)->send(new LeadConfirmation($lead));
+                    \Log::info('Confirmation email sent successfully to: ' . $leadEmail);
+                } catch (\Exception $e) {
+                    // Log error but don't fail the request
+                    \Log::error('Failed to send lead confirmation email to ' . $leadEmail . ': ' . $e->getMessage());
+                    \Log::error('Exception trace: ' . $e->getTraceAsString());
+                }
+            } else {
+                \Log::warning('Lead email is invalid or not found: ' . ($leadEmail ?? 'NULL'));
+            }
+
+            // Send notification email to assigned user (lead owner/employee/admin)
+            if ($assignedUser && $assignedUser->email) {
+                try {
+                    \Log::info('Attempting to send notification email to: ' . $assignedUser->email);
+                    Mail::to($assignedUser->email)->send(new LeadCreatedNotification($lead));
+                    \Log::info('Notification email sent successfully to: ' . $assignedUser->email);
+                } catch (\Exception $e) {
+                    // Log error but don't fail the request
+                    \Log::error('Failed to send lead created notification email to ' . $assignedUser->email . ': ' . $e->getMessage());
+                    \Log::error('Exception trace: ' . $e->getTraceAsString());
+                }
+            } else {
+                \Log::warning('Assigned user email is invalid or not found');
+            }
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            \Log::error('Failed to send lead emails: ' . $e->getMessage());
+            \Log::error('Exception trace: ' . $e->getTraceAsString());
         }
     }
 
