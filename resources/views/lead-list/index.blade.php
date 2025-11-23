@@ -3,9 +3,126 @@
 @push('datatable-styles')
     @include('sections.datatable_css')
     <link rel="stylesheet" href="{{ asset('css/lead-list.css') }}">
+    <style>
+        .follow-up-tooltip-trigger {
+            pointer-events: auto;
+        }
+        .follow-up-tooltip-trigger .feedback-section,
+        .follow-up-tooltip-trigger .reminder-section {
+            pointer-events: none;
+        }
+        .follow-up-tooltip-trigger:hover {
+            z-index: 1050;
+        }
+        .add-follow-up-btn,
+        .edit-follow-up-btn {
+            position: relative;
+            z-index: 1000 !important;
+            pointer-events: auto !important;
+        }
+        .follow-up-column {
+            position: relative;
+            z-index: 1;
+        }
+        /* Fix follow-up text overlap when filter is open - CRITICAL: Filter must be above everything */
+        .more-filters {
+            position: relative;
+            z-index: 1055 !important;
+        }
+        .more-filters .more-filter-tab {
+            z-index: 1055 !important;
+            position: fixed !important;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1) !important;
+        }
+        .more-filters .more-filter-tab.in {
+            z-index: 1055 !important;
+            position: fixed !important;
+        }
+        .filter-box {
+            z-index: 2 !important;
+        }
+        /* Ensure table stays BELOW filter - set lower z-index for table container */
+        .content-wrapper {
+            position: relative;
+            z-index: 1 !important;
+        }
+        .w-tables {
+            position: relative;
+            z-index: 1 !important;
+        }
+        .dataTables_wrapper {
+            position: relative;
+            z-index: 1 !important;
+        }
+        .dataTables_wrapper .table {
+            position: relative;
+            z-index: 1 !important;
+        }
+        .dataTables_wrapper .table tbody tr {
+            position: relative;
+            z-index: 1 !important;
+        }
+        .dataTables_wrapper .table tbody tr td {
+            position: relative;
+            z-index: 1 !important;
+        }
+        .follow-up-column .last-follow-up-info {
+            max-width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            position: relative;
+            z-index: 1;
+        }
+        /* Prevent follow-up column from overlapping filter */
+        #new-leads-table_wrapper {
+            position: relative;
+            z-index: 1;
+        }
+        #new-leads-table {
+            position: relative;
+            z-index: 1;
+        }
+        /* Table cells should not overlap filter */
+        #new-leads-table td {
+            position: relative;
+            z-index: 1;
+        }
+        #new-leads-table td.follow-up-column {
+            position: relative;
+            z-index: 1;
+            max-width: 300px;
+            overflow: hidden;
+        }
+        /* Ensure follow-up text doesn't overflow */
+        .follow-up-column .last-follow-up-info {
+            max-width: 100%;
+            overflow: hidden;
+        }
+        .follow-up-column .feedback-section,
+        .follow-up-column .reminder-section {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-height: 1.4;
+            max-height: 2.8em;
+        }
+        /* Ensure filter inner elements also have high z-index */
+        .more-filter-tab .filter-inner {
+            position: relative;
+            z-index: 1056 !important;
+        }
+        .more-filter-tab .clear-all {
+            position: relative;
+            z-index: 1056 !important;
+        }
+    </style>
 @endpush
 
 @section('filter-section')
+    @php
+        $addLeadPermission = user()->permission('add_lead');
+    @endphp
 
     <x-filters.filter-box>
         <!-- DATE START -->
@@ -29,7 +146,7 @@
                         </span>
                     </div>
                     <input type="text" class="form-control f-14 p-1 border-additional-grey" id="search-text-field"
-                           placeholder="@lang('app.startTyping')">
+                           placeholder="Search by Name / Lead Number / Subclass">
                 </div>
             </form>
         </div>
@@ -56,6 +173,22 @@
             </div>
 
             <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('modules.lead.leadStatus')</label>
+                <div class="select-filter mb-4">
+                    <div class="select-others">
+                        <select class="form-control select-picker" id="filter_lead_status" data-live-search="true" data-container="body" data-size="8">
+                            <option value="all">@lang('app.all')</option>
+                            @if(isset($leadStatuses))
+                                @foreach ($leadStatuses as $status)
+                                    <option value="{{ $status->type }}">{{ $status->type }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="more-filter-items">
                 <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('modules.lead.leadSource')</label>
                 <div class="select-filter mb-4">
                     <div class="select-others">
@@ -64,6 +197,39 @@
                             @foreach ($sources as $source)
                                 <option value="{{ $source->id }}">{{ $source->type }}</option>
                             @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('app.services')</label>
+                <div class="select-filter mb-4">
+                    <div class="select-others">
+                        <select class="form-control select-picker" id="filter_subclass" data-live-search="true" data-container="body" data-size="8">
+                            <option value="all">@lang('app.all')</option>
+                            @if(isset($subclasses))
+                                @foreach ($subclasses as $subclass)
+                                    <option value="{{ $subclass }}">{{ $subclass }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">Priority</label>
+                <div class="select-filter mb-4">
+                    <div class="select-others">
+                        <select class="form-control select-picker" id="filter_priority" data-container="body" data-size="8">
+                            <option value="all">@lang('app.all')</option>
+                            <option value="Select Priority">Select Priority</option>
+                            <option value="1st Priority">1st Priority</option>
+                            <option value="2nd Priority">2nd Priority</option>
+                            <option value="3rd Priority">3rd Priority</option>
+                            <option value="4th Priority">4th Priority</option>
+                            <option value="5th Priority">5th Priority</option>
                         </select>
                     </div>
                 </div>
@@ -88,16 +254,15 @@
 
 @endsection
 
-@php
-    $addLeadPermission = user()->permission('add_lead');
-@endphp
-
 @section('content')
+    @php
+        $addLeadPermission = user()->permission('add_lead');
+    @endphp
+    
     <!-- CONTENT WRAPPER START -->
     <div class="content-wrapper">
-        <!-- Add Task Export Buttons Start -->
-        <div class="d-flex justify-content-between action-bar">
-
+        <!-- Add Lead Button Start -->
+        <div class="d-flex justify-content-between action-bar mb-3">
             <div id="table-actions" class="d-block d-lg-flex align-items-center">
                 @if ($addLeadPermission == 'all' || $addLeadPermission == 'added')
                     <x-forms.link-primary :link="route('add-lead.index')" class="mr-3 mb-2 mb-lg-0" icon="plus">
@@ -106,6 +271,7 @@
                 @endif
             </div>
 
+            <!-- Quick Actions Start -->
             <x-datatable.actions>
                 <div class="select-status mr-3 pl-3">
                     <select name="action_type" class="form-control select-picker" id="quick-action-type" disabled>
@@ -114,9 +280,9 @@
                     </select>
                 </div>
             </x-datatable.actions>
-
+            <!-- Quick Actions End -->
         </div>
-        <!-- Add Task Export Buttons End -->
+        <!-- Add Lead Button End -->
         <!-- Task Box Start -->
         <div class="d-flex flex-column w-tables rounded mt-3 bg-white table-responsive">
 
@@ -126,6 +292,103 @@
         <!-- Task Box End -->
     </div>
     <!-- CONTENT WRAPPER END -->
+
+    <!-- Add Follow-Up Modal -->
+    <div class="modal fade" id="addFollowUpModalList" tabindex="-1" role="dialog" aria-labelledby="addFollowUpModalListLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addFollowUpModalListLabel">Add Follow-Up</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <x-form id="followUpFormList" method="POST" class="ajax-form">
+                    <div class="modal-body">
+                        <input type="hidden" name="new_lead_id" id="follow_up_lead_id">
+                        <input type="hidden" name="id" id="follow_up_id">
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">Follow-Up Type</label>
+                            <div class="d-flex gap-2">
+                                <label class="form-check-label mr-3">
+                                    <input type="radio" name="follow_up_type" value="call" checked class="mr-1"> Call
+                                </label>
+                                <label class="form-check-label mr-3">
+                                    <input type="radio" name="follow_up_type" value="meeting" class="mr-1"> Meeting
+                                </label>
+                                <label class="form-check-label mr-3">
+                                    <input type="radio" name="follow_up_type" value="sms" class="mr-1"> SMS
+                                </label>
+                                <label class="form-check-label">
+                                    <input type="radio" name="follow_up_type" value="email" class="mr-1"> Email
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <x-forms.label fieldId="subject" fieldLabel="Subject">
+                            </x-forms.label>
+                            <input type="text" name="subject" id="subject" class="form-control height-35 f-14" value="">
+                        </div>
+                        <div class="form-group">
+                            <x-forms.label fieldId="outcome" fieldLabel="Outcome of Call">
+                            </x-forms.label>
+                            <input type="text" name="outcome" id="outcome" class="form-control height-35 f-14" value="">
+                        </div>
+                        <div class="form-group">
+                            <x-forms.label fieldId="notes" fieldLabel="Notes">
+                            </x-forms.label>
+                            <textarea name="notes" id="notes" class="form-control f-14" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">Do you want to get update for next follow-up - Set reminder?</label>
+                            <x-forms.checkbox :fieldLabel="__('modules.tasks.reminder')" fieldName="send_reminder"
+                                fieldId="send_reminder" fieldValue="yes" />
+                        </div>
+                        <div class="form-group next_follow_up_datetime_div d-none">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <x-forms.datepicker fieldId="next_follow_up_date"
+                                        fieldLabel="Next Follow Up Date" fieldName="next_follow_up_date"
+                                        :fieldValue="now(company()->timezone)->format(company()->date_format)"
+                                        :fieldPlaceholder="__('placeholders.date')" />
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bootstrap-timepicker timepicker">
+                                        <x-forms.text fieldLabel="Time" :fieldPlaceholder="__('placeholders.hours')"
+                                            fieldName="next_follow_up_time" fieldId="next_follow_up_time"
+                                            :fieldValue="now(company()->timezone)->format(company()->time_format)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group send_reminder_div d-none">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <x-forms.label fieldId="remind_time" fieldLabel="Remind Time">
+                                    </x-forms.label>
+                                    <select name="remind_time" id="remind_time" class="form-control select-picker height-35 f-14">
+                                        <option value="15 Minutes Before" selected>15 Minutes Before</option>
+                                        <option value="30 Minutes Before">30 Minutes Before</option>
+                                        <option value="1 Hour Before">1 Hour Before</option>
+                                        <option value="2 Hours Before">2 Hours Before</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group follow_up_subject_line_div d-none">
+                            <x-forms.label fieldId="follow_up_subject_line" fieldLabel="Follow Up Subject Line" fieldRequired="true">
+                            </x-forms.label>
+                            <input type="text" name="follow_up_subject_line" id="follow_up_subject_line" class="form-control height-35 f-14" value="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <x-forms.button-primary id="save-followup-list" icon="check">Save</x-forms.button-primary>
+                    </div>
+                </x-form>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
@@ -150,6 +413,9 @@
             var source_id = $('#filter_source_id').val();
             var date_filter_on = $('#date_filter_on').val();
             var filter_added_by = $('#filter_addedBy').val();
+            var filter_lead_status = $('#filter_lead_status').val();
+            var filter_subclass = $('#filter_subclass').val();
+            var filter_priority = $('#filter_priority').val();
 
             data['startDate'] = startDate;
             data['filter_addedBy'] = filter_added_by;
@@ -157,19 +423,28 @@
             data['searchText'] = searchText;
             data['source_id'] = source_id;
             data['date_filter_on'] = date_filter_on;
+            data['filter_lead_status'] = filter_lead_status;
+            data['filter_subclass'] = filter_subclass;
+            data['filter_priority'] = filter_priority;
         });
 
         const showTable = () => {
             window.LaravelDataTables["new-leads-table"].draw(true);
         }
 
-        $('#filter_source_id, #date_filter_on, #filter_addedBy').on('change keyup',
+        $('#filter_source_id, #date_filter_on, #filter_addedBy, #filter_lead_status, #filter_subclass, #filter_priority').on('change keyup',
             function () {
                 if ($('#filter_source_id').val() != "all") {
                     $('#reset-filters').removeClass('d-none');
                 } else if ($('#date_filter_on').val() != "created_at") {
                     $('#reset-filters').removeClass('d-none');
                 } else if ($('#filter_addedBy').val() != "all") {
+                    $('#reset-filters').removeClass('d-none');
+                } else if ($('#filter_lead_status').val() != "all") {
+                    $('#reset-filters').removeClass('d-none');
+                } else if ($('#filter_subclass').val() != "all") {
+                    $('#reset-filters').removeClass('d-none');
+                } else if ($('#filter_priority').val() != "all") {
                     $('#reset-filters').removeClass('d-none');
                 } else {
                     $('#reset-filters').addClass('d-none');
@@ -309,10 +584,37 @@
                 showTable();
             @endif
 
-            // Initialize select pickers after table draw
+            // Function to initialize follow-up tooltips
+            function initFollowUpTooltips() {
+                // Destroy existing follow-up tooltips to prevent conflicts
+                $('.follow-up-tooltip-trigger').each(function() {
+                    if ($(this).data('bs.tooltip')) {
+                        $(this).tooltip('dispose');
+                    }
+                });
+                // Initialize follow-up tooltips
+                $('.follow-up-tooltip-trigger').tooltip({
+                    html: true,
+                    placement: 'auto',
+                    trigger: 'hover',
+                    container: 'body',
+                    delay: { show: 300, hide: 100 }
+                });
+            }
+
+            // Initialize select pickers and tooltips after table draw
             $('#new-leads-table').on('draw.dt', function() {
                 $('.priority-select, .status-select, .quality-select').selectpicker();
+                // Small delay to ensure DOM is ready
+                setTimeout(function() {
+                    initFollowUpTooltips();
+                }, 100);
             });
+
+            // Also initialize on initial load if table is already drawn
+            setTimeout(function() {
+                initFollowUpTooltips();
+            }, 500);
         });
 
         // Track previous values to prevent duplicate calls
@@ -419,6 +721,282 @@
                 error: function() {
                     // Reset previous value on error
                     delete previousValues[key];
+                }
+            });
+        });
+
+        // Handle follow-up button click (Add) - stop propagation to prevent dropdown interference
+        $(document).on('click', '.add-follow-up-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            var leadId = $(this).data('lead-id');
+            $('#follow_up_lead_id').val(leadId);
+            $('#follow_up_id').val(''); // Clear edit ID
+            $('#addFollowUpModalListLabel').text('Add Follow-Up');
+            $('#followUpFormList')[0].reset();
+            $('#follow_up_lead_id').val(leadId); // Set lead ID again after reset
+            $('.next_follow_up_datetime_div, .send_reminder_div, .follow_up_subject_line_div').addClass('d-none');
+            $('#send_reminder').prop('checked', false);
+            // Trigger change event to ensure UI is in sync
+            $('#send_reminder').trigger('change');
+            
+            // Open modal programmatically instead of using data-toggle
+            $('#addFollowUpModalList').modal('show');
+        });
+
+        // Handle edit follow-up button click - stop propagation
+        $(document).on('click', '.edit-follow-up-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            var followUpId = $(this).data('follow-up-id');
+            var leadId = $(this).data('lead-id');
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.follow-up-edit', ':id') }}".replace(':id', followUpId),
+                type: "GET",
+                blockUI: true,
+                success: function(response) {
+                    console.log('Edit follow-up response:', response);
+                    
+                    // Handle both response formats: response.follow_up or response.data.follow_up
+                    var followUp = null;
+                    if (response && response.status == "success") {
+                        if (response.follow_up) {
+                            followUp = response.follow_up;
+                        } else if (response.data && response.data.follow_up) {
+                            followUp = response.data.follow_up;
+                        }
+                    } else if (response && response.follow_up) {
+                        // Handle case where status is not in response but follow_up is
+                        followUp = response.follow_up;
+                    } else if (response && response.data && response.data.follow_up) {
+                        followUp = response.data.follow_up;
+                    }
+                    
+                    if (followUp) {
+                        // Set modal title
+                        $('#addFollowUpModalListLabel').text('Edit Follow-Up');
+                        
+                        // Set form values
+                        $('#follow_up_id').val(followUp.id);
+                        $('#follow_up_lead_id').val(followUp.new_lead_id);
+                        $('input[name="follow_up_type"][value="' + followUp.follow_up_type + '"]').prop('checked', true);
+                        $('#subject').val(followUp.subject || '');
+                        $('#outcome').val(followUp.outcome || '');
+                        $('#notes').val(followUp.notes || '');
+                        $('#next_follow_up_date').val(followUp.next_follow_up_date || '');
+                        $('#next_follow_up_time').val(followUp.next_follow_up_time || '');
+                        $('#send_reminder').prop('checked', followUp.send_reminder == 'yes');
+                        $('#remind_time').val(followUp.remind_time || '15 Minutes Before');
+                        $('#follow_up_subject_line').val(followUp.follow_up_subject_line || '');
+                        
+                        // Show/hide date/time fields based on send_reminder
+                        if (followUp.send_reminder == 'yes') {
+                            $('.next_follow_up_datetime_div').removeClass('d-none');
+                        } else {
+                            $('.next_follow_up_datetime_div').addClass('d-none');
+                        }
+                        
+                        // Trigger change event to show/hide reminder sections
+                        $('#send_reminder').trigger('change');
+                        
+                        // Refresh select pickers
+                        $('.select-picker').selectpicker('refresh');
+                        
+                        // Reinitialize date and time pickers after setting values
+                        setTimeout(function() {
+                            // Destroy existing datepicker if any
+                            var dateInput = document.getElementById('next_follow_up_date');
+                            if (dateInput && dateInput._datepicker) {
+                                dateInput._datepicker.destroy();
+                            }
+                            
+                            // Initialize date picker (no minDate restriction for edit)
+                            const dp = datepicker('#next_follow_up_date', {
+                                position: 'bl',
+                                ...datepickerConfig
+                            });
+                            
+                            // Set the date value if exists
+                            if (followUp.next_follow_up_date) {
+                                var dateValue = moment(followUp.next_follow_up_date, '{{ company()->moment_date_format }}').toDate();
+                                dp.setDate(dateValue, true);
+                            }
+                            
+                            // Reinitialize time picker
+                            $('#next_follow_up_time').timepicker({
+                                @if (company()->time_format == 'H:i')
+                                    showMeridian: false,
+                                @endif
+                            });
+                        }, 100);
+                        
+                        // Open modal
+                        $('#addFollowUpModalList').modal('show');
+                    } else {
+                        $.showToastr('Failed to load follow-up data. Please try again.', 'error');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $.showToastr('An error occurred while loading follow-up data. Please try again.', 'error');
+                }
+            });
+        });
+
+        // Initialize date and time pickers for follow-up modal
+        $('#addFollowUpModalList').on('shown.bs.modal', function() {
+            $('.select-picker').selectpicker();
+            
+            // Check if this is edit mode
+            var isEditMode = $('#follow_up_id').val() !== '';
+            
+            // Initialize date picker - only allow future dates for new follow-ups
+            const dp = datepicker('#next_follow_up_date', {
+                position: 'bl',
+                minDate: isEditMode ? null : new Date(), // Allow past dates when editing
+                ...datepickerConfig
+            });
+
+            // Initialize time picker
+            $('#next_follow_up_time').timepicker({
+                @if (company()->time_format == 'H:i')
+                    showMeridian: false,
+                @endif
+            });
+
+            // Validate time when date is selected
+            $('#next_follow_up_date').on('changeDate', function() {
+                var selectedDate = $(this).val();
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                var selectedDateObj = new Date(selectedDate);
+                selectedDateObj.setHours(0, 0, 0, 0);
+                
+                // If selected date is today, we should validate time is in future
+                // This will be handled on form submission
+            });
+
+        });
+
+        // Toggle reminder div, follow up subject line, and next follow up date/time - use event delegation so it works even when modal is opened dynamically
+        $(document).on('change', '#send_reminder', function() {
+            var isChecked = $(this).is(':checked');
+            $('.next_follow_up_datetime_div').toggleClass('d-none', !isChecked);
+            $('.send_reminder_div').toggleClass('d-none', !isChecked);
+            $('.follow_up_subject_line_div').toggleClass('d-none', !isChecked);
+            
+            // Make follow up subject line required/unrequired
+            if (isChecked) {
+                $('#follow_up_subject_line').attr('required', 'required');
+            } else {
+                $('#follow_up_subject_line').removeAttr('required');
+            }
+        });
+
+        // Save follow-up (both create and update)
+        $('#save-followup-list').click(function() {
+            // Validate Follow Up Subject Line if Send Reminder is checked
+            if ($('#send_reminder').is(':checked')) {
+                var followUpSubjectLine = $('#follow_up_subject_line').val();
+                if (!followUpSubjectLine || followUpSubjectLine.trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Follow Up Subject Line is required when Send Reminder is checked.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+            }
+            
+            var followUpDate = $('#next_follow_up_date').val();
+            var followUpTime = $('#next_follow_up_time').val();
+            var followUpId = $('#follow_up_id').val();
+            
+            // Validate future date and time using moment.js (only for new follow-ups)
+            if (!followUpId && followUpDate) {
+                // Parse date using company's date format
+                var selectedDate = moment(followUpDate, '{{ company()->moment_date_format }}');
+                var today = moment().startOf('day');
+                
+                // Check if date is in the past
+                if (!selectedDate.isValid() || selectedDate.isBefore(today)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Next Follow Up Date must be today or a future date.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                
+                // If date is today and time is provided, check if time is in the future
+                if (selectedDate.isSame(today, 'day') && followUpTime) {
+                    // Parse time using company's time format
+                    var timeFormat = '{{ company()->time_format == "H:i" ? "HH:mm" : (company()->time_format == "h:i A" ? "hh:mm A" : "hh:mm a") }}';
+                    var selectedTime = moment(followUpTime, timeFormat);
+                    var now = moment();
+                    
+                    // Combine date and time
+                    var selectedDateTime = selectedDate.clone();
+                    selectedDateTime.hour(selectedTime.hour());
+                    selectedDateTime.minute(selectedTime.minute());
+                    selectedDateTime.second(0);
+                    
+                    if (!selectedTime.isValid() || selectedDateTime.isSameOrBefore(now)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Next Follow Up Time must be in the future.',
+                            confirmButtonText: 'OK'
+                        });
+                        return false;
+                    }
+                } else if (followUpDate && followUpTime) {
+                    // Both date and time provided - validate combined datetime
+                    var timeFormat = '{{ company()->time_format == "H:i" ? "HH:mm" : (company()->time_format == "h:i A" ? "hh:mm A" : "hh:mm a") }}';
+                    var selectedTime = moment(followUpTime, timeFormat);
+                    var now = moment();
+                    
+                    var selectedDateTime = selectedDate.clone();
+                    selectedDateTime.hour(selectedTime.hour());
+                    selectedDateTime.minute(selectedTime.minute());
+                    selectedDateTime.second(0);
+                    
+                    if (!selectedTime.isValid() || selectedDateTime.isSameOrBefore(now)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Next Follow Up Date and Time must be in the future.',
+                            confirmButtonText: 'OK'
+                        });
+                        return false;
+                    }
+                }
+            }
+            
+            // Determine if this is an update or create
+            var url = followUpId ? "{{ route('new-leads.follow-up-update') }}" : "{{ route('new-leads.follow-up-store') }}";
+            
+            $.easyAjax({
+                url: url,
+                container: '#followUpFormList',
+                type: "POST",
+                blockUI: true,
+                data: $('#followUpFormList').serialize(),
+                success: function(response) {
+                    if (response.status == "success") {
+                        $('#addFollowUpModalList').modal('hide');
+                        $('#followUpFormList')[0].reset();
+                        $('#follow_up_id').val('');
+                        $('#addFollowUpModalListLabel').text('Add Follow-Up');
+                        showTable();
+                    }
                 }
             });
         });

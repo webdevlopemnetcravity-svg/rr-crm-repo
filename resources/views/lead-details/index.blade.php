@@ -1438,7 +1438,7 @@
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" placeholder="">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-2">
                                 <x-forms.label fieldId="next_follow_up_time" fieldLabel="Next Follow Up Start Time">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14">

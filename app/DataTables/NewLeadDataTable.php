@@ -205,9 +205,110 @@ class NewLeadDataTable extends BaseDataTable
             return '<div class="lead-quality-dropdown">' . $qualitySelect . '</div>';
         });
 
-        // FOLLOW-UP Column: Leave blank
+        // FOLLOW-UP Column: Show last follow-up info and add button
         $datatables->addColumn('follow_up', function ($row) {
-            return '<div class="follow-up-info"></div>';
+            // Check if lead is draft
+            $isDraft = false;
+            if ($row->stepStatus && $row->stepStatus->final_status == 'draft') {
+                $isDraft = true;
+            }
+            
+            $followUpCount = $row->followUps ? $row->followUps->count() : 0;
+            $html = '<div class="follow-up-column">';
+            
+            // Show last follow-up information
+            if ($followUpCount > 0 && $row->followUps) {
+                $lastFollowUp = $row->followUps->sortByDesc('created_at')->first();
+                
+                // Format date
+                $followUpDate = $lastFollowUp->created_at ? $lastFollowUp->created_at->format(company()->date_format) : '';
+                $followUpType = ucfirst($lastFollowUp->follow_up_type ?? '');
+                $subject = $lastFollowUp->subject ?? '';
+                
+                // Build tooltip content with all follow-up details
+                $tooltipContent = '<div class="text-left" style="max-width: 300px; line-height: 1.6;">';
+                $tooltipContent .= '<strong>Subject:</strong><br>' . htmlspecialchars($subject ?: 'N/A', ENT_QUOTES) . '<br><br>';
+                $tooltipContent .= '<strong>Outcome:</strong><br>' . htmlspecialchars($lastFollowUp->outcome ?: 'N/A', ENT_QUOTES) . '<br><br>';
+                $tooltipContent .= '<strong>Note:</strong><br>' . htmlspecialchars($lastFollowUp->notes ?: 'N/A', ENT_QUOTES) . '<br><br>';
+                $tooltipContent .= '<strong>Reminder:</strong><br>' . ($lastFollowUp->send_reminder == 'yes' ? 'Yes' : 'No') . '<br><br>';
+                
+                if ($lastFollowUp->send_reminder == 'yes' && $lastFollowUp->next_follow_up_date) {
+                    $reminderDateTime = $lastFollowUp->next_follow_up_date->format(company()->date_format . ' ' . company()->time_format);
+                    $tooltipContent .= '<strong>Reminder Date & Time:</strong><br>' . htmlspecialchars($reminderDateTime, ENT_QUOTES) . '<br><br>';
+                } else {
+                    $tooltipContent .= '<strong>Reminder Date & Time:</strong><br>N/A<br><br>';
+                }
+                
+                // Show only Updated if available, otherwise show Created
+                $hasUpdate = $lastFollowUp->lastUpdatedBy && $lastFollowUp->updated_at && $lastFollowUp->updated_at->ne($lastFollowUp->created_at);
+                
+                if ($hasUpdate) {
+                    // Show Updated information
+                    $updatedBy = $lastFollowUp->lastUpdatedBy ? htmlspecialchars($lastFollowUp->lastUpdatedBy->name, ENT_QUOTES) : 'N/A';
+                    $updatedAt = $lastFollowUp->updated_at ? $lastFollowUp->updated_at->format(company()->date_format . ' ' . company()->time_format) : 'N/A';
+                    $tooltipContent .= '<strong>Updated By:</strong><br>' . $updatedBy . ' on ' . htmlspecialchars($updatedAt, ENT_QUOTES);
+                } else {
+                    // Show Created information
+                    $createdBy = $lastFollowUp->addedBy ? htmlspecialchars($lastFollowUp->addedBy->name, ENT_QUOTES) : 'N/A';
+                    $createdAt = $lastFollowUp->created_at ? $lastFollowUp->created_at->format(company()->date_format . ' ' . company()->time_format) : 'N/A';
+                    $tooltipContent .= '<strong>Created By:</strong><br>' . $createdBy . ' on ' . htmlspecialchars($createdAt, ENT_QUOTES);
+                }
+                $tooltipContent .= '</div>';
+                
+                // Feedback section - format: "Subject: [subject] on [date] by [type]..."
+                // Limit subject to 2 lines
+                $feedbackText = '';
+                if ($subject) {
+                    $feedbackLines = preg_split('/\r\n|\r|\n/', $subject);
+                    $feedbackLines = array_filter($feedbackLines); // Remove empty lines
+                    $feedbackLines = array_slice($feedbackLines, 0, 2); // Take only first 2 lines
+                    $feedbackText = implode(' ', $feedbackLines);
+                    if (strlen($subject) > strlen($feedbackText)) {
+                        $feedbackText .= '...';
+                    }
+                }
+                
+                // Use a unique ID for each tooltip to avoid conflicts
+                $tooltipId = 'follow-up-tooltip-' . $row->id . '-' . $lastFollowUp->id;
+                $html .= '<div class="last-follow-up-info mb-2 follow-up-tooltip-trigger" data-toggle="tooltip" data-html="true" data-placement="auto" data-tooltip-id="' . $tooltipId . '" title="' . htmlspecialchars($tooltipContent, ENT_QUOTES) . '" style="cursor: help; display: inline-block;">';
+                $html .= '<div class="feedback-section f-12 text-dark-grey mb-1">';
+                $html .= '<strong>Subject:</strong> ' . htmlspecialchars($feedbackText) . ' on ' . $followUpDate . ' by ' . $followUpType;
+                $html .= '</div>';
+                
+                // Reminder section - only if reminder is set
+                if ($lastFollowUp->send_reminder == 'yes' && $lastFollowUp->follow_up_subject_line) {
+                    $reminderText = $lastFollowUp->follow_up_subject_line;
+                    $reminderLines = preg_split('/\r\n|\r|\n/', $reminderText);
+                    $reminderLines = array_filter($reminderLines); // Remove empty lines
+                    $reminderLines = array_slice($reminderLines, 0, 2); // Take only first 2 lines
+                    $reminderDisplay = implode(' ', $reminderLines);
+                    if (strlen($reminderText) > strlen($reminderDisplay)) {
+                        $reminderDisplay .= '...';
+                    }
+                    
+                    $html .= '<div class="reminder-section f-12 text-dark-grey">';
+                    $html .= '<strong>Reminder:</strong> ' . htmlspecialchars($reminderDisplay);
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div>';
+                
+                // Edit button - only show if there's a follow-up and not draft
+                if (!$isDraft) {
+                    $html .= '<button type="button" class="edit-follow-up-btn-simple edit-follow-up-btn" data-follow-up-id="' . $lastFollowUp->id . '" data-lead-id="' . $row->id . '" style="padding: 0; background: none; border: none; color: #007bff; text-decoration: underline; cursor: pointer; margin-right: 10px;">
+                                <i class="fa fa-edit"></i> Edit
+                            </button>';
+                }
+            }
+            
+            // Add button - only show if not draft, simple style without padding and background
+            if (!$isDraft) {
+                $html .= '<button type="button" class="add-follow-up-btn add-follow-up-btn-simple" data-lead-id="' . $row->id . '" style="padding: 0; background: none; border: none; color: #007bff; text-decoration: underline; cursor: pointer; position: relative; z-index: 10;">
+                            <i class="fa fa-plus"></i> Add
+                        </button>';
+            }
+            $html .= '</div>';
+            return $html;
         });
 
         // ACTION Column: Lead owner image/placeholder with 2 letters and view button
@@ -285,7 +386,7 @@ class NewLeadDataTable extends BaseDataTable
      */
     public function query(NewLead $model)
     {
-        $newLead = $model->with(['addedBy', 'leadOwner', 'stepStatus'])
+        $newLead = $model->with(['addedBy', 'leadOwner', 'stepStatus', 'followUps.addedBy', 'followUps.lastUpdatedBy'])
             ->select(
                 'new_leads.id',
                 'new_leads.added_by',
@@ -324,11 +425,8 @@ class NewLeadDataTable extends BaseDataTable
         }
 
         if ($this->request()->source_id != 'all' && $this->request()->source_id != '') {
-            // Get the source type from the source ID
-            $source = \App\Models\LeadSource::find($this->request()->source_id);
-            if ($source) {
-                $newLead = $newLead->where('new_leads.lead_source', $source->type);
-            }
+            // Filter by lead source directly (now using hardcoded values)
+            $newLead = $newLead->where('new_leads.lead_source', $this->request()->source_id);
         }
 
         if ($this->viewLeadPermission == 'all' && $this->request()->filter_addedBy != 'all' && $this->request()->filter_addedBy != '') {
@@ -351,11 +449,51 @@ class NewLeadDataTable extends BaseDataTable
         }
 
         if ($this->request()->searchText != '') {
-            $newLead = $newLead->where(function ($query) {
-                $query->where('new_leads.client_name', 'like', '%' . request('searchText') . '%')
-                    ->orWhere('new_leads.client_email', 'like', '%' . request('searchText') . '%')
-                    ->orwhere('new_leads.mobile', 'like', '%' . request('searchText') . '%');
+            $searchText = request('searchText');
+            $newLead = $newLead->where(function ($query) use ($searchText) {
+                // Search by name
+                $query->where('new_leads.client_name', 'like', '%' . $searchText . '%')
+                    ->orWhere('new_leads.client_email', 'like', '%' . $searchText . '%')
+                    ->orWhere('new_leads.mobile', 'like', '%' . $searchText . '%');
+                
+                // Search by lead number (extract number from "LEAD-0001" format)
+                if (preg_match('/LEAD-?(\d+)/i', $searchText, $matches)) {
+                    $leadId = (int)$matches[1];
+                    $query->orWhere('new_leads.id', $leadId);
+                } elseif (is_numeric($searchText)) {
+                    // If just a number, search by ID
+                    $query->orWhere('new_leads.id', (int)$searchText);
+                }
+                
+                // Search by subclass in step_2_data JSON
+                $query->orWhere(function ($q) use ($searchText) {
+                    $q->whereRaw("JSON_EXTRACT(new_leads.step_2_data, '$.pr_subclass') LIKE ?", ['%' . $searchText . '%'])
+                      ->orWhereRaw("JSON_EXTRACT(new_leads.step_2_data, '$.visit_subclass') LIKE ?", ['%' . $searchText . '%'])
+                      ->orWhereRaw("JSON_EXTRACT(new_leads.step_2_data, '$.work_subclass') LIKE ?", ['%' . $searchText . '%'])
+                      ->orWhereRaw("JSON_EXTRACT(new_leads.step_2_data, '$.student_subclass') LIKE ?", ['%' . $searchText . '%']);
+                });
             });
+        }
+        
+        // Filter by Lead Status
+        if ($this->request()->filter_lead_status != 'all' && $this->request()->filter_lead_status != '') {
+            $newLead = $newLead->where('new_leads.lead_status', $this->request()->filter_lead_status);
+        }
+        
+        // Filter by Subclass
+        if ($this->request()->filter_subclass != 'all' && $this->request()->filter_subclass != '') {
+            $subclass = $this->request()->filter_subclass;
+            $newLead = $newLead->where(function ($query) use ($subclass) {
+                $query->whereRaw("JSON_EXTRACT(new_leads.step_2_data, '$.pr_subclass') = ?", [$subclass])
+                      ->orWhereRaw("JSON_EXTRACT(new_leads.step_2_data, '$.visit_subclass') = ?", [$subclass])
+                      ->orWhereRaw("JSON_EXTRACT(new_leads.step_2_data, '$.work_subclass') = ?", [$subclass])
+                      ->orWhereRaw("JSON_EXTRACT(new_leads.step_2_data, '$.student_subclass') = ?", [$subclass]);
+            });
+        }
+        
+        // Filter by Priority
+        if ($this->request()->filter_priority != 'all' && $this->request()->filter_priority != '') {
+            $newLead = $newLead->where('new_leads.priority', $this->request()->filter_priority);
         }
 
         return $newLead;
@@ -368,24 +506,30 @@ class NewLeadDataTable extends BaseDataTable
      */
     public function html()
     {
-        $dataTable = $this->setBuilder('new-leads-table', 2)
+            $dataTable = $this->setBuilder('new-leads-table', 2)
             ->parameters([
                 'initComplete' => 'function () {
-                   window.LaravelDataTables["new-leads-table"].buttons().container()
-                    .appendTo("#table-actions");
                    $(".priority-select, .status-select, .quality-select").selectpicker();
                 }',
                 'fnDrawCallback' => 'function( oSettings ) {
+                    // Destroy existing tooltips to prevent conflicts
+                    $(".follow-up-tooltip-trigger").tooltip("dispose");
+                    // Initialize tooltips for follow-up info
+                    $(".follow-up-tooltip-trigger").tooltip({
+                        html: true,
+                        placement: "top",
+                        trigger: "hover",
+                        container: "body"
+                    });
+                    // Initialize other tooltips
                     $("body").tooltip({
-                        selector: \'[data-toggle="tooltip"]\'
+                        selector: \'[data-toggle="tooltip"]:not(.follow-up-tooltip-trigger)\'
                     });
                     $(".priority-select, .status-select, .quality-select").selectpicker();
                 }',
             ]);
 
-        if (canDataTableExport()) {
-            $dataTable->buttons(Button::make(['extend' => 'excel', 'text' => '<i class="fa fa-file-export"></i> ' . trans('app.exportExcel')]));
-        }
+        // Export button removed
 
         return $dataTable;
     }

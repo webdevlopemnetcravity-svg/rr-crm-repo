@@ -81,8 +81,57 @@ class LeadContactController extends AccountBaseController
 
         if (!request()->ajax()) {
             $this->categories = LeadCategory::get();
-            $this->sources = LeadSource::get();
             $this->employees = User::allEmployees(null, 'active');
+            
+            // Hardcoded lead source values for filter
+            $this->sources = collect([
+                'Facebook',
+                'Google Ads',
+                'Walk-in',
+                'WhatsApp Inquiry',
+                'Reference',
+                'Website',
+                'Email Marketing'
+            ])->map(function ($source) {
+                return (object)['id' => $source, 'type' => $source];
+            });
+            
+            // Hardcoded lead status values for filter
+            $this->leadStatuses = collect([
+                'Untouched',
+                'Introduction',
+                'Info Collected',
+                'Consultation Call 1',
+                'Consultation Call 2',
+                'Consultation Meet 1',
+                'Consultation Meet 2',
+                'Documentation',
+                'Final Discussion',
+                'Estimation',
+                'Payment',
+                'MOU',
+                'File in Process',
+                'File Submission',
+                'Visa Process',
+                'Flying Date Received',
+                'Join/Move/Admissions',
+                'Follow Up',
+                'Lead Close'
+            ])->map(function ($status) {
+                return (object)['id' => $status, 'type' => $status];
+            });
+            
+            // Hardcoded service/subclass values for filter
+            $this->subclasses = collect([
+                'Visitor Visa (Subclass 600)',
+                'PR - Employer Nomination Scheme (ENS)(Subclass 186)',
+                'PR - Skilled Nominated Visa (Subclass 190)',
+                'PR - Skilled Independent Visa (Subclass 189)',
+                'Work Visa - Temporary Skill Shortage Visa (Subclass 482)',
+                'Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)',
+                'Student Visa (Subclass 500)',
+                'Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)'
+            ])->sort()->values();
         }
 
         return $dataTable->render('lead-list.index', $this->data);
@@ -2717,6 +2766,388 @@ class LeadContactController extends AccountBaseController
         ];
         
         return download_local_s3($file, $filePath);
+    }
+
+    /**
+     * Store new lead follow-up
+     */
+    public function storeNewLeadFollowUp(Request $request)
+    {
+        $newLead = NewLead::findOrFail($request->new_lead_id);
+        
+        // Check if lead is draft - don't allow follow-up for draft leads
+        $isDraft = false;
+        if ($newLead->stepStatus && $newLead->stepStatus->final_status == 'draft') {
+            $isDraft = true;
+        }
+        
+        if ($isDraft) {
+            return Reply::error('Cannot add follow-up for draft leads. Please complete the lead first.');
+        }
+        
+        $rules = [
+            'new_lead_id' => 'required|exists:new_leads,id',
+            'follow_up_type' => 'required|in:call,meeting,sms,email',
+            'subject' => 'nullable|string|max:255',
+            'outcome' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+            'next_follow_up_date' => 'nullable|date|after_or_equal:' . now(company()->timezone)->format('Y-m-d'),
+            'next_follow_up_time' => 'nullable|string',
+            'send_reminder' => 'nullable|in:yes,no',
+            'remind_time' => 'nullable|string',
+        ];
+        
+        // Make follow_up_subject_line required if send_reminder is checked
+        if ($request->send_reminder == 'yes') {
+            $rules['follow_up_subject_line'] = 'required|string|max:255';
+        } else {
+            $rules['follow_up_subject_line'] = 'nullable|string|max:255';
+        }
+        
+        $request->validate($rules);
+
+        // Combine date and time if both are provided
+        $nextFollowUpDate = null;
+        $now = now(company()->timezone);
+        
+        if ($request->next_follow_up_date && $request->next_follow_up_time) {
+            try {
+                // Parse date first
+                $dateObj = \Carbon\Carbon::createFromFormat(
+                    company()->date_format,
+                    $request->next_follow_up_date
+                )->setTimezone(company()->timezone);
+                
+                // Parse time - try multiple formats
+                $timeStr = trim($request->next_follow_up_time);
+                $timeFormats = [
+                    company()->time_format, // Try company format first
+                    'h:i A', // 12-hour with uppercase AM/PM
+                    'h:i a', // 12-hour with lowercase am/pm
+                    'H:i',   // 24-hour format
+                    'g:i A', // 12-hour without leading zero
+                    'g:i a', // 12-hour without leading zero lowercase
+                ];
+                
+                $timeParsed = false;
+                $timeObj = null;
+                
+                foreach ($timeFormats as $format) {
+                    try {
+                        $timeObj = \Carbon\Carbon::createFromFormat($format, $timeStr);
+                        $timeParsed = true;
+                        break;
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                }
+                
+                if (!$timeParsed) {
+                    // If all formats fail, try to parse as standard time
+                    try {
+                        $timeObj = \Carbon\Carbon::parse($timeStr);
+                        $timeParsed = true;
+                    } catch (\Exception $e) {
+                        // If still fails, use start of day
+                        $timeObj = \Carbon\Carbon::now()->startOfDay();
+                    }
+                }
+                
+                // Combine date and time
+                $dateTime = $dateObj->setTime($timeObj->hour, $timeObj->minute, 0);
+                
+                // Validate that the datetime is in the future
+                if ($dateTime->lte($now)) {
+                    return Reply::error('Next Follow Up Date and Time must be in the future.');
+                }
+                
+                $nextFollowUpDate = $dateTime->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                // If parsing fails, try with just date
+                if ($request->next_follow_up_date) {
+                    try {
+                        $dateTime = \Carbon\Carbon::createFromFormat(
+                            company()->date_format,
+                            $request->next_follow_up_date
+                        )->setTimezone(company()->timezone)->startOfDay();
+                        
+                        // If only date is provided and it's today, it's valid (time can be set later)
+                        // But if it's in the past, reject it
+                        if ($dateTime->lt($now->startOfDay())) {
+                            return Reply::error('Next Follow Up Date must be today or in the future.');
+                        }
+                        
+                        $nextFollowUpDate = $dateTime->format('Y-m-d H:i:s');
+                    } catch (\Exception $e2) {
+                        return Reply::error('Invalid date format: ' . $e2->getMessage());
+                    }
+                } else {
+                    return Reply::error('Invalid date or time format: ' . $e->getMessage());
+                }
+            }
+        } elseif ($request->next_follow_up_date) {
+            // Only date provided - must be today or future
+            try {
+                $dateTime = \Carbon\Carbon::createFromFormat(
+                    company()->date_format,
+                    $request->next_follow_up_date
+                )->setTimezone(company()->timezone)->startOfDay();
+                
+                // Validate that the date is today or in the future
+                if ($dateTime->lt($now->startOfDay())) {
+                    return Reply::error('Next Follow Up Date must be today or in the future.');
+                }
+                
+                $nextFollowUpDate = $dateTime->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                return Reply::error('Invalid date format.');
+            }
+        }
+
+        $followUp = new \App\Models\NewLeadFollowUp();
+        $followUp->new_lead_id = $request->new_lead_id;
+        $followUp->follow_up_type = $request->follow_up_type;
+        $followUp->subject = $request->subject;
+        $followUp->outcome = $request->outcome;
+        $followUp->notes = $request->notes;
+        $followUp->next_follow_up_date = $nextFollowUpDate;
+        $followUp->send_reminder = $request->send_reminder ?? 'no';
+        $followUp->remind_time = $request->remind_time;
+        $followUp->follow_up_subject_line = $request->follow_up_subject_line;
+        $followUp->status = 'pending';
+        $followUp->added_by = user()->id;
+        $followUp->save();
+
+        // Fire notification event if reminder is enabled
+        if ($followUp->send_reminder == 'yes') {
+            event(new \App\Events\NewLeadFollowUpReminderEvent($followUp, true));
+        }
+
+        return Reply::success(__('messages.recordSaved'));
+    }
+
+    /**
+     * Get follow-ups for a new lead
+     */
+    public function getNewLeadFollowUps($leadId)
+    {
+        $dataTable = new \App\DataTables\NewLeadFollowUpDataTable();
+        $dataTable->getAjaxUrl = route('new-leads.follow-ups', $leadId);
+        return $dataTable->render('lead-list.follow-ups', ['leadId' => $leadId]);
+    }
+
+    /**
+     * Update follow-up status
+     */
+    public function updateNewLeadFollowUpStatus(Request $request)
+    {
+        $request->validate([
+            'followup_id' => 'required|exists:new_lead_follow_up,id',
+            'status' => 'required|in:pending,completed,canceled',
+        ]);
+
+        $followUp = \App\Models\NewLeadFollowUp::findOrFail($request->followup_id);
+        $followUp->status = $request->status;
+        $followUp->last_updated_by = user()->id;
+        $followUp->save();
+
+        return Reply::success(__('messages.updateSuccess'));
+    }
+
+    /**
+     * Get follow-up for editing
+     */
+    public function editNewLeadFollowUp($id)
+    {
+        $followUp = \App\Models\NewLeadFollowUp::findOrFail($id);
+        
+        // Check permissions
+        $editPermission = user()->permission('edit_lead_follow_up');
+        abort_403(!($editPermission == 'all' || ($editPermission == 'added' && $followUp->added_by == user()->id)));
+        
+        return Reply::dataOnly([
+            'status' => 'success',
+            'follow_up' => [
+                'id' => $followUp->id,
+                'new_lead_id' => $followUp->new_lead_id,
+                'follow_up_type' => $followUp->follow_up_type,
+                'subject' => $followUp->subject,
+                'outcome' => $followUp->outcome,
+                'notes' => $followUp->notes,
+                'next_follow_up_date' => $followUp->next_follow_up_date ? $followUp->next_follow_up_date->format(company()->date_format) : '',
+                'next_follow_up_time' => $followUp->next_follow_up_date ? $followUp->next_follow_up_date->format(company()->time_format) : '',
+                'send_reminder' => $followUp->send_reminder,
+                'remind_time' => $followUp->remind_time,
+                'follow_up_subject_line' => $followUp->follow_up_subject_line,
+            ]
+        ]);
+    }
+
+    /**
+     * Update follow-up
+     */
+    public function updateNewLeadFollowUp(Request $request)
+    {
+        $followUp = \App\Models\NewLeadFollowUp::findOrFail($request->id);
+        $newLead = NewLead::findOrFail($request->new_lead_id);
+        
+        // Check if lead is draft - don't allow follow-up update for draft leads
+        $isDraft = false;
+        if ($newLead->stepStatus && $newLead->stepStatus->final_status == 'draft') {
+            $isDraft = true;
+        }
+        
+        if ($isDraft) {
+            return Reply::error('Cannot update follow-up for draft leads. Please complete the lead first.');
+        }
+        
+        // Check permissions
+        $editPermission = user()->permission('edit_lead_follow_up');
+        abort_403(!($editPermission == 'all' || ($editPermission == 'added' && $followUp->added_by == user()->id)));
+        
+        $rules = [
+            'id' => 'required|exists:new_lead_follow_up,id',
+            'new_lead_id' => 'required|exists:new_leads,id',
+            'follow_up_type' => 'required|in:call,meeting,sms,email',
+            'subject' => 'nullable|string|max:255',
+            'outcome' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+            'next_follow_up_date' => 'nullable|date|after_or_equal:' . now(company()->timezone)->format('Y-m-d'),
+            'next_follow_up_time' => 'nullable|string',
+            'send_reminder' => 'nullable|in:yes,no',
+            'remind_time' => 'nullable|string',
+        ];
+        
+        // Make follow_up_subject_line required if send_reminder is checked
+        if ($request->send_reminder == 'yes') {
+            $rules['follow_up_subject_line'] = 'required|string|max:255';
+        } else {
+            $rules['follow_up_subject_line'] = 'nullable|string|max:255';
+        }
+        
+        $request->validate($rules);
+
+        $now = now(company()->timezone);
+        
+        // Combine date and time if both are provided
+        $nextFollowUpDate = null;
+        if ($request->next_follow_up_date && $request->next_follow_up_time) {
+            try {
+                // Parse date first
+                $dateObj = \Carbon\Carbon::createFromFormat(
+                    company()->date_format,
+                    $request->next_follow_up_date
+                )->setTimezone(company()->timezone);
+                
+                // Parse time - try multiple formats
+                $timeStr = trim($request->next_follow_up_time);
+                $timeFormats = [
+                    company()->time_format, // Try company format first
+                    'h:i A', // 12-hour with uppercase AM/PM
+                    'h:i a', // 12-hour with lowercase am/pm
+                    'H:i',   // 24-hour format
+                    'g:i A', // 12-hour without leading zero
+                    'g:i a', // 12-hour without leading zero lowercase
+                ];
+                
+                $timeParsed = false;
+                $timeObj = null;
+                
+                foreach ($timeFormats as $format) {
+                    try {
+                        $timeObj = \Carbon\Carbon::createFromFormat($format, $timeStr);
+                        $timeParsed = true;
+                        break;
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                }
+                
+                if (!$timeParsed) {
+                    // If all formats fail, try to parse as standard time
+                    try {
+                        $timeObj = \Carbon\Carbon::parse($timeStr);
+                        $timeParsed = true;
+                    } catch (\Exception $e) {
+                        // If still fails, use start of day
+                        $timeObj = \Carbon\Carbon::now()->startOfDay();
+                    }
+                }
+                
+                // Combine date and time
+                $dateTime = $dateObj->setTime($timeObj->hour, $timeObj->minute, 0);
+                
+                // Validate that the datetime is in the future
+                if ($dateTime->lte($now)) {
+                    return Reply::error('Next Follow Up Date and Time must be in the future.');
+                }
+                
+                $nextFollowUpDate = $dateTime->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                if ($request->next_follow_up_date) {
+                    try {
+                        $dateTime = \Carbon\Carbon::createFromFormat(
+                            company()->date_format,
+                            $request->next_follow_up_date
+                        )->setTimezone(company()->timezone)->startOfDay();
+                        
+                        if ($dateTime->lt($now->startOfDay())) {
+                            return Reply::error('Next Follow Up Date must be today or in the future.');
+                        }
+                        
+                        $nextFollowUpDate = $dateTime->format('Y-m-d H:i:s');
+                    } catch (\Exception $e2) {
+                        return Reply::error('Invalid date format: ' . $e2->getMessage());
+                    }
+                } else {
+                    return Reply::error('Invalid date or time format: ' . $e->getMessage());
+                }
+            }
+        } elseif ($request->next_follow_up_date) {
+            try {
+                $dateTime = \Carbon\Carbon::createFromFormat(
+                    company()->date_format,
+                    $request->next_follow_up_date
+                )->setTimezone(company()->timezone)->startOfDay();
+                
+                if ($dateTime->lt($now->startOfDay())) {
+                    return Reply::error('Next Follow Up Date must be today or in the future.');
+                }
+                
+                $nextFollowUpDate = $dateTime->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                return Reply::error('Invalid date format.');
+            }
+        }
+
+        $followUp->follow_up_type = $request->follow_up_type;
+        $followUp->subject = $request->subject;
+        $followUp->outcome = $request->outcome;
+        $followUp->notes = $request->notes;
+        $followUp->next_follow_up_date = $nextFollowUpDate;
+        $followUp->send_reminder = $request->send_reminder ?? 'no';
+        $followUp->remind_time = $request->remind_time;
+        $followUp->follow_up_subject_line = $request->follow_up_subject_line;
+        $followUp->last_updated_by = user()->id;
+        $followUp->save();
+
+        // Fire notification event if reminder is enabled
+        if ($followUp->send_reminder == 'yes') {
+            event(new \App\Events\NewLeadFollowUpReminderEvent($followUp, true));
+        }
+
+        return Reply::success(__('messages.updateSuccess'));
+    }
+
+    /**
+     * Delete follow-up
+     */
+    public function deleteNewLeadFollowUp($id)
+    {
+        $followUp = \App\Models\NewLeadFollowUp::findOrFail($id);
+        $followUp->delete();
+
+        return Reply::success(__('messages.deleteSuccess'));
     }
 
 }

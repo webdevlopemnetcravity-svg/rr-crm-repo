@@ -543,6 +543,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('new-leads/update-priority', [LeadContactController::class, 'updateLeadPriority'])->name('new-leads.update_priority');
     Route::post('new-leads/update-status', [LeadContactController::class, 'updateLeadStatus'])->name('new-leads.update_status');
     Route::post('new-leads/update-quality', [LeadContactController::class, 'updateLeadQuality'])->name('new-leads.update_quality');
+    Route::post('new-leads/follow-up-store', [LeadContactController::class, 'storeNewLeadFollowUp'])->name('new-leads.follow-up-store');
+    Route::get('new-leads/follow-ups/{leadId}', [LeadContactController::class, 'getNewLeadFollowUps'])->name('new-leads.follow-ups');
+    Route::get('new-leads/follow-up-edit/{id}', [LeadContactController::class, 'editNewLeadFollowUp'])->name('new-leads.follow-up-edit');
+    Route::post('new-leads/follow-up-update', [LeadContactController::class, 'updateNewLeadFollowUp'])->name('new-leads.follow-up-update');
+    Route::post('new-leads/follow-up-status', [LeadContactController::class, 'updateNewLeadFollowUpStatus'])->name('new-leads.follow-up-status');
+    Route::delete('new-leads/follow-up/{id}', [LeadContactController::class, 'deleteNewLeadFollowUp'])->name('new-leads.follow-up-delete');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
     Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
     Route::get('lead-dashboard', [LeadContactController::class, 'leadDashboard'])->name('lead-dashboard.index');

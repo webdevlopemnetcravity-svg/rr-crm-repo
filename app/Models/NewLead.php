@@ -89,4 +89,12 @@ class NewLead extends BaseModel
     {
         return $this->hasMany(LeadStepLog::class, 'lead_id');
     }
+
+    /**
+     * Get the follow-ups for this lead.
+     */
+    public function followUps(): HasMany
+    {
+        return $this->hasMany(NewLeadFollowUp::class, 'new_lead_id');
+    }
 }

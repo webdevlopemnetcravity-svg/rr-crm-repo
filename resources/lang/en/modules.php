@@ -1615,6 +1615,7 @@ return array(
         'editLeadStatus' => 'Edit Lead Status',
         'editFollowUp' => 'Edit FollowUp',
         'pipelineInfo' => 'A pipeline is a collection of stages that shows how a deal goes from when lead is generated to when you finalize the deal.',
+        'leadQuality' => 'Lead Quality',
     ),
     'proposal' => array(
         'createTitle' => 'Add Proposal Info',

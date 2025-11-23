@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Notifications;
+
+use App\Models\NewLeadFollowUp;
+use App\Models\GlobalSetting;
+use Illuminate\Support\Facades\App;
+use App\Models\EmailNotificationSetting;
+
+class NewLeadFollowUpReminder extends BaseNotification
+{
+    /**
+     * Create a new notification instance.
+     *
+     * @return void
+     */
+    private $leadFollowup;
+    private $subject;
+    private $emailSetting;
+
+    public function __construct(NewLeadFollowUp $leadFollowup, $subject)
+    {
+        $this->leadFollowup = $leadFollowup;
+        $this->subject = $subject;
+        $this->company = $leadFollowup->newLead->company;
+        $this->emailSetting = EmailNotificationSetting::where('company_id', $this->company->id)->where('slug', 'follow-up-reminder')->first() ?? new EmailNotificationSetting();
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param mixed $notifiable
+     * @return array
+     */
+    public function via($notifiable)
+    {
+        $via = ['database'];
+
+        if ($this->emailSetting && $this->emailSetting->send_email == 'yes' && $notifiable->email_notifications && $notifiable->email != '') {
+            array_push($via, 'mail');
+        }
+
+        return $via;
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     *
+     * @param mixed $notifiable
+     * @return \Illuminate\Notifications\Messages\MailMessage
+     */
+    public function toMail($notifiable)
+    {
+        $build = parent::build($notifiable);
+        $url = route('lead-list.index');
+
+        $url = getDomainSpecificUrl($url, $this->company);
+
+        $followUpLead = $this->leadFollowup->newLead->client_name ?? 'N/A';
+        $followUpDate = $this->leadFollowup->next_follow_up_date->format($this->company->date_format);
+        $followUpTime = $this->leadFollowup->next_follow_up_date->format($this->company->time_format);
+        $followUpSubject = $this->leadFollowup->follow_up_subject_line ?? 'N/A';
+        $remindTime = $this->leadFollowup->remind_time ?? 'N/A';
+
+        $content = __('email.followUpReminder.followUpLeadText') . '<br><br>' .
+            __('email.followUpReminder.followUpLead') . ' :- ' . $followUpLead . '<br>' .
+            'Follow Up Subject Line: ' . $followUpSubject . '<br>' .
+            'Next Follow Up Start Time: ' . $remindTime . '<br>' .
+            __('email.followUpReminder.nextFollowUpDate') . ' :- ' . $followUpDate . '<br>' .
+            __('email.followUpReminder.nextFollowUpTime') . ' :- ' . $followUpTime . '<br>' .
+            ($this->leadFollowup->notes ?? '');
+
+        $mailSubject = ($this->subject) ? __('email.followUpReminder.newFollowUpSubject') : __('email.followUpReminder.subject');
+        $build
+            ->subject($mailSubject . ' #' . $this->leadFollowup->newLead->id . ' - ' . config('app.name') . '.')
+            ->markdown('mail.email', [
+                'url' => $url,
+                'content' => $content,
+                'themeColor' => $this->company->header_color,
+                'actionText' => __('email.followUpReminder.action'),
+                'notifiableName' => $notifiable->name
+            ]);
+
+        parent::resetLocale();
+
+        return $build;
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param mixed $notifiable
+     * @return array
+     */
+    public function toArray($notifiable)
+    {
+        return [
+            'follow_up_id' => $this->leadFollowup->id,
+            'id' => $this->leadFollowup->newLead->id,
+            'created_at' => $this->leadFollowup->created_at->format('Y-m-d H:i:s'),
+            'heading' => __('email.followUpReminder.subject'),
+        ];
+    }
+}
+

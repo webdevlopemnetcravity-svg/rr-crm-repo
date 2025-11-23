@@ -6,6 +6,7 @@ use App\Events\AppreciationEvent;
 use App\Events\AttendanceReminderEvent;
 use App\Events\AutoFollowUpReminderEvent;
 use App\Events\AutoTaskReminderEvent;
+use App\Events\NewLeadFollowUpReminderEvent;
 use App\Events\BirthdayReminderEvent;
 use App\Events\BulkShiftEvent;
 use App\Events\ContractSignedEvent;
@@ -81,6 +82,7 @@ use App\Listeners\AppreciationListener;
 use App\Listeners\AttendanceReminderListener;
 use App\Listeners\AutoFollowUpReminderListener;
 use App\Listeners\AutoTaskReminderListener;
+use App\Listeners\NewLeadFollowUpReminderListener;
 use App\Listeners\BirthdayReminderListener;
 use App\Listeners\BulkShiftListener;
 use App\Listeners\ContractSignedListener;
@@ -535,6 +537,7 @@ class EventServiceProvider extends ServiceProvider
         OrderUpdatedEvent::class => [OrderUpdatedListener::class],
         NewUserRegistrationViaInviteEvent::class => [NewUserRegistrationViaInviteListener::class],
         AutoFollowUpReminderEvent::class => [AutoFollowUpReminderListener::class],
+        NewLeadFollowUpReminderEvent::class => [NewLeadFollowUpReminderListener::class],
         ContractSignedEvent::class => [ContractSignedListener::class],
         EmployeeShiftScheduleEvent::class => [EmployeeShiftScheduleListener::class],
         EmployeeShiftChangeEvent::class => [EmployeeShiftChangeListener::class],

@@ -1497,6 +1497,7 @@ return array(
     'industryRetailShowroomsSpecialtyStores' => 'Retail (Showrooms & Specialty Stores)',
     'industrySchoolsColleges' => 'Schools & Colleges',
     'industrySecurityServices' => 'Security Services',
+    'services' => 'Services',
     'industrySoftwareDevelopment' => 'Software Development',
     'industrySupermarketGrocery' => 'Supermarket / Grocery',
     'industryTechnicalSupport' => 'Technical Support',
