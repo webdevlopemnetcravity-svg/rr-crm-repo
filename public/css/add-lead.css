@@ -55,7 +55,7 @@
 .tabs .nav-link-lead .tab-item {
     width: 36px;
     height: 36px;
-    background: #F2EDF9;
+    background: #e1efff;
     border-radius: 8px;
     display: flex;
     justify-content: center;
@@ -74,7 +74,7 @@
 
 /* HOVER EFFECT */
 .tabs .nav-link-lead:hover .tab-item {
-    background: #E4D9FF;
+    background: #b8d9ff;
 }
 
 .tabs .nav-link-lead:hover {
@@ -92,7 +92,7 @@
 }
 
 .tabs .nav-link-lead.active .tab-item {
-    background: #7441DF !important;
+    background: #1D82F4 !important;
 }
 
 .tabs .nav-link-lead.active img {
@@ -362,21 +362,21 @@ input[type="file"].form-control.height-35 {
 
 /* Save and Next button styling */
 #save-lead-form {
-    background-color: #7441DF !important;
-    border-color: #7441DF !important;
+    background-color: #1D82F4 !important;
+    border-color: #1D82F4 !important;
     color: #ffffff !important;
     transition: all 0.3s ease;
 }
 
 #save-lead-form:hover {
-    background-color: #5d2fb8 !important;
-    border-color: #5d2fb8 !important;
+    background-color: #000000 !important;
+    border-color: #000000 !important;
     color: #ffffff !important;
 }
 
 #save-lead-form:focus {
-    background-color: #7441DF !important;
-    border-color: #7441DF !important;
+    background-color: #1D82F4 !important;
+    border-color: #1D82F4 !important;
     color: #ffffff !important;
     box-shadow: 0 0 0 0.2rem rgba(116, 65, 223, 0.25);
 }
@@ -388,24 +388,16 @@ input[type="file"].form-control.height-35 {
 
 /* Cancel button styling */
 .btn-cancel {
-    color: #FF8383 !important;
-    border: 1px solid #FF8383 !important;
-    border-color: #FF8383 !important;
+    color: #99a5b5!important;
     background-color: #ffffff !important;
 }
 
 .btn-cancel:hover {
     color: #ffffff !important;
-    background-color: #FF8383 !important;
-    border: 1px solid #FF8383 !important;
+    background-color: #000000 !important;
+    border: 0px !important;
 }
 
-.btn-cancel:focus {
-    color: #FF8383 !important;
-    border-color: #FF8383 !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 0 0 0.2rem rgba(255, 131, 131, 0.25);
-}
 
 /* 12px spacing between Save and Next and Cancel buttons */
 .col-12.col-md-auto.d-flex.flex-column.flex-md-row.gap-2.justify-content-md-end {
@@ -414,16 +406,14 @@ input[type="file"].form-control.height-35 {
 
 /* Previous button styling */
 #btn-previous {
-    color: #676767 !important;
-    background-color: #F2EDF9 !important;
-    border-color: #F2EDF9 !important;
-    transition: all 0.3s ease;
+    color: #99a5b5!important;
+    background-color: #ffffff !important;
+    border: 0px !important;
 }
 
 #btn-previous:hover:not(:disabled) {
-    background-color: #E4D9FF !important;
-    border-color: #E4D9FF !important;
-    color: #676767 !important;
+    background-color: #000000 !important;
+    color: #ffffff !important;
 }
 
 #btn-previous:focus {

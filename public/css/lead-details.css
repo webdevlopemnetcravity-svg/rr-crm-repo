@@ -15,10 +15,10 @@
     background-color: #FFFBF1 !important;
 }
 .lead-avatar-circle{
-    background-color: #F1EBFF !important;
+    background-color: #e1efff !important;
 }
 .lead-id-header{
-    color: #713ED9;
+    color: #1D82F5;
 }
 
 .lead-contact-info{
@@ -37,7 +37,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #F1EBFF;
+    background-color: #e1efff;
     border-radius: 4px;
     width: 40px;
     height: 40px;
@@ -116,7 +116,7 @@
 .tabs .nav-link-lead .tab-item {
     width: 36px;
     height: 36px;
-    background: #F2EDF9;
+    background: #e1efff;
     border-radius: 8px;
     display: flex;
     justify-content: center;
@@ -135,7 +135,7 @@
 
 /* HOVER EFFECT */
 .tabs .nav-link-lead:hover .tab-item {
-    background: #E4D9FF;
+    background: #B8D9FF;
 }
 
 .tabs .nav-link-lead:hover {
@@ -153,7 +153,7 @@
 }
 
 .tabs .nav-link-lead.active .tab-item {
-    background: #6A32FF !important;
+    background: #1D82F5 !important;
 }
 
 .tabs .nav-link-lead.active img {
@@ -186,7 +186,7 @@
 .info-section-title-text {
     font-size: 16px;
     font-weight: 600;
-    color: #713ED9;                 /* Purple heading from Figma */
+    color: #1D82F5;                 /* Purple heading from Figma */
     margin: 0;
     margin-bottom: 8px;
     line-height: 1.4;
@@ -194,7 +194,7 @@
 
 .info-section-divider {
     height: 1px;
-    background-color: #bda5ff;
+    background-color: #d4e8ff;
     width: 100%;
     margin-top: 8px;
 }
@@ -278,7 +278,7 @@
 .content-section-header h3 {
     font-size: 18px;
     font-weight: 600;
-    color: #6A32FF;
+    color: #1D82F5;
 }
 
 /* ===============================
@@ -293,10 +293,10 @@
 .fa-heart { color: #F472B6 !important; }
 
 /* Address Icon */
-.fa-map-marker-alt { color: #6A32FF !important; }
+.fa-map-marker-alt { color: #1D82F5 !important; }
 
 /* Link Icon */
-.fa-link { color: #6A32FF !important; }
+.fa-link { color: #1D82F5 !important; }
 
 /* ===============================
    TAB SECTION HEADER (All Tabs)
@@ -304,11 +304,11 @@
 
 /* Tab Section Header - Applied to all tabs */
 .tab-section-header {
-    background-color: #F1EBFF; /* Light purple background */
+    background-color: #e1efff; /* Light purple background */
     padding: 12px 16px;
     border-radius: 8px 8px 0 0;
     margin: 0 -16px 0 -16px; /* Extend to edges */
-    border: 1px solid #E9E6F5;
+    border: 1px solid #dcecff;
     border-bottom: none;
     min-height: 56px; /* Consistent height matching File Notes */
     display: flex;
@@ -326,7 +326,7 @@
 .tab-section-title {
     font-size: 16px;
     font-weight: 500;
-    color: #713ED9; /* Darker purple text */
+    color: #1D82F5; /* Darker purple text */
     margin: 0;
     line-height: 1.4;
     display: flex;
@@ -359,7 +359,7 @@
 .tab-section-add-btn {
     width: 32px;
     height: 32px;
-    background-color: #713ED9; /* Darker purple background */
+    background-color: #1D82F5; /* Darker purple background */
     border: none;
     border-radius: 4px;
     color: #FFFFFF;
@@ -373,7 +373,7 @@
 }
 
 .tab-section-add-btn:hover {
-    background-color: #5A2DB8;
+    background-color: #000000;
 }
 
 .tab-section-add-btn i {
@@ -384,9 +384,8 @@
 /* Secondary Button for Travel Details */
 .tab-section-secondary-btn {
     padding: 6px 12px;
-    background-color: #7441DF;
+    background-color: #1d82f5;
     color: #FFFFFF;
-    border: 1px solid #E0E0E0;
     border-radius: 4px;
     font-size: 13px;
     font-weight: 500;
@@ -396,8 +395,7 @@
 }
 
 .tab-section-secondary-btn:hover {
-    background-color: #7441DF;
-    border-color: #B8A7F0;
+    background-color: #000000;
     color: #FFFFFF;
 }
 
@@ -414,7 +412,7 @@
     padding: 20px;
     border-radius: 0 0 8px 8px;
     margin: 0 -16px -16px -16px; /* Extend to edges */
-    border: 1px solid #E9E6F5;
+    border: 1px solid #dcecff;
     border-top: none;
 }
 
@@ -456,7 +454,7 @@
 .timeline-dot {
     width: 27px;
     height: 27px;
-    background-color: #713ED9; /* Solid purple circle */
+    background-color: #1D82F5; /* Solid purple circle */
     border-radius: 50%;
     z-index: 2;
     flex-shrink: 0;
@@ -468,7 +466,7 @@
     top: 27px;
     width: 1px;
     height: calc(100% + 50px);
-    border-left: 2px dashed #7441DF;
+    border-left: 2px dashed #1d82f5;
     z-index: 1;
 }
 
@@ -514,7 +512,7 @@
 /* Communication Card */
 .communication-card {
     background-color: #F5F5F5;
-    border: 1px solid #E9E6F5;
+    border: 1px solid #dcecff;
     transition: all 0.2s ease;
 }
 
@@ -528,7 +526,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #F1EBFF;
+    background-color: #e1efff;
     border-radius: 8px;
     flex-shrink: 0;
 }
@@ -542,7 +540,7 @@
 }
 
 .communication-type {
-    color: #713ED9;
+    color: #1D82F5;
 }
 
 .communication-description {
@@ -567,13 +565,13 @@
 /* Document Card */
 .document-card {
     background-color: #F5F5F5;
-    border: 1px solid #E9E6F5;
+    border: 1px solid #dcecff;
     transition: all 0.2s ease;
 }
 
 .document-card:hover {
-    box-shadow: 0 2px 8px rgba(106, 50, 255, 0.1);
-    border-color: #CFC2F5;
+    box-shadow: 0 2px 4px #e1efff;
+    border-color: #a3ceff;
 }
 
 /* Document Icon */
@@ -586,7 +584,7 @@
     background-color: #FFFFFF;
     border-radius: 8px;
     flex-shrink: 0;
-    border: 1px solid #E9E6F5;
+    border: 1px solid #dcecff;
 }
 
 .document-icon i {
@@ -631,8 +629,8 @@
 }
 
 .document-email-btn {
-    background-color: #F1EBFF;
-    color: #5A2DB8;
+    background-color: #e1efff;
+    color: #000000;
     border: 1px solid #CFC2F5;
     padding: 6px 12px;
     border-radius: 4px;
@@ -641,7 +639,7 @@
 }
 
 .document-email-btn:hover {
-    background-color: #E4D9FF;
+    background-color: #B8D9FF;
     border-color: #B8A7F0;
     color: #4A1D9A;
 }
@@ -692,25 +690,25 @@
 
 /* Invoice Modal Toggle Switch Styling */
 #installment_payment_toggle:checked {
-    background-color: #713ED9;
-    border-color: #713ED9;
+    background-color: #1D82F5;
+    border-color: #1D82F5;
 }
 
 #installment_payment_toggle {
-    background-color: #E9E6F5;
-    border-color: #E9E6F5;
+    background-color: #dcecff;
+    border-color: #dcecff;
 }
 
 /* Invoice Modal Services Header */
 .services-header {
-    background-color: #713ED9 !important;
+    background-color: #1D82F5 !important;
     color: #FFFFFF !important;
 }
 
 /* Invoice Modal Summary Box */
 .total-summary-box {
-    background-color: #F1EBFF;
-    border: 1px solid #E9E6F5;
+    background-color: #e1efff;
+    border: 1px solid #dcecff;
 }
 
 /* Invoice Modal Responsive Styles */
@@ -803,14 +801,14 @@
 
 /* Table Header Styling */
 .document-checklist-table thead th {
-    background-color: #F1EBFF; /* Light purple background */
+    background-color: #e1efff; /* Light purple background */
     color: #000000;
     font-size: 14px;
     font-weight: 600;
     padding: 12px 16px;
     text-align: left;
     border: none;
-    border-bottom: 1px solid #E9E6F5;
+    border-bottom: 1px solid #dcecff;
 }
 
 .document-checklist-table thead th:first-child {
@@ -823,7 +821,7 @@
 
 /* Table Body Styling */
 .document-checklist-table tbody tr {
-    border-bottom: 1px solid #E9E6F5;
+    border-bottom: 1px solid #dcecff;
 }
 
 .document-checklist-table tbody tr:last-child {
@@ -888,7 +886,7 @@
 }
 
 .document-view-icon:hover {
-    color: #713ED9;
+    color: #1D82F5;
 }
 
 .document-change-link {
@@ -900,7 +898,7 @@
 }
 
 .document-change-link:hover {
-    color: #713ED9;
+    color: #1D82F5;
     text-decoration: none;
 }
 
@@ -975,14 +973,14 @@
 
 .upload-document-item {
     background-color: #F5F5F5;
-    border: 1px solid #E9E6F5;
+    border: 1px solid #dcecff;
     border-radius: 4px;
     transition: all 0.2s ease;
 }
 
 .upload-document-item:hover {
-    box-shadow: 0 2px 4px rgba(106, 50, 255, 0.1);
-    border-color: #CFC2F5;
+    box-shadow: 0 2px 4px #e1efff;
+    border-color: #a3ceff;
 }
 
 .upload-document-icon {
@@ -1046,19 +1044,19 @@
 /* Modal Header */
 .invoice-view-header {
     background-color: #FFFFFF;
-    border-bottom: 1px solid #E9E6F5;
+    border-bottom: 1px solid #dcecff;
     padding: 16px 24px;
 }
 
 .invoice-view-title {
-    color: #713ED9;
+    color: #1D82F5;
     font-size: 16px;
     font-weight: 500;
     margin: 0;
 }
 
 .invoice-download-btn {
-    background-color: #713ED9;
+    background-color: #1D82F5;
     color: #FFFFFF;
     border: none;
     padding: 8px 16px;
@@ -1070,7 +1068,7 @@
 }
 
 .invoice-download-btn:hover {
-    background-color: #5A2DB8;
+    background-color: #000000;
     color: #FFFFFF;
 }
 
@@ -1217,13 +1215,13 @@
 
 /* Invoice Divider */
 .invoice-divider {
-    border-top: 1px solid #E9E6F5;
+    border-top: 1px solid #dcecff;
     margin: 24px 0;
 }
 
 /* Invoice Section Titles */
 .invoice-section-title {
-    color: #713ED9;
+    color: #1D82F5;
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 16px;
@@ -1259,7 +1257,7 @@
 /* Invoice Amount Table */
 .invoice-amount-table {
     background-color: #FFFFFF;
-    border: 1px solid #E9E6F5;
+    border: 1px solid #dcecff;
     border-radius: 4px;
     padding: 16px;
 }
@@ -1278,7 +1276,7 @@
 }
 
 .invoice-amount-row.total {
-    border-top: 1px solid #E9E6F5;
+    border-top: 1px solid #dcecff;
     border-bottom: none;
     padding-top: 12px;
     margin-top: 8px;
@@ -1409,8 +1407,8 @@
 }
 
 .follow-up-card:hover {
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
-    border-color: #D4C8F0;
+    box-shadow: 0 2px 4px #e1efff;
+    border-color: #a3ceff;
 }
 
 /* Follow Up Card Content */
@@ -1498,14 +1496,14 @@
 .travel-section-title {
     font-size: 18px;
     font-weight: 600;
-    color: #713ED9;
+    color: #1D82F5;
     margin: 0 0 8px 0;
     padding: 0;
 }
 
 .travel-section-divider {
     height: 1px;
-    background-color: #E9E6F5;
+    background-color: #dcecff;
     width: 100%;
 }
 
