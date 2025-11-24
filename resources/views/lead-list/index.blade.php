@@ -821,8 +821,11 @@
 
         // Save follow-up (both create and update)
         $('#save-followup-list').click(function() {
-            // Validate Follow Up Subject Line if Send Reminder is checked
-            if ($('#send_reminder').is(':checked')) {
+            var sendReminderChecked = $('#send_reminder').is(':checked');
+            
+            // Only validate reminder-related fields if Send Reminder is checked
+            if (sendReminderChecked) {
+                // Validate Follow Up Subject Line if Send Reminder is checked
                 var followUpSubjectLine = $('#follow_up_subject_line').val();
                 if (!followUpSubjectLine || followUpSubjectLine.trim() === '') {
                     Swal.fire({
@@ -833,70 +836,91 @@
                     });
                     return false;
                 }
-            }
-            
-            var followUpDate = $('#next_follow_up_date').val();
-            var followUpTime = $('#next_follow_up_time').val();
-            var followUpId = $('#follow_up_id').val();
-            
-            // Validate future date and time using moment.js (only for new follow-ups)
-            if (!followUpId && followUpDate) {
-                // Parse date using company's date format
-                var selectedDate = moment(followUpDate, '{{ company()->moment_date_format }}');
-                var today = moment().startOf('day');
                 
-                // Check if date is in the past
-                if (!selectedDate.isValid() || selectedDate.isBefore(today)) {
+                var followUpDate = $('#next_follow_up_date').val();
+                var followUpTime = $('#next_follow_up_time').val();
+                var followUpId = $('#follow_up_id').val();
+                
+                // Validate that date and time are provided when send reminder is checked
+                if (!followUpDate || followUpDate.trim() === '') {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Next Follow Up Date must be today or a future date.',
+                        text: 'Next Follow Up Date is required when Send Reminder is checked.',
                         confirmButtonText: 'OK'
                     });
                     return false;
                 }
                 
-                // If date is today and time is provided, check if time is in the future
-                if (selectedDate.isSame(today, 'day') && followUpTime) {
-                    // Parse time using company's time format
-                    var timeFormat = '{{ company()->time_format == "H:i" ? "HH:mm" : (company()->time_format == "h:i A" ? "hh:mm A" : "hh:mm a") }}';
-                    var selectedTime = moment(followUpTime, timeFormat);
-                    var now = moment();
+                if (!followUpTime || followUpTime.trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Next Follow Up Time is required when Send Reminder is checked.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                
+                // Validate future date and time using moment.js (only for new follow-ups)
+                if (!followUpId) {
+                    // Parse date using company's date format
+                    var selectedDate = moment(followUpDate, '{{ company()->moment_date_format }}');
+                    var today = moment().startOf('day');
                     
-                    // Combine date and time
-                    var selectedDateTime = selectedDate.clone();
-                    selectedDateTime.hour(selectedTime.hour());
-                    selectedDateTime.minute(selectedTime.minute());
-                    selectedDateTime.second(0);
-                    
-                    if (!selectedTime.isValid() || selectedDateTime.isSameOrBefore(now)) {
+                    // Check if date is in the past
+                    if (!selectedDate.isValid() || selectedDate.isBefore(today)) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Next Follow Up Time must be in the future.',
+                            text: 'Next Follow Up Date must be today or a future date.',
                             confirmButtonText: 'OK'
                         });
                         return false;
                     }
-                } else if (followUpDate && followUpTime) {
-                    // Both date and time provided - validate combined datetime
-                    var timeFormat = '{{ company()->time_format == "H:i" ? "HH:mm" : (company()->time_format == "h:i A" ? "hh:mm A" : "hh:mm a") }}';
-                    var selectedTime = moment(followUpTime, timeFormat);
-                    var now = moment();
                     
-                    var selectedDateTime = selectedDate.clone();
-                    selectedDateTime.hour(selectedTime.hour());
-                    selectedDateTime.minute(selectedTime.minute());
-                    selectedDateTime.second(0);
-                    
-                    if (!selectedTime.isValid() || selectedDateTime.isSameOrBefore(now)) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Next Follow Up Date and Time must be in the future.',
-                            confirmButtonText: 'OK'
-                        });
-                        return false;
+                    // If date is today and time is provided, check if time is in the future
+                    if (selectedDate.isSame(today, 'day') && followUpTime) {
+                        // Parse time using company's time format
+                        var timeFormat = '{{ company()->time_format == "H:i" ? "HH:mm" : (company()->time_format == "h:i A" ? "hh:mm A" : "hh:mm a") }}';
+                        var selectedTime = moment(followUpTime, timeFormat);
+                        var now = moment();
+                        
+                        // Combine date and time
+                        var selectedDateTime = selectedDate.clone();
+                        selectedDateTime.hour(selectedTime.hour());
+                        selectedDateTime.minute(selectedTime.minute());
+                        selectedDateTime.second(0);
+                        
+                        if (!selectedTime.isValid() || selectedDateTime.isSameOrBefore(now)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Next Follow Up Time must be in the future.',
+                                confirmButtonText: 'OK'
+                            });
+                            return false;
+                        }
+                    } else if (followUpDate && followUpTime) {
+                        // Both date and time provided - validate combined datetime
+                        var timeFormat = '{{ company()->time_format == "H:i" ? "HH:mm" : (company()->time_format == "h:i A" ? "hh:mm A" : "hh:mm a") }}';
+                        var selectedTime = moment(followUpTime, timeFormat);
+                        var now = moment();
+                        
+                        var selectedDateTime = selectedDate.clone();
+                        selectedDateTime.hour(selectedTime.hour());
+                        selectedDateTime.minute(selectedTime.minute());
+                        selectedDateTime.second(0);
+                        
+                        if (!selectedTime.isValid() || selectedDateTime.isSameOrBefore(now)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Next Follow Up Date and Time must be in the future.',
+                                confirmButtonText: 'OK'
+                            });
+                            return false;
+                        }
                     }
                 }
             }
