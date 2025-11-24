@@ -303,7 +303,7 @@ class NewLeadDataTable extends BaseDataTable
             
             // Add button - only show if not draft, simple style without padding and background
             if (!$isDraft) {
-                $html .= '<button type="button" class="add-follow-up-btn add-follow-up-btn-simple" data-lead-id="' . $row->id . '" style="padding: 0; background: none; border: none; color: #007bff; text-decoration: underline; cursor: pointer; position: relative; z-index: 10;">
+                $html .= '<button type="button" class="add-follow-up-btn add-follow-up-btn-simple" data-lead-id="' . $row->id . '" style="padding: 0; background: none; border: none; color: #007bff; text-decoration: underline; cursor: pointer; position: relative;">
                             <i class="fa fa-plus"></i> Add
                         </button>';
             }

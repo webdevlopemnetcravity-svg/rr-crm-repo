@@ -17,86 +17,18 @@
         .add-follow-up-btn,
         .edit-follow-up-btn {
             position: relative;
-            z-index: 1000 !important;
             pointer-events: auto !important;
-        }
-        .follow-up-column {
-            position: relative;
-            z-index: 1;
-        }
-        /* Fix follow-up text overlap when filter is open - CRITICAL: Filter must be above everything */
-        .more-filters {
-            position: relative;
-            z-index: 1055 !important;
-        }
-        .more-filters .more-filter-tab {
-            z-index: 1055 !important;
-            position: fixed !important;
-            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1) !important;
-        }
-        .more-filters .more-filter-tab.in {
-            z-index: 1055 !important;
-            position: fixed !important;
         }
         .filter-box {
             z-index: 2 !important;
         }
         /* Ensure table stays BELOW filter - set lower z-index for table container */
-        .content-wrapper {
-            position: relative;
-            z-index: 1 !important;
-        }
-        .w-tables {
-            position: relative;
-            z-index: 1 !important;
-        }
-        .dataTables_wrapper {
-            position: relative;
-            z-index: 1 !important;
-        }
-        .dataTables_wrapper .table {
-            position: relative;
-            z-index: 1 !important;
-        }
-        .dataTables_wrapper .table tbody tr {
-            position: relative;
-            z-index: 1 !important;
-        }
-        .dataTables_wrapper .table tbody tr td {
-            position: relative;
-            z-index: 1 !important;
-        }
-        .follow-up-column .last-follow-up-info {
-            max-width: 100%;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            position: relative;
-            z-index: 1;
-        }
-        /* Prevent follow-up column from overlapping filter */
-        #new-leads-table_wrapper {
-            position: relative;
-            z-index: 1;
-        }
-        #new-leads-table {
-            position: relative;
-            z-index: 1;
-        }
-        /* Table cells should not overlap filter */
-        #new-leads-table td {
-            position: relative;
-            z-index: 1;
-        }
-        #new-leads-table td.follow-up-column {
-            position: relative;
-            z-index: 1;
-            max-width: 300px;
-            overflow: hidden;
-        }
+        
         /* Ensure follow-up text doesn't overflow */
         .follow-up-column .last-follow-up-info {
             max-width: 100%;
             overflow: hidden;
+            width: 100%;
         }
         .follow-up-column .feedback-section,
         .follow-up-column .reminder-section {
@@ -108,14 +40,6 @@
             max-height: 2.8em;
         }
         /* Ensure filter inner elements also have high z-index */
-        .more-filter-tab .filter-inner {
-            position: relative;
-            z-index: 1056 !important;
-        }
-        .more-filter-tab .clear-all {
-            position: relative;
-            z-index: 1056 !important;
-        }
     </style>
 @endpush
 

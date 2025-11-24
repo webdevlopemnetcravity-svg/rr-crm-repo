@@ -48,7 +48,7 @@
                 @if (in_array(user()->permission('add_lead'), ['all', 'added']))
                 <x-sub-menu-item :link="route('add-lead.index')" :text="__('app.addLead')" />
                 @endif
-                <x-sub-menu-item :link="route('lead-details.index')" :text="__('app.leadDetails')" />
+
             </div>
             @endif
             @if ($sidebarUserPermissions['view_deals'] != 5 && $sidebarUserPermissions['view_deals'] != 'none')
