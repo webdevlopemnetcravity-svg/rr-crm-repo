@@ -367,6 +367,261 @@
                 $('#installment_months_container').show();
                 $('#installment_months').val('8').selectpicker('refresh');
             });
+
+            // ========== FOLLOW-UP FUNCTIONALITY ==========
+            
+            // Handle Add Follow-Up button click
+            $(document).on('click', '#addFollowUpBtn', function(e) {
+                e.preventDefault();
+                var leadId = $('#follow_up_lead_id_details').val();
+                if (!leadId) {
+                    $.showToastr('Lead ID is missing.', 'error');
+                    return;
+                }
+                $('#follow_up_id_details').val(''); // Clear edit ID
+                $('#addFollowUpModalLabel').text('Add Follow-Up');
+                $('#followUpFormDetails')[0].reset();
+                $('#follow_up_lead_id_details').val(leadId); // Set lead ID again after reset
+                $('.next_follow_up_datetime_div_details, .send_reminder_div_details, .follow_up_subject_line_div_details').addClass('d-none');
+                $('#send_reminder_details').prop('checked', false);
+                $('#send_reminder_details').trigger('change');
+                $('#addFollowUpModal').modal('show');
+            });
+
+            // Initialize date and time pickers for follow-up modal
+            $('#addFollowUpModal').on('shown.bs.modal', function() {
+                $('.select-picker').selectpicker();
+                
+                // Check if this is edit mode
+                var isEditMode = $('#follow_up_id_details').val() !== '';
+                
+                // Initialize date picker - only allow future dates for new follow-ups
+                const dp = datepicker('#next_follow_up_date_details', {
+                    position: 'bl',
+                    minDate: isEditMode ? null : new Date(), // Allow past dates when editing
+                    ...datepickerConfig
+                });
+
+                // Initialize time picker
+                $('#next_follow_up_time_details').timepicker({
+                    @if (company()->time_format == 'H:i')
+                        showMeridian: false,
+                    @endif
+                });
+            });
+
+            // Toggle reminder div, follow up subject line, and next follow up date/time
+            $(document).on('change', '#send_reminder_details', function() {
+                var isChecked = $(this).is(':checked');
+                $('.next_follow_up_datetime_div_details').toggleClass('d-none', !isChecked);
+                $('.send_reminder_div_details').toggleClass('d-none', !isChecked);
+                $('.follow_up_subject_line_div_details').toggleClass('d-none', !isChecked);
+                
+                // Make follow up subject line required/unrequired
+                if (isChecked) {
+                    $('#follow_up_subject_line_details').attr('required', 'required');
+                } else {
+                    $('#follow_up_subject_line_details').removeAttr('required');
+                }
+            });
+
+            // Handle edit follow-up button click
+            $(document).on('click', '.edit-follow-up-btn-details', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                
+                var followUpId = $(this).data('follow-up-id');
+                var leadId = $(this).data('lead-id');
+                
+                $.easyAjax({
+                    url: "{{ route('new-leads.follow-up-edit', ':id') }}".replace(':id', followUpId),
+                    type: "GET",
+                    blockUI: true,
+                    success: function(response) {
+                        var followUp = null;
+                        if (response && response.status == "success") {
+                            if (response.follow_up) {
+                                followUp = response.follow_up;
+                            } else if (response.data && response.data.follow_up) {
+                                followUp = response.data.follow_up;
+                            }
+                        } else if (response && response.follow_up) {
+                            followUp = response.follow_up;
+                        } else if (response && response.data && response.data.follow_up) {
+                            followUp = response.data.follow_up;
+                        }
+                        
+                        if (followUp) {
+                            // Set modal title
+                            $('#addFollowUpModalLabel').text('Edit Follow-Up');
+                            
+                            // Set form values
+                            $('#follow_up_id_details').val(followUp.id);
+                            $('#follow_up_lead_id_details').val(followUp.new_lead_id);
+                            $('input[name="follow_up_type"][value="' + followUp.follow_up_type + '"]').prop('checked', true);
+                            $('#subject_details').val(followUp.subject || '');
+                            $('#outcome_details').val(followUp.outcome || '');
+                            $('#notes_details').val(followUp.notes || '');
+                            $('#next_follow_up_date_details').val(followUp.next_follow_up_date || '');
+                            $('#next_follow_up_time_details').val(followUp.next_follow_up_time || '');
+                            $('#send_reminder_details').prop('checked', followUp.send_reminder == 'yes');
+                            $('#remind_time_details').val(followUp.remind_time || '15 Minutes Before');
+                            $('#follow_up_subject_line_details').val(followUp.follow_up_subject_line || '');
+                            
+                            // Show/hide date/time fields based on send_reminder
+                            if (followUp.send_reminder == 'yes') {
+                                $('.next_follow_up_datetime_div_details').removeClass('d-none');
+                            } else {
+                                $('.next_follow_up_datetime_div_details').addClass('d-none');
+                            }
+                            
+                            // Trigger change event to show/hide reminder sections
+                            $('#send_reminder_details').trigger('change');
+                            
+                            // Refresh select pickers
+                            $('.select-picker').selectpicker('refresh');
+                            
+                            // Reinitialize date and time pickers after setting values
+                            setTimeout(function() {
+                                // Destroy existing datepicker if any
+                                var dateInput = document.getElementById('next_follow_up_date_details');
+                                if (dateInput && dateInput._datepicker) {
+                                    dateInput._datepicker.destroy();
+                                }
+                                
+                                // Initialize date picker (no minDate restriction for edit)
+                                const dp = datepicker('#next_follow_up_date_details', {
+                                    position: 'bl',
+                                    ...datepickerConfig
+                                });
+                                
+                                // Set the date value if exists
+                                if (followUp.next_follow_up_date) {
+                                    var dateValue = moment(followUp.next_follow_up_date, '{{ company()->moment_date_format }}').toDate();
+                                    dp.setDate(dateValue, true);
+                                }
+                                
+                                // Reinitialize time picker
+                                $('#next_follow_up_time_details').timepicker({
+                                    @if (company()->time_format == 'H:i')
+                                        showMeridian: false,
+                                    @endif
+                                });
+                            }, 100);
+                            
+                            // Open modal
+                            $('#addFollowUpModal').modal('show');
+                        } else {
+                            $.showToastr('Failed to load follow-up data. Please try again.', 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $.showToastr('An error occurred while loading follow-up data. Please try again.', 'error');
+                    }
+                });
+            });
+
+
+            // Save follow-up (both create and update)
+            $('#save-followup-details').click(function() {
+                var sendReminderChecked = $('#send_reminder_details').is(':checked');
+                var followUpId = $('#follow_up_id_details').val();
+                
+                // Only validate reminder-related fields if Send Reminder is checked
+                if (sendReminderChecked) {
+                    // Validate Follow Up Subject Line if Send Reminder is checked
+                    var followUpSubjectLine = $('#follow_up_subject_line_details').val();
+                    if (!followUpSubjectLine || followUpSubjectLine.trim() === '') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Follow Up Subject Line is required when Send Reminder is checked.',
+                            confirmButtonText: 'OK'
+                        });
+                        return false;
+                    }
+                    
+                    var followUpDate = $('#next_follow_up_date_details').val();
+                    var followUpTime = $('#next_follow_up_time_details').val();
+                    
+                    // Validate future date and time using moment.js (only for new follow-ups)
+                    if (!followUpId && followUpDate) {
+                        // Parse date using company's date format
+                        var selectedDate = moment(followUpDate, '{{ company()->moment_date_format }}');
+                        var today = moment().startOf('day');
+                        
+                        // Check if date is in the past
+                        if (!selectedDate.isValid() || selectedDate.isBefore(today)) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Next Follow Up Date must be today or a future date.',
+                                confirmButtonText: 'OK'
+                            });
+                            return false;
+                        }
+                        
+                        // If date is today and time is provided, check if time is in the future
+                        if (selectedDate.isSame(today, 'day') && followUpTime) {
+                            // Parse time using company's time format
+                            var timeFormat = '{{ company()->time_format == "H:i" ? "HH:mm" : (company()->time_format == "h:i A" ? "hh:mm A" : "hh:mm a") }}';
+                            var selectedTime = moment(followUpTime, timeFormat);
+                            var now = moment();
+                            
+                            // Combine date and time
+                            var selectedDateTime = selectedDate.clone();
+                            selectedDateTime.hour(selectedTime.hour());
+                            selectedDateTime.minute(selectedTime.minute());
+                            selectedDateTime.second(0);
+                            
+                            if (!selectedTime.isValid() || selectedDateTime.isSameOrBefore(now)) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Next Follow Up Time must be in the future.',
+                                    confirmButtonText: 'OK'
+                                });
+                                return false;
+                            }
+                        }
+                    }
+                }
+                
+                // Determine if this is an update or create
+                var url = followUpId ? "{{ route('new-leads.follow-up-update') }}" : "{{ route('new-leads.follow-up-store') }}";
+                
+                $.easyAjax({
+                    url: url,
+                    container: '#followUpFormDetails',
+                    type: "POST",
+                    blockUI: true,
+                    data: $('#followUpFormDetails').serialize(),
+                    success: function(response) {
+                        if (response.status == "success") {
+                            $('#addFollowUpModal').modal('hide');
+                            $('#followUpFormDetails')[0].reset();
+                            $('#follow_up_id_details').val('');
+                            $('#addFollowUpModalLabel').text('Add Follow-Up');
+                            $.showToastr(response.message || 'Follow-up saved successfully', 'success');
+                            
+                            // Reload the page after a short delay to ensure modal is closed and toastr is shown
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 500);
+                        }
+                    }
+                });
+            });
+
+            // Reset form when follow-up modal is closed
+            $('#addFollowUpModal').on('hidden.bs.modal', function () {
+                $('#followUpFormDetails')[0].reset();
+                $('#follow_up_id_details').val('');
+                $('#addFollowUpModalLabel').text('Add Follow-Up');
+                $('.next_follow_up_datetime_div_details, .send_reminder_div_details, .follow_up_subject_line_div_details').addClass('d-none');
+                $('#send_reminder_details').prop('checked', false);
+            });
         });
     </script>
 @endpush

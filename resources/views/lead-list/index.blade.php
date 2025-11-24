@@ -19,9 +19,6 @@
             position: relative;
             pointer-events: auto !important;
         }
-        .filter-box {
-            z-index: 2 !important;
-        }
         /* Ensure table stays BELOW filter - set lower z-index for table container */
         
         /* Ensure follow-up text doesn't overflow */

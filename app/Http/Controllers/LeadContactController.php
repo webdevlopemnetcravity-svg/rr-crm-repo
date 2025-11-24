@@ -228,7 +228,7 @@ class LeadContactController extends AccountBaseController
         // Fetch the lead data if ID is provided
         $this->lead = null;
         if ($id) {
-            $this->lead = NewLead::with(['addedBy', 'leadOwner'])->find($id);
+            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy'])->find($id);
             if (!$this->lead) {
                 abort(404, 'Lead not found');
             }
