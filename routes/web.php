@@ -549,6 +549,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('new-leads/follow-up-update', [LeadContactController::class, 'updateNewLeadFollowUp'])->name('new-leads.follow-up-update');
     Route::post('new-leads/follow-up-status', [LeadContactController::class, 'updateNewLeadFollowUpStatus'])->name('new-leads.follow-up-status');
     Route::delete('new-leads/follow-up/{id}', [LeadContactController::class, 'deleteNewLeadFollowUp'])->name('new-leads.follow-up-delete');
+    Route::post('new-leads/file-note-store', [LeadContactController::class, 'storeNewLeadFileNote'])->name('new-leads.file-note-store');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
     Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
     Route::get('lead-dashboard', [LeadContactController::class, 'leadDashboard'])->name('lead-dashboard.index');

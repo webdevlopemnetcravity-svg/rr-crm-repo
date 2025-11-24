@@ -3,39 +3,49 @@
                     <div class="tab-section-header">
                         <div class="tab-section-header-content">
                             <h3 class="tab-section-title">File Notes</h3>
-                            <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addFileNoteModal">
-                                <i class="fa fa-plus"></i>
-                            </button>
+                            @php
+                                $addLeadFileNotePermission = user()->permission('add_lead_note');
+                                $isDraft = false;
+                                if (isset($lead) && $lead && $lead->stepStatus && $lead->stepStatus->final_status == 'draft') {
+                                    $isDraft = true;
+                                }
+                            @endphp
+                            @if(($addLeadFileNotePermission == 'all' || $addLeadFileNotePermission == 'added' || $addLeadFileNotePermission == 'both') && !$isDraft)
+                                <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addFileNoteModal">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            @endif
                         </div>
                     </div>
                     <!-- Tab Content Area -->
                     <div class="tab-section-content">
-                        <div class="file-notes-list">
-                            <div class="file-note-item">
-                                <div class="file-note-timeline">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-line"></div>
-                                </div>
-                                <div class="file-note-box">
-                                    <div class="file-note-text">Need student visa with admission service for Australia</div>
-                                    <div class="file-note-meta">
-                                        <span class="file-note-bullet">•</span> Created by: Samuel Parker - 17-07-2025 2:00 PM
+                        @if(isset($lead) && $lead && $lead->fileNotes && $lead->fileNotes->count() > 0)
+                            <div class="file-notes-list">
+                                @foreach($lead->fileNotes->sortByDesc('created_at') as $index => $fileNote)
+                                    @php
+                                        $createdBy = $fileNote->addedBy ? $fileNote->addedBy->name : 'N/A';
+                                        $createdDate = $fileNote->created_at ? $fileNote->created_at->format(company()->date_format . ' ' . company()->time_format) : 'N/A';
+                                        $isLast = ($index == $lead->fileNotes->count() - 1);
+                                    @endphp
+                                    <div class="file-note-item">
+                                        <div class="file-note-timeline">
+                                            <div class="timeline-dot"></div>
+                                            <div class="timeline-line"></div>
+                                        </div>
+                                        <div class="file-note-box">
+                                            <div class="file-note-text" style="margin-bottom: 0;">{!! $fileNote->note !!}</div>
+                                            <div class="file-note-meta" style="margin-top: -10px;">
+                                                Created by: {{ $createdBy }} - {{ $createdDate }}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                @endforeach
                             </div>
-                            <div class="file-note-item">
-                                <div class="file-note-timeline">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-line"></div>
-                                </div>
-                                <div class="file-note-box">
-                                    <div class="file-note-text">Need student visa with admission service for Australia</div>
-                                    <div class="file-note-meta">
-                                        <span class="file-note-bullet">•</span> Created by: Samuel Parker - 17-07-2025 2:00 PM
-                                    </div>
-                                </div>
+                        @else
+                            <div class="text-center p-5">
+                                <p class="text-muted">No file notes found</p>
                             </div>
-                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -49,17 +59,20 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Note</label>
-                        <div id="file-note-editor"></div>
-                        <textarea name="note" id="file-note-editor-text" class="d-none"></textarea>
+                <x-form id="fileNoteFormDetails" method="POST" class="ajax-form">
+                    <div class="modal-body">
+                        <input type="hidden" name="new_lead_id" id="file_note_lead_id_details" value="{{ isset($lead) && $lead ? $lead->id : '' }}">
+                        <div class="form-group">
+                            <label>Note</label>
+                            <div id="file-note-editor"></div>
+                            <textarea name="note" id="file-note-editor-text" class="d-none"></textarea>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="save-file-note-btn">Save</button>
-                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <x-forms.button-primary id="save-file-note-btn" icon="check">Save</x-forms.button-primary>
+                    </div>
+                </x-form>
             </div>
         </div>
     </div>

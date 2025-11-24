@@ -97,4 +97,12 @@ class NewLead extends BaseModel
     {
         return $this->hasMany(NewLeadFollowUp::class, 'new_lead_id');
     }
+
+    /**
+     * Get the file notes for this lead.
+     */
+    public function fileNotes(): HasMany
+    {
+        return $this->hasMany(NewLeadFileNote::class, 'new_lead_id');
+    }
 }

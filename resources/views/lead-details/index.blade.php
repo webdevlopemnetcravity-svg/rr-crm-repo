@@ -183,6 +183,18 @@
             // Initialize select pickers
             $('.select-picker').selectpicker();
             
+            // Check if there's a hash in URL to activate specific tab
+            if (window.location.hash) {
+                var hash = window.location.hash.substring(1);
+                var $tabLink = $('.nav-item-lead[data-tab="' + hash + '"]');
+                if ($tabLink.length) {
+                    $('.nav-item-lead').removeClass('active');
+                    $tabLink.addClass('active');
+                    $('.tab-content').removeClass('active');
+                    $('#' + hash).addClass('active');
+                }
+            }
+            
             // Tab Switching Functionality
             $('.nav-item-lead').on('click', function(e) {
                 e.preventDefault();
@@ -199,6 +211,8 @@
                 const tabId = $(this).data('tab');
                 if (tabId) {
                     $('#' + tabId).addClass('active');
+                    // Update URL hash
+                    window.location.hash = tabId;
                 }
             });
 
@@ -225,20 +239,86 @@
                 }
             });
 
-            // Save File Note button handler
-            $('#save-file-note-btn').on('click', function() {
+            // Prevent form submission for file note form
+            $('#fileNoteFormDetails').on('submit', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Save File Note button handler - use event delegation
+            $(document).on('click', '#save-file-note-btn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('Save file note button clicked');
+                
                 // Copy content from Quill editor to hidden textarea
                 if (document.getElementById('file-note-editor') && document.getElementById('file-note-editor').children[0]) {
                     var note = document.getElementById('file-note-editor').children[0].innerHTML;
                     document.getElementById('file-note-editor-text').value = note;
                 }
                 
-                // Here you can add your save logic
-                // For example: submit form, make AJAX call, etc.
-                console.log('Note content:', $('#file-note-editor-text').val());
+                // Validate note content
+                var noteContent = $('#file-note-editor-text').val();
+                if (!noteContent || noteContent.trim() === '' || noteContent.trim() === '<p><br></p>') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Please enter a note.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
                 
-                // Close modal after save (you can modify this based on your needs)
-                // $('#addFileNoteModal').modal('hide');
+                // Get lead ID
+                var leadId = $('#file_note_lead_id_details').val();
+                if (!leadId) {
+                    $.showToastr('Lead ID is missing.', 'error');
+                    return false;
+                }
+                
+                console.log('Saving file note for lead:', leadId);
+                console.log('Form data:', $('#fileNoteFormDetails').serialize());
+                
+                $.easyAjax({
+                    url: "{{ route('new-leads.file-note-store') }}",
+                    container: '#fileNoteFormDetails',
+                    type: "POST",
+                    blockUI: true,
+                    data: $('#fileNoteFormDetails').serialize(),
+                    success: function(response) {
+                        console.log('File note save response:', response);
+                        if (response.status == "success") {
+                            $('#addFileNoteModal').modal('hide');
+                            $('#fileNoteFormDetails')[0].reset();
+                            
+                            // Clear Quill editor
+                            if (quillArray['#file-note-editor']) {
+                                destory_editor('#file-note-editor');
+                                delete quillArray['#file-note-editor'];
+                                $('#file-note-editor').html('');
+                                $('#file-note-editor-text').val('');
+                            }
+                            
+                            $.showToastr(response.message || 'File note saved successfully', 'success');
+                            
+                            // Reload the page after a short delay to ensure modal is closed and toastr is shown
+                            // Add hash to URL to ensure file notes tab is active after reload
+                            setTimeout(function() {
+                                window.location.hash = 'fileNotesTab';
+                                window.location.reload();
+                            }, 500);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error saving file note:', error);
+                        console.error('Status:', status);
+                        console.error('Response:', xhr.responseText);
+                        $.showToastr('An error occurred while saving the file note. Please try again.', 'error');
+                    }
+                });
+                
+                return false;
             });
 
             // Initialize installment months selectpicker when invoice modal opens

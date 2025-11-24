@@ -228,7 +228,7 @@ class LeadContactController extends AccountBaseController
         // Fetch the lead data if ID is provided
         $this->lead = null;
         if ($id) {
-            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy'])->find($id);
+            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy'])->find($id);
             if (!$this->lead) {
                 abort(404, 'Lead not found');
             }
@@ -3172,6 +3172,29 @@ class LeadContactController extends AccountBaseController
         $followUp->delete();
 
         return Reply::success(__('messages.deleteSuccess'));
+    }
+
+    /**
+     * Store new lead file note
+     */
+    public function storeNewLeadFileNote(Request $request)
+    {
+        $newLead = NewLead::findOrFail($request->new_lead_id);
+        
+        $rules = [
+            'new_lead_id' => 'required|exists:new_leads,id',
+            'note' => 'required|string',
+        ];
+        
+        $request->validate($rules);
+
+        $fileNote = new \App\Models\NewLeadFileNote();
+        $fileNote->new_lead_id = $request->new_lead_id;
+        $fileNote->note = trim_editor($request->note);
+        $fileNote->added_by = user()->id;
+        $fileNote->save();
+
+        return Reply::success(__('messages.recordSaved'));
     }
 
 }
