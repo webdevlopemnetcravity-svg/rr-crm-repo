@@ -5,38 +5,56 @@
             <span class="d-inline-block text-truncate mw-300">{{ $pageTitle }}</span>
 
             <span class="text-lightest f-12 f-w-500 mx-2 mw-250 text-truncate">
-                <a href="{{ route('dashboard') }}" class="text-lightest">@lang('app.menu.home')</a> &bull;
-                @php
-                    $link = '';
-                @endphp
-
-                @for ($i = 1; $i <= count(Request::segments()); $i++)
-                    @if (($i < count(Request::segments())) && ($i > 0))
-                        @php $link .= '/' . Request::segment($i); @endphp
-
-                        @if (Request::segment($i) != 'account')
-                            @php
-                                $langKey = 'app.'.str(Request::segment($i))->camel();
-
-                                if (!Lang::has($langKey)) {
-                                    $langKey = str($langKey)->replace('app.', 'app.menu.')->__toString();
-                                }
-                                $segmentText = Lang::has($langKey) ? __($langKey) : ucwords(str_replace('-', ' ', Request::segment($i)));
-                                $segmentLink = str_contains(url()->current(), 'public') ? '/public' . $link : $link;
-                            @endphp
-
-                            @if (in_array(Request::segment($i), App\Enums\NonClickableSegments::getValues()))
-                                {{ $segmentText }} &bull;
-                            @else
-                                <a href="{{ $segmentLink }}" class="text-lightest">
-                                    {{ $segmentText }}
-                                </a> &bull;
-                            @endif
+                @if(isset($customBreadcrumb) && !empty($customBreadcrumb) && is_array($customBreadcrumb))
+                    @php
+                        $breadcrumbCount = count($customBreadcrumb);
+                    @endphp
+                    @foreach($customBreadcrumb as $index => $crumb)
+                        @if(is_array($crumb) && isset($crumb['url']))
+                            <a href="{{ $crumb['url'] }}" class="text-lightest">{{ $crumb['text'] }}</a>
+                        @elseif(is_string($crumb))
+                            {{ $crumb }}
+                        @elseif(is_array($crumb) && isset($crumb['text']))
+                            {{ $crumb['text'] }}
                         @endif
-                    @else
-                        {{ $pageTitle }}
-                    @endif
-                @endfor
+                        @if($index < $breadcrumbCount - 1)
+                            &bull;
+                        @endif
+                    @endforeach
+                @else
+                    <a href="{{ route('dashboard') }}" class="text-lightest">@lang('app.menu.home')</a> &bull;
+                    @php
+                        $link = '';
+                    @endphp
+
+                    @for ($i = 1; $i <= count(Request::segments()); $i++)
+                        @if (($i < count(Request::segments())) && ($i > 0))
+                            @php $link .= '/' . Request::segment($i); @endphp
+
+                            @if (Request::segment($i) != 'account')
+                                @php
+                                    $langKey = 'app.'.str(Request::segment($i))->camel();
+
+                                    if (!Lang::has($langKey)) {
+                                        $langKey = str($langKey)->replace('app.', 'app.menu.')->__toString();
+                                    }
+                                    $segmentText = Lang::has($langKey) ? __($langKey) : ucwords(str_replace('-', ' ', Request::segment($i)));
+                                    $segmentLink = str_contains(url()->current(), 'public') ? '/public' . $link : $link;
+                                @endphp
+
+                                @if (in_array(Request::segment($i), App\Enums\NonClickableSegments::getValues()))
+                                    {{ $segmentText }} &bull;
+                                @else
+                                    <a href="{{ $segmentLink }}" class="text-lightest">
+                                        {{ $segmentText }}
+                                    </a> &bull;
+                                @endif
+                            @endif
+                        @else
+                            {{ $pageTitle }}
+                        @endif
+                    @endfor
+                @endif
             </span>
         </h2>
     </div>

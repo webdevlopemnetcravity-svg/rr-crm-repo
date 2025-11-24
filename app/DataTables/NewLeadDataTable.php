@@ -496,6 +496,9 @@ class NewLeadDataTable extends BaseDataTable
             $newLead = $newLead->where('new_leads.priority', $this->request()->filter_priority);
         }
 
+        // Order by ID in descending order (newest first)
+        $newLead = $newLead->orderBy('new_leads.id', 'desc');
+
         return $newLead;
     }
 

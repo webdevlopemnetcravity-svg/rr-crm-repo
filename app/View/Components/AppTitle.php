@@ -9,15 +9,17 @@ class AppTitle extends Component
 {
 
     public $pageTitle;
+    public $customBreadcrumb;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($pageTitle)
+    public function __construct($pageTitle, $customBreadcrumb = null)
     {
         $this->pageTitle = is_array(__($pageTitle)) ? $pageTitle : __($pageTitle);
+        $this->customBreadcrumb = $customBreadcrumb;
     }
 
     /**

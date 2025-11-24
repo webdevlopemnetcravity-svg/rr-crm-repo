@@ -18,28 +18,63 @@
                         </div>
                         <div class="lead-info-group">
                             <div class="lead-priority d-flex align-items-center mb-1">
-                                <img src="{{ asset('img/icon/1st_Priority.svg') }}">
-                                <span class="f-12 pl-1">1st Priority</span>
+                                @if(isset($lead) && $lead)
+                                    <img src="{{ asset('img/icon/' . str_replace(' ', '_', $lead->priority) . '.svg') }}">
+                                    <span class="f-12 pl-1">{{ $lead->priority ?? 'Select Priority' }}</span>
+                                @else
+                                    <img src="{{ asset('img/icon/1st_Priority.svg') }}">
+                                    <span class="f-12 pl-1">1st Priority</span>
+                                @endif
                             </div>
-                            <div class="lead-id-header f-14 font-weight-bold">LEAD-0008</div>
+                            <div class="lead-id-header f-14 font-weight-bold">
+                                @if(isset($lead) && $lead)
+                                    LEAD-{{ str_pad($lead->id, 4, '0', STR_PAD_LEFT) }}
+                                @else
+                                    LEAD-0008
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Middle-Left Section: Contact Info -->
                 <div class="lead-contact-info d-flex align-items-center">
-                    <div class="contact-info-item mr-4">
-                        <a href="tel:+91123-456-7890" class="text-dark">
-                            <img src="{{ asset('img/icon/Phone.svg') }}">
-                            <span class="pl-1">+91 123 4567 890</span>
-                        </a>
-                    </div>
-                    <div class="contact-info-item">
-                        <a href="mailto:abc@gmail.com?subject=SUBJECT&body=Demo email" target="_blank" class="text-dark">
-                            <img src="{{ asset('img/icon/Mail.svg') }}">
-                            <span class="pl-1">abc@gmail.com</span>
-                        </a>
-                    </div>
+                    @if(isset($lead) && $lead)
+                        @php
+                            $step1Data = $lead->step_1_data ?? [];
+                            $primaryPhone = $step1Data['primary_phone'] ?? $lead->mobile ?? '';
+                            $email = $step1Data['email_address'] ?? $lead->client_email ?? '';
+                        @endphp
+                        @if($primaryPhone)
+                            <div class="contact-info-item mr-4">
+                                <a href="tel:{{ $primaryPhone }}" class="text-dark">
+                                    <img src="{{ asset('img/icon/Phone.svg') }}">
+                                    <span class="pl-1">{{ $primaryPhone }}</span>
+                                </a>
+                            </div>
+                        @endif
+                        @if($email)
+                            <div class="contact-info-item">
+                                <a href="mailto:{{ $email }}?subject=SUBJECT&body=Demo email" target="_blank" class="text-dark">
+                                    <img src="{{ asset('img/icon/Mail.svg') }}">
+                                    <span class="pl-1">{{ $email }}</span>
+                                </a>
+                            </div>
+                        @endif
+                    @else
+                        <div class="contact-info-item mr-4">
+                            <a href="tel:+91123-456-7890" class="text-dark">
+                                <img src="{{ asset('img/icon/Phone.svg') }}">
+                                <span class="pl-1">+91 123 4567 890</span>
+                            </a>
+                        </div>
+                        <div class="contact-info-item">
+                            <a href="mailto:abc@gmail.com?subject=SUBJECT&body=Demo email" target="_blank" class="text-dark">
+                                <img src="{{ asset('img/icon/Mail.svg') }}">
+                                <span class="pl-1">abc@gmail.com</span>
+                            </a>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- View Resume Button -->
@@ -49,7 +84,26 @@
                 <div class="lead-header-right-group d-flex align-items-center">
                     <div class="lead-service-actions-group d-flex align-items-center">
                         <div class="lead-service-section mr-3">
-                            <div class="lead-service-name f-14 font-weight-bold">PR - Employer Nomination Scheme (ENS)(Subclass 186)</div>
+                            <div class="lead-service-name f-14 font-weight-bold">
+                                @if(isset($lead) && $lead && $lead->step_2_data)
+                                    @php
+                                        $step2Data = $lead->step_2_data ?? [];
+                                        $serviceName = '--';
+                                        if (isset($step2Data['pr_subclass']) && !empty($step2Data['pr_subclass'])) {
+                                            $serviceName = $step2Data['pr_subclass'];
+                                        } elseif (isset($step2Data['visit_subclass']) && !empty($step2Data['visit_subclass'])) {
+                                            $serviceName = $step2Data['visit_subclass'];
+                                        } elseif (isset($step2Data['work_subclass']) && !empty($step2Data['work_subclass'])) {
+                                            $serviceName = $step2Data['work_subclass'];
+                                        } elseif (isset($step2Data['student_subclass']) && !empty($step2Data['student_subclass'])) {
+                                            $serviceName = $step2Data['student_subclass'];
+                                        }
+                                    @endphp
+                                    {{ $serviceName }}
+                                @else
+                                    PR - Employer Nomination Scheme (ENS)(Subclass 186)
+                                @endif
+                            </div>
                         </div>
                         <div class="lead-header-actions d-flex align-items-center">
                             <a class="Whatsapp mr-2" href="#">

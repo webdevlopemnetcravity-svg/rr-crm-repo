@@ -1,5 +1,36 @@
 ﻿                <!-- Client Info Tab Content -->
                 <div class="tab-content px-4 pb-4 active" id="clientInfoTab">
+                    @php
+                        // Extract step data
+                        $step1Data = isset($lead) && $lead ? ($lead->step_1_data ?? []) : [];
+                        $step2Data = isset($lead) && $lead ? ($lead->step_2_data ?? []) : [];
+                        $step3Data = isset($lead) && $lead ? ($lead->step_3_data ?? []) : [];
+                        $step4Data = isset($lead) && $lead ? ($lead->step_4_data ?? []) : [];
+                        $step5Data = isset($lead) && $lead ? ($lead->step_5_data ?? []) : [];
+                        $step6Data = isset($lead) && $lead ? ($lead->step_6_data ?? []) : [];
+                        $step7Data = isset($lead) && $lead ? ($lead->step_7_data ?? []) : [];
+                        $step8Data = isset($lead) && $lead ? ($lead->step_8_data ?? []) : [];
+                        $step9Data = isset($lead) && $lead ? ($lead->step_9_data ?? []) : [];
+                        
+                        // Helper function to format date
+                        $formatDate = function($date) {
+                            if (empty($date)) return '-';
+                            try {
+                                if (is_string($date)) {
+                                    $dateObj = \Carbon\Carbon::parse($date);
+                                    return $dateObj->format('d-M-Y');
+                                }
+                                return $date->format('d-M-Y');
+                            } catch (\Exception $e) {
+                                return $date;
+                            }
+                        };
+                        
+                        // Helper function to get value or default
+                        $getValue = function($value, $default = '-') {
+                            return !empty($value) ? $value : $default;
+                        };
+                    @endphp
                     <!-- Tab Header -->
                     <div class="tab-section-header">
                         <div class="tab-section-header-content">
@@ -23,33 +54,33 @@
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Surname</div>
-                                        <div class="info-field-value-text">Patel</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['surname'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Given Name</div>
-                                        <div class="info-field-value-text">Rajesh Kumar</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['given_name'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Date of Birth</div>
-                                        <div class="info-field-value-text">15-Mar-1992</div>
+                                        <div class="info-field-value-text">{{ $formatDate($step1Data['date_of_birth'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Gender</div>
-                                        <div class="info-field-value-text">Male</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['gender'] ?? null) }}</div>
                                     </div>
                                 </div>
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Marital Status</div>
-                                        <div class="info-field-value-text">Unmarried</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['marital_status'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Visa Expiry Date</div>
-                                        <div class="info-field-value-text">-</div>
+                                        <div class="info-field-value-text">{{ $formatDate($step1Data['visa_expire_date'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Passport Number</div>
-                                        <div class="info-field-value-text">-</div>
+                                        <div class="info-field-value-text">{{ $getValue($step3Data['passport_number'] ?? null) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -63,55 +94,80 @@
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Primary Phone</div>
-                                        <div class="info-field-value-text">+91 98765 43210</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['primary_phone'] ?? $lead->mobile ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Secondary Phone</div>
-                                        <div class="info-field-value-text">+91 98765 43211</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['secondary_phone'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Work Phone</div>
-                                        <div class="info-field-value-text">+91 98765 43212</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['work_phone'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Other Phone Number Used in Last Five Years</div>
-                                        <div class="info-field-value-text">+91 98765 43212</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['other_phone'] ?? null) }}</div>
                                     </div>
                                 </div>
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Email</div>
-                                        <div class="info-field-value-text">rajesh.patel@example.com</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['email_address'] ?? $lead->client_email ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Other Email Used in Last Five Years</div>
-                                        <div class="info-field-value-text">rajesh.patel@example.com</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['other_email'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Home Address</div>
-                                        <div class="info-field-value-text">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
+                                        <div class="info-field-value-text">
+                                            @php
+                                                $homeAddress = '';
+                                                if (!empty($step1Data['home_address'])) {
+                                                    $homeAddress = $step1Data['home_address'];
+                                                    if (!empty($step1Data['home_city'])) $homeAddress .= ', ' . $step1Data['home_city'];
+                                                    if (!empty($step1Data['home_state'])) $homeAddress .= ', ' . $step1Data['home_state'];
+                                                    if (!empty($step1Data['home_pin_code'])) $homeAddress .= ', ' . $step1Data['home_pin_code'];
+                                                    if (!empty($step1Data['country_of_origin'])) $homeAddress .= ', ' . $step1Data['country_of_origin'];
+                                                }
+                                            @endphp
+                                            {{ $getValue($homeAddress) }}
+                                        </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Mailing Address</div>
-                                        <div class="info-field-value-text">B-204, Navkar Residency, Vesu, Surat, Gujarat, 395007, India</div>
+                                        <div class="info-field-value-text">
+                                            @php
+                                                $mailingAddress = '';
+                                                if (!empty($step1Data['mailing_address'])) {
+                                                    $mailingAddress = $step1Data['mailing_address'];
+                                                    if (!empty($step1Data['mailing_city'])) $mailingAddress .= ', ' . $step1Data['mailing_city'];
+                                                    if (!empty($step1Data['mailing_state'])) $mailingAddress .= ', ' . $step1Data['mailing_state'];
+                                                    if (!empty($step1Data['mailing_pin_code'])) $mailingAddress .= ', ' . $step1Data['mailing_pin_code'];
+                                                } elseif (!empty($step1Data['mailing_same_as_home']) && $step1Data['mailing_same_as_home'] == '1') {
+                                                    $mailingAddress = $homeAddress;
+                                                }
+                                            @endphp
+                                            {{ $getValue($mailingAddress) }}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Linkedin Link</div>
-                                        <div class="info-field-value-text">-</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['linkedin_profile_url'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Facebook Link</div>
-                                        <div class="info-field-value-text">-</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['facebook_profile_url'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Instagram Link</div>
-                                        <div class="info-field-value-text">-</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['instagram_profile_url'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Sub Agent</div>
-                                        <div class="info-field-value-text">-</div>
+                                        <div class="info-field-value-text">{{ $getValue($step1Data['sub_agent'] ?? null) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -126,19 +182,19 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Lead Source</div>
-                                    <div class="info-field-value-text">Facebook</div>
+                                    <div class="info-field-value-text">{{ $getValue($lead->lead_source ?? $step1Data['lead_source'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Lead Added by</div>
-                                    <div class="info-field-value-text">Vishal Gami</div>
+                                    <div class="info-field-value-text">{{ $getValue($lead->addedBy->name ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Lead Assign to</div>
-                                    <div class="info-field-value-text">Nishant Bhuva</div>
+                                    <div class="info-field-value-text">{{ $getValue($lead->leadOwner->name ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Country Of Origin (Nationality)</div>
-                                    <div class="info-field-value-text">India</div>
+                                    <div class="info-field-value-text">{{ $getValue($step1Data['country_of_origin'] ?? null) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -152,25 +208,25 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Visa Status</div>
-                                    <div class="info-field-value-text">Visa Refusal</div>
+                                    <div class="info-field-value-text">{{ $getValue($step1Data['visa_status'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Visa Rejection Date</div>
-                                    <div class="info-field-value-text">26/10/2025</div>
+                                    <div class="info-field-value-text">{{ $formatDate($step1Data['visa_rejection_date'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Visa Category</div>
-                                    <div class="info-field-value-text">Subclass 600</div>
+                                    <div class="info-field-value-text">{{ $getValue($step1Data['visa_category'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Reason</div>
-                                    <div class="info-field-value-text">-</div>
+                                    <div class="info-field-value-text">{{ $getValue($step1Data['visa_refusal_reason'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Languages Spoken</div>
-                                    <div class="info-field-value-text">Visa Refusal</div>
+                                    <div class="info-field-value-text">{{ $getValue($step1Data['languages_spoken'] ?? null) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -184,29 +240,43 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Preferred Designation</div>
-                                    <div class="info-field-value-text">UI/UX Designer</div>
+                                    <div class="info-field-value-text">{{ $getValue($step2Data['preferred_designation'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Industry</div>
-                                    <div class="info-field-value-text">Information Technology / Software</div>
+                                    <div class="info-field-value-text">{{ $getValue($step2Data['industry'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Role</div>
-                                    <div class="info-field-value-text">On Role</div>
+                                    <div class="info-field-value-text">{{ $getValue($step2Data['role'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Preferred Country</div>
-                                    <div class="info-field-value-text">Australia</div>
+                                    <div class="info-field-value-text">{{ $getValue($step2Data['preferred_country'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Work Category</div>
-                                    <div class="info-field-value-text">Skilid</div>
+                                    <div class="info-field-value-text">{{ $getValue($step2Data['work_category'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-9 mb-3">
                                     <div class="info-field-label-text">Subclass</div>
-                                    <div class="info-field-value-text">Work Visa - Temporary Skill Shortage Visa (Subclass 482)</div>
+                                    <div class="info-field-value-text">
+                                        @php
+                                            $subclass = '-';
+                                            if (isset($step2Data['pr_subclass']) && !empty($step2Data['pr_subclass'])) {
+                                                $subclass = $step2Data['pr_subclass'];
+                                            } elseif (isset($step2Data['visit_subclass']) && !empty($step2Data['visit_subclass'])) {
+                                                $subclass = $step2Data['visit_subclass'];
+                                            } elseif (isset($step2Data['work_subclass']) && !empty($step2Data['work_subclass'])) {
+                                                $subclass = $step2Data['work_subclass'];
+                                            } elseif (isset($step2Data['student_subclass']) && !empty($step2Data['student_subclass'])) {
+                                                $subclass = $step2Data['student_subclass'];
+                                            }
+                                        @endphp
+                                        {{ $subclass }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -220,29 +290,29 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Passport Number</div>
-                                    <div class="info-field-value-text">Z4589217</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['passport_number'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Issuing Country</div>
-                                    <div class="info-field-value-text">India</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['issuing_country'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">City Where Issued</div>
-                                    <div class="info-field-value-text">Ahmedabad</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['city_where_issued'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Issuance Date</div>
-                                    <div class="info-field-value-text">14-Mar-2019</div>
+                                    <div class="info-field-value-text">{{ $formatDate($step3Data['issuance_date'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Expiration Date</div>
-                                    <div class="info-field-value-text">13-Mar-2029</div>
+                                    <div class="info-field-value-text">{{ $formatDate($step3Data['expiration_date'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-9 mb-3">
                                     <div class="info-field-label-text">Lost Passport History</div>
-                                    <div class="info-field-value-text">No, I have never lost a passport.</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['lost_passport_history'] ?? null) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -253,41 +323,63 @@
                                 <h4 class="info-section-title-text">Relative Contact Information</h4>
                                 <div class="info-section-divider"></div>
                             </div>
-                            <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Relative Contact 1</h5>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Surname</div>
-                                    <div class="info-field-value-text">Shah</div>
+                            @php
+                                $relatives = [];
+                                if (isset($step4Data['relatives']) && is_array($step4Data['relatives'])) {
+                                    $relatives = $step4Data['relatives'];
+                                } elseif (!empty($step4Data)) {
+                                    // If it's a single relative object, wrap it in array
+                                    $relatives = [$step4Data];
+                                }
+                            @endphp
+                            @if(count($relatives) > 0)
+                                @foreach($relatives as $index => $relative)
+                                    <div class="info-subsection-title mb-2">
+                                        <h5 class="info-subsection-title-text">Relative Contact {{ $index + 1 }}</h5>
+                                    </div>
+                                    <div class="info-grid-row row">
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Surname</div>
+                                            <div class="info-field-value-text">{{ $getValue($relative['surname'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Given Name</div>
+                                            <div class="info-field-value-text">{{ $getValue($relative['given_name'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Organization Name</div>
+                                            <div class="info-field-value-text">{{ $getValue($relative['organization_name'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Relationship To You</div>
+                                            <div class="info-field-value-text">{{ $getValue($relative['relationship'] ?? null) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-grid-row row">
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Contact Address</div>
+                                            <div class="info-field-value-text">{{ $getValue($relative['contact_address'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Email</div>
+                                            <div class="info-field-value-text">{{ $getValue($relative['email'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Phone Number</div>
+                                            <div class="info-field-value-text">{{ $getValue($relative['phone_number'] ?? null) }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="info-subsection-title mb-2">
+                                    <h5 class="info-subsection-title-text">Relative Contact 1</h5>
                                 </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Given Name</div>
-                                    <div class="info-field-value-text">Karan</div>
+                                <div class="info-grid-row row">
+                                    <div class="info-field-item col-md-12 mb-3">
+                                        <div class="info-field-value-text">-</div>
+                                    </div>
                                 </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Organization Name</div>
-                                    <div class="info-field-value-text">TechNova Solutions Pvt. Ltd.</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Relationship To You</div>
-                                    <div class="info-field-value-text">Former Manager</div>
-                                </div>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Contact Address</div>
-                                    <div class="info-field-value-text">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Email</div>
-                                    <div class="info-field-value-text">karan.shah@technova.com</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Phone Number</div>
-                                    <div class="info-field-value-text">+91 98254 12345</div>
-                                </div>
-                            </div>
+                            @endif
                         </div>
 
                         <!-- Family Information Section -->
@@ -304,25 +396,25 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Father's Surname</div>
-                                    <div class="info-field-value-text">Patel</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['father_surname'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Father's Given Name</div>
-                                    <div class="info-field-value-text">Ramesh Kumar</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['father_given_name'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Father's Date of Birth</div>
-                                    <div class="info-field-value-text">12-Aug-1965</div>
+                                    <div class="info-field-value-text">{{ $formatDate($step5Data['father_date_of_birth'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Father's Occupation</div>
-                                    <div class="info-field-value-text">Business Owner</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['father_occupation'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Have Passport</div>
-                                    <div class="info-field-value-text">Yes</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['father_have_passport'] ?? null) }}</div>
                                 </div>
                             </div>
 
@@ -333,115 +425,127 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Mother's Surname</div>
-                                    <div class="info-field-value-text">Patel</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['mother_surname'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Mother's Given Name</div>
-                                    <div class="info-field-value-text">Meena Ramesh</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['mother_given_name'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Mother's Date of Birth</div>
-                                    <div class="info-field-value-text">25-Jan-1968</div>
+                                    <div class="info-field-value-text">{{ $formatDate($step5Data['mother_date_of_birth'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Mother's Occupation</div>
-                                    <div class="info-field-value-text">Homemaker</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['mother_occupation'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Have Passport</div>
-                                    <div class="info-field-value-text">No</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['mother_have_passport'] ?? null) }}</div>
                                 </div>
                             </div>
 
                             <!-- Spouse Details -->
+                            @if(!empty($step5Data['spouse_surname']) || !empty($step5Data['spouse_given_name']))
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Spouse Details</h5>
                             </div>
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Surname</div>
-                                    <div class="info-field-value-text">Patel</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_surname'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Given Name</div>
-                                    <div class="info-field-value-text">Neha</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_given_name'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Date of Birth</div>
-                                    <div class="info-field-value-text">04-May-1995</div>
+                                    <div class="info-field-value-text">{{ $formatDate($step5Data['spouse_date_of_birth'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Country</div>
-                                    <div class="info-field-value-text">India</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_country'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's City of Birth</div>
-                                    <div class="info-field-value-text">Surat</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_city_of_birth'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Have Passport</div>
-                                    <div class="info-field-value-text">Yes</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_have_passport'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Address</div>
-                                    <div class="info-field-value-text">B-204, Navkar Residency, Vesu, Surat</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_address'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Phone Number</div>
-                                    <div class="info-field-value-text">+91 98765 44221</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_phone_number'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Education</div>
-                                    <div class="info-field-value-text">Master's in Computer Applications (MCA)</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_education'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Occupation</div>
-                                    <div class="info-field-value-text">Software Engineer</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_occupation'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Yearly Income</div>
-                                    <div class="info-field-value-text">9,50,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step5Data['spouse_yearly_income'] ?? null) }}</div>
                                 </div>
                             </div>
+                            @endif
 
-                            <!-- Child 1 Details -->
-                            <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Child 1</h5>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Child's Name</div>
-                                    <div class="info-field-value-text">Aarav Patel</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Child's Age</div>
-                                    <div class="info-field-value-text">4</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Date of Birth</div>
-                                    <div class="info-field-value-text">17-Jun-2021</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">City of Birth</div>
-                                    <div class="info-field-value-text">Ahmedabad</div>
-                                </div>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Have Passport</div>
-                                    <div class="info-field-value-text">Yes</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Gender</div>
-                                    <div class="info-field-value-text">Male</div>
-                                </div>
-                            </div>
+                            <!-- Children Details -->
+                            @php
+                                $children = [];
+                                if (isset($step5Data['children']) && is_array($step5Data['children'])) {
+                                    $children = $step5Data['children'];
+                                }
+                            @endphp
+                            @if(count($children) > 0)
+                                @foreach($children as $index => $child)
+                                    <div class="info-subsection-title mb-2">
+                                        <h5 class="info-subsection-title-text">Child {{ $index + 1 }}</h5>
+                                    </div>
+                                    <div class="info-grid-row row">
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Child's Name</div>
+                                            <div class="info-field-value-text">{{ $getValue($child['name'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Child's Age</div>
+                                            <div class="info-field-value-text">{{ $getValue($child['age'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Date of Birth</div>
+                                            <div class="info-field-value-text">{{ $formatDate($child['date_of_birth'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">City of Birth</div>
+                                            <div class="info-field-value-text">{{ $getValue($child['city_of_birth'] ?? null) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-grid-row row">
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Have Passport</div>
+                                            <div class="info-field-value-text">{{ $getValue($child['have_passport'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Gender</div>
+                                            <div class="info-field-value-text">{{ $getValue($child['gender'] ?? null) }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
 
                         <!-- Education Information Section -->
@@ -458,19 +562,19 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Exam Type</div>
-                                    <div class="info-field-value-text">IELTS</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['exam_type'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Passing Year</div>
-                                    <div class="info-field-value-text">2022</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['exam_passing_year'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Score</div>
-                                    <div class="info-field-value-text">7.5</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['exam_score'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Trial</div>
-                                    <div class="info-field-value-text">2</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['exam_trial'] ?? null) }}</div>
                                 </div>
                             </div>
 
@@ -481,19 +585,19 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Passing Year</div>
-                                    <div class="info-field-value-text">2014</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['tenth_passing_year'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Percentage</div>
-                                    <div class="info-field-value-text">85.5%</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['tenth_percentage'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Board Name</div>
-                                    <div class="info-field-value-text">Gujarat Secondary Education Board</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['tenth_board_name'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Trial</div>
-                                    <div class="info-field-value-text">1</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['tenth_trial'] ?? null) }}</div>
                                 </div>
                             </div>
 
@@ -504,25 +608,25 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Passing Year</div>
-                                    <div class="info-field-value-text">2016</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['twelfth_passing_year'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Stream</div>
-                                    <div class="info-field-value-text">Science</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['twelfth_stream'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Percentage</div>
-                                    <div class="info-field-value-text">82.3%</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['twelfth_percentage'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Board Name</div>
-                                    <div class="info-field-value-text">Gujarat Higher Secondary Education Board</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['twelfth_board_name'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Trial</div>
-                                    <div class="info-field-value-text">1</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['twelfth_trial'] ?? null) }}</div>
                                 </div>
                             </div>
 
@@ -533,25 +637,25 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Degree</div>
-                                    <div class="info-field-value-text">Bachelor of Technology / Engineering (B.Tech / B.E.)</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['graduation_degree'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">University Name</div>
-                                    <div class="info-field-value-text">Gujarat Technological University</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['graduation_university'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Percentage</div>
-                                    <div class="info-field-value-text">78.5%</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['graduation_percentage'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Passing Year</div>
-                                    <div class="info-field-value-text">2020</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['graduation_passing_year'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Trial</div>
-                                    <div class="info-field-value-text">1</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['graduation_trial'] ?? null) }}</div>
                                 </div>
                             </div>
 
@@ -562,56 +666,66 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Degree</div>
-                                    <div class="info-field-value-text">Master of Business Administration (MBA)</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['post_graduation_degree'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">University Name</div>
-                                    <div class="info-field-value-text">Indian Institute of Management</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['post_graduation_university'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Percentage</div>
-                                    <div class="info-field-value-text">85.2%</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['post_graduation_percentage'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Passing Year</div>
-                                    <div class="info-field-value-text">2022</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['post_graduation_passing_year'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Trial</div>
-                                    <div class="info-field-value-text">1</div>
+                                    <div class="info-field-value-text">{{ $getValue($step6Data['post_graduation_trial'] ?? null) }}</div>
                                 </div>
                             </div>
 
                             <!-- Other Degree Details -->
-                            <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Other Degree 1</h5>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Degree</div>
-                                    <div class="info-field-value-text">Diploma in Digital Marketing</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Institution Name</div>
-                                    <div class="info-field-value-text">Digital Marketing Institute</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Percentage</div>
-                                    <div class="info-field-value-text">90.0%</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Passing Year</div>
-                                    <div class="info-field-value-text">2023</div>
-                                </div>
-                            </div>
-                            <div class="info-grid-row row mb-4">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Trial</div>
-                                    <div class="info-field-value-text">1</div>
-                                </div>
-                            </div>
+                            @php
+                                $otherDegrees = [];
+                                if (isset($step6Data['other_degrees']) && is_array($step6Data['other_degrees'])) {
+                                    $otherDegrees = $step6Data['other_degrees'];
+                                }
+                            @endphp
+                            @if(count($otherDegrees) > 0)
+                                @foreach($otherDegrees as $index => $degree)
+                                    <div class="info-subsection-title mb-2">
+                                        <h5 class="info-subsection-title-text">Other Degree {{ $index + 1 }}</h5>
+                                    </div>
+                                    <div class="info-grid-row row">
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Degree</div>
+                                            <div class="info-field-value-text">{{ $getValue($degree['degree'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Institution Name</div>
+                                            <div class="info-field-value-text">{{ $getValue($degree['institution_name'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Percentage</div>
+                                            <div class="info-field-value-text">{{ $getValue($degree['percentage'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Passing Year</div>
+                                            <div class="info-field-value-text">{{ $getValue($degree['passing_year'] ?? null) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-grid-row row mb-4">
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Trial</div>
+                                            <div class="info-field-value-text">{{ $getValue($degree['trial'] ?? null) }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
 
                         <!-- Professional Experience Section -->
@@ -621,71 +735,49 @@
                                 <div class="info-section-divider"></div>
                             </div>
                             
-                            <!-- Experience 1 -->
-                            <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Experience 1</h5>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Duration - From</div>
-                                    <div class="info-field-value-text">01-Jan-2020</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Duration - To</div>
-                                    <div class="info-field-value-text">Present</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Country</div>
-                                    <div class="info-field-value-text">India</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Designation</div>
-                                    <div class="info-field-value-text">Senior UI/UX Designer</div>
-                                </div>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-6 mb-3">
-                                    <div class="info-field-label-text">Company Name</div>
-                                    <div class="info-field-value-text">TechNova Solutions Pvt. Ltd.</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Salary</div>
-                                    <div class="info-field-value-text">₹ 8,50,000</div>
-                                </div>
-                            </div>
-
-                            <!-- Experience 2 -->
-                            <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Experience 2</h5>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Duration - From</div>
-                                    <div class="info-field-value-text">15-Jun-2018</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Duration - To</div>
-                                    <div class="info-field-value-text">31-Dec-2019</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Country</div>
-                                    <div class="info-field-value-text">India</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Designation</div>
-                                    <div class="info-field-value-text">UI/UX Designer</div>
-                                </div>
-                            </div>
-                            <div class="info-grid-row row">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Company Name</div>
-                                    <div class="info-field-value-text">Digital Innovations Inc.</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Salary</div>
-                                    <div class="info-field-value-text">₹ 6,00,000</div>
-                                </div>
-                            </div>
+                            @php
+                                $experiences = [];
+                                if (isset($step7Data['experiences']) && is_array($step7Data['experiences'])) {
+                                    $experiences = $step7Data['experiences'];
+                                } elseif (!empty($step7Data)) {
+                                    $experiences = [$step7Data];
+                                }
+                            @endphp
+                            @if(count($experiences) > 0)
+                                @foreach($experiences as $index => $experience)
+                                    <div class="info-subsection-title mb-2">
+                                        <h5 class="info-subsection-title-text">Experience {{ $index + 1 }}</h5>
+                                    </div>
+                                    <div class="info-grid-row row">
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Duration - From</div>
+                                            <div class="info-field-value-text">{{ $formatDate($experience['from_date'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Duration - To</div>
+                                            <div class="info-field-value-text">{{ $getValue($experience['to_date'] ?? ($experience['is_present'] ?? false ? 'Present' : null)) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Country</div>
+                                            <div class="info-field-value-text">{{ $getValue($experience['country'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Designation</div>
+                                            <div class="info-field-value-text">{{ $getValue($experience['designation'] ?? null) }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-grid-row row">
+                                        <div class="info-field-item col-md-6 mb-3">
+                                            <div class="info-field-label-text">Company Name</div>
+                                            <div class="info-field-value-text">{{ $getValue($experience['company_name'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Salary</div>
+                                            <div class="info-field-value-text">{{ $getValue($experience['salary'] ?? null) }}</div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
 
                         <!-- Property Details Section -->
@@ -702,43 +794,43 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Home</div>
-                                    <div class="info-field-value-text">₹ 50,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['home_value'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Land</div>
-                                    <div class="info-field-value-text">₹ 30,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['land_value'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Plot</div>
-                                    <div class="info-field-value-text">₹ 20,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['plot_value'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Commercials</div>
-                                    <div class="info-field-value-text">₹ 1,20,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['commercials_value'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Other</div>
-                                    <div class="info-field-value-text">₹ 5,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['other_value'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Shop</div>
-                                    <div class="info-field-value-text">₹ 15,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['shop_value'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Gold</div>
-                                    <div class="info-field-value-text">₹ 8,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['gold_value'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Silver</div>
-                                    <div class="info-field-value-text">₹ 2,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['silver_value'] ?? null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Total Asset Valuation</div>
-                                    <div class="info-field-value-text">₹ 2,50,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['total_asset_valuation'] ?? null) }}</div>
                                 </div>
                             </div>
 
@@ -749,15 +841,15 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Total Loan Value</div>
-                                    <div class="info-field-value-text">₹ 30,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['total_loan_value'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Loan Years</div>
-                                    <div class="info-field-value-text">15</div>
+                                    <div class="info-field-value-text">{{ $getValue($step8Data['loan_years'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Loan Availed On</div>
-                                    <div class="info-field-value-text">15-Mar-2019</div>
+                                    <div class="info-field-value-text">{{ $formatDate($step8Data['loan_availed_on'] ?? null) }}</div>
                                 </div>
                             </div>
                         </div>
@@ -773,28 +865,35 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Income Details</h5>
                             </div>
+                            @php
+                                $fatherIncome = $step9Data['father_income'] ?? 0;
+                                $motherIncome = $step9Data['mother_income'] ?? 0;
+                                $candidateIncome = $step9Data['candidate_income'] ?? 0;
+                                $spouseIncome = $step9Data['spouse_income'] ?? 0;
+                                $totalIncome = $fatherIncome + $motherIncome + $candidateIncome + $spouseIncome;
+                            @endphp
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Father's Income</div>
-                                    <div class="info-field-value-text">₹ 8,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($fatherIncome ? '₹ ' . number_format($fatherIncome) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Mother's Income</div>
-                                    <div class="info-field-value-text">₹ 0</div>
+                                    <div class="info-field-value-text">{{ $getValue($motherIncome ? '₹ ' . number_format($motherIncome) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Candidate's Income</div>
-                                    <div class="info-field-value-text">₹ 12,00,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($candidateIncome ? '₹ ' . number_format($candidateIncome) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse Income</div>
-                                    <div class="info-field-value-text">₹ 9,50,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($spouseIncome ? '₹ ' . number_format($spouseIncome) : null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Total Income</div>
-                                    <div class="info-field-value-text">₹ 29,50,000</div>
+                                    <div class="info-field-value-text">{{ $getValue($totalIncome ? '₹ ' . number_format($totalIncome) : null) }}</div>
                                 </div>
                             </div>
                         </div>

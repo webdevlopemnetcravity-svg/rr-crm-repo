@@ -163,7 +163,7 @@
 
         @yield('filter-section')
 
-        <x-app-title class="d-block d-lg-none" :pageTitle="$pageTitle"></x-app-title>
+        <x-app-title class="d-block d-lg-none" :pageTitle="$pageTitle" :customBreadcrumb="$customBreadcrumb ?? null"></x-app-title>
 
         @yield('content')
 

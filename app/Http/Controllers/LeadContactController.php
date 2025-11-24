@@ -203,12 +203,36 @@ class LeadContactController extends AccountBaseController
         return view('add-lead.index', $this->data);
     }
 
-    public function leadDetails()
+    public function leadDetails($id = null)
     {
         $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
         abort_403(!in_array($viewPermission, ['all','added','owned','both']));
 
         $this->pageTitle = 'app.leadDetails';
+
+        // Set custom breadcrumb
+        $this->customBreadcrumb = [
+            [
+                'text' => __('app.menu.home'),
+                'url' => route('dashboard')
+            ],
+            [
+                'text' => __('app.leadList'),
+                'url' => route('lead-list.index')
+            ],
+            [
+                'text' => __('app.leadDetails')
+            ]
+        ];
+
+        // Fetch the lead data if ID is provided
+        $this->lead = null;
+        if ($id) {
+            $this->lead = NewLead::with(['addedBy', 'leadOwner'])->find($id);
+            if (!$this->lead) {
+                abort(404, 'Lead not found');
+            }
+        }
 
         if (!request()->ajax()) {
             $this->categories = LeadCategory::get();
