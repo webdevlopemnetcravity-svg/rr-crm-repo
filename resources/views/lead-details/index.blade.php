@@ -87,7 +87,7 @@
                             <div class="tab-item"><img src="{{ asset('img/icon/Accounts.svg') }}"></div>Accounts
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" data-tab="communicationTab" href="#">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Communication.svg') }}"></div>Communication
+                            <div class="tab-item"><img src="{{ asset('img/icon/Communication.svg') }}"></div>Template Document
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" data-tab="followUpTab" href="#">
                             <div class="tab-item"><img src="{{ asset('img/icon/Follow_Up.svg') }}"></div>Follow Up
@@ -107,17 +107,126 @@
                     <div class="tab-section-header">
                         <div class="tab-section-header-content">
                             <h3 class="tab-section-title">Client Info</h3>
+                            <button type="button" class="btn-primary rounded" id="downloadClientInfoBtn">
+                                Download Client Info
+                            </button>
                         </div>
                     </div>
                     <!-- Tab Content Area -->
                     <div class="tab-section-content">
+                        
+                        <!-- Candidate Information & Contact Details Card -->
+                        <div style="background-color: #F8F6FB; border: 1px solid #B5B5B5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <!-- Candidate Information Section -->
+                            <div class="info-section mb-1">
+                                <div class="info-section-header mb-3">
+                                    <h4 class="info-section-title-text">Candidate Information</h4>
+                                    <div class="info-section-divider"></div>
+                                </div>
+                                <div class="info-grid-row row">
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Surname</div>
+                                        <div class="info-field-value-text">Patel</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Given Name</div>
+                                        <div class="info-field-value-text">Rajesh Kumar</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Date of Birth</div>
+                                        <div class="info-field-value-text">15-Mar-1992</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Gender</div>
+                                        <div class="info-field-value-text">Male</div>
+                                    </div>
+                                </div>
+                                <div class="info-grid-row row">
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Marital Status</div>
+                                        <div class="info-field-value-text">Unmarried</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Visa Expiry Date</div>
+                                        <div class="info-field-value-text">-</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Passport Number</div>
+                                        <div class="info-field-value-text">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Details Section -->
+                            <div class="info-section mb-1">
+                                <div class="info-section-header mb-3">
+                                    <h4 class="info-section-title-text">Contact Details</h4>
+                                    <div class="info-section-divider"></div>
+                                </div>
+                                <div class="info-grid-row row">
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Primary Phone</div>
+                                        <div class="info-field-value-text">+91 98765 43210</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Secondary Phone</div>
+                                        <div class="info-field-value-text">+91 98765 43211</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Work Phone</div>
+                                        <div class="info-field-value-text">+91 98765 43212</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Other Phone Number Used in Last Five Years</div>
+                                        <div class="info-field-value-text">+91 98765 43212</div>
+                                    </div>
+                                </div>
+                                <div class="info-grid-row row">
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Email</div>
+                                        <div class="info-field-value-text">rajesh.patel@example.com</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Other Email Used in Last Five Years</div>
+                                        <div class="info-field-value-text">rajesh.patel@example.com</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Home Address</div>
+                                        <div class="info-field-value-text">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Mailing Address</div>
+                                        <div class="info-field-value-text">B-204, Navkar Residency, Vesu, Surat, Gujarat, 395007, India</div>
+                                    </div>
+                                </div>
+                                <div class="info-grid-row row">
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Linkedin Link</div>
+                                        <div class="info-field-value-text">-</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Facebook Link</div>
+                                        <div class="info-field-value-text">-</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Instagram Link</div>
+                                        <div class="info-field-value-text">-</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Sub Agent</div>
+                                        <div class="info-field-value-text">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Personal Details Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-header mb-3">
                                 <h4 class="info-section-title-text">Personal Details</h4>
                                 <div class="info-section-divider"></div>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Lead Source</div>
                                     <div class="info-field-value-text">Facebook</div>
@@ -138,11 +247,12 @@
                         </div>
 
                         <!-- Last Five Years Visa Status Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-header mb-3">
                                 <h4 class="info-section-title-text">Last Five Years Visa Status</h4>
+                                <div class="info-section-divider"></div>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Visa Status</div>
                                     <div class="info-field-value-text">Visa Refusal</div>
@@ -169,12 +279,12 @@
                         </div>
 
                         <!-- Client Preference Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-header mb-3">
                                 <h4 class="info-section-title-text">Client Preference</h4>
                                 <div class="info-section-divider"></div>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Preferred Designation</div>
                                     <div class="info-field-value-text">UI/UX Designer</div>
@@ -205,12 +315,12 @@
                         </div>
 
                         <!-- Passport Details Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-header mb-3">
                                 <h4 class="info-section-title-text">Passport Details</h4>
                                 <div class="info-section-divider"></div>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Passport Number</div>
                                     <div class="info-field-value-text">Z4589217</div>
@@ -241,7 +351,7 @@
                         </div>
 
                         <!-- Relative Contact Information Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-header mb-3">
                                 <h4 class="info-section-title-text">Relative Contact Information</h4>
                                 <div class="info-section-divider"></div>
@@ -249,7 +359,7 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Relative Contact 1</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Surname</div>
                                     <div class="info-field-value-text">Shah</div>
@@ -268,15 +378,15 @@
                                 </div>
                             </div>
                             <div class="info-grid-row row">
-                                <div class="info-field-item col-md-4 mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Contact Address</div>
                                     <div class="info-field-value-text">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
                                 </div>
-                                <div class="info-field-item col-md-4 mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Email</div>
                                     <div class="info-field-value-text">karan.shah@technova.com</div>
                                 </div>
-                                <div class="info-field-item col-md-4 mb-3">
+                                <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Phone Number</div>
                                     <div class="info-field-value-text">+91 98254 12345</div>
                                 </div>
@@ -284,7 +394,7 @@
                         </div>
 
                         <!-- Family Information Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-header mb-3">
                                 <h4 class="info-section-title-text">Family Information</h4>
                                 <div class="info-section-divider"></div>
@@ -294,7 +404,7 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Father Details</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Father's Surname</div>
                                     <div class="info-field-value-text">Patel</div>
@@ -323,7 +433,7 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Mother's Details</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Mother's Surname</div>
                                     <div class="info-field-value-text">Patel</div>
@@ -352,7 +462,7 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Spouse Details</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's Surname</div>
                                     <div class="info-field-value-text">Patel</div>
@@ -370,7 +480,7 @@
                                     <div class="info-field-value-text">India</div>
                                 </div>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Spouse's City of Birth</div>
                                     <div class="info-field-value-text">Surat</div>
@@ -407,7 +517,7 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Child 1</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Child's Name</div>
                                     <div class="info-field-value-text">Aarav Patel</div>
@@ -437,8 +547,178 @@
                             </div>
                         </div>
 
+                        <!-- Education Information Section -->
+                        <div class="info-section mb-1">
+                            <div class="info-section-header mb-3">
+                                <h4 class="info-section-title-text">Education Information</h4>
+                                <div class="info-section-divider"></div>
+                            </div>
+                            
+                            <!-- IELTS/PTE/OET/TOEFL Exam Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">IELTS/PTE/OET/TOEFL Exam Details</h5>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Exam Type</div>
+                                    <div class="info-field-value-text">IELTS</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passing Year</div>
+                                    <div class="info-field-value-text">2022</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Score</div>
+                                    <div class="info-field-value-text">7.5</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Trial</div>
+                                    <div class="info-field-value-text">2</div>
+                                </div>
+                            </div>
+
+                            <!-- 10th Exam Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">10th Exam Details</h5>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passing Year</div>
+                                    <div class="info-field-value-text">2014</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Percentage</div>
+                                    <div class="info-field-value-text">85.5%</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Board Name</div>
+                                    <div class="info-field-value-text">Gujarat Secondary Education Board</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Trial</div>
+                                    <div class="info-field-value-text">1</div>
+                                </div>
+                            </div>
+
+                            <!-- 12th Exam Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">12th Exam Details</h5>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passing Year</div>
+                                    <div class="info-field-value-text">2016</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Stream</div>
+                                    <div class="info-field-value-text">Science</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Percentage</div>
+                                    <div class="info-field-value-text">82.3%</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Board Name</div>
+                                    <div class="info-field-value-text">Gujarat Higher Secondary Education Board</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Trial</div>
+                                    <div class="info-field-value-text">1</div>
+                                </div>
+                            </div>
+
+                            <!-- Graduation Degree Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Graduation Degree Details</h5>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Degree</div>
+                                    <div class="info-field-value-text">Bachelor of Technology / Engineering (B.Tech / B.E.)</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">University Name</div>
+                                    <div class="info-field-value-text">Gujarat Technological University</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Percentage</div>
+                                    <div class="info-field-value-text">78.5%</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passing Year</div>
+                                    <div class="info-field-value-text">2020</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Trial</div>
+                                    <div class="info-field-value-text">1</div>
+                                </div>
+                            </div>
+
+                            <!-- Post Graduation Degree Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Post Graduation Degree Details</h5>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Degree</div>
+                                    <div class="info-field-value-text">Master of Business Administration (MBA)</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">University Name</div>
+                                    <div class="info-field-value-text">Indian Institute of Management</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Percentage</div>
+                                    <div class="info-field-value-text">85.2%</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passing Year</div>
+                                    <div class="info-field-value-text">2022</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Trial</div>
+                                    <div class="info-field-value-text">1</div>
+                                </div>
+                            </div>
+
+                            <!-- Other Degree Details -->
+                            <div class="info-subsection-title mb-2">
+                                <h5 class="info-subsection-title-text">Other Degree 1</h5>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Degree</div>
+                                    <div class="info-field-value-text">Diploma in Digital Marketing</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Institution Name</div>
+                                    <div class="info-field-value-text">Digital Marketing Institute</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Percentage</div>
+                                    <div class="info-field-value-text">90.0%</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passing Year</div>
+                                    <div class="info-field-value-text">2023</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Trial</div>
+                                    <div class="info-field-value-text">1</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Professional Experience Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-header mb-3">
                                 <h4 class="info-section-title-text">Professional Experience</h4>
                                 <div class="info-section-divider"></div>
@@ -448,36 +728,32 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Experience 1</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Company Name</div>
-                                    <div class="info-field-value-text">TechNova Solutions Pvt. Ltd.</div>
+                                    <div class="info-field-label-text">Duration - From</div>
+                                    <div class="info-field-value-text">01-Jan-2020</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Duration - To</div>
+                                    <div class="info-field-value-text">Present</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Country</div>
+                                    <div class="info-field-value-text">India</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Designation</div>
                                     <div class="info-field-value-text">Senior UI/UX Designer</div>
                                 </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Start Date</div>
-                                    <div class="info-field-value-text">01-Jan-2020</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">End Date</div>
-                                    <div class="info-field-value-text">Present</div>
-                                </div>
                             </div>
-                            <div class="info-grid-row row mb-4">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-6 mb-3">
-                                    <div class="info-field-label-text">Job Description</div>
-                                    <div class="info-field-value-text">Responsible for designing user interfaces and user experiences for web and mobile applications. Collaborated with cross-functional teams to deliver high-quality design solutions.</div>
+                                    <div class="info-field-label-text">Company Name</div>
+                                    <div class="info-field-value-text">TechNova Solutions Pvt. Ltd.</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Location</div>
-                                    <div class="info-field-value-text">Ahmedabad, India</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Employment Type</div>
-                                    <div class="info-field-value-text">Full-time</div>
+                                    <div class="info-field-label-text">Salary</div>
+                                    <div class="info-field-value-text">₹ 8,50,000</div>
                                 </div>
                             </div>
 
@@ -485,118 +761,106 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Experience 2</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Company Name</div>
-                                    <div class="info-field-value-text">Digital Innovations Inc.</div>
+                                    <div class="info-field-label-text">Duration - From</div>
+                                    <div class="info-field-value-text">15-Jun-2018</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Duration - To</div>
+                                    <div class="info-field-value-text">31-Dec-2019</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Country</div>
+                                    <div class="info-field-value-text">India</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Designation</div>
                                     <div class="info-field-value-text">UI/UX Designer</div>
                                 </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Start Date</div>
-                                    <div class="info-field-value-text">15-Jun-2018</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">End Date</div>
-                                    <div class="info-field-value-text">31-Dec-2019</div>
-                                </div>
                             </div>
-                            <div class="info-grid-row row mb-4">
-                                <div class="info-field-item col-md-6 mb-3">
-                                    <div class="info-field-label-text">Job Description</div>
-                                    <div class="info-field-value-text">Designed user interfaces for various client projects. Worked on wireframing, prototyping, and visual design.</div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Company Name</div>
+                                    <div class="info-field-value-text">Digital Innovations Inc.</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Location</div>
-                                    <div class="info-field-value-text">Mumbai, India</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Employment Type</div>
-                                    <div class="info-field-value-text">Full-time</div>
+                                    <div class="info-field-label-text">Salary</div>
+                                    <div class="info-field-value-text">₹ 6,00,000</div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Property Details Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-header mb-3">
                                 <h4 class="info-section-title-text">Property Details</h4>
                                 <div class="info-section-divider"></div>
                             </div>
                             
-                            <!-- Property 1 -->
+                            <!-- Property Valuation -->
                             <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Property 1</h5>
+                                <h5 class="info-subsection-title-text">Property Valuation</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Property Type</div>
-                                    <div class="info-field-value-text">Residential</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Ownership Type</div>
-                                    <div class="info-field-value-text">Owned</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Property Value</div>
+                                    <div class="info-field-label-text">Home</div>
                                     <div class="info-field-value-text">₹ 50,00,000</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Area (Sq. Ft.)</div>
-                                    <div class="info-field-value-text">1,200</div>
+                                    <div class="info-field-label-text">Land</div>
+                                    <div class="info-field-value-text">₹ 30,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Plot</div>
+                                    <div class="info-field-value-text">₹ 20,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Commercials</div>
+                                    <div class="info-field-value-text">₹ 1,20,00,000</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Other</div>
+                                    <div class="info-field-value-text">₹ 5,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Shop</div>
+                                    <div class="info-field-value-text">₹ 15,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Gold</div>
+                                    <div class="info-field-value-text">₹ 8,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Silver</div>
+                                    <div class="info-field-value-text">₹ 2,00,000</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
-                                <div class="info-field-item col-md-6 mb-3">
-                                    <div class="info-field-label-text">Property Address</div>
-                                    <div class="info-field-value-text">27 Greenfield Avenue, Maplewood Heights, New Delhi, 110019, India</div>
-                                </div>
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Purchase Date</div>
-                                    <div class="info-field-value-text">15-Mar-2019</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Mortgage/Loan</div>
-                                    <div class="info-field-value-text">Yes</div>
+                                    <div class="info-field-label-text">Total Asset Valuation</div>
+                                    <div class="info-field-value-text">₹ 2,50,00,000</div>
                                 </div>
                             </div>
 
-                            <!-- Property 2 -->
+                            <!-- Loan Information -->
                             <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Property 2</h5>
+                                <h5 class="info-subsection-title-text">Loan Information</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Property Type</div>
-                                    <div class="info-field-value-text">Commercial</div>
+                                    <div class="info-field-label-text">Total Loan Value</div>
+                                    <div class="info-field-value-text">₹ 30,00,000</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Ownership Type</div>
-                                    <div class="info-field-value-text">Owned</div>
+                                    <div class="info-field-label-text">Loan Years</div>
+                                    <div class="info-field-value-text">15</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Property Value</div>
-                                    <div class="info-field-value-text">₹ 1,20,00,000</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Area (Sq. Ft.)</div>
-                                    <div class="info-field-value-text">2,500</div>
-                                </div>
-                            </div>
-                            <div class="info-grid-row row mb-4">
-                                <div class="info-field-item col-md-6 mb-3">
-                                    <div class="info-field-label-text">Property Address</div>
-                                    <div class="info-field-value-text">B-204, Navkar Residency, Vesu, Surat, Gujarat, 395007, India</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Purchase Date</div>
-                                    <div class="info-field-value-text">10-Aug-2021</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Mortgage/Loan</div>
-                                    <div class="info-field-value-text">No</div>
+                                    <div class="info-field-label-text">Loan Availed On</div>
+                                    <div class="info-field-value-text">15-Mar-2019</div>
                                 </div>
                             </div>
                         </div>
@@ -612,110 +876,28 @@
                             <div class="info-subsection-title mb-2">
                                 <h5 class="info-subsection-title-text">Income Details</h5>
                             </div>
-                            <div class="info-grid-row row mb-3">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Annual Income</div>
+                                    <div class="info-field-label-text">Father's Income</div>
+                                    <div class="info-field-value-text">₹ 8,00,000</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Mother's Income</div>
+                                    <div class="info-field-value-text">₹ 0</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Candidate's Income</div>
                                     <div class="info-field-value-text">₹ 12,00,000</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Monthly Income</div>
-                                    <div class="info-field-value-text">₹ 1,00,000</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Income Source</div>
-                                    <div class="info-field-value-text">Salary</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Additional Income</div>
-                                    <div class="info-field-value-text">₹ 2,00,000</div>
+                                    <div class="info-field-label-text">Spouse Income</div>
+                                    <div class="info-field-value-text">₹ 9,50,000</div>
                                 </div>
                             </div>
-                            <div class="info-grid-row row mb-4">
+                            <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Additional Income Source</div>
-                                    <div class="info-field-value-text">Freelance Projects</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Total Annual Income</div>
-                                    <div class="info-field-value-text">₹ 14,00,000</div>
-                                </div>
-                            </div>
-
-                            <!-- Bank Accounts -->
-                            <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Bank Accounts</h5>
-                            </div>
-                            <div class="info-grid-row row mb-3">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Bank Name</div>
-                                    <div class="info-field-value-text">HDFC Bank</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Account Type</div>
-                                    <div class="info-field-value-text">Savings</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Account Number</div>
-                                    <div class="info-field-value-text">****1234</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Current Balance</div>
-                                    <div class="info-field-value-text">₹ 5,50,000</div>
-                                </div>
-                            </div>
-                            <div class="info-grid-row row mb-4">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Bank Name</div>
-                                    <div class="info-field-value-text">ICICI Bank</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Account Type</div>
-                                    <div class="info-field-value-text">Current</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Account Number</div>
-                                    <div class="info-field-value-text">****5678</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Current Balance</div>
-                                    <div class="info-field-value-text">₹ 2,30,000</div>
-                                </div>
-                            </div>
-
-                            <!-- Assets & Liabilities -->
-                            <div class="info-subsection-title mb-2">
-                                <h5 class="info-subsection-title-text">Assets & Liabilities</h5>
-                            </div>
-                            <div class="info-grid-row row mb-3">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Total Assets Value</div>
-                                    <div class="info-field-value-text">₹ 1,75,00,000</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Total Liabilities</div>
-                                    <div class="info-field-value-text">₹ 30,00,000</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Net Worth</div>
-                                    <div class="info-field-value-text">₹ 1,45,00,000</div>
-                                </div>
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Credit Score</div>
-                                    <div class="info-field-value-text">750</div>
-                                </div>
-                            </div>
-                            <div class="info-grid-row row mb-4">
-                                <div class="info-field-item col-md-4 mb-3">
-                                    <div class="info-field-label-text">Investments (Stocks, Mutual Funds, etc.)</div>
-                                    <div class="info-field-value-text">₹ 15,00,000</div>
-                                </div>
-                                <div class="info-field-item col-md-4 mb-3">
-                                    <div class="info-field-label-text">Loans Outstanding</div>
-                                    <div class="info-field-value-text">₹ 30,00,000</div>
-                                </div>
-                                <div class="info-field-item col-md-4 mb-3">
-                                    <div class="info-field-label-text">Credit Cards</div>
-                                    <div class="info-field-value-text">2 Active Cards</div>
+                                    <div class="info-field-label-text">Total Income</div>
+                                    <div class="info-field-value-text">₹ 29,50,000</div>
                                 </div>
                             </div>
                         </div>
@@ -726,13 +908,13 @@
                     <!-- Tab Header -->
                     <div class="tab-section-header">
                         <div class="tab-section-header-content">
-                            <h3 class="tab-section-title">Process - <span class="tab-section-subtitle">Registered Date: 05-09-2025</span></h3>
+                            <h3 class="tab-section-title">Process - <span class="tab-section-subtitle"> Registered Date: 05-09-2025</span></h3>
                         </div>
                     </div>
                     <!-- Tab Content Area -->
                     <div class="tab-section-content">
                         <!-- Agent & Applicant Details Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-title mb-3">
                                 <h4 class="f-16 font-weight-bold">Agent & Applicant Details</h4>
                             </div>
@@ -787,7 +969,7 @@
                         </div>
 
                         <!-- All Fees Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-title mb-3">
                                 <h4 class="f-16 font-weight-bold">All Fees</h4>
                             </div>
@@ -826,7 +1008,7 @@
                         </div>
 
                         <!-- Process & Status Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-title mb-3">
                                 <h4 class="f-16 font-weight-bold">Process & Status</h4>
                             </div>
@@ -860,37 +1042,37 @@
                         </div>
 
                         <!-- Upload Documents Section -->
-                        <div class="info-section mb-4">
+                        <div class="info-section mb-1">
                             <div class="info-section-title mb-3">
                                 <h4 class="f-16 font-weight-bold">Upload Documents</h4>
                             </div>
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <x-forms.label fieldId="contract_letter" fieldLabel="Contract Letter">
                                     </x-forms.label>
                                     <input type="file" class="form-control" name="contract_letter" id="contract_letter">
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <x-forms.label fieldId="grant_letter" fieldLabel="Grant Letter">
                                     </x-forms.label>
                                     <input type="file" class="form-control" name="grant_letter" id="grant_letter">
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <x-forms.label fieldId="offer_letter" fieldLabel="Offer Letter/Sponsor Letter">
                                     </x-forms.label>
                                     <input type="file" class="form-control" name="offer_letter" id="offer_letter">
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <x-forms.label fieldId="medical_letter" fieldLabel="Medical Letter">
                                     </x-forms.label>
                                     <input type="file" class="form-control" name="medical_letter" id="medical_letter">
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <x-forms.label fieldId="air_ticket" fieldLabel="Air Ticket">
                                     </x-forms.label>
                                     <input type="file" class="form-control" name="air_ticket" id="air_ticket">
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-3 mb-3">
                                     <x-forms.label fieldId="accommodation_letter" fieldLabel="Accommodation Configuration Letter">
                                     </x-forms.label>
                                     <input type="file" class="form-control" name="accommodation_letter" id="accommodation_letter">
@@ -902,6 +1084,203 @@
                                 </button>
                             </div>
                         </div>
+                                                <!-- Agent & Applicant Details Section -->
+                                                <div class="info-section mb-1">
+                                                    <div class="info-section-header mb-3">
+                                                        <h4 class="info-section-title-text">Agent & Applicant Details</h4>
+                                                        <div class="info-section-divider"></div>
+                                                    </div>
+                                                    <div class="info-grid-row row">
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Applicant Name</div>
+                                                            <div class="info-field-value-text">15 March 2026</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Passport Name</div>
+                                                            <div class="info-field-value-text">AI 173</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Passport Number</div>
+                                                            <div class="info-field-value-text">San Francisco</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Agent Name</div>
+                                                            <div class="info-field-value-text">30 March 2026</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="info-grid-row row mt-3">
+                                                        <div class="info-field-item col-md-6 mb-3">
+                                                            <div class="info-field-label-text">Visa Category</div>
+                                                            <div class="info-field-value-text">Business visit and meetings with partners in the USA.</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-6 mb-3">
+                                                            <div class="info-field-label-text">Subclass</div>
+                                                            <div class="info-field-value-text">San Francisco, Los Angeles, and New York City</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- All Fees Section -->
+                                                <div class="info-section mb-1">
+                                                    <div class="info-section-header mb-3">
+                                                        <h4 class="info-section-title-text">All Fees</h4>
+                                                        <div class="info-section-divider"></div>
+                                                    </div>
+                                                    <div class="info-grid-row row">
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Advance Fees</div>
+                                                            <div class="info-field-value-text">15 March 2026</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Advance Fees Due Date</div>
+                                                            <div class="info-field-value-text">AI 173</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Remaining Fees</div>
+                                                            <div class="info-field-value-text">San Francisco</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Remaining Fees Due Date</div>
+                                                            <div class="info-field-value-text">30 March 2026</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="info-grid-row row mt-3">
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Agent Fees</div>
+                                                            <div class="info-field-value-text">15 March 2026</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Submission Fees</div>
+                                                            <div class="info-field-value-text">AI 173</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Process & Status Section -->
+                                                <div class="info-section mb-1">
+                                                    <div class="info-section-header mb-3">
+                                                        <h4 class="info-section-title-text">Process & Status</h4>
+                                                        <div class="info-section-divider"></div>
+                                                    </div>
+                                                    <div class="info-grid-row row">
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Status</div>
+                                                            <div class="info-field-value-text">Pending</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Processing Time</div>
+                                                            <div class="info-field-value-text">AI 173</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Bank Cheque Document Handover Date</div>
+                                                            <div class="info-field-value-text">San Francisco</div>
+                                                        </div>
+                                                        <div class="info-field-item col-md-3 mb-3">
+                                                            <div class="info-field-label-text">Passport Handover Date</div>
+                                                            <div class="info-field-value-text">30 March 2026</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="info-grid-row row mt-3">
+                                                        <div class="info-field-item col-md-6 mb-3">
+                                                            <div class="info-field-label-text">Note related to agent or process</div>
+                                                            <div class="info-field-value-text">15 March 2026</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Upload Documents Section -->
+                                                <div class="info-section mb-1">
+                                                    <div class="info-section-header mb-3">
+                                                        <h4 class="info-section-title-text">Upload Documents</h4>
+                                                        <div class="info-section-divider"></div>
+                                                    </div>
+                                                    <div class="upload-documents-list">
+                                                        <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="upload-document-icon mr-3">
+                                                                    <i class="fa fa-file-pdf text-danger"></i>
+                                                                </div>
+                                                                <span class="upload-document-name f-14 font-weight-500">Contract Letter</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-eye document-view-icon mr-3"></i>
+                                                                <button class="btn btn-sm btn-link text-danger p-0 upload-document-delete" title="Delete">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="upload-document-icon mr-3">
+                                                                    <i class="fa fa-file-word text-primary"></i>
+                                                                </div>
+                                                                <span class="upload-document-name f-14 font-weight-400">Grant Letter</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-eye document-view-icon mr-3"></i>
+                                                                <button class="btn btn-sm btn-link text-danger p-0 upload-document-delete" title="Delete">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="upload-document-icon mr-3">
+                                                                    <i class="fa fa-file-word text-primary"></i>
+                                                                </div>
+                                                                <span class="upload-document-name f-14 font-weight-400">Offer Letter/Sponsor Letter</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-eye document-view-icon mr-3"></i>
+                                                                <button class="btn btn-sm btn-link text-danger p-0 upload-document-delete" title="Delete">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="upload-document-icon mr-3">
+                                                                    <i class="fa fa-file-word text-primary"></i>
+                                                                </div>
+                                                                <span class="upload-document-name f-14 font-weight-400">Medical Letter</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-eye document-view-icon mr-3"></i>
+                                                                <button class="btn btn-sm btn-link text-danger p-0 upload-document-delete" title="Delete">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="upload-document-icon mr-3">
+                                                                    <i class="fa fa-file-word text-primary"></i>
+                                                                </div>
+                                                                <span class="upload-document-name f-14 font-weight-400">Air Ticket</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-eye document-view-icon mr-3"></i>
+                                                                <button class="btn btn-sm btn-link text-danger p-0 upload-document-delete" title="Delete">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="upload-document-icon mr-3">
+                                                                    <i class="fa fa-file-word text-primary"></i>
+                                                                </div>
+                                                                <span class="upload-document-name f-14 font-weight-400">Accommodation Configuration Letter</span>
+                                                            </div>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="fas fa-eye document-view-icon mr-3"></i>
+                                                                <button class="btn btn-sm btn-link text-danger p-0 upload-document-delete" title="Delete">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                     </div>
                     <!-- Save Button -->
                     <div class="mt-4">
@@ -960,56 +1339,174 @@
                     <!-- Tab Content Area -->
                     <div class="tab-section-content">
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table document-checklist-table">
                                 <thead>
                                     <tr>
                                         <th>DOCUMENT TYPE/NAME</th>
-                                        <th>STATUS</th>
                                         <th>ACTION</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
+                                        <td>Assessment Letter <span class="text-danger">*</span></td>
                                         <td>
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input">
-                                                <label class="form-check-label">Assessment Letter</label>
-                                            </div>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
                                         </td>
-                                        <td><span class="badge badge-secondary">-</span></td>
-                                        <td></td>
                                     </tr>
                                     <tr>
+                                        <td>Passport - Applicant <span class="text-danger">*</span></td>
                                         <td>
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" checked>
-                                                <label class="form-check-label">Passport - Applicant</label>
-                                            </div>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
                                         </td>
-                                        <td><span class="badge badge-warning">Pending</span></td>
-                                        <td><button class="btn btn-sm btn-primary">Upload</button></td>
                                     </tr>
                                     <tr>
+                                        <td>Father Passport <span class="text-danger">*</span></td>
                                         <td>
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" checked>
-                                                <label class="form-check-label">Father Passport</label>
-                                            </div>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
                                         </td>
-                                        <td><span class="badge badge-warning">Pending</span></td>
-                                        <td><button class="btn btn-sm btn-primary">Upload</button></td>
                                     </tr>
                                     <tr>
+                                        <td>Mother Passport <span class="text-danger">*</span></td>
                                         <td>
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" checked>
-                                                <label class="form-check-label">Child Document</label>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Spouse Passport <span class="text-danger">*</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Spouse Document</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Child Document</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
                                             </div>
                                         </td>
-                                        <td><span class="badge badge-success">Received</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Child Passport <span class="text-danger">*</span></td>
                                         <td>
-                                            <button class="btn btn-sm btn-info mr-1">View</button>
-                                            <a href="#" class="text-danger">Delete</a>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>IELTS / PTE / OET / TOEFL - Result</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>10th Passing Result <span class="text-danger">*</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>12th Passing Result</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Graduation Degree</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Post Graduation Degree</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-success document-upload-btn">Upload</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Other Degree</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Offerletter</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Experience letter</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Valuation Report</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Father Income Document</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mother Income Document</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Candidate Income Document</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Spouse Income Document</td>
+                                        <td>
+                                            <div class="document-action-group">
+                                                <i class="fas fa-eye document-view-icon"></i>
+                                                <a href="#" class="document-change-link">Change</a>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -1034,17 +1531,48 @@
                             <p class="text-muted mb-3">No invoice has been created for this Lead.</p>
                             <p class="text-muted">To create an Invoice, click on <i class="fa fa-plus"></i> at the top right corner</p>
                         </div>
+                                            <!-- Upload Documents Section -->
+                    <div class="info-section mb-1">
+                        <div class="upload-documents-list">
+                            <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                <div class="d-flex align-items-center">
+                                    <div class="upload-document-icon mr-3">
+                                        <i class="fa fa-file-pdf text-danger"></i>
+                                    </div>
+                                    <span class="upload-document-name f-14 font-weight-500">Revised Invoice LEAD-0008 | Kishan Ghaghada | 17-05-2025</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-eye document-view-icon mr-3" style="cursor: pointer;" data-toggle="modal" data-target="#viewInvoiceModal" title="View Invoice"></i>
+                                    <button class="btn btn-sm btn-link text-danger p-0 upload-document-delete" title="Delete">
+                                        <i class="fa fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                <div class="d-flex align-items-center">
+                                    <div class="upload-document-icon mr-3">
+                                        <i class="fa fa-file-pdf text-danger"></i>
+                                    </div>
+                                    <span class="upload-document-name f-14 font-weight-400">Invoice LEAD-0008 | Kishan Ghaghada | 17-05-2025</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-eye document-view-icon mr-3" style="cursor: pointer;" data-toggle="modal" data-target="#viewInvoiceModal" title="View Invoice"></i>
+                                    <button class="btn btn-sm btn-link text-danger p-0 upload-document-delete" title="Delete">
+                                        <i class="fa fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    </div>
+
                 </div>
                 <!-- Communication Tab Content -->
                 <div class="tab-content px-4 pb-4" id="communicationTab">
                     <!-- Tab Header -->
                     <div class="tab-section-header">
                         <div class="tab-section-header-content">
-                            <h3 class="tab-section-title">Communication History</h3>
-                            <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addCommunicationModal">
-                                <i class="fa fa-plus"></i>
-                            </button>
+                            <h3 class="tab-section-title">Template Document</h3>
                         </div>
                     </div>
                     <!-- Tab Content Area -->
@@ -1190,6 +1718,69 @@
                         <div class="text-center p-5">
                             <p class="text-muted">No data found</p>
                         </div>
+                        <!-- Follow Up List -->
+                        <div class="follow-up-list">
+                            <!-- Follow Up Card 1 -->
+                            <div class="follow-up-card">
+                                <div class="follow-up-card-content">
+                                    <img src="{{ asset('img/icon/follow_up_list.svg') }}">
+                                    <div class="follow-up-details">
+                                        <div class="follow-up-subject">
+                                            <span class="follow-up-label">Subject:</span> Introductory meeting with the customer
+                                        </div>
+                                        <div class="follow-up-outcome">
+                                            <span class="follow-up-label">Outcome:</span> Interested
+                                        </div>
+                                        <div class="follow-up-description">
+                                            The customer has shown interest in the Australian admission service
+                                        </div>
+                                        <div class="follow-up-meta">
+                                            Created by : Shivani Patel - 09-09-2025 11:46 AM
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Follow Up Card 2 -->
+                            <div class="follow-up-card">
+                                <div class="follow-up-card-content">
+                                    <img src="{{ asset('img/icon/follow_up_list.svg') }}">
+                                    <div class="follow-up-details">
+                                        <div class="follow-up-subject">
+                                            <span class="follow-up-label">Subject:</span> Introductory meeting with the customer
+                                        </div>
+                                        <div class="follow-up-outcome">
+                                            <span class="follow-up-label">Outcome:</span> Interested
+                                        </div>
+                                        <div class="follow-up-description">
+                                            The customer has shown interest in the Australian admission service
+                                        </div>
+                                        <div class="follow-up-meta">
+                                            Created by : Shivani Patel - 09-09-2025 11:46 AM
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Follow Up Card 3 -->
+                            <div class="follow-up-card">
+                                <div class="follow-up-card-content">
+                                    <img src="{{ asset('img/icon/follow_up_list.svg') }}">
+                                    <div class="follow-up-details">
+                                        <div class="follow-up-subject">
+                                            <span class="follow-up-label">Subject:</span> Introductory meeting with the customer
+                                        </div>
+                                        <div class="follow-up-outcome">
+                                            <span class="follow-up-label">Outcome:</span> Interested
+                                        </div>
+                                        <div class="follow-up-description">
+                                            The customer has shown interest in the Australian admission service
+                                        </div>
+                                        <div class="follow-up-meta">
+                                            Created by : Shivani Patel - 09-09-2025 11:46 AM
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- Travel Details Tab Content -->
@@ -1212,6 +1803,113 @@
                             <p class="text-muted mb-3">No data found</p>
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addTravelDetailsModal">Add Travel Details</button>
                         </div>
+                        <!-- Travel Details Section -->
+                        <div class="travel-details-section">
+                            <div class="travel-section-header">
+                                <h4 class="travel-section-title">Travel Details</h4>
+                                <div class="travel-section-divider"></div>
+                            </div>
+                            <div class="travel-details-container">
+                                <!-- 6 Column Grid: Purpose of Trip, Place To Visit USA -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Purpose of Trip:</div>
+                                        <div class="travel-detail-value">Business visit and meetings with partners in the USA.</div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-12 travel-detail-item">
+                                        <div class="travel-detail-label">Place To Visit USA</div>
+                                        <div class="travel-detail-value">San Francisco, Los Angeles, and New York City</div>
+                                    </div>
+                                </div>
+                                <!-- 4 Column Grid -->
+                                <div class="row mb-3">
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Date of Arrival</div>
+                                        <div class="travel-detail-value">15 March 2026</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Arrival Flight</div>
+                                        <div class="travel-detail-value">AI 173</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Arrival City</div>
+                                        <div class="travel-detail-value">San Francisco</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Date of Departure From</div>
+                                        <div class="travel-detail-value">30 March 2026</div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Departure Flight</div>
+                                        <div class="travel-detail-value">UA 868</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Departure City</div>
+                                        <div class="travel-detail-value">San Francisco</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 travel-detail-item">
+                                        <div class="travel-detail-label">Phone Number (of other country)</div>
+                                        <div class="travel-detail-value">+1 415 623 9874</div>
+                                    </div>
+                                </div>
+                                <!-- 4 Column Grid: Address Where You Will Stay, City, State, Postal/Zip Code -->
+                                <div class="row">
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Address Where You Will Stay</div>
+                                        <div class="travel-detail-value">
+                                            123 Mission Street, Suite 400<br>
+                                            123 Mission jkmklsd hjourf
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">City</div>
+                                        <div class="travel-detail-value">San Francisco</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">State</div>
+                                        <div class="travel-detail-value">California</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 travel-detail-item">
+                                        <div class="travel-detail-label">Postal/Zip Code</div>
+                                        <div class="travel-detail-value">94105</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information Section -->
+                        <div class="travel-details-section">
+                            <div class="travel-section-header">
+                                <h4 class="travel-section-title">Personal Information</h4>
+                                <div class="travel-section-divider"></div>
+                            </div>
+                            <div class="travel-details-container">
+                                <!-- Full Width: Person Paying For Your Trip (Details) -->
+                                <div class="row mb-3">
+                                    <div class="col-12 travel-detail-item">
+                                        <div class="travel-detail-label">Person Paying For Your Trip (Details)</div>
+                                        <div class="travel-detail-value">Travel expenses sponsored by Cravity Studio Pvt. Ltd., Ahmedabad, India. Travel expenses sponsored by Cravity Studio Pvt. Ltd., Ahmedabad, India. Travel expenses sponsored by Cravity Studio Pvt. Ltd., Ahmedabad, India.</div>
+                                    </div>
+                                </div>
+                                <!-- 4 Column Grid: Is Your Mother, Immediate Relatives, Other Relatives -->
+                                <div class="row">
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Is Your Mother in that country?</div>
+                                        <div class="travel-detail-value">No</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 mb-3 mb-md-0 travel-detail-item">
+                                        <div class="travel-detail-label">Immediate Relatives in that country?</div>
+                                        <div class="travel-detail-value">No</div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6 col-12 travel-detail-item">
+                                        <div class="travel-detail-label">Other Relatives in that country?</div>
+                                        <div class="travel-detail-value">Yes</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1232,12 +1930,13 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Note</label>
-                        <textarea class="form-control" rows="5" placeholder="Enter your details."></textarea>
+                        <div id="file-note-editor"></div>
+                        <textarea name="note" id="file-note-editor-text" class="d-none"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-primary" id="save-file-note-btn">Save</button>
                 </div>
             </div>
         </div>
@@ -1245,93 +1944,163 @@
 
     <!-- Add Invoice Modal -->
     <div class="modal fade" id="addInvoiceModal" tabindex="-1" role="dialog" aria-labelledby="addInvoiceModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-xl" role="document" style="max-width: 1200px;">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addInvoiceModalLabel">ADD INVOICE</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header" style="border-bottom: 1px solid #E9E6F5; padding: 16px 24px;">
+                    <h5 class="modal-title" id="addInvoiceModalLabel" style="font-size: 16px; font-weight: 600; color: #713ED9; margin: 0;">ADD INVOICE</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #F5213D; opacity: 1; font-size: 24px;">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding: 24px;">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <x-forms.label fieldId="client_name" fieldLabel="Client Name">
-                            </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" value="Kishan Ghaghada">
+                        <!-- Left Column: Form Fields -->
+                        <div class="col-md-8">
+                            <!-- Client Information Section -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <x-forms.label fieldId="client_name" fieldLabel="Client Name">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" id="client_name" name="client_name" value="Kishan Ghaghada">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <x-forms.label fieldId="invoice_date" fieldLabel="Invoice Date">
+                                    </x-forms.label>
+                                    <input type="date" class="form-control height-35 f-14" id="invoice_date" name="invoice_date" value="2023-07-17">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <x-forms.label fieldId="phone" fieldLabel="Phone">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" id="phone" name="phone" value="+91 123 4567 890">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <x-forms.label fieldId="email" fieldLabel="Email">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" id="email" name="email" value="abc@gmail.com">
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <x-forms.label fieldId="address" fieldLabel="Address">
+                                    </x-forms.label>
+                                    <textarea class="form-control f-14" id="address" name="address" rows="2">906- A, Appartment, Sindhubhavan Road, Appartment, Sindhubhavan Road, Ahmedabad</textarea>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <x-forms.label fieldId="bill_to" fieldLabel="Bill To">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" id="bill_to" name="bill_to" value="Vrajesh Ghaghada">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <x-forms.label fieldId="invoice_belongs" fieldLabel="Invoice Belongs To">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" id="invoice_belongs" name="invoice_belongs">
+                                        <option value="">Select Agent</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Services Section -->
+                            <div class="services-section" style="margin-top: 32px;">
+                                <div class="services-header" style="background-color: #713ED9; color: #FFFFFF; padding: 10px 16px; margin: 0 -24px 20px -24px; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">
+                                    SERVICES
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <x-forms.label fieldId="service" fieldLabel="Service">
+                                        </x-forms.label>
+                                        <input type="text" class="form-control height-35 f-14" id="service" name="service" value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <x-forms.label fieldId="price" fieldLabel="Price">
+                                        </x-forms.label>
+                                        <input type="number" class="form-control height-35 f-14" id="price" name="price" value="50000">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <x-forms.label fieldId="tax" fieldLabel="Tax">
+                                        </x-forms.label>
+                                        <select class="form-control select-picker height-35 f-14" id="tax" name="tax">
+                                            <option value="GST 18%" selected>GST 18%</option>
+                                            <option value="GST 0%">0% GST</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <x-forms.label fieldId="discount" fieldLabel="Discount">
+                                        </x-forms.label>
+                                        <input type="number" class="form-control height-35 f-14" id="discount" name="discount" value="5000">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <x-forms.label fieldId="net_amount" fieldLabel="Net Amt">
+                                        </x-forms.label>
+                                        <input type="number" class="form-control height-35 f-14" id="net_amount" name="net_amount" value="45000" readonly style="background-color: #F5F5F5;">
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <x-forms.label fieldId="service_description" fieldLabel="Service Description">
+                                        </x-forms.label>
+                                        <textarea class="form-control f-14" id="service_description" name="service_description" rows="2">Student Visa - Temporary Graduate Visa (Australia)(Subclass 485) Country Visa + admissions</textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Installment Payment Option -->
+                            <div class="row" style="margin-top: 24px;">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-check form-switch d-flex align-items-center">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="installment_payment_toggle" aria-checked="true" style="cursor: pointer; width: 48px; height: 24px;">
+                                        <label class="form-check-label ml-3 f-14" for="installment_payment_toggle" style="cursor: pointer; margin-bottom: 0;">
+                                            Do you want to avail installment payment option?
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3" id="installment_months_container">
+                                    <x-forms.label fieldId="installment_months" fieldLabel="Installment Months">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" id="installment_months" name="installment_months">
+                                        <option value="">Select month</option>
+                                        <option value="3">3 Months</option>
+                                        <option value="6">6 Months</option>
+                                        <option value="8" selected>8 Months</option>
+                                        <option value="12">12 Months</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Invoice Notes -->
+                            <div class="row" style="margin-top: 24px;">
+                                <div class="col-md-12 mb-3">
+                                    <x-forms.label fieldId="invoice_notes" fieldLabel="Invoice Notes">
+                                    </x-forms.label>
+                                    <textarea class="form-control f-14" id="invoice_notes" name="invoice_notes" rows="2">Payment conditions - Payment will be 100% advace</textarea>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <x-forms.label fieldId="invoice_date" fieldLabel="Invoice Date">
-                            </x-forms.label>
-                            <input type="date" class="form-control height-35 f-14" value="17-07-2023">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <x-forms.label fieldId="phone" fieldLabel="Phone">
-                            </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" value="+91 123 4567 890">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <x-forms.label fieldId="email" fieldLabel="Email">
-                            </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" value="abc@gmail.com">
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <x-forms.label fieldId="address" fieldLabel="Address">
-                            </x-forms.label>
-                            <textarea class="form-control f-14" rows="2"></textarea>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <x-forms.label fieldId="bill_to" fieldLabel="Bill To">
-                            </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" value="">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <x-forms.label fieldId="invoice_belongs" fieldLabel="Invoice Belongs To">
-                            </x-forms.label>
-                            <select class="form-control select-picker height-35 f-14">
-                                <option value="">Select Agent</option>
-                            </select>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <x-forms.label fieldId="service" fieldLabel="Service">
-                            </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="price" fieldLabel="Price">
-                            </x-forms.label>
-                            <input type="number" class="form-control height-35 f-14" value="">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="tax" fieldLabel="Tax">
-                            </x-forms.label>
-                            <select class="form-control select-picker height-35 f-14">
-                                <option value="GST 18%" selected>GST 18%</option>
-                                <option value="GST 0%">GST 0%</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="discount" fieldLabel="Discount">
-                            </x-forms.label>
-                            <input type="number" class="form-control height-35 f-14" value="">
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="net_amount" fieldLabel="Net Amount">
-                            </x-forms.label>
-                            <input type="number" class="form-control height-35 f-14" value="">
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <x-forms.label fieldId="service_description" fieldLabel="Service Description">
-                            </x-forms.label>
-                            <textarea class="form-control f-14" rows="2"></textarea>
+
+                        <!-- Right Column: Total Amount Summary Box -->
+                        <div class="col-md-4">
+                            <div class="total-summary-box" style="background-color: #F1EBFF; border: 1px solid #E9E6F5; border-radius: 8px; padding: 20px; position: sticky; top: 20px;">
+                                <h6 class="mb-3" style="font-weight: 600; font-size: 14px; color: #000; margin-bottom: 16px;">Summary</h6>
+                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #E9E6F5;">
+                                    <span class="f-14" style="color: #6C6C6C;">Sub Total</span>
+                                    <span class="f-14" style="color: #000; font-weight: 500;" id="summary_sub_total">INR 50,000</span>
+                                </div>
+                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #E9E6F5;">
+                                    <span class="f-14" style="color: #6C6C6C;">Discount</span>
+                                    <span class="f-14" style="color: #000; font-weight: 500;" id="summary_discount">INR 5,000</span>
+                                </div>
+                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #E9E6F5;">
+                                    <span class="f-14" style="color: #6C6C6C;">Tax Amount</span>
+                                    <span class="f-14" style="color: #000; font-weight: 500;" id="summary_tax_amount">INR 500</span>
+                                </div>
+                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 2px solid #713ED9;">
+                                    <span class="f-14" style="color: #000; font-weight: 600;">Total Amount</span>
+                                    <span class="f-14" style="color: #713ED9; font-weight: 600;" id="summary_total_amount">INR 45,500</span>
+                                </div>
+                                <div class="installment-note" id="installment_note" style="padding-top: 12px; border-top: 1px solid #E9E6F5;">
+                                    <span class="f-12" style="color: #6C6C6C;" id="installment_note_text">Installment Rs.5687.5 for 8 months</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary">Save</button>
+                <div class="modal-footer" style="border-top: 1px solid #E9E6F5; padding: 16px 24px; justify-content: flex-end;">
+                    <button type="button" class="btn" style="background-color: #713ED9; color: #FFFFFF; border: none; padding: 8px 24px; font-weight: 500; border-radius: 4px;">Save</button>
                 </div>
             </div>
         </div>
@@ -1542,110 +2311,112 @@
     <div class="modal fade" id="addTravelDetailsModal" tabindex="-1" role="dialog" aria-labelledby="addTravelDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addTravelDetailsModalLabel">Add Travel Details</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header" style="border-bottom: 1px solid #E9E6F5; padding: 16px 24px;">
+                    <h5 class="modal-title" id="addTravelDetailsModalLabel" style="font-size: 16px; font-weight: 600; color: #713ED9; margin: 0;">Add Travel Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #F5213D; opacity: 1; font-size: 24px;">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
+                <div class="modal-body" style="padding: 24px;">
+                    <div class="form-group mb-3">
                         <x-forms.label fieldId="purpose_of_trip" fieldLabel="Purpose of Trip">
                         </x-forms.label>
-                        <input type="text" class="form-control height-35 f-14">
+                        <input type="text" class="form-control height-35 f-14" id="purpose_of_trip" name="purpose_of_trip" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                     </div>
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="date_of_arrival" fieldLabel="Date of Arrival">
                             </x-forms.label>
-                            <input type="date" class="form-control height-35 f-14">
+                            <input type="date" class="form-control height-35 f-14" id="date_of_arrival" name="date_of_arrival" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="arrival_flight" fieldLabel="Arrival Flight">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14">
+                            <input type="text" class="form-control height-35 f-14" id="arrival_flight" name="arrival_flight" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="arrival_city" fieldLabel="Arrival City">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14">
+                            <input type="text" class="form-control height-35 f-14" id="arrival_city" name="arrival_city" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="date_of_departure" fieldLabel="Date of Departure From">
                             </x-forms.label>
-                            <input type="date" class="form-control height-35 f-14">
+                            <input type="date" class="form-control height-35 f-14" id="date_of_departure" name="date_of_departure" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
-                        <div class="col-md-4 mb-3">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="departure_flight" fieldLabel="Departure Flight">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14">
+                            <input type="text" class="form-control height-35 f-14" id="departure_flight" name="departure_flight" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="departure_city" fieldLabel="Departure City">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14">
+                            <input type="text" class="form-control height-35 f-14" id="departure_city" name="departure_city" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="phone_number_other_country" fieldLabel="Phone Number (of other country)">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14">
+                            <input type="text" class="form-control height-35 f-14" id="phone_number_other_country" name="phone_number_other_country" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <x-forms.label fieldId="place_to_visit" fieldLabel="Place To Visit USA">
                         </x-forms.label>
-                        <textarea class="form-control f-14" rows="3"></textarea>
+                        <textarea class="form-control f-14" id="place_to_visit" name="place_to_visit" rows="3" style="border: 1px solid #E9E6F5; border-radius: 4px;"></textarea>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <x-forms.label fieldId="address_stay" fieldLabel="Address Where You Will Stay">
                         </x-forms.label>
-                        <textarea class="form-control f-14" rows="3"></textarea>
+                        <textarea class="form-control f-14" id="address_stay" name="address_stay" rows="3" style="border: 1px solid #E9E6F5; border-radius: 4px;"></textarea>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="city" fieldLabel="City">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14">
+                            <input type="text" class="form-control height-35 f-14" id="city" name="city" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="state" fieldLabel="State">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14">
+                            <input type="text" class="form-control height-35 f-14" id="state" name="state" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 col-sm-6 mb-3">
                             <x-forms.label fieldId="postal_code" fieldLabel="Postal/Zip Code">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14">
+                            <input type="text" class="form-control height-35 f-14" id="postal_code" name="postal_code" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <x-forms.label fieldId="person_paying" fieldLabel="Person Paying For Your Trip (Details)">
                         </x-forms.label>
-                        <textarea class="form-control f-14" rows="3"></textarea>
+                        <textarea class="form-control f-14" id="person_paying" name="person_paying" rows="3" style="border: 1px solid #E9E6F5; border-radius: 4px;"></textarea>
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 col-sm-6 mb-3">
                             <x-forms.label fieldId="mother_in_country" fieldLabel="Is Your Mother in that country?">
                             </x-forms.label>
-                            <select class="form-control select-picker height-35 f-14">
+                            <select class="form-control select-picker height-35 f-14" id="mother_in_country" name="mother_in_country" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                                 <option value="" disabled selected>Select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 col-sm-6 mb-3">
                             <x-forms.label fieldId="immediate_relatives" fieldLabel="Immediate Relatives In that country?">
                             </x-forms.label>
-                            <select class="form-control select-picker height-35 f-14">
+                            <select class="form-control select-picker height-35 f-14" id="immediate_relatives" name="immediate_relatives" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                                 <option value="" disabled selected>Select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-4 col-sm-6 mb-3">
                             <x-forms.label fieldId="other_relatives" fieldLabel="Other Relatives In that country?">
                             </x-forms.label>
-                            <select class="form-control select-picker height-35 f-14">
+                            <select class="form-control select-picker height-35 f-14" id="other_relatives" name="other_relatives" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                                 <option value="" disabled selected>Select</option>
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
@@ -1653,9 +2424,166 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Save</button>
+                <div class="modal-footer" style="border-top: 1px solid #E9E6F5; padding: 16px 24px; justify-content: flex-end;">
+                    <button type="button" class="btn" data-dismiss="modal" style="background-color: #FFE7E7; color: #F5213D; border: none; padding: 8px 24px; font-weight: 500; border-radius: 4px; margin-right: 12px;">Cancel</button>
+                    <button type="button" class="btn" style="background-color: #713ED9; color: #FFFFFF; border: none; padding: 8px 24px; font-weight: 500; border-radius: 4px;">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Invoice Modal -->
+    <div class="modal fade" id="viewInvoiceModal" tabindex="-1" role="dialog" aria-labelledby="viewInvoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header invoice-view-header">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <h5 class="modal-title invoice-view-title">VIEW INVOICE</h5>
+                        <div class="d-flex align-items-center">
+                            <button type="button" class="btn invoice-download-btn">
+                                <i class="fa fa-download mr-1"></i> Download Invoice
+                            </button>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body invoice-view-body">
+                    <!-- Invoice Title and Company Info Section -->
+                    <div class="invoice-header-row mb-4 d-flex justify-content-between align-items-start">
+                        <!-- Invoice Title Section (Left) -->
+                        <div class="invoice-title-section">
+                            <h2 class="invoice-main-title">INVOICE</h2>
+                            <p class="invoice-lead-number">LEAD-0008</p>
+                        </div>
+
+                        <!-- Company Logo Section (Right) -->
+                        <div class="invoice-company-info">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="{{ company()->light_logo_url ?? global_setting()->light_logo_url }}" alt="Company Logo" class="company-logo-image">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="invoice-divider">
+
+                    <!-- Client and Invoice Details Section -->
+                    <div class="invoice-details-grid mb-4">
+                        <div class="row">
+                            <!-- Row 1: Client Name | Email | Phone | Invoice Date -->
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Client Name</div>
+                                    <div class="invoice-detail-value">Kishan Ghaghada</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Email</div>
+                                    <div class="invoice-detail-value">abc@gmail.com</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Phone</div>
+                                    <div class="invoice-detail-value">+91 123 4567 890</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Invoice Date</div>
+                                    <div class="invoice-detail-value">17-07-2023</div>
+                                </div>
+                            </div>
+                            <!-- Row 2: Bill to | Invoice Belongs To | Address -->
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Bill to</div>
+                                    <div class="invoice-detail-value">Vrajesh Ghaghada</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Invoice Belongs To</div>
+                                    <div class="invoice-detail-value">Deepak Parmar</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Address</div>
+                                    <div class="invoice-detail-value">906- A, Appartment, Sindhubhavan Road, Appartment, Sindhubhavan Road, Ahmedabad</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="invoice-divider">
+
+                    <!-- Details Section -->
+                    <div class="invoice-service-section mb-4">
+                        <h4 class="invoice-section-title">DETAILS</h4>
+                        <div class="invoice-service-item mb-3">
+                            <div class="invoice-detail-label">Service</div>
+                            <div class="invoice-detail-value">Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)</div>
+                        </div>
+                        <div class="invoice-service-item">
+                            <div class="invoice-detail-label">Note</div>
+                            <div class="invoice-detail-value">Payment conditions - Payment will be 100% advance</div>
+                        </div>
+                    </div>
+
+                    <hr class="invoice-divider">
+
+                    <!-- Payable Amount Section -->
+                    <div class="invoice-payable-section mb-4">
+                        <h4 class="invoice-section-title">PAYABLE AMOUNT</h4>
+                        <div class="invoice-amount-table">
+                            <div class="invoice-amount-row">
+                                <div class="invoice-amount-label">Sub Total :</div>
+                                <div class="invoice-amount-value">INR 50,000</div>
+                            </div>
+                            <div class="invoice-amount-row">
+                                <div class="invoice-amount-label">Discount :</div>
+                                <div class="invoice-amount-value">INR 5,000</div>
+                            </div>
+                            <div class="invoice-amount-row">
+                                <div class="invoice-amount-label">Tax Amount :</div>
+                                <div class="invoice-amount-value">INR 500</div>
+                            </div>
+                            <div class="invoice-amount-row total">
+                                <div class="invoice-amount-label total">Total Amount :</div>
+                                <div class="invoice-amount-value total">INR 45,500</div>
+                            </div>
+                            <div class="invoice-installment-note">
+                                Installment Rs.5,687.5 for 8 months
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="invoice-divider">
+
+                    <!-- Footer Section -->
+                    <div class="invoice-footer-section">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="{{ company()->light_logo_url ?? global_setting()->light_logo_url }}" alt="Company Logo" class="company-logo-image-footer">
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3 text-center">
+                                <div class="footer-label">Toll-Free Number</div>
+                                <div class="footer-toll-free">1800 571 2844</div>
+                                <div class="footer-email">info.rrpei@gmail.com</div>
+                            </div>
+                            <div class="col-md-4 mb-3 text-right">
+                                <div class="footer-address">3rd Floor, Aaron Spectra, 302, Rajpath Rangoli Rd, behind Rajpath Club, Bodakdev, Ahmedabad, Gujarat 380059</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1691,7 +2619,169 @@
             $('#addFileNoteModal, #addInvoiceModal, #addCommunicationModal, #addFollowUpModal, #notifyClientModal, #addTravelDetailsModal').on('shown.bs.modal', function () {
                 $('.select-picker').selectpicker('refresh');
             });
+
+            // Initialize Quill editor when File Note modal opens
+            $('#addFileNoteModal').on('shown.bs.modal', function () {
+                // Check if Quill is already initialized for this editor
+                if (!quillArray['#file-note-editor']) {
+                    quillImageLoad('#file-note-editor');
+                }
+            });
+
+            // Clear and destroy Quill editor when modal is closed
+            $('#addFileNoteModal').on('hidden.bs.modal', function () {
+                if (quillArray['#file-note-editor']) {
+                    destory_editor('#file-note-editor');
+                    delete quillArray['#file-note-editor'];
+                    $('#file-note-editor').html('');
+                    $('#file-note-editor-text').val('');
+                }
+            });
+
+            // Save File Note button handler
+            $('#save-file-note-btn').on('click', function() {
+                // Copy content from Quill editor to hidden textarea
+                if (document.getElementById('file-note-editor') && document.getElementById('file-note-editor').children[0]) {
+                    var note = document.getElementById('file-note-editor').children[0].innerHTML;
+                    document.getElementById('file-note-editor-text').value = note;
+                }
+                
+                // Here you can add your save logic
+                // For example: submit form, make AJAX call, etc.
+                console.log('Note content:', $('#file-note-editor-text').val());
+                
+                // Close modal after save (you can modify this based on your needs)
+                // $('#addFileNoteModal').modal('hide');
+            });
+
+            // Initialize installment months selectpicker when invoice modal opens
+            $('#addInvoiceModal').on('shown.bs.modal', function () {
+                $('#installment_months').selectpicker();
+                // Set toggle to checked (ON) by default
+                $('#installment_payment_toggle').prop('checked', true).attr('aria-checked', 'true');
+                $('#installment_months_container').show();
+                // Calculate and show installment note
+                calculateTotalAmount();
+            });
+
+            // Calculate Total Amount Function
+            function calculateTotalAmount() {
+                const price = parseFloat($('#price').val()) || 0;
+                const taxValue = $('#tax').val() || '';
+                const taxPercent = taxValue ? parseFloat(taxValue.replace('GST ', '').replace('%', '')) : 0;
+                const discount = parseFloat($('#discount').val()) || 0;
+                
+                // Sub Total is the price
+                const subTotal = price;
+                
+                // Calculate tax: Based on image, tax seems to be calculated on (price - discount)
+                // But to match image values: Price=50,000, Discount=5,000, Tax=500, Total=45,500
+                // Formula: Total = Price - Discount + Tax
+                // So: 45,500 = 50,000 - 5,000 + Tax => Tax = 500
+                let taxAmount = 0;
+                if (taxPercent > 0) {
+                    // Calculate tax on (price - discount)
+                    const taxableAmount = price - discount;
+                    taxAmount = (taxableAmount * taxPercent) / 100;
+                }
+                
+                // Calculate total: Sub Total - Discount + Tax
+                const totalAmount = subTotal - discount + taxAmount;
+                
+                // Update Net Amount field (amount after discount, before tax)
+                const netAmount = price - discount;
+                $('#net_amount').val(Math.round(netAmount));
+                
+                // Update summary box
+                $('#summary_sub_total').text('INR ' + formatNumber(subTotal));
+                $('#summary_discount').text('INR ' + formatNumber(discount));
+                $('#summary_tax_amount').text('INR ' + formatNumber(Math.round(taxAmount)));
+                $('#summary_total_amount').text('INR ' + formatNumber(Math.round(totalAmount)));
+                
+                // Update installment note if toggle is ON
+                if ($('#installment_payment_toggle').is(':checked')) {
+                    updateInstallmentNote(Math.round(totalAmount));
+                }
+            }
+            
+            // Get current total amount
+            function getCurrentTotal() {
+                const price = parseFloat($('#price').val()) || 0;
+                const taxValue = $('#tax').val() || '';
+                const taxPercent = taxValue ? parseFloat(taxValue.replace('GST ', '').replace('%', '')) : 0;
+                const discount = parseFloat($('#discount').val()) || 0;
+                
+                let taxAmount = 0;
+                if (taxPercent > 0) {
+                    const taxableAmount = price - discount;
+                    taxAmount = (taxableAmount * taxPercent) / 100;
+                }
+                
+                return Math.round(price - discount + taxAmount);
+            }
+
+            // Format number with commas
+            function formatNumber(num) {
+                return num.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            }
+
+            // Update Installment Note
+            function updateInstallmentNote(totalAmount) {
+                const months = parseInt($('#installment_months').val());
+                if (months > 0 && totalAmount > 0) {
+                    const installmentAmount = totalAmount / months;
+                    $('#installment_note_text').text('Installment Rs.' + installmentAmount.toFixed(1) + ' for ' + months + ' months');
+                    $('#installment_note').show();
+                } else {
+                    $('#installment_note').hide();
+                }
+            }
+
+            // Calculate totals when price, tax, or discount changes
+            $(document).on('input change', '#price, #tax, #discount', function() {
+                calculateTotalAmount();
+            });
+
+            // Installment Payment Toggle Functionality
+            $(document).on('change', '#installment_payment_toggle', function() {
+                const isChecked = $(this).is(':checked');
+                $(this).attr('aria-checked', isChecked);
+                
+                if (isChecked) {
+                    $('#installment_months_container').slideDown();
+                    // Refresh selectpicker after showing
+                    setTimeout(function() {
+                        $('#installment_months').selectpicker('refresh');
+                        // Calculate installment if months already selected
+                        updateInstallmentNote(getCurrentTotal());
+                    }, 100);
+                } else {
+                    $('#installment_months_container').slideUp();
+                    $('#installment_months').val('').selectpicker('refresh');
+                    $('#installment_note').hide();
+                }
+            });
+
+            // Update installment note when months change
+            $(document).on('change', '#installment_months', function() {
+                if ($('#installment_payment_toggle').is(':checked')) {
+                    updateInstallmentNote(getCurrentTotal());
+                }
+            });
+
+            // Initialize calculation when modal opens
+            $('#addInvoiceModal').on('shown.bs.modal', function () {
+                calculateTotalAmount();
+            });
+
+            // Reset form when invoice modal is closed
+            $('#addInvoiceModal').on('hidden.bs.modal', function () {
+                $('#installment_payment_toggle').prop('checked', true).attr('aria-checked', 'true');
+                $('#installment_months_container').show();
+                $('#installment_months').val('8').selectpicker('refresh');
+            });
         });
     </script>
 @endpush
+
 

@@ -194,7 +194,7 @@
 
 .info-section-divider {
     height: 1px;
-    background-color: #E9E6F5;
+    background-color: #bda5ff;
     width: 100%;
     margin-top: 8px;
 }
@@ -203,8 +203,6 @@
    INFO SECTIONS
 =============================== */
 .info-section {
-    border-bottom: 1px solid #E9E6F5;
-    padding-bottom: 20px;
     margin-bottom: 24px;
 }
 
@@ -386,8 +384,8 @@
 /* Secondary Button for Travel Details */
 .tab-section-secondary-btn {
     padding: 6px 12px;
-    background-color: #F5F5F5;
-    color: #000000;
+    background-color: #7441DF;
+    color: #FFFFFF;
     border: 1px solid #E0E0E0;
     border-radius: 4px;
     font-size: 13px;
@@ -398,9 +396,9 @@
 }
 
 .tab-section-secondary-btn:hover {
-    background-color: #EEEEEE;
+    background-color: #7441DF;
     border-color: #B8A7F0;
-    color: #000000;
+    color: #FFFFFF;
 }
 
 /* Header Actions Container */
@@ -688,4 +686,853 @@
     }
 }
 
+/* ===============================
+   INVOICE MODAL STYLING
+=============================== */
 
+/* Invoice Modal Toggle Switch Styling */
+#installment_payment_toggle:checked {
+    background-color: #713ED9;
+    border-color: #713ED9;
+}
+
+#installment_payment_toggle {
+    background-color: #E9E6F5;
+    border-color: #E9E6F5;
+}
+
+/* Invoice Modal Services Header */
+.services-header {
+    background-color: #713ED9 !important;
+    color: #FFFFFF !important;
+}
+
+/* Invoice Modal Summary Box */
+.total-summary-box {
+    background-color: #F1EBFF;
+    border: 1px solid #E9E6F5;
+}
+
+/* Invoice Modal Responsive Styles */
+@media (max-width: 991px) {
+    #addInvoiceModal .col-md-8,
+    #addInvoiceModal .col-md-4 {
+        margin-bottom: 20px;
+    }
+    
+    #addInvoiceModal .total-summary-box {
+        position: relative !important;
+        top: 0 !important;
+    }
+    
+    #addInvoiceModal .services-header {
+        margin: 0 -12px 20px -12px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    #addInvoiceModal .modal-dialog {
+        margin: 10px;
+    }
+    
+    #addInvoiceModal .modal-body {
+        padding: 16px !important;
+    }
+    
+    #addInvoiceModal .services-header {
+        margin: 0 -16px 16px -16px !important;
+        padding: 8px 12px !important;
+    }
+}
+
+/* ===============================
+   TRAVEL DETAILS MODAL STYLING
+=============================== */
+
+/* Travel Details Modal Responsive Styles */
+@media (max-width: 991px) {
+    #addTravelDetailsModal .col-md-3,
+    #addTravelDetailsModal .col-md-4 {
+        margin-bottom: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    #addTravelDetailsModal .modal-dialog {
+        margin: 10px;
+    }
+    
+    #addTravelDetailsModal .modal-body {
+        padding: 16px !important;
+    }
+    
+    #addTravelDetailsModal .col-md-3,
+    #addTravelDetailsModal .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    #addTravelDetailsModal .modal-footer {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+    
+    #addTravelDetailsModal .modal-footer .btn {
+        width: 100%;
+        margin-right: 0 !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .modal-lg, .modal-xl {
+        max-width: 1100px;
+    }
+}
+
+/* ===============================
+   DOCUMENT CHECKLIST TABLE
+=============================== */
+
+/* Document Checklist Table */
+.document-checklist-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+}
+
+/* Table Header Styling */
+.document-checklist-table thead th {
+    background-color: #F1EBFF; /* Light purple background */
+    color: #000000;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+    border: none;
+    border-bottom: 1px solid #E9E6F5;
+}
+
+.document-checklist-table thead th:first-child {
+    border-top-left-radius: 0;
+}
+
+.document-checklist-table thead th:last-child {
+    border-top-right-radius: 0;
+}
+
+/* Table Body Styling */
+.document-checklist-table tbody tr {
+    border-bottom: 1px solid #E9E6F5;
+}
+
+.document-checklist-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.document-checklist-table tbody td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: #000000;
+    vertical-align: middle;
+    border: none;
+}
+
+.document-checklist-table tbody td:first-child {
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/* Required Field Asterisk */
+.document-checklist-table tbody td .text-danger {
+    color: #F5213D;
+    margin-left: 2px;
+}
+
+/* Upload Button Styling */
+.document-upload-btn {
+    background-color: #28A745 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    padding: 6px 16px !important;
+    border-radius: 4px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.document-upload-btn:hover {
+    background-color: #218838 !important;
+    color: #FFFFFF !important;
+}
+
+.document-upload-btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    outline: none;
+}
+
+/* Document Action Group (Eye Icon + Change Link) */
+.document-action-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.document-view-icon {
+    color: #6C6C6C;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.document-view-icon:hover {
+    color: #713ED9;
+}
+
+.document-change-link {
+    color: #000000;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 400;
+    transition: color 0.2s ease;
+}
+
+.document-change-link:hover {
+    color: #713ED9;
+    text-decoration: none;
+}
+
+/* Responsive Design for Document Checklist */
+@media (max-width: 768px) {
+    .document-checklist-table {
+        font-size: 13px;
+    }
+    
+    .document-checklist-table thead th {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .document-checklist-table tbody td {
+        padding: 12px;
+        font-size: 13px;
+    }
+    
+    .document-upload-btn {
+        padding: 5px 12px !important;
+        font-size: 12px !important;
+        min-width: 70px;
+    }
+    
+    .document-action-group {
+        gap: 6px;
+    }
+    
+    .document-view-icon {
+        font-size: 14px;
+    }
+    
+    .document-change-link {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 576px) {
+    .document-checklist-table thead th,
+    .document-checklist-table tbody td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+    
+    .document-checklist-table thead th {
+        font-size: 12px;
+    }
+    
+    .document-upload-btn {
+        padding: 4px 10px !important;
+        font-size: 11px !important;
+        min-width: 60px;
+    }
+    
+    .document-view-icon {
+        font-size: 13px;
+    }
+    
+    .document-change-link {
+        font-size: 12px;
+    }
+}
+
+/* ===============================
+   UPLOAD DOCUMENTS SECTION
+=============================== */
+
+.upload-documents-list {
+    position: relative;
+}
+
+.upload-document-item {
+    background-color: #F5F5F5;
+    border: 1px solid #E9E6F5;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.upload-document-item:hover {
+    box-shadow: 0 2px 4px rgba(106, 50, 255, 0.1);
+    border-color: #CFC2F5;
+}
+
+.upload-document-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.upload-document-icon i {
+    font-size: 18px;
+}
+
+.upload-document-name {
+    color: #000000;
+    line-height: 1.4;
+}
+
+.upload-document-preview {
+    background-color: #F0F0F0;
+    border-radius: 4px;
+    flex-shrink: 0;
+    border: 1px solid #E0E0E0;
+}
+
+.upload-document-delete {
+    color: #F5213D;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 400;
+    transition: color 0.2s ease;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.upload-document-delete:hover {
+    color: #D91E2F;
+    text-decoration: none;
+}
+
+.upload-document-delete i {
+    margin-right: 4px;
+}
+
+/* ===============================
+   INVOICE VIEW MODAL STYLING
+=============================== */
+
+/* Modal Dialog */
+#viewInvoiceModal .modal-dialog {
+    max-width: 800px;
+}
+
+#viewInvoiceModal .modal-content {
+    border-radius: 8px;
+}
+
+/* Modal Header */
+.invoice-view-header {
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #E9E6F5;
+    padding: 16px 24px;
+}
+
+.invoice-view-title {
+    color: #713ED9;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.invoice-download-btn {
+    background-color: #713ED9;
+    color: #FFFFFF;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.invoice-download-btn:hover {
+    background-color: #5A2DB8;
+    color: #FFFFFF;
+}
+
+#viewInvoiceModal .close {
+    color: #F5213D;
+    opacity: 1;
+    font-size: 24px;
+    background: #FFFFFF;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+/* Modal Body */
+.invoice-view-body {
+    background-color: #FFFFFF;
+    padding: 24px;
+}
+
+/* Invoice Header Row */
+.invoice-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+/* Invoice Title Section */
+.invoice-title-section {
+    flex: 0 0 auto;
+}
+
+.invoice-main-title {
+    color: #1E40AF;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.invoice-lead-number {
+    color: #000000;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Company Section */
+.invoice-company-info {
+    flex: 0 0 auto;
+    text-align: right;
+}
+
+.invoice-company-info .d-flex {
+    justify-content: flex-end;
+}
+
+.company-logo-image {
+    width: auto;
+    height: 62px;
+    object-fit: contain;
+    margin-right: 12px;
+    flex-shrink: 0;
+    border-radius: 4px;
+}
+
+.company-logo-image-footer {
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin-right: 12px;
+    flex-shrink: 0;
+    border-radius: 4px;
+}
+
+.invoice-company-info .company-name-primary,
+.invoice-company-info .company-name-secondary {
+    text-align: right;
+}
+
+.invoice-company-info .company-tagline {
+    text-align: right;
+}
+
+.company-logo-placeholder {
+    background: linear-gradient(135deg, #FF6B35 0%, #1E40AF 100%);
+    border-radius: 8px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.company-logo-placeholder.large {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+}
+
+.company-logo-placeholder.small {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+}
+
+.company-name-primary {
+    color: #1E40AF;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.company-name-secondary {
+    color: #1E40AF;
+    font-size: 12px;
+}
+
+.company-tagline {
+    color: #6C6C6C;
+    font-size: 12px;
+    margin: 0;
+}
+
+.company-name-footer-primary {
+    color: #1E40AF;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.company-name-footer-secondary {
+    color: #1E40AF;
+    font-size: 10px;
+}
+
+.company-tagline-footer {
+    color: #6C6C6C;
+    font-size: 11px;
+    margin: 0;
+}
+
+/* Invoice Divider */
+.invoice-divider {
+    border-top: 1px solid #E9E6F5;
+    margin: 24px 0;
+}
+
+/* Invoice Section Titles */
+.invoice-section-title {
+    color: #713ED9;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* Invoice Detail Items */
+.invoice-details-grid {
+    width: 100%;
+}
+
+.invoice-detail-item {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.invoice-detail-label {
+    color: #6C6C6C;
+    font-size: 12px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+    font-weight: 400;
+}
+
+.invoice-detail-value {
+    color: #000000;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+/* Invoice Amount Table */
+.invoice-amount-table {
+    background-color: #FFFFFF;
+    border: 1px solid #E9E6F5;
+    border-radius: 4px;
+    padding: 16px;
+}
+
+.invoice-amount-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    color: #000000;
+    font-size: 14px;
+}
+
+.invoice-amount-row:last-of-type {
+    border-bottom: none;
+}
+
+.invoice-amount-row.total {
+    border-top: 1px solid #E9E6F5;
+    border-bottom: none;
+    padding-top: 12px;
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.invoice-amount-label {
+    color: #000000;
+    font-size: 14px;
+    text-align: left;
+    flex: 1;
+}
+
+.invoice-amount-value {
+    color: #000000;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+    flex: 0 0 auto;
+}
+
+.invoice-amount-label.total,
+.invoice-amount-value.total {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.invoice-installment-note {
+    color: #6C6C6C;
+    font-size: 12px;
+    text-align: left;
+}
+
+/* Footer Section */
+.footer-label {
+    color: #000000;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.footer-toll-free {
+    color: #1E40AF;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.footer-email {
+    color: #000000;
+    font-size: 12px;
+}
+
+.footer-address {
+    color: #000000;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Responsive Design for Invoice View Modal */
+@media (max-width: 768px) {
+    .invoice-view-body {
+        padding: 16px;
+    }
+    
+    .invoice-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .invoice-title-section {
+        margin-bottom: 20px;
+        width: 100%;
+    }
+    
+    .invoice-company-info {
+        width: 100%;
+        text-align: left;
+    }
+    
+    .invoice-company-info .d-flex {
+        justify-content: flex-start;
+    }
+    
+    .invoice-company-info .company-name-primary,
+    .invoice-company-info .company-name-secondary {
+        text-align: left;
+    }
+    
+    .invoice-company-info .company-tagline {
+        text-align: left;
+    }
+    
+    .invoice-main-title {
+        font-size: 24px;
+    }
+    
+    .invoice-details-grid .row > div {
+        margin-bottom: 16px;
+    }
+    
+    .invoice-footer-section .row > div {
+        text-align: left !important;
+        margin-bottom: 20px;
+    }
+}
+
+/* ===============================
+   FOLLOW UP SECTION (Specific Styles)
+=============================== */
+
+/* Follow Up List Container */
+.follow-up-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 0;
+}
+
+/* Follow Up Card */
+.follow-up-card {
+    background-color: #F5F5F5;
+    border: 1px solid #E2E2E2;
+    border-radius: 8px;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.follow-up-card:hover {
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+    border-color: #D4C8F0;
+}
+
+/* Follow Up Card Content */
+.follow-up-card-content {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 20px;
+    gap: 16px;
+}
+
+/* Follow Up Icon Wrapper */
+.follow-up-icon-wrapper {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+
+/* Follow Up Details */
+.follow-up-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+/* Follow Up Subject */
+.follow-up-subject {
+    font-size: 14px;
+    color: #000000;
+    line-height: 1.5;
+}
+
+.follow-up-label {
+    font-weight: 600;
+    color: #000000;
+}
+
+/* Follow Up Outcome */
+.follow-up-outcome {
+    font-size: 14px;
+    color: #000000;
+    line-height: 1.5;
+    margin-bottom: 2px;
+}
+
+/* Follow Up Description */
+.follow-up-description {
+    font-size: 14px;
+    color: #000000;
+    font-weight: 400;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+/* Follow Up Meta (Created by) */
+.follow-up-meta {
+    font-size: 12px;
+    color: #6C6C6C;
+    line-height: 1.4;
+    font-weight: 400;
+}
+
+/* ===============================
+   TRAVEL DETAILS SECTION (Specific Styles)
+=============================== */
+
+/* Travel Details Section Container */
+.travel-details-section {
+    margin-bottom: 32px;
+}
+
+.travel-details-section:last-child {
+    margin-bottom: 0;
+}
+
+/* Travel Section Header */
+.travel-section-header {
+    margin-bottom: 20px;
+}
+
+.travel-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #713ED9;
+    margin: 0 0 8px 0;
+    padding: 0;
+}
+
+.travel-section-divider {
+    height: 1px;
+    background-color: #E9E6F5;
+    width: 100%;
+}
+
+/* Travel Details Container */
+.travel-details-container {
+    /* Bootstrap handles layout, only custom styling here */
+}
+
+/* Travel Detail Item */
+.travel-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.travel-detail-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #000000;
+    line-height: 1.5;
+    margin-bottom: 2px;
+}
+
+.travel-detail-value {
+    font-size: 14px;
+    font-weight: 400;
+    color: #000000;
+    line-height: 1.5;
+    word-wrap: break-word;
+}

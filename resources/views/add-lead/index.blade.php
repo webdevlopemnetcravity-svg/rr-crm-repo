@@ -9,7 +9,7 @@
     <div class="content-wrapper">
         <!-- Add Task Export Buttons End -->
 
-        <div class="d-flex flex-column w-100 rounded mt-3 bg-white">
+        <div class="d-flex flex-column w-100 rounded bg-white">
             <!-- Tabs Navigation -->
             <div class="s-b-n-header" id="tabs">
                 <nav class="tabs px-4 border-bottom-grey">
@@ -169,7 +169,7 @@
                             <div class="col-md-12 mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="mailing_same_as_home" id="mailing_same_as_home" value="1">
-                                    <label class="form-check-label" for="mailing_same_as_home">
+                                    <label class="form-check-label pl-3" for="mailing_same_as_home">
                                         @lang('app.mailingAddressAsAbove')
                                     </label>
                                 </div>
@@ -1329,8 +1329,8 @@
                 <div class="row align-items-center justify-content-between g-2 p-20 border-top-grey">
                     <div class="col-12 col-md-auto d-flex flex-column flex-md-row">
                         <button type="button" class="btn btn-secondary mr-2" id="btn-previous">
-                            <i class="fa fa-arrow-left mr-1"></i>@lang('app.previous')
-                        </button>
+                            @lang('app.previous')
+                    </button>
                     </div>
                     <div class="col-12 col-md-auto d-flex flex-column flex-md-row gap-2 justify-content-md-end">
                         <x-forms.button-primary id="save-lead-form" icon="check">
@@ -3630,7 +3630,7 @@
                 if (currentStep === 9) {
                     $saveBtn.html('<i class="fa fa-check mr-1"></i>Save and Submit');
                 } else {
-                    $saveBtn.html('<i class="fa fa-arrow-right mr-1"></i>@lang('app.saveAndNext')');
+                    $saveBtn.html('@lang('app.saveAndNext')');
                 }
             }
 
