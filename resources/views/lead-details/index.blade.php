@@ -702,6 +702,246 @@
                 $('.next_follow_up_datetime_div_details, .send_reminder_div_details, .follow_up_subject_line_div_details').addClass('d-none');
                 $('#send_reminder_details').prop('checked', false);
             });
+
+            // ========== PROCESS TAB FUNCTIONALITY ==========
+            
+            // Helper function to show error message below a field (similar to add-lead)
+            function showProcessFieldError(fieldId, errorMessage) {
+                const $field = $(fieldId);
+                
+                // Find the parent column container
+                const $parentColumn = $field.closest('.col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-12');
+                
+                // Check if it's a bootstrap-select field first
+                const $bootstrapSelect = $field.closest('.bootstrap-select');
+                
+                // Remove ALL existing error messages comprehensively
+                if ($parentColumn.length) {
+                    // Remove from entire parent column
+                    $parentColumn.find('.invalid-feedback').remove();
+                }
+                // Remove from field itself and siblings
+                $field.next('.invalid-feedback').remove();
+                $field.siblings('.invalid-feedback').remove();
+                
+                if ($bootstrapSelect.length) {
+                    // For bootstrap-select, add is-invalid to the wrapper
+                    $bootstrapSelect.addClass('is-invalid');
+                    
+                    // Remove errors from wrapper and its parent
+                    $bootstrapSelect.next('.invalid-feedback').remove();
+                    $bootstrapSelect.siblings('.invalid-feedback').remove();
+                    $bootstrapSelect.parent().find('.invalid-feedback').remove();
+                    
+                    // Add error after the wrapper (only once)
+                    $bootstrapSelect.after('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+                } else if ($field.attr('type') === 'file') {
+                    // For file inputs, add is-invalid to the field
+                    $field.addClass('is-invalid');
+                    // For file inputs, add error after the parent container
+                    if ($parentColumn.length) {
+                        $parentColumn.append('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+                    } else {
+                        $field.after('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+                    }
+                } else {
+                    // For regular inputs, add is-invalid to the field
+                    $field.addClass('is-invalid');
+                    // Add error message below the field
+                    $field.after('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+                }
+            }
+            
+            // Function to remove all field errors
+            function removeProcessFieldErrors() {
+                $('.invalid-feedback').remove();
+                $('.is-invalid').removeClass('is-invalid');
+            }
+            
+            // File size validation and file name display for all file inputs (similar to add-lead)
+            $(document).on('change', '#processForm input[type="file"][data-max-size]', function() {
+                const file = this.files[0];
+                const maxSize = $(this).data('max-size'); // 5242880 = 5MB
+                const fieldId = $(this).attr('id');
+                
+                // Remove previous error
+                $(this).removeClass('is-invalid');
+                $(this).closest('.col-md-3').find('.invalid-feedback').remove();
+                
+                if (file && file.size > maxSize) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File too large',
+                            text: 'File size must be less than 5MB',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        alert('File size must be less than 5MB');
+                    }
+                    $(this).val('');
+                }
+            });
+            
+            // Edit Process Button Click
+            $(document).on('click', '#editProcessBtn', function(e) {
+                e.preventDefault();
+                // Hide details section and show form section
+                $('#processDetailsSection').hide();
+                $('#processFormSection').show();
+                // Hide edit button and show save/cancel buttons
+                $('#editProcessBtn').hide();
+                $('#processFormActions').show();
+                // Initialize select pickers
+                $('.select-picker').selectpicker('refresh');
+                // Remove any previous errors
+                removeProcessFieldErrors();
+            });
+
+            // Cancel Process Button Click
+            $(document).on('click', '#cancelProcessBtn', function(e) {
+                e.preventDefault();
+                // Show details section and hide form section
+                $('#processDetailsSection').show();
+                $('#processFormSection').hide();
+                // Show edit button and hide save/cancel buttons
+                $('#editProcessBtn').show();
+                $('#processFormActions').hide();
+                // Remove any errors
+                removeProcessFieldErrors();
+            });
+
+            // Save Process Button Click (from header or form bottom)
+            $(document).on('click', '#saveProcessBtn, #saveProcessFormBtn', function(e) {
+                e.preventDefault();
+                
+                // Remove previous errors
+                removeProcessFieldErrors();
+                
+                var form = $('#processForm')[0];
+                var isValid = true;
+                
+                // Basic HTML5 validation
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    isValid = false;
+                }
+                
+                var leadId = $('#process_lead_id').val();
+                if (!leadId) {
+                    $.showToastr('Lead ID is missing.', 'error');
+                    return false;
+                }
+                
+                // Custom validation for required fields
+                var requiredFields = [
+                    { id: '#applicant_name', name: 'Applicant Name' },
+                    { id: '#visa_category', name: 'Visa Category' },
+                    { id: '#subclass', name: 'Subclass' },
+                    { id: '#passport_name', name: 'Passport Name' },
+                    { id: '#passport_number', name: 'Passport Number' },
+                    { id: '#agent_name', name: 'Agent Name' },
+                    { id: '#advance_fees', name: 'Advance Fees' },
+                    { id: '#advance_fees_due_date', name: 'Advance Fees Due Date' },
+                    { id: '#remaining_fees', name: 'Remaining Fees' },
+                    { id: '#remaining_fees_due_date', name: 'Remaining Fees Due Date' },
+                    { id: '#agent_fees', name: 'Agent Fees' },
+                    { id: '#submission_fees', name: 'Submission Fees' },
+                    { id: '#status', name: 'Status' },
+                    { id: '#processing_time', name: 'Processing Time' },
+                    { id: '#bank_cheque_handover_date', name: 'Bank Cheque Document Handover Date' },
+                    { id: '#passport_handover_date', name: 'Passport Handover Date' },
+                    { id: '#process_note', name: 'Note related to agent or process' }
+                ];
+                
+                requiredFields.forEach(function(field) {
+                    var $field = $(field.id);
+                    var value = $field.val();
+                    
+                    if (field.id === '#visa_category' || field.id === '#subclass') {
+                        // For select pickers, check the actual select value
+                        value = $field.selectpicker('val');
+                    }
+                    
+                    if (!value || value.trim() === '') {
+                        isValid = false;
+                        showProcessFieldError(field.id, field.name + ' is required');
+                    }
+                });
+                
+                // Validate file uploads (only if no existing file)
+                var fileFields = [
+                    { id: '#contract_letter', name: 'Contract Letter' },
+                    { id: '#grant_letter', name: 'Grant Letter' },
+                    { id: '#offer_letter', name: 'Offer Letter/Sponsor Letter' },
+                    { id: '#medical_letter', name: 'Medical Letter' },
+                    { id: '#air_ticket', name: 'Air Ticket' },
+                    { id: '#accommodation_letter', name: 'Accommodation Configuration Letter' }
+                ];
+                
+                fileFields.forEach(function(field) {
+                    var $field = $(field.id);
+                    var hasFile = $field.val() && $field.val() !== '';
+                    var hasExistingFile = $field.closest('.col-md-3').find('small a').length > 0;
+                    
+                    if (!hasFile && !hasExistingFile) {
+                        isValid = false;
+                        showProcessFieldError(field.id, field.name + ' is required');
+                    }
+                });
+                
+                if (!isValid) {
+                    return false;
+                }
+                
+                // Get select picker values and add to form
+                $('#visa_category, #subclass').each(function() {
+                    var $select = $(this);
+                    var selectedValue = $select.selectpicker('val');
+                    if (selectedValue) {
+                        $select.val(selectedValue);
+                    }
+                });
+                
+                $.easyAjax({
+                    url: "{{ route('new-leads.process-store') }}",
+                    container: '#processForm',
+                    type: "POST",
+                    blockUI: true,
+                    file: true,
+                    disableButton: true,
+                    buttonSelector: "#saveProcessBtn, #saveProcessFormBtn",
+                    success: function(response) {
+                        if (response.status == "success") {
+                            $.showToastr(response.message || 'Process saved successfully', 'success');
+                            
+                            // Reload the page after a short delay to show updated data
+                            setTimeout(function() {
+                                window.location.hash = 'processTab';
+                                window.location.reload();
+                            }, 500);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle validation errors from server
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            var errors = xhr.responseJSON.errors;
+                            $.each(errors, function(field, messages) {
+                                var fieldId = '#' + field;
+                                showProcessFieldError(fieldId, messages[0]);
+                            });
+                        } else {
+                            console.error('Error saving process:', error);
+                            console.error('Status:', status);
+                            console.error('Response:', xhr.responseText);
+                            $.showToastr('An error occurred while saving the process. Please try again.', 'error');
+                        }
+                    }
+                });
+                
+                return false;
+            });
         });
     </script>
 @endpush

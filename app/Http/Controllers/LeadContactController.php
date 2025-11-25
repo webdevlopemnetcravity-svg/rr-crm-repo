@@ -25,6 +25,7 @@ use App\Models\LeadSource;
 use App\Models\LeadStepLog;
 use App\Models\LeadStepStatus;
 use App\Models\NewLead;
+use App\Models\NewLeadProcess;
 use App\Models\PipelineStage;
 use App\Models\LeadStatus;
 use App\Models\Product;
@@ -228,7 +229,7 @@ class LeadContactController extends AccountBaseController
         // Fetch the lead data if ID is provided
         $this->lead = null;
         if ($id) {
-            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy'])->find($id);
+            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process'])->find($id);
             if (!$this->lead) {
                 abort(404, 'Lead not found');
             }
@@ -3193,6 +3194,88 @@ class LeadContactController extends AccountBaseController
         $fileNote->note = trim_editor($request->note);
         $fileNote->added_by = user()->id;
         $fileNote->save();
+
+        return Reply::success(__('messages.recordSaved'));
+    }
+
+    /**
+     * Store or update new lead process
+     */
+    public function storeNewLeadProcess(Request $request)
+    {
+        $newLead = NewLead::findOrFail($request->new_lead_id);
+        
+        $rules = [
+            'new_lead_id' => 'required|exists:new_leads,id',
+            'applicant_name' => 'required|string|max:255',
+            'visa_category' => 'required|string|max:255',
+            'subclass' => 'required|string|max:255',
+            'passport_name' => 'required|string|max:255',
+            'passport_number' => 'required|string|max:255',
+            'agent_name' => 'required|string|max:255',
+            'advance_fees' => 'required|string|max:255',
+            'advance_fees_due_date' => 'required|date',
+            'remaining_fees' => 'required|string|max:255',
+            'remaining_fees_due_date' => 'required|date',
+            'agent_fees' => 'required|string|max:255',
+            'submission_fees' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
+            'processing_time' => 'required|string|max:255',
+            'bank_cheque_handover_date' => 'required|date',
+            'passport_handover_date' => 'required|date',
+            'process_note' => 'required|string',
+            'contract_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'grant_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'offer_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'medical_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'air_ticket' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+            'accommodation_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+        ];
+        
+        $request->validate($rules);
+
+        // Check if process exists
+        $process = NewLeadProcess::where('new_lead_id', $request->new_lead_id)->first();
+        
+        if (!$process) {
+            $process = new NewLeadProcess();
+            $process->new_lead_id = $request->new_lead_id;
+            $process->added_by = user()->id;
+        } else {
+            $process->last_updated_by = user()->id;
+        }
+
+        // Fill basic fields
+        $process->applicant_name = $request->applicant_name;
+        $process->visa_category = $request->visa_category;
+        $process->subclass = $request->subclass;
+        $process->passport_name = $request->passport_name;
+        $process->passport_number = $request->passport_number;
+        $process->agent_name = $request->agent_name;
+        $process->advance_fees = $request->advance_fees;
+        $process->advance_fees_due_date = $request->advance_fees_due_date;
+        $process->remaining_fees = $request->remaining_fees;
+        $process->remaining_fees_due_date = $request->remaining_fees_due_date;
+        $process->agent_fees = $request->agent_fees;
+        $process->submission_fees = $request->submission_fees;
+        $process->status = $request->status;
+        $process->processing_time = $request->processing_time;
+        $process->bank_cheque_handover_date = $request->bank_cheque_handover_date;
+        $process->passport_handover_date = $request->passport_handover_date;
+        $process->process_note = $request->process_note;
+
+        // Handle file uploads
+        $fileFields = ['contract_letter', 'grant_letter', 'offer_letter', 'medical_letter', 'air_ticket', 'accommodation_letter'];
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $fileName = 'process_documents/' . $newLead->id . '/' . $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public', $fileName);
+                $process->$field = $fileName;
+            }
+        }
+
+        $process->save();
 
         return Reply::success(__('messages.recordSaved'));
     }

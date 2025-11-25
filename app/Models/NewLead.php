@@ -105,4 +105,12 @@ class NewLead extends BaseModel
     {
         return $this->hasMany(NewLeadFileNote::class, 'new_lead_id');
     }
+
+    /**
+     * Get the process for this lead.
+     */
+    public function process(): HasOne
+    {
+        return $this->hasOne(NewLeadProcess::class, 'new_lead_id');
+    }
 }
