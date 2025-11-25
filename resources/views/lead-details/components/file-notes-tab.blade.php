@@ -4,13 +4,15 @@
                         <div class="tab-section-header-content">
                             <h3 class="tab-section-title">File Notes</h3>
                             @php
-                                $addLeadFileNotePermission = user()->permission('add_lead_note');
+                                $userRoles = user_roles();
+                                $isAdmin = in_array('admin', $userRoles);
+                                $isEmployee = in_array('employee', $userRoles);
                                 $isDraft = false;
                                 if (isset($lead) && $lead && $lead->stepStatus && $lead->stepStatus->final_status == 'draft') {
                                     $isDraft = true;
                                 }
                             @endphp
-                            @if(($addLeadFileNotePermission == 'all' || $addLeadFileNotePermission == 'added' || $addLeadFileNotePermission == 'both') && !$isDraft)
+                            @if(($isAdmin || $isEmployee) && !$isDraft)
                                 <button type="button" class="tab-section-add-btn" data-toggle="modal" data-target="#addFileNoteModal">
                                     <i class="fa fa-plus"></i>
                                 </button>
