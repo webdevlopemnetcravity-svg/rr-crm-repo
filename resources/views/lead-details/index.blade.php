@@ -211,8 +211,18 @@
                 const tabId = $(this).data('tab');
                 if (tabId) {
                     $('#' + tabId).addClass('active');
-                    // Update URL hash
-                    window.location.hash = tabId;
+                    // Update URL hash without triggering hashchange events
+                    // Only update if hash is different to prevent unnecessary updates
+                    const currentHash = window.location.hash.substring(1);
+                    if (currentHash !== tabId) {
+                        // Use replaceState to update hash silently without triggering hashchange
+                        if (window.history && window.history.replaceState) {
+                            window.history.replaceState(null, null, '#' + tabId);
+                        } else {
+                            // Fallback for older browsers - directly set hash (may trigger hashchange in old browsers)
+                            window.location.hash = tabId;
+                        }
+                    }
                 }
             });
 
