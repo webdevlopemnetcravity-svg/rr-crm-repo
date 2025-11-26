@@ -553,6 +553,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('new-leads/process-store', [LeadContactController::class, 'storeNewLeadProcess'])->name('new-leads.process-store');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
     Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
+    Route::post('lead-details/{leadId}/send-template-document/{documentId}', [LeadContactController::class, 'sendTemplateDocumentEmail'])->name('lead-details.send-template-document');
     Route::get('lead-dashboard', [LeadContactController::class, 'leadDashboard'])->name('lead-dashboard.index');
     
     // Step-by-step lead saving routes

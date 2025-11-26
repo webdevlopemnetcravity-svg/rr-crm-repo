@@ -239,9 +239,47 @@ class LeadContactController extends AccountBaseController
             $this->categories = LeadCategory::get();
             $this->sources = LeadSource::get();
             $this->employees = User::allEmployees(null, 'active');
+            $this->templateDocuments = \App\Models\NewLeadTemplateDocument::all();
         }
 
         return view('lead-details.index', $this->data);
+    }
+
+    /**
+     * Send template document via email to lead
+     */
+    public function sendTemplateDocumentEmail(Request $request, $leadId, $documentId)
+    {
+        try {
+            $lead = NewLead::findOrFail($leadId);
+            $document = \App\Models\NewLeadTemplateDocument::findOrFail($documentId);
+
+            // Get lead email from step_1_data or client_email
+            $leadEmail = null;
+            if ($lead->step_1_data) {
+                $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : $lead->step_1_data;
+                if (is_array($step1Data)) {
+                    $leadEmail = $step1Data['email_address'] ?? null;
+                }
+            }
+            
+            // Fallback to client_email
+            if (empty($leadEmail)) {
+                $leadEmail = $lead->client_email;
+            }
+
+            if (empty($leadEmail) || !filter_var($leadEmail, FILTER_VALIDATE_EMAIL)) {
+                return Reply::error(__('Lead email address is not available or invalid.'));
+            }
+
+            // Send email with attachment
+            \Mail::to($leadEmail)->send(new \App\Mail\SendTemplateDocument($lead, $document));
+
+            return Reply::success(__('Template document sent successfully to ') . $leadEmail);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send template document email: ' . $e->getMessage());
+            return Reply::error(__('Failed to send email. Please try again.'));
+        }
     }
 
     public function leadDashboard()

@@ -140,7 +140,7 @@
                         <a class="nav-item-lead nav-link-lead f-14" data-tab="accountsTab" href="#">
                             <div class="tab-item"><img src="{{ asset('img/icon/Accounts.svg') }}"></div>Accounts
                         </a>
-                        <a class="nav-item-lead nav-link-lead f-14" data-tab="communicationTab" href="#">
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="templateDocumentTab" href="#">
                             <div class="tab-item"><img src="{{ asset('img/icon/Communication.svg') }}"></div>Template Document
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" data-tab="followUpTab" href="#">
@@ -165,8 +165,8 @@
                 @include('lead-details.components.documents-tab')
                 <!-- Accounts Tab Content -->
                 @include('lead-details.components.accounts-tab')
-                <!-- Communication Tab Content -->
-                @include('lead-details.components.communication-tab')
+                <!-- Template Document Tab Content -->
+                @include('lead-details.components.template-document-tab')
                 <!-- Follow Up Tab Content -->
                 @include('lead-details.components.follow-up-tab')
                 <!-- Travel Details Tab Content -->
@@ -951,6 +951,92 @@
                 });
                 
                 return false;
+            });
+
+            // Send Template Document via Email
+            $(document).on('click', '.send-template-email', function(e) {
+                e.preventDefault();
+                
+                var leadId = $(this).data('lead-id');
+                var documentId = $(this).data('document-id');
+                
+                if (!leadId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Lead ID is missing.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                
+                if (!documentId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Document ID is missing.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                
+                // Show confirmation
+                Swal.fire({
+                    title: 'Send Email?',
+                    text: 'Do you want to send this template document via email to the lead?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Send',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'btn btn-primary mr-3',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var url = "{{ route('lead-details.send-template-document', [':leadId', ':documentId']) }}";
+                        url = url.replace(':leadId', leadId).replace(':documentId', documentId);
+                        
+                        $.easyAjax({
+                            url: url,
+                            type: "POST",
+                            blockUI: true,
+                            data: {
+                                '_token': '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.status == "success") {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Success',
+                                        text: response.message || 'Email sent successfully!',
+                                        confirmButtonText: 'OK'
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.message || 'Failed to send email.',
+                                        confirmButtonText: 'OK'
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                var errorMessage = 'Failed to send email. Please try again.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                }
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: errorMessage,
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>
