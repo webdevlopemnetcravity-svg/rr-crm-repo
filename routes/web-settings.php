@@ -9,6 +9,7 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\TicketTypeController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\LeadSettingController;
+use App\Http\Controllers\NewLeadTemplateDocumentController;
 use App\Http\Controllers\SmtpSettingController;
 use App\Http\Controllers\TaskSettingController;
 use App\Http\Controllers\TicketAgentController;
@@ -205,6 +206,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     Route::post('lead-agent-settings/update-category/{id}', [LeadAgentSettingController::class, 'updateCategory'])->name('lead_agents.update_category');
     Route::post('lead-agent-settings/update-status/{id}', [LeadAgentSettingController::class, 'updateStatus'])->name('lead_agents.update_status');
     Route::get('agent-category', [LeadAgentSettingController::class, 'agentCategories'])->name('lead_agent.categories');
+
+    /* New Lead Template Documents */
+    Route::resource('new-lead-template-documents', NewLeadTemplateDocumentController::class);
 
     /* Contract Setting */
     Route::resource('contract-settings', ContractSettingController::class);

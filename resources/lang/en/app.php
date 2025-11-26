@@ -246,6 +246,7 @@ return array(
         'projectSettings' => 'Project Settings',
         'financeSettings' => 'Finance Settings',
         'taxSettings' => 'Tax Settings',
+        'newLeadTemplateDocuments' => 'Lead Template Documents',
         'credit-note' => 'Credit Note',
         'designation' => 'Designation',
         'help' => 'Help',

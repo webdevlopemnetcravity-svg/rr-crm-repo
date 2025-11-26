@@ -109,6 +109,11 @@
                                  :text="__('app.menu.leadSettings')"/>
         @endif
 
+        @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_lead_template_documents" :href="route('new-lead-template-documents.index')"
+                                 :text="__('app.menu.newLeadTemplateDocuments')"/>
+        @endif
+
         @if (user()->permission('manage_time_log_setting') == 'all' && in_array('timelogs', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="timelog_settings" :href="route('timelog-settings.index')"
                                  :text="__('app.menu.timeLogSettings')"/>
