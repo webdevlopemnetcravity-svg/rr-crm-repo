@@ -310,14 +310,65 @@
                                 $('#file-note-editor-text').val('');
                             }
                             
-                            $.showToastr(response.message || 'File note saved successfully', 'success');
+                            // Show success message (with error handling)
+                            try {
+                                if (typeof $.showToastr === 'function') {
+                                    $.showToastr(response.message || 'File note saved successfully', 'success');
+                                } else if (typeof toastr !== 'undefined') {
+                                    toastr.success(response.message || 'File note saved successfully');
+                                }
+                            } catch (e) {
+                                console.warn('Could not show toastr message:', e);
+                            }
                             
-                            // Reload the page after a short delay to ensure modal is closed and toastr is shown
-                            // Add hash to URL to ensure file notes tab is active after reload
-                            setTimeout(function() {
-                                window.location.hash = 'fileNotesTab';
-                                window.location.reload();
-                            }, 500);
+                            // Refresh file notes section via AJAX
+                            // Use leadId from outer scope (captured before the AJAX call)
+                            console.log('Attempting to refresh file notes, leadId:', leadId);
+                            
+                            if (!leadId) {
+                                // Fallback: try to get leadId again
+                                leadId = $('#file_note_lead_id_details').val();
+                                console.log('Retrieved leadId from input:', leadId);
+                            }
+                            
+                            if (leadId) {
+                                var fileNotesUrl = "{{ route('new-leads.file-notes', ':id') }}".replace(':id', leadId);
+                                console.log('Calling file notes API:', fileNotesUrl);
+                                
+                                $.easyAjax({
+                                    url: fileNotesUrl,
+                                    type: "GET",
+                                    blockUI: false,
+                                    success: function(fileNotesResponse) {
+                                        console.log('File notes API response:', fileNotesResponse);
+                                        
+                                        // Handle different possible response structures
+                                        var html = null;
+                                        if (fileNotesResponse.status == "success" && fileNotesResponse.data && fileNotesResponse.data.html) {
+                                            html = fileNotesResponse.data.html;
+                                        } else if (fileNotesResponse.html) {
+                                            html = fileNotesResponse.html;
+                                        } else if (fileNotesResponse.data && fileNotesResponse.data.html) {
+                                            html = fileNotesResponse.data.html;
+                                        }
+                                        
+                                        if (html) {
+                                            $('#fileNotesContent').html(html);
+                                            console.log('File notes section updated successfully');
+                                        } else {
+                                            console.warn('No HTML found in response:', fileNotesResponse);
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Error loading file notes:', error);
+                                        console.error('Status:', status);
+                                        console.error('Response:', xhr.responseText);
+                                        console.error('XHR object:', xhr);
+                                    }
+                                });
+                            } else {
+                                console.error('Lead ID is missing, cannot refresh file notes');
+                            }
                         }
                     },
                     error: function(xhr, status, error) {

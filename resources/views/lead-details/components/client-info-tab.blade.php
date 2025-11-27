@@ -44,7 +44,7 @@
                     <div class="tab-section-content">
                         
                         <!-- Candidate Information & Contact Details Card -->
-                        <div style="background-color: #F8F6FB; border: 1px solid #B5B5B5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <div style="background-color: #f6f8fb; border: 1px solid #B5B5B5; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
                             <!-- Candidate Information Section -->
                             <div class="info-section mb-1">
                                 <div class="info-section-header mb-3">

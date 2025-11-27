@@ -99,10 +99,6 @@
     color: #171f29;
 }
 
-/* Table Header Background Color */
-#new-leads-table thead th {
-    background-color: #F2EDF9;
-}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

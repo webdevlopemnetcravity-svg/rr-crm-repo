@@ -3237,6 +3237,20 @@ class LeadContactController extends AccountBaseController
     }
 
     /**
+     * Get file notes for a lead via AJAX
+     */
+    public function getNewLeadFileNotes($id)
+    {
+        $lead = NewLead::with(['fileNotes.addedBy'])->findOrFail($id);
+        
+        $this->lead = $lead;
+        
+        $html = view('lead-details.components.file-notes-list', $this->data)->render();
+        
+        return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
+    }
+
+    /**
      * Store or update new lead process
      */
     public function storeNewLeadProcess(Request $request)
