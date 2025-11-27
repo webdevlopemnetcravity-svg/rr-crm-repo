@@ -1141,6 +1141,141 @@
                 });
             });
         });
+        
+        // ========== DOCUMENT UPLOAD FUNCTIONALITY ==========
+        
+        // Handle document upload/change button clicks
+        $(document).on('click', '.document-upload-btn, .document-change-link', function(e) {
+            e.preventDefault();
+            
+            var documentKey = $(this).data('document-key');
+            var documentName = $(this).data('document-name');
+            
+            if (!documentKey) {
+                return;
+            }
+            
+            $('#document_key_input').val(documentKey);
+            $('#document_name_label').text(documentName || 'Document');
+            $('#documentUploadModalLabel').text($(this).hasClass('document-change-link') ? 'Change Document' : 'Upload Document');
+            $('#document_file_input').val('');
+            $('#documentUploadModal').modal('show');
+        });
+        
+        // Handle document form submission
+        $(document).on('click', '#save-document-btn', function(e) {
+            e.preventDefault();
+            
+            var documentKey = $('#document_key_input').val();
+            var fileInput = $('#document_file_input')[0];
+            
+            if (!documentKey) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Document key is missing.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Document key is missing.');
+                    }
+                } catch (e) {}
+                return;
+            }
+            
+            if (!fileInput.files || !fileInput.files[0]) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Please select a file to upload.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Please select a file to upload.');
+                    }
+                } catch (e) {}
+                return;
+            }
+            
+            var leadId = {{ isset($lead) && $lead ? $lead->id : 'null' }};
+            if (!leadId) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Lead ID is missing.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Lead ID is missing.');
+                    }
+                } catch (e) {}
+                return;
+            }
+            
+            var formData = new FormData();
+            formData.append('document_key', documentKey);
+            formData.append('document_file', fileInput.files[0]);
+            formData.append('_token', '{{ csrf_token() }}');
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.upload-document', ':leadId') }}".replace(':leadId', leadId),
+                container: '#documentUploadForm',
+                type: "POST",
+                blockUI: true,
+                file: true,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status == "success") {
+                        $('#documentUploadModal').modal('hide');
+                        $('#documentUploadForm')[0].reset();
+                        
+                        try {
+                            if (typeof $.showToastr === 'function') {
+                                $.showToastr(response.message || 'Document uploaded successfully', 'success');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message || 'Document uploaded successfully');
+                            }
+                        } catch (e) {}
+                        
+                        // Refresh only the documents tab content
+                        var leadId = {{ $lead->id ?? 0 }};
+                        if (leadId) {
+                            var documentsUrl = "{{ route('new-leads.documents-tab', ':id') }}".replace(':id', leadId);
+                            
+                            $.easyAjax({
+                                url: documentsUrl,
+                                type: "GET",
+                                blockUI: false,
+                                success: function(response) {
+                                    // Handle different possible response structures
+                                    var html = null;
+                                    if (response.status == "success" && response.data && response.data.html) {
+                                        html = response.data.html;
+                                    } else if (response.html) {
+                                        html = response.html;
+                                    } else if (response.data && response.data.html) {
+                                        html = response.data.html;
+                                    }
+                                    
+                                    if (html) {
+                                        $('#documentsContent').html(html);
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    // Silent fail - documents will refresh on next page load
+                                }
+                            });
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMessage = 'An error occurred while uploading the document. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    try {
+                        if (typeof $.showToastr === 'function') {
+                            $.showToastr(errorMessage, 'error');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.error(errorMessage);
+                        }
+                    } catch (e) {}
+                }
+            });
+        });
     </script>
 @endpush
 

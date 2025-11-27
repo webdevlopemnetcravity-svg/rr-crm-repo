@@ -552,8 +552,13 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::delete('new-leads/follow-up/{id}', [LeadContactController::class, 'deleteNewLeadFollowUp'])->name('new-leads.follow-up-delete');
     Route::post('new-leads/file-note-store', [LeadContactController::class, 'storeNewLeadFileNote'])->name('new-leads.file-note-store');
     Route::get('new-leads/file-notes/{id}', [LeadContactController::class, 'getNewLeadFileNotes'])->name('new-leads.file-notes');
+    Route::get('new-leads/documents-tab/{id}', [LeadContactController::class, 'getNewLeadDocumentsTab'])->name('new-leads.documents-tab');
+    Route::post('new-leads/{leadId}/upload-document', [LeadContactController::class, 'uploadLeadDocument'])->name('new-leads.upload-document');
     Route::post('new-leads/process-store', [LeadContactController::class, 'storeNewLeadProcess'])->name('new-leads.process-store');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
+    // Specific routes must come before generic route
+    Route::get('lead-details/{leadId}/download-document/{documentKey}', [LeadContactController::class, 'downloadLeadDocument'])->name('lead-details.download-document');
+    Route::post('lead-details/{leadId}/send-template-document/{documentId}', [LeadContactController::class, 'sendTemplateDocumentEmail'])->name('lead-details.send-template-document');
     Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
     Route::post('lead-details/{leadId}/send-template-document/{documentId}', [LeadContactController::class, 'sendTemplateDocumentEmail'])->name('lead-details.send-template-document');
     Route::get('lead-dashboard', [LeadContactController::class, 'leadDashboard'])->name('lead-dashboard.index');

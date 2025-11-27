@@ -228,10 +228,25 @@ class LeadContactController extends AccountBaseController
 
         // Fetch the lead data if ID is provided
         $this->lead = null;
+        $this->leadDocuments = [];
+        $this->allExpectedDocuments = [];
+        
         if ($id) {
             $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process'])->find($id);
             if (!$this->lead) {
                 abort(404, 'Lead not found');
+            }
+            
+            // Extract all documents from step data
+            try {
+                $this->leadDocuments = $this->extractAllDocuments($this->lead);
+                // Get all expected documents (including missing ones)
+                $this->allExpectedDocuments = $this->getAllExpectedDocuments($this->lead);
+            } catch (\Exception $e) {
+                \Log::error('Error extracting documents for lead ' . $id . ': ' . $e->getMessage());
+                \Log::error('Stack trace: ' . $e->getTraceAsString());
+                $this->leadDocuments = [];
+                $this->allExpectedDocuments = [];
             }
         }
 
@@ -243,6 +258,499 @@ class LeadContactController extends AccountBaseController
         }
 
         return view('lead-details.index', $this->data);
+    }
+    
+    /**
+     * Extract all documents from step 1-9 data
+     */
+    private function extractAllDocuments($lead)
+    {
+        $documents = [];
+        
+        if (!$lead) {
+            return $documents;
+        }
+        
+        // Helper function to safely get step data
+        $getStepData = function($stepData) {
+            if (is_string($stepData)) {
+                $decoded = json_decode($stepData, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return is_array($stepData) ? $stepData : [];
+        };
+        
+        // Step 1 - Resume
+        $step1Data = $getStepData($lead->step_1_data ?? null);
+        if (!empty($step1Data['upload_resume'])) {
+            $documents[] = [
+                'key' => 'upload_resume',
+                'name' => 'Resume',
+                'file' => $step1Data['upload_resume'],
+                'step' => 1,
+                'folder' => 'lead-resume-files',
+                'required' => true,
+                'no_lead_id' => true
+            ];
+        }
+        
+        // Step 2 - Assessment Letter
+        $step2Data = $getStepData($lead->step_2_data ?? null);
+        if (!empty($step2Data['pr_assessment_letter_file'])) {
+            $documents[] = [
+                'key' => 'pr_assessment_letter_file',
+                'name' => 'Assessment Letter',
+                'file' => $step2Data['pr_assessment_letter_file'],
+                'step' => 2,
+                'folder' => 'lead-assessment-letters',
+                'required' => true
+            ];
+        }
+        
+        // Step 3 - Passport
+        $step3Data = $getStepData($lead->step_3_data ?? null);
+        if (!empty($step3Data['passport_file_upload'])) {
+            $documents[] = [
+                'key' => 'passport_file_upload',
+                'name' => 'Passport - Applicant',
+                'file' => $step3Data['passport_file_upload'],
+                'step' => 3,
+                'folder' => 'lead-passport-files',
+                'required' => true
+            ];
+        }
+        
+        // Step 5 - Family Documents
+        $step5Data = $getStepData($lead->step_5_data ?? null);
+        
+        // Father Passport
+        if (!empty($step5Data['father_passport_file'])) {
+            $documents[] = [
+                'key' => 'father_passport_file',
+                'name' => 'Father Passport',
+                'file' => $step5Data['father_passport_file'],
+                'step' => 5,
+                'folder' => 'lead-family-passports',
+                'required' => true
+            ];
+        }
+        
+        // Mother Passport
+        if (!empty($step5Data['mother_passport_file'])) {
+            $documents[] = [
+                'key' => 'mother_passport_file',
+                'name' => 'Mother Passport',
+                'file' => $step5Data['mother_passport_file'],
+                'step' => 5,
+                'folder' => 'lead-family-passports',
+                'required' => true
+            ];
+        }
+        
+        // Spouse Passport
+        if (!empty($step5Data['spouse_passport_file'])) {
+            $documents[] = [
+                'key' => 'spouse_passport_file',
+                'name' => 'Spouse Passport',
+                'file' => $step5Data['spouse_passport_file'],
+                'step' => 5,
+                'folder' => 'lead-family-passports',
+                'required' => true
+            ];
+        }
+        
+        // Spouse Document
+        if (!empty($step5Data['spouse_document_file'])) {
+            $documents[] = [
+                'key' => 'spouse_document_file',
+                'name' => 'Spouse Document',
+                'file' => $step5Data['spouse_document_file'],
+                'step' => 5,
+                'folder' => 'lead-family-documents',
+                'required' => false
+            ];
+        }
+        
+        // Children Documents (dynamic)
+        if (!empty($step5Data['children']) && is_array($step5Data['children'])) {
+            foreach ($step5Data['children'] as $index => $child) {
+                $childName = $child['child_name'] ?? 'Child ' . ($index + 1);
+                
+                if (!empty($child['child_passport_file'])) {
+                    $documents[] = [
+                        'key' => 'child_passport_file_' . ($index + 1),
+                        'name' => 'Child Passport - ' . $childName,
+                        'file' => $child['child_passport_file'],
+                        'step' => 5,
+                        'folder' => 'lead-family-passports',
+                        'required' => true,
+                        'child_index' => $index
+                    ];
+                }
+                
+                if (!empty($child['child_document_file'])) {
+                    $documents[] = [
+                        'key' => 'child_document_file_' . ($index + 1),
+                        'name' => 'Child Document - ' . $childName,
+                        'file' => $child['child_document_file'],
+                        'step' => 5,
+                        'folder' => 'lead-family-documents',
+                        'required' => false,
+                        'child_index' => $index
+                    ];
+                }
+            }
+        }
+        
+        // Step 6 - Education Documents
+        $step6Data = $getStepData($lead->step_6_data ?? null);
+        
+        // IELTS Result
+        if (!empty($step6Data['ielts_result_file'])) {
+            $documents[] = [
+                'key' => 'ielts_result_file',
+                'name' => 'IELTS / PTE / OET / TOEFL - Result',
+                'file' => $step6Data['ielts_result_file'],
+                'step' => 6,
+                'folder' => 'lead-education-files',
+                'required' => false
+            ];
+        }
+        
+        // 10th Result
+        if (!empty($step6Data['tenth_result_file'])) {
+            $documents[] = [
+                'key' => 'tenth_result_file',
+                'name' => '10th Passing Result',
+                'file' => $step6Data['tenth_result_file'],
+                'step' => 6,
+                'folder' => 'lead-education-files',
+                'required' => true
+            ];
+        }
+        
+        // 12th Result
+        if (!empty($step6Data['twelfth_result_file'])) {
+            $documents[] = [
+                'key' => 'twelfth_result_file',
+                'name' => '12th Passing Result',
+                'file' => $step6Data['twelfth_result_file'],
+                'step' => 6,
+                'folder' => 'lead-education-files',
+                'required' => false
+            ];
+        }
+        
+        // Graduation Result
+        if (!empty($step6Data['graduation_result_file'])) {
+            $documents[] = [
+                'key' => 'graduation_result_file',
+                'name' => 'Graduation Degree',
+                'file' => $step6Data['graduation_result_file'],
+                'step' => 6,
+                'folder' => 'lead-education-files',
+                'required' => false
+            ];
+        }
+        
+        // Post Graduation Result
+        if (!empty($step6Data['post_graduation_result_file'])) {
+            $documents[] = [
+                'key' => 'post_graduation_result_file',
+                'name' => 'Post Graduation Degree',
+                'file' => $step6Data['post_graduation_result_file'],
+                'step' => 6,
+                'folder' => 'lead-education-files',
+                'required' => false
+            ];
+        }
+        
+        // Other Degrees (dynamic)
+        if (!empty($step6Data['other_degrees']) && is_array($step6Data['other_degrees'])) {
+            foreach ($step6Data['other_degrees'] as $index => $degree) {
+                $degreeName = $degree['other_degree'] ?? 'Other Degree ' . ($index + 1);
+                
+                if (!empty($degree['other_degree_result_file'])) {
+                    $documents[] = [
+                        'key' => 'other_degree_result_file_' . ($index + 1),
+                        'name' => 'Other Degree - ' . $degreeName,
+                        'file' => $degree['other_degree_result_file'],
+                        'step' => 6,
+                        'folder' => 'lead-education-files',
+                        'required' => false,
+                        'degree_index' => $index
+                    ];
+                }
+            }
+        }
+        
+        // Step 7 - Job Documents (dynamic)
+        $step7Data = $getStepData($lead->step_7_data ?? null);
+        if (!empty($step7Data['jobs']) && is_array($step7Data['jobs'])) {
+            foreach ($step7Data['jobs'] as $index => $job) {
+                $jobTitle = $job['job_designation'] ?? $job['job_title'] ?? 'Job ' . ($index + 1);
+                
+                if (!empty($job['job_offer_letter_file'])) {
+                    $documents[] = [
+                        'key' => 'job_offer_letter_file_' . ($index + 1),
+                        'name' => 'Job Offer Letter - ' . $jobTitle,
+                        'file' => $job['job_offer_letter_file'],
+                        'step' => 7,
+                        'folder' => 'lead-job-files',
+                        'required' => false,
+                        'job_index' => $index
+                    ];
+                }
+                
+                if (!empty($job['job_experience_letter_file'])) {
+                    $documents[] = [
+                        'key' => 'job_experience_letter_file_' . ($index + 1),
+                        'name' => 'Job Experience Letter - ' . $jobTitle,
+                        'file' => $job['job_experience_letter_file'],
+                        'step' => 7,
+                        'folder' => 'lead-job-files',
+                        'required' => false,
+                        'job_index' => $index
+                    ];
+                }
+            }
+        }
+        
+        // Step 8 - Valuation Report
+        $step8Data = $getStepData($lead->step_8_data ?? null);
+        if (!empty($step8Data['valuation_report_file'])) {
+            $documents[] = [
+                'key' => 'valuation_report_file',
+                'name' => 'Valuation Report',
+                'file' => $step8Data['valuation_report_file'],
+                'step' => 8,
+                'folder' => 'lead-property-files',
+                'required' => false
+            ];
+        }
+        
+        // Step 9 - Income Documents
+        $step9Data = $getStepData($lead->step_9_data ?? null);
+        
+        if (!empty($step9Data['father_income_document_file'])) {
+            $documents[] = [
+                'key' => 'father_income_document_file',
+                'name' => 'Father Income Document',
+                'file' => $step9Data['father_income_document_file'],
+                'step' => 9,
+                'folder' => 'lead-income-documents',
+                'required' => false
+            ];
+        }
+        
+        if (!empty($step9Data['mother_income_document_file'])) {
+            $documents[] = [
+                'key' => 'mother_income_document_file',
+                'name' => 'Mother Income Document',
+                'file' => $step9Data['mother_income_document_file'],
+                'step' => 9,
+                'folder' => 'lead-income-documents',
+                'required' => false
+            ];
+        }
+        
+        if (!empty($step9Data['candidate_income_document_file'])) {
+            $documents[] = [
+                'key' => 'candidate_income_document_file',
+                'name' => 'Candidate Income Document',
+                'file' => $step9Data['candidate_income_document_file'],
+                'step' => 9,
+                'folder' => 'lead-income-documents',
+                'required' => false
+            ];
+        }
+        
+        if (!empty($step9Data['spouse_income_document_file'])) {
+            $documents[] = [
+                'key' => 'spouse_income_document_file',
+                'name' => 'Spouse Income Document',
+                'file' => $step9Data['spouse_income_document_file'],
+                'step' => 9,
+                'folder' => 'lead-income-documents',
+                'required' => false
+            ];
+        }
+        
+        return $documents;
+    }
+    
+    /**
+     * Get all expected documents (including missing ones) for display
+     */
+    private function getAllExpectedDocuments($lead)
+    {
+        $expectedDocs = [];
+        
+        if (!$lead) {
+            return $expectedDocs;
+        }
+        
+        $existingDocs = $this->extractAllDocuments($lead);
+        $existingDocKeys = array_column($existingDocs, 'key');
+        
+        // Helper function to safely get step data
+        $getStepData = function($stepData) {
+            if (is_string($stepData)) {
+                $decoded = json_decode($stepData, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return is_array($stepData) ? $stepData : [];
+        };
+        
+        // Define all expected documents
+        $allDocs = [
+            // Step 1
+            ['key' => 'upload_resume', 'name' => 'Resume', 'step' => 1, 'folder' => 'lead-resume-files', 'required' => true, 'no_lead_id' => true],
+            // Step 2
+            ['key' => 'pr_assessment_letter_file', 'name' => 'Assessment Letter', 'step' => 2, 'folder' => 'lead-assessment-letters', 'required' => true],
+            // Step 3
+            ['key' => 'passport_file_upload', 'name' => 'Passport - Applicant', 'step' => 3, 'folder' => 'lead-passport-files', 'required' => true],
+            // Step 5
+            ['key' => 'father_passport_file', 'name' => 'Father Passport', 'step' => 5, 'folder' => 'lead-family-passports', 'required' => true],
+            ['key' => 'mother_passport_file', 'name' => 'Mother Passport', 'step' => 5, 'folder' => 'lead-family-passports', 'required' => true],
+            ['key' => 'spouse_passport_file', 'name' => 'Spouse Passport', 'step' => 5, 'folder' => 'lead-family-passports', 'required' => true],
+            ['key' => 'spouse_document_file', 'name' => 'Spouse Document', 'step' => 5, 'folder' => 'lead-family-documents', 'required' => false],
+            // Step 6
+            ['key' => 'ielts_result_file', 'name' => 'IELTS / PTE / OET / TOEFL - Result', 'step' => 6, 'folder' => 'lead-education-files', 'required' => false],
+            ['key' => 'tenth_result_file', 'name' => '10th Passing Result', 'step' => 6, 'folder' => 'lead-education-files', 'required' => true],
+            ['key' => 'twelfth_result_file', 'name' => '12th Passing Result', 'step' => 6, 'folder' => 'lead-education-files', 'required' => false],
+            ['key' => 'graduation_result_file', 'name' => 'Graduation Degree', 'step' => 6, 'folder' => 'lead-education-files', 'required' => false],
+            ['key' => 'post_graduation_result_file', 'name' => 'Post Graduation Degree', 'step' => 6, 'folder' => 'lead-education-files', 'required' => false],
+            // Step 8
+            ['key' => 'valuation_report_file', 'name' => 'Valuation Report', 'step' => 8, 'folder' => 'lead-property-files', 'required' => false],
+            // Step 9
+            ['key' => 'father_income_document_file', 'name' => 'Father Income Document', 'step' => 9, 'folder' => 'lead-income-documents', 'required' => false],
+            ['key' => 'mother_income_document_file', 'name' => 'Mother Income Document', 'step' => 9, 'folder' => 'lead-income-documents', 'required' => false],
+            ['key' => 'candidate_income_document_file', 'name' => 'Candidate Income Document', 'step' => 9, 'folder' => 'lead-income-documents', 'required' => false],
+            ['key' => 'spouse_income_document_file', 'name' => 'Spouse Income Document', 'step' => 9, 'folder' => 'lead-income-documents', 'required' => false],
+        ];
+        
+        // Create a map of existing documents by key
+        $existingDocsMap = [];
+        foreach ($existingDocs as $ed) {
+            $existingDocsMap[$ed['key']] = $ed;
+        }
+        
+        // Add static documents
+        foreach ($allDocs as $doc) {
+            $docKey = $doc['key'];
+            if (isset($existingDocsMap[$docKey])) {
+                $expectedDocs[] = $existingDocsMap[$docKey];
+            } else {
+                $expectedDocs[] = $doc;
+            }
+        }
+        
+        // Add dynamic documents (children, other_degrees, jobs)
+        $step5Data = $getStepData($lead->step_5_data ?? null);
+        if (!empty($step5Data['children']) && is_array($step5Data['children'])) {
+            foreach ($step5Data['children'] as $index => $child) {
+                $childName = $child['child_name'] ?? 'Child ' . ($index + 1);
+                
+                // Check if child passport exists - use index + 1 to match extractAllDocuments format
+                $childPassportKey = 'child_passport_file_' . ($index + 1);
+                if (isset($existingDocsMap[$childPassportKey])) {
+                    $expectedDocs[] = $existingDocsMap[$childPassportKey];
+                } else {
+                    $expectedDocs[] = [
+                        'key' => $childPassportKey,
+                        'name' => 'Child Passport - ' . $childName,
+                        'step' => 5,
+                        'folder' => 'lead-family-passports',
+                        'required' => true,
+                        'child_index' => $index,
+                        'file' => !empty($child['child_passport_file']) ? $child['child_passport_file'] : null
+                    ];
+                }
+                
+                // Check if child document exists - use index + 1 to match extractAllDocuments format
+                $childDocKey = 'child_document_file_' . ($index + 1);
+                if (isset($existingDocsMap[$childDocKey])) {
+                    $expectedDocs[] = $existingDocsMap[$childDocKey];
+                } else {
+                    $expectedDocs[] = [
+                        'key' => $childDocKey,
+                        'name' => 'Child Document - ' . $childName,
+                        'step' => 5,
+                        'folder' => 'lead-family-documents',
+                        'required' => false,
+                        'child_index' => $index,
+                        'file' => !empty($child['child_document_file']) ? $child['child_document_file'] : null
+                    ];
+                }
+            }
+        }
+        
+        // Add other degrees
+        $step6Data = $getStepData($lead->step_6_data ?? null);
+        if (!empty($step6Data['other_degrees']) && is_array($step6Data['other_degrees'])) {
+            foreach ($step6Data['other_degrees'] as $index => $degree) {
+                $degreeName = $degree['other_degree'] ?? 'Other Degree ' . ($index + 1);
+                // Use index + 1 to match extractAllDocuments format
+                $degreeKey = 'other_degree_result_file_' . ($index + 1);
+                
+                if (isset($existingDocsMap[$degreeKey])) {
+                    $expectedDocs[] = $existingDocsMap[$degreeKey];
+                } else {
+                    $expectedDocs[] = [
+                        'key' => $degreeKey,
+                        'name' => 'Other Degree - ' . $degreeName,
+                        'step' => 6,
+                        'folder' => 'lead-education-files',
+                        'required' => false,
+                        'degree_index' => $index,
+                        'file' => !empty($degree['other_degree_result_file']) ? $degree['other_degree_result_file'] : null
+                    ];
+                }
+            }
+        }
+        
+        // Add job documents
+        $step7Data = $getStepData($lead->step_7_data ?? null);
+        if (!empty($step7Data['jobs']) && is_array($step7Data['jobs'])) {
+            foreach ($step7Data['jobs'] as $index => $job) {
+                $jobTitle = $job['job_designation'] ?? $job['job_title'] ?? 'Job ' . ($index + 1);
+                
+                // Job Offer Letter
+                $offerKey = 'job_offer_letter_file_' . ($index + 1);
+                if (isset($existingDocsMap[$offerKey])) {
+                    $expectedDocs[] = $existingDocsMap[$offerKey];
+                } else {
+                    $expectedDocs[] = [
+                        'key' => $offerKey,
+                        'name' => 'Job Offer Letter - ' . $jobTitle,
+                        'step' => 7,
+                        'folder' => 'lead-job-files',
+                        'required' => false,
+                        'job_index' => $index,
+                        'file' => !empty($job['job_offer_letter_file']) ? $job['job_offer_letter_file'] : null
+                    ];
+                }
+                
+                // Job Experience Letter
+                $experienceKey = 'job_experience_letter_file_' . ($index + 1);
+                if (isset($existingDocsMap[$experienceKey])) {
+                    $expectedDocs[] = $existingDocsMap[$experienceKey];
+                } else {
+                    $expectedDocs[] = [
+                        'key' => $experienceKey,
+                        'name' => 'Job Experience Letter - ' . $jobTitle,
+                        'step' => 7,
+                        'folder' => 'lead-job-files',
+                        'required' => false,
+                        'job_index' => $index,
+                        'file' => !empty($job['job_experience_letter_file']) ? $job['job_experience_letter_file'] : null
+                    ];
+                }
+            }
+        }
+        
+        return $expectedDocs;
     }
 
     /**
@@ -2830,6 +3338,77 @@ class LeadContactController extends AccountBaseController
         
         return download_local_s3($file, $filePath);
     }
+    
+    /**
+     * Download lead document
+     */
+    public function downloadLeadDocument($leadId, $documentKey)
+    {
+        try {
+            $lead = NewLead::findOrFail($leadId);
+            
+            // Get document configuration
+            $documentConfig = $this->getDocumentConfig($documentKey, $lead);
+            
+            if (!$documentConfig) {
+                abort(404, 'Invalid document key: ' . $documentKey);
+            }
+            
+            // Get step data
+            $stepData = $this->getStepDataArray($lead, $documentConfig['step']);
+            
+            // Get file name
+            $fileName = $this->getDocumentFileName($stepData, $documentKey, $documentConfig);
+            
+            if (!$fileName) {
+                abort(404, 'Document file not found in step data for key: ' . $documentKey);
+            }
+            
+            // Verify the file belongs to this lead by checking step data
+            // Step 1 resume files don't have lead ID subfolder
+            if (!empty($documentConfig['no_lead_id'])) {
+                $filePath = $documentConfig['folder'] . '/' . $fileName;
+            } else {
+                $filePath = $documentConfig['folder'] . '/' . $leadId . '/' . $fileName;
+            }
+            
+            // Check if file exists (for local storage)
+            if (config('filesystems.default') == 'local') {
+                $fullPath = public_path(\App\Helper\Files::UPLOAD_FOLDER . '/' . $filePath);
+                if (!file_exists($fullPath)) {
+                    \Log::error('File not found at path: ' . $fullPath);
+                    abort(404, 'File not found: ' . $fileName);
+                }
+            }
+            
+            // Return redirect to file URL for viewing in browser
+            $fileUrl = asset_url_local_s3($filePath);
+            return redirect($fileUrl);
+        } catch (\Exception $e) {
+            \Log::error('Error downloading lead document: ' . $e->getMessage());
+            \Log::error('Lead ID: ' . $leadId . ', Document Key: ' . $documentKey);
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            abort(404, 'Document not found: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Get documents tab content for AJAX refresh
+     */
+    public function getNewLeadDocumentsTab($leadId)
+    {
+        $lead = NewLead::with(['step_1_data', 'step_2_data', 'step_3_data', 'step_4_data', 'step_5_data', 'step_6_data', 'step_7_data', 'step_8_data', 'step_9_data'])->findOrFail($leadId);
+        
+        $this->lead = $lead;
+        
+        // Get all expected documents
+        $allExpectedDocuments = $this->getAllExpectedDocuments($lead);
+        $this->data['allExpectedDocuments'] = $allExpectedDocuments;
+        
+        $html = view('lead-details.components.documents-list', $this->data)->render();
+        
+        return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
+    }
 
     /**
      * Store new lead follow-up
@@ -3250,6 +3829,190 @@ class LeadContactController extends AccountBaseController
         return Reply::success(__('messages.recordSaved'));
     }
 
+    /**
+     * Upload or update document for a lead
+     */
+    public function uploadLeadDocument(Request $request, $leadId)
+    {
+        $lead = NewLead::findOrFail($leadId);
+        
+        $request->validate([
+            'document_key' => 'required|string',
+            'document_file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+        ]);
+        
+        $documentKey = $request->document_key;
+        $file = $request->file('document_file');
+        
+        // Determine step and folder based on document key
+        $documentConfig = $this->getDocumentConfig($documentKey, $lead);
+        
+        if (!$documentConfig) {
+            return Reply::error('Invalid document key.');
+        }
+        
+        try {
+            // Delete old file if exists
+            $stepData = $this->getStepDataArray($lead, $documentConfig['step']);
+            $oldFileName = $this->getDocumentFileName($stepData, $documentKey, $documentConfig);
+            
+            // Step 1 resume files don't have lead ID subfolder
+            $folderPath = !empty($documentConfig['no_lead_id']) 
+                ? $documentConfig['folder'] 
+                : $documentConfig['folder'] . '/' . $lead->id;
+            
+            if ($oldFileName) {
+                \App\Helper\Files::deleteFile($oldFileName, $folderPath);
+            }
+            
+            // Upload new file
+            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+            \App\Helper\Files::fileStore($file, $folderPath, $customFileName);
+            
+            $fileVisibility = [];
+            if (config('filesystems.default') == 'local') {
+                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+            }
+            
+            \Storage::disk(config('filesystems.default'))->putFileAs(
+                $folderPath,
+                $file,
+                $customFileName,
+                $fileVisibility
+            );
+            
+            // Update step data
+            $this->updateDocumentInStepData($lead, $documentConfig['step'], $documentKey, $customFileName, $documentConfig);
+            
+            return Reply::success(__('messages.recordSaved'));
+        } catch (\Exception $e) {
+            return Reply::error('Failed to upload document: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Get document configuration based on key
+     */
+    private function getDocumentConfig($documentKey, $lead)
+    {
+        $configs = [
+            'upload_resume' => ['step' => 1, 'folder' => 'lead-resume-files', 'field' => 'upload_resume', 'no_lead_id' => true],
+            'pr_assessment_letter_file' => ['step' => 2, 'folder' => 'lead-assessment-letters', 'field' => 'pr_assessment_letter_file'],
+            'passport_file_upload' => ['step' => 3, 'folder' => 'lead-passport-files', 'field' => 'passport_file_upload'],
+            'father_passport_file' => ['step' => 5, 'folder' => 'lead-family-passports', 'field' => 'father_passport_file'],
+            'mother_passport_file' => ['step' => 5, 'folder' => 'lead-family-passports', 'field' => 'mother_passport_file'],
+            'spouse_passport_file' => ['step' => 5, 'folder' => 'lead-family-passports', 'field' => 'spouse_passport_file'],
+            'spouse_document_file' => ['step' => 5, 'folder' => 'lead-family-documents', 'field' => 'spouse_document_file'],
+            'ielts_result_file' => ['step' => 6, 'folder' => 'lead-education-files', 'field' => 'ielts_result_file'],
+            'tenth_result_file' => ['step' => 6, 'folder' => 'lead-education-files', 'field' => 'tenth_result_file'],
+            'twelfth_result_file' => ['step' => 6, 'folder' => 'lead-education-files', 'field' => 'twelfth_result_file'],
+            'graduation_result_file' => ['step' => 6, 'folder' => 'lead-education-files', 'field' => 'graduation_result_file'],
+            'post_graduation_result_file' => ['step' => 6, 'folder' => 'lead-education-files', 'field' => 'post_graduation_result_file'],
+            'job_offer_letter_file' => ['step' => 7, 'folder' => 'lead-job-files', 'field' => 'job_offer_letter_file'],
+            'job_experience_letter_file' => ['step' => 7, 'folder' => 'lead-job-files', 'field' => 'job_experience_letter_file'],
+            'valuation_report_file' => ['step' => 8, 'folder' => 'lead-property-files', 'field' => 'valuation_report_file'],
+            'father_income_document_file' => ['step' => 9, 'folder' => 'lead-income-documents', 'field' => 'father_income_document_file'],
+            'mother_income_document_file' => ['step' => 9, 'folder' => 'lead-income-documents', 'field' => 'mother_income_document_file'],
+            'candidate_income_document_file' => ['step' => 9, 'folder' => 'lead-income-documents', 'field' => 'candidate_income_document_file'],
+            'spouse_income_document_file' => ['step' => 9, 'folder' => 'lead-income-documents', 'field' => 'spouse_income_document_file'],
+        ];
+        
+        // Handle dynamic documents
+        if (strpos($documentKey, 'child_passport_file_') === 0) {
+            $index = (int) str_replace('child_passport_file_', '', $documentKey);
+            return ['step' => 5, 'folder' => 'lead-family-passports', 'field' => 'child_passport_file', 'is_array' => true, 'array_key' => 'children', 'array_index' => $index - 1, 'array_field' => 'child_passport_file'];
+        }
+        
+        if (strpos($documentKey, 'child_document_file_') === 0) {
+            $index = (int) str_replace('child_document_file_', '', $documentKey);
+            return ['step' => 5, 'folder' => 'lead-family-documents', 'field' => 'child_document_file', 'is_array' => true, 'array_key' => 'children', 'array_index' => $index - 1, 'array_field' => 'child_document_file'];
+        }
+        
+        if (strpos($documentKey, 'other_degree_result_file_') === 0) {
+            $index = (int) str_replace('other_degree_result_file_', '', $documentKey);
+            return ['step' => 6, 'folder' => 'lead-education-files', 'field' => 'other_degree_result_file', 'is_array' => true, 'array_key' => 'other_degrees', 'array_index' => $index - 1, 'array_field' => 'other_degree_result_file'];
+        }
+        
+        if (strpos($documentKey, 'job_offer_letter_file_') === 0) {
+            $index = (int) str_replace('job_offer_letter_file_', '', $documentKey);
+            return ['step' => 7, 'folder' => 'lead-job-files', 'field' => 'job_offer_letter_file', 'is_array' => true, 'array_key' => 'jobs', 'array_index' => $index - 1, 'array_field' => 'job_offer_letter_file'];
+        }
+        
+        if (strpos($documentKey, 'job_experience_letter_file_') === 0) {
+            $index = (int) str_replace('job_experience_letter_file_', '', $documentKey);
+            return ['step' => 7, 'folder' => 'lead-job-files', 'field' => 'job_experience_letter_file', 'is_array' => true, 'array_key' => 'jobs', 'array_index' => $index - 1, 'array_field' => 'job_experience_letter_file'];
+        }
+        
+        return $configs[$documentKey] ?? null;
+    }
+    
+    /**
+     * Get step data as array
+     */
+    private function getStepDataArray($lead, $stepNumber)
+    {
+        $stepField = 'step_' . $stepNumber . '_data';
+        $stepData = $lead->$stepField;
+        
+        if (is_string($stepData)) {
+            $decoded = json_decode($stepData, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return is_array($stepData) ? $stepData : [];
+    }
+    
+    /**
+     * Get document file name from step data
+     */
+    private function getDocumentFileName($stepData, $documentKey, $config)
+    {
+        if (!empty($config['is_array'])) {
+            $arrayKey = $config['array_key'];
+            $arrayIndex = $config['array_index'];
+            $arrayField = $config['array_field'];
+            
+            if (!empty($stepData[$arrayKey][$arrayIndex][$arrayField])) {
+                return $stepData[$arrayKey][$arrayIndex][$arrayField];
+            }
+        } else {
+            $field = $config['field'];
+            if (!empty($stepData[$field])) {
+                return $stepData[$field];
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Update document in step data
+     */
+    private function updateDocumentInStepData($lead, $stepNumber, $documentKey, $fileName, $config)
+    {
+        $stepField = 'step_' . $stepNumber . '_data';
+        $stepData = $this->getStepDataArray($lead, $stepNumber);
+        
+        if (!empty($config['is_array'])) {
+            $arrayKey = $config['array_key'];
+            $arrayIndex = $config['array_index'];
+            $arrayField = $config['array_field'];
+            
+            if (!isset($stepData[$arrayKey])) {
+                $stepData[$arrayKey] = [];
+            }
+            if (!isset($stepData[$arrayKey][$arrayIndex])) {
+                $stepData[$arrayKey][$arrayIndex] = [];
+            }
+            $stepData[$arrayKey][$arrayIndex][$arrayField] = $fileName;
+        } else {
+            $field = $config['field'];
+            $stepData[$field] = $fileName;
+        }
+        
+        $lead->$stepField = $stepData;
+        $lead->save();
+    }
+    
     /**
      * Get file notes for a lead via AJAX
      */
