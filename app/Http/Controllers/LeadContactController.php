@@ -3397,17 +3397,24 @@ class LeadContactController extends AccountBaseController
      */
     public function getNewLeadDocumentsTab($leadId)
     {
-        $lead = NewLead::with(['step_1_data', 'step_2_data', 'step_3_data', 'step_4_data', 'step_5_data', 'step_6_data', 'step_7_data', 'step_8_data', 'step_9_data'])->findOrFail($leadId);
-        
-        $this->lead = $lead;
-        
-        // Get all expected documents
-        $allExpectedDocuments = $this->getAllExpectedDocuments($lead);
-        $this->data['allExpectedDocuments'] = $allExpectedDocuments;
-        
-        $html = view('lead-details.components.documents-list', $this->data)->render();
-        
-        return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
+        try {
+            $lead = NewLead::findOrFail($leadId);
+            
+            $this->lead = $lead;
+            
+            // Get all expected documents
+            $allExpectedDocuments = $this->getAllExpectedDocuments($lead);
+            $this->data['allExpectedDocuments'] = $allExpectedDocuments;
+            $this->data['lead'] = $lead;
+            
+            $html = view('lead-details.components.documents-list', $this->data)->render();
+            
+            return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
+        } catch (\Exception $e) {
+            \Log::error('Error in getNewLeadDocumentsTab: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return Reply::error('Failed to load documents: ' . $e->getMessage());
+        }
     }
 
     /**
