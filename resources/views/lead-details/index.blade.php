@@ -260,8 +260,6 @@
                 e.preventDefault();
                 e.stopPropagation();
                 
-                console.log('Save file note button clicked');
-                
                 // Copy content from Quill editor to hidden textarea
                 if (document.getElementById('file-note-editor') && document.getElementById('file-note-editor').children[0]) {
                     var note = document.getElementById('file-note-editor').children[0].innerHTML;
@@ -283,12 +281,15 @@
                 // Get lead ID
                 var leadId = $('#file_note_lead_id_details').val();
                 if (!leadId) {
-                    $.showToastr('Lead ID is missing.', 'error');
+                    try {
+                        if (typeof $.showToastr === 'function') {
+                            $.showToastr('Lead ID is missing.', 'error');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.error('Lead ID is missing.');
+                        }
+                    } catch (e) {}
                     return false;
                 }
-                
-                console.log('Saving file note for lead:', leadId);
-                console.log('Form data:', $('#fileNoteFormDetails').serialize());
                 
                 $.easyAjax({
                     url: "{{ route('new-leads.file-note-store') }}",
@@ -297,7 +298,6 @@
                     blockUI: true,
                     data: $('#fileNoteFormDetails').serialize(),
                     success: function(response) {
-                        console.log('File note save response:', response);
                         if (response.status == "success") {
                             $('#addFileNoteModal').modal('hide');
                             $('#fileNoteFormDetails')[0].reset();
@@ -317,31 +317,23 @@
                                 } else if (typeof toastr !== 'undefined') {
                                     toastr.success(response.message || 'File note saved successfully');
                                 }
-                            } catch (e) {
-                                console.warn('Could not show toastr message:', e);
-                            }
+                            } catch (e) {}
                             
                             // Refresh file notes section via AJAX
                             // Use leadId from outer scope (captured before the AJAX call)
-                            console.log('Attempting to refresh file notes, leadId:', leadId);
-                            
                             if (!leadId) {
                                 // Fallback: try to get leadId again
                                 leadId = $('#file_note_lead_id_details').val();
-                                console.log('Retrieved leadId from input:', leadId);
                             }
                             
                             if (leadId) {
                                 var fileNotesUrl = "{{ route('new-leads.file-notes', ':id') }}".replace(':id', leadId);
-                                console.log('Calling file notes API:', fileNotesUrl);
                                 
                                 $.easyAjax({
                                     url: fileNotesUrl,
                                     type: "GET",
                                     blockUI: false,
                                     success: function(fileNotesResponse) {
-                                        console.log('File notes API response:', fileNotesResponse);
-                                        
                                         // Handle different possible response structures
                                         var html = null;
                                         if (fileNotesResponse.status == "success" && fileNotesResponse.data && fileNotesResponse.data.html) {
@@ -354,28 +346,23 @@
                                         
                                         if (html) {
                                             $('#fileNotesContent').html(html);
-                                            console.log('File notes section updated successfully');
-                                        } else {
-                                            console.warn('No HTML found in response:', fileNotesResponse);
                                         }
                                     },
                                     error: function(xhr, status, error) {
-                                        console.error('Error loading file notes:', error);
-                                        console.error('Status:', status);
-                                        console.error('Response:', xhr.responseText);
-                                        console.error('XHR object:', xhr);
+                                        // Silent fail - file notes will refresh on next page load
                                     }
                                 });
-                            } else {
-                                console.error('Lead ID is missing, cannot refresh file notes');
                             }
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error saving file note:', error);
-                        console.error('Status:', status);
-                        console.error('Response:', xhr.responseText);
-                        $.showToastr('An error occurred while saving the file note. Please try again.', 'error');
+                        try {
+                            if (typeof $.showToastr === 'function') {
+                                $.showToastr('An error occurred while saving the file note. Please try again.', 'error');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.error('An error occurred while saving the file note. Please try again.');
+                            }
+                        } catch (e) {}
                     }
                 });
                 
@@ -516,7 +503,13 @@
                 e.preventDefault();
                 var leadId = $('#follow_up_lead_id_details').val();
                 if (!leadId) {
-                    $.showToastr('Lead ID is missing.', 'error');
+                    try {
+                        if (typeof $.showToastr === 'function') {
+                            $.showToastr('Lead ID is missing.', 'error');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.error('Lead ID is missing.');
+                        }
+                    } catch (e) {}
                     return;
                 }
                 $('#follow_up_id_details').val(''); // Clear edit ID
@@ -654,11 +647,23 @@
                             // Open modal
                             $('#addFollowUpModal').modal('show');
                         } else {
-                            $.showToastr('Failed to load follow-up data. Please try again.', 'error');
+                            try {
+                                if (typeof $.showToastr === 'function') {
+                                    $.showToastr('Failed to load follow-up data. Please try again.', 'error');
+                                } else if (typeof toastr !== 'undefined') {
+                                    toastr.error('Failed to load follow-up data. Please try again.');
+                                }
+                            } catch (e) {}
                         }
                     },
                     error: function(xhr, status, error) {
-                        $.showToastr('An error occurred while loading follow-up data. Please try again.', 'error');
+                        try {
+                            if (typeof $.showToastr === 'function') {
+                                $.showToastr('An error occurred while loading follow-up data. Please try again.', 'error');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.error('An error occurred while loading follow-up data. Please try again.');
+                            }
+                        } catch (e) {}
                     }
                 });
             });
@@ -744,12 +749,43 @@
                             $('#followUpFormDetails')[0].reset();
                             $('#follow_up_id_details').val('');
                             $('#addFollowUpModalLabel').text('Add Follow-Up');
-                            $.showToastr(response.message || 'Follow-up saved successfully', 'success');
+                            try {
+                                if (typeof $.showToastr === 'function') {
+                                    $.showToastr(response.message || 'Follow-up saved successfully', 'success');
+                                } else if (typeof toastr !== 'undefined') {
+                                    toastr.success(response.message || 'Follow-up saved successfully');
+                                }
+                            } catch (e) {}
                             
-                            // Reload the page after a short delay to ensure modal is closed and toastr is shown
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 500);
+                            // Refresh follow-up section via AJAX
+                            var leadId = $('#follow_up_lead_id_details').val();
+                            if (leadId) {
+                                var followUpListUrl = "{{ route('new-leads.follow-up-list', ':id') }}".replace(':id', leadId);
+                                
+                                $.easyAjax({
+                                    url: followUpListUrl,
+                                    type: "GET",
+                                    blockUI: false,
+                                    success: function(followUpResponse) {
+                                        // Handle different possible response structures
+                                        var html = null;
+                                        if (followUpResponse.status == "success" && followUpResponse.data && followUpResponse.data.html) {
+                                            html = followUpResponse.data.html;
+                                        } else if (followUpResponse.html) {
+                                            html = followUpResponse.html;
+                                        } else if (followUpResponse.data && followUpResponse.data.html) {
+                                            html = followUpResponse.data.html;
+                                        }
+                                        
+                                        if (html) {
+                                            $('#followUpContent').html(html);
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        // Silent fail - follow-up will refresh on next page load
+                                    }
+                                });
+                            }
                         }
                     }
                 });
@@ -891,7 +927,13 @@
                 
                 var leadId = $('#process_lead_id').val();
                 if (!leadId) {
-                    $.showToastr('Lead ID is missing.', 'error');
+                    try {
+                        if (typeof $.showToastr === 'function') {
+                            $.showToastr('Lead ID is missing.', 'error');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.error('Lead ID is missing.');
+                        }
+                    } catch (e) {}
                     return false;
                 }
                 
@@ -975,7 +1017,13 @@
                     buttonSelector: "#saveProcessBtn, #saveProcessFormBtn",
                     success: function(response) {
                         if (response.status == "success") {
-                            $.showToastr(response.message || 'Process saved successfully', 'success');
+                            try {
+                                if (typeof $.showToastr === 'function') {
+                                    $.showToastr(response.message || 'Process saved successfully', 'success');
+                                } else if (typeof toastr !== 'undefined') {
+                                    toastr.success(response.message || 'Process saved successfully');
+                                }
+                            } catch (e) {}
                             
                             // Reload the page after a short delay to show updated data
                             setTimeout(function() {
@@ -993,10 +1041,13 @@
                                 showProcessFieldError(fieldId, messages[0]);
                             });
                         } else {
-                            console.error('Error saving process:', error);
-                            console.error('Status:', status);
-                            console.error('Response:', xhr.responseText);
-                            $.showToastr('An error occurred while saving the process. Please try again.', 'error');
+                            try {
+                                if (typeof $.showToastr === 'function') {
+                                    $.showToastr('An error occurred while saving the process. Please try again.', 'error');
+                                } else if (typeof toastr !== 'undefined') {
+                                    toastr.error('An error occurred while saving the process. Please try again.');
+                                }
+                            } catch (e) {}
                         }
                     }
                 });

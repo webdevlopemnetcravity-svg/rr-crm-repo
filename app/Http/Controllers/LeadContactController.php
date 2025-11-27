@@ -3203,6 +3203,20 @@ class LeadContactController extends AccountBaseController
     }
 
     /**
+     * Get follow-up list for a lead via AJAX
+     */
+    public function getNewLeadFollowUpList($id)
+    {
+        $lead = NewLead::with(['followUps.addedBy', 'followUps.lastUpdatedBy'])->findOrFail($id);
+        
+        $this->lead = $lead;
+        
+        $html = view('lead-details.components.follow-up-list', $this->data)->render();
+        
+        return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
+    }
+
+    /**
      * Delete follow-up
      */
     public function deleteNewLeadFollowUp($id)
