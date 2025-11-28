@@ -88,14 +88,18 @@
                             </x-forms.label>
                             <select class="form-control select-picker height-35 f-14" name="subclass" id="subclass" required>
                                 <option value="">Select</option>
-                                <option value="Visitor Visa (Subclass 600)" {{ $processData && $processData->subclass == 'Visitor Visa (Subclass 600)' ? 'selected' : '' }}>Visitor Visa (Subclass 600)</option>
-                                <option value="PR - Employer Nomination Scheme (ENS)(Subclass 186)" {{ $processData && $processData->subclass == 'PR - Employer Nomination Scheme (ENS)(Subclass 186)' ? 'selected' : '' }}>PR - Employer Nomination Scheme (ENS)(Subclass 186)</option>
-                                <option value="PR - Skilled Nominated Visa (Subclass 190)" {{ $processData && $processData->subclass == 'PR - Skilled Nominated Visa (Subclass 190)' ? 'selected' : '' }}>PR - Skilled Nominated Visa (Subclass 190)</option>
-                                <option value="PR - Skilled Independent Visa (Subclass 189)" {{ $processData && $processData->subclass == 'PR - Skilled Independent Visa (Subclass 189)' ? 'selected' : '' }}>PR - Skilled Independent Visa (Subclass 189)</option>
-                                <option value="Work Visa - Temporary Skill Shortage Visa (Subclass 482)" {{ $processData && $processData->subclass == 'Work Visa - Temporary Skill Shortage Visa (Subclass 482)' ? 'selected' : '' }}>Work Visa - Temporary Skill Shortage Visa (Subclass 482)</option>
-                                <option value="Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)" {{ $processData && $processData->subclass == 'Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)' ? 'selected' : '' }}>Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)</option>
-                                <option value="Student Visa (Subclass 500)" {{ $processData && $processData->subclass == 'Student Visa (Subclass 500)' ? 'selected' : '' }}>Student Visa (Subclass 500)</option>
-                                <option value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)" {{ $processData && $processData->subclass == 'Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)' ? 'selected' : '' }}>Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)</option>
+                                <!-- PR Subclasses -->
+                                <option value="PR - Employer Nomination Scheme (ENS)(Subclass 186)" data-visa-category="PR" {{ $processData && $processData->subclass == 'PR - Employer Nomination Scheme (ENS)(Subclass 186)' ? 'selected' : '' }}>PR - Employer Nomination Scheme (ENS)(Subclass 186)</option>
+                                <option value="PR - Skilled Nominated Visa (Subclass 190)" data-visa-category="PR" {{ $processData && $processData->subclass == 'PR - Skilled Nominated Visa (Subclass 190)' ? 'selected' : '' }}>PR - Skilled Nominated Visa (Subclass 190)</option>
+                                <option value="PR - Skilled Independent Visa (Subclass 189)" data-visa-category="PR" {{ $processData && $processData->subclass == 'PR - Skilled Independent Visa (Subclass 189)' ? 'selected' : '' }}>PR - Skilled Independent Visa (Subclass 189)</option>
+                                <!-- Student Visa Subclasses -->
+                                <option value="Student Visa (Subclass 500)" data-visa-category="Student Visa" {{ $processData && $processData->subclass == 'Student Visa (Subclass 500)' ? 'selected' : '' }}>Student Visa (Subclass 500)</option>
+                                <option value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)" data-visa-category="Student Visa" {{ $processData && $processData->subclass == 'Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)' ? 'selected' : '' }}>Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)</option>
+                                <!-- Visit Visa Subclasses -->
+                                <option value="Visitor Visa (Subclass 600)" data-visa-category="Visit Visa" {{ $processData && $processData->subclass == 'Visitor Visa (Subclass 600)' ? 'selected' : '' }}>Visitor Visa (Subclass 600)</option>
+                                <!-- Work Permit Subclasses -->
+                                <option value="Work Visa - Temporary Skill Shortage Visa (Subclass 482)" data-visa-category="Work Permit" {{ $processData && $processData->subclass == 'Work Visa - Temporary Skill Shortage Visa (Subclass 482)' ? 'selected' : '' }}>Work Visa - Temporary Skill Shortage Visa (Subclass 482)</option>
+                                <option value="Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)" data-visa-category="Work Permit" {{ $processData && $processData->subclass == 'Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)' ? 'selected' : '' }}>Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">

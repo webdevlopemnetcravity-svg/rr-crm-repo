@@ -2,6 +2,12 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/lead-details.css') }}">
+    <style>
+        /* Hide disabled subclass options completely */
+        .bootstrap-select .dropdown-menu li.disabled {
+            display: none !important;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -884,6 +890,71 @@
                     e.preventDefault();
                     return false;
                 }
+            });
+
+            // Dynamic subclass filtering based on visa category
+            function filterSubclassOptions() {
+                var selectedCategory = $('#visa_category').selectpicker('val');
+                var $subclassSelect = $('#subclass');
+                var currentValue = $subclassSelect.selectpicker('val');
+                
+                // Show/hide options based on visa category
+                $subclassSelect.find('option').each(function() {
+                    var $option = $(this);
+                    var visaCategory = $option.data('visa-category');
+                    
+                    // Always show the "Select" option
+                    if ($option.val() === '') {
+                        $option.prop('disabled', false);
+                        return;
+                    }
+                    
+                    // Enable/disable options based on visa category
+                    if (selectedCategory && visaCategory === selectedCategory) {
+                        $option.prop('disabled', false);
+                    } else if (!selectedCategory) {
+                        // If no category selected, show all options
+                        $option.prop('disabled', false);
+                    } else {
+                        $option.prop('disabled', true);
+                    }
+                });
+                
+                // If current value doesn't match selected category, clear it
+                if (selectedCategory && currentValue) {
+                    var currentOptionCategory = $subclassSelect.find('option[value="' + currentValue + '"]').data('visa-category');
+                    if (currentOptionCategory !== selectedCategory) {
+                        $subclassSelect.val('').selectpicker('refresh');
+                    } else {
+                        $subclassSelect.selectpicker('refresh');
+                    }
+                } else {
+                    $subclassSelect.selectpicker('refresh');
+                }
+            }
+            
+            // Initialize subclass filtering when form section is shown or on page load
+            function initializeSubclassFiltering() {
+                if ($('#processFormSection').is(':visible')) {
+                    filterSubclassOptions();
+                }
+            }
+            
+            // Initialize on page load
+            setTimeout(function() {
+                initializeSubclassFiltering();
+            }, 100);
+            
+            // Update subclass options when visa category changes
+            $(document).on('changed.bs.select', '#visa_category', function() {
+                filterSubclassOptions();
+            });
+            
+            // Re-initialize when edit button is clicked
+            $(document).on('click', '#editProcessBtn', function() {
+                setTimeout(function() {
+                    filterSubclassOptions();
+                }, 100);
             });
 
             // File size validation and file name display for all file inputs (similar to add-lead)
