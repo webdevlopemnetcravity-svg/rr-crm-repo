@@ -855,6 +855,37 @@
                 $('.is-invalid').removeClass('is-invalid');
             }
             
+            // Number validation for fee fields - only allow numbers and decimal point
+            $(document).on('input', '#advance_fees, #remaining_fees, #agent_fees, #submission_fees', function() {
+                var value = $(this).val();
+                // Remove any non-numeric characters except decimal point
+                var numericValue = value.replace(/[^0-9.]/g, '');
+                // Ensure only one decimal point
+                var parts = numericValue.split('.');
+                if (parts.length > 2) {
+                    numericValue = parts[0] + '.' + parts.slice(1).join('');
+                }
+                // Update the value if it changed
+                if (value !== numericValue) {
+                    $(this).val(numericValue);
+                }
+            });
+
+            // Prevent non-numeric characters on keypress for fee fields
+            $(document).on('keypress', '#advance_fees, #remaining_fees, #agent_fees, #submission_fees', function(e) {
+                var char = String.fromCharCode(e.which);
+                // Allow: backspace, delete, tab, escape, enter, decimal point, and numbers
+                if (char === '.' && $(this).val().indexOf('.') !== -1) {
+                    e.preventDefault(); // Prevent multiple decimal points
+                    return false;
+                }
+                // Allow numbers and decimal point
+                if (!/[0-9.]/.test(char) && !e.ctrlKey && !e.metaKey && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 9 && e.keyCode !== 27 && e.keyCode !== 13) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
             // File size validation and file name display for all file inputs (similar to add-lead)
             $(document).on('change', '#processForm input[type="file"][data-max-size]', function() {
                 const file = this.files[0];

@@ -125,7 +125,7 @@
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="advance_fees" fieldLabel="Advance Fees *">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="advance_fees" id="advance_fees" value="{{ $processData ? $processData->advance_fees : '' }}" required>
+                            <input type="number" step="0.01" min="0" class="form-control height-35 f-14" name="advance_fees" id="advance_fees" value="{{ $processData ? $processData->advance_fees : '' }}" required>
                         </div>
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="advance_fees_due_date" fieldLabel="Advance Fees Due Date *">
@@ -135,7 +135,7 @@
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="remaining_fees" fieldLabel="Remaining Fees *">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="remaining_fees" id="remaining_fees" value="{{ $processData ? $processData->remaining_fees : '' }}" required>
+                            <input type="number" step="0.01" min="0" class="form-control height-35 f-14" name="remaining_fees" id="remaining_fees" value="{{ $processData ? $processData->remaining_fees : '' }}" required>
                         </div>
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="remaining_fees_due_date" fieldLabel="Remaining Fees Due Date *">
@@ -145,12 +145,12 @@
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="agent_fees" fieldLabel="Agent Fees *">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="agent_fees" id="agent_fees" value="{{ $processData ? $processData->agent_fees : '' }}" required>
+                            <input type="number" step="0.01" min="0" class="form-control height-35 f-14" name="agent_fees" id="agent_fees" value="{{ $processData ? $processData->agent_fees : '' }}" required>
                         </div>
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="submission_fees" fieldLabel="Submission Fees *">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="submission_fees" id="submission_fees" value="{{ $processData ? $processData->submission_fees : '' }}" required>
+                            <input type="number" step="0.01" min="0" class="form-control height-35 f-14" name="submission_fees" id="submission_fees" value="{{ $processData ? $processData->submission_fees : '' }}" required>
                         </div>
                     </div>
                 </div>
@@ -164,7 +164,11 @@
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="status" fieldLabel="Status Pending/Completed *">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="status" id="status" value="{{ $processData ? $processData->status : '' }}" required>
+                            <select class="form-control select-picker height-35 f-14" name="status" id="status" required>
+                                <option value="">Select</option>
+                                <option value="Pending" {{ $processData && $processData->status == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="Completed" {{ $processData && $processData->status == 'Completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
                         </div>
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="processing_time" fieldLabel="Processing Time *">
