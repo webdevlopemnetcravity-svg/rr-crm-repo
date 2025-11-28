@@ -529,14 +529,89 @@
                 // Small delay to ensure DOM is ready
                 setTimeout(function() {
                     initFollowUpTooltips();
+                    applyAllDropdownColors();
                 }, 100);
             });
 
             // Also initialize on initial load if table is already drawn
             setTimeout(function() {
                 initFollowUpTooltips();
+                applyAllDropdownColors();
             }, 500);
         });
+
+        // Color mappings for status dropdown
+        var statusColors = {
+            "Untouched": "#9E9E9E",
+            "Introduction": "#42A5F5",
+            "Info Collected": "#26C6DA",
+            "Consultation Call 1": "#9575CD",
+            "Consultation Call 2": "#7E57C2",
+            "Consultation Meet 1": "#5C6BC0",
+            "Consultation Meet 2": "#3F51B5",
+            "Documentation": "#81C784",
+            "Final Discussion": "#4CAF50",
+            "Estimation": "#C0CA33",
+            "Payment": "#FFC107",
+            "MOU": "#FB8C00",
+            "File in Process": "#64B5F6",
+            "File Submission": "#00BCD4",
+            "Visa Process": "#8BC34A",
+            "Flying Date Received": "#4DD0E1",
+            "Join/Move/Admissions": "#43A047",
+            "Follow Up": "#F06292",
+            "Lead Close": "#E53935"
+        };
+
+        // Color mappings for Lead Quality dropdown
+        var qualityColors = {
+            "Assigned": "#42A5F5",
+            "In-Process": "#26C6DA",
+            "On Hold": "#FFC107",
+            "Plan Dropped": "#FF7043",
+            "Negotiation": "#8E24AA",
+            "Future Prospect": "#7CB342",
+            "Ringing": "#5C6BC0",
+            "Dead/Junk Lead": "#E53935",
+            "Not Interested": "#F06292",
+            "Rejected": "#9E9E9E"
+        };
+
+        // Function to apply background color to dropdown button
+        function applyDropdownColor($select, colorMap) {
+            var selectedValue = $select.val();
+            if (!selectedValue) return;
+            
+            var color = colorMap[selectedValue];
+            if (!color) return;
+            
+            // Find the bootstrap-select wrapper and dropdown toggle button
+            var $bootstrapSelect = $select.closest('.bootstrap-select');
+            if (!$bootstrapSelect.length) {
+                // If bootstrap-select wrapper doesn't exist, try parent
+                $bootstrapSelect = $select.parent('.bootstrap-select');
+            }
+            
+            var $button = $bootstrapSelect.find('.dropdown-toggle');
+            
+            if ($button.length) {
+                $button.css({
+                    'background-color': color,
+                    'border-color': color,
+                    'color': '#ffffff'
+                });
+            }
+        }
+
+        // Function to apply colors to all dropdowns
+        function applyAllDropdownColors() {
+            $('.status-select').each(function() {
+                applyDropdownColor($(this), statusColors);
+            });
+            $('.quality-select').each(function() {
+                applyDropdownColor($(this), qualityColors);
+            });
+        }
 
         // Track previous values to prevent duplicate calls
         var previousValues = {};
@@ -584,6 +659,9 @@
             var status = $select.val();
             var key = 'status_' + leadId;
             
+            // Apply color immediately
+            applyDropdownColor($select, statusColors);
+            
             // Prevent duplicate calls and validate value
             if (!status || status === '' || previousValues[key] === status) {
                 return;
@@ -618,6 +696,9 @@
             var leadId = $select.data('lead-id');
             var quality = $select.val();
             var key = 'quality_' + leadId;
+            
+            // Apply color immediately
+            applyDropdownColor($select, qualityColors);
             
             // Prevent duplicate calls and validate value
             if (!quality || quality === '' || previousValues[key] === quality) {

@@ -213,78 +213,78 @@
                 </div>
                 <div class="modal-body" style="padding: 24px;">
                     <div class="form-group mb-3">
-                        <x-forms.label fieldId="purpose_of_trip" fieldLabel="Purpose of Trip">
+                        <x-forms.label fieldId="purpose_of_trip" fieldLabel="Purpose of Trip *">
                         </x-forms.label>
                         <input type="text" class="form-control height-35 f-14" id="purpose_of_trip" name="purpose_of_trip" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                     </div>
                     <div class="row">
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="date_of_arrival" fieldLabel="Date of Arrival">
+                            <x-forms.label fieldId="date_of_arrival" fieldLabel="Date of Arrival 8 *">
                             </x-forms.label>
                             <input type="date" class="form-control height-35 f-14" id="date_of_arrival" name="date_of_arrival" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="arrival_flight" fieldLabel="Arrival Flight">
+                            <x-forms.label fieldId="arrival_flight" fieldLabel="Arrival Flight 8 *">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" id="arrival_flight" name="arrival_flight" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="arrival_city" fieldLabel="Arrival City">
+                            <x-forms.label fieldId="arrival_city" fieldLabel="Arrival City *">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" id="arrival_city" name="arrival_city" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="date_of_departure" fieldLabel="Date of Departure From">
+                            <x-forms.label fieldId="date_of_departure" fieldLabel="Date of Departure From *">
                             </x-forms.label>
                             <input type="date" class="form-control height-35 f-14" id="date_of_departure" name="date_of_departure" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="departure_flight" fieldLabel="Departure Flight">
+                            <x-forms.label fieldId="departure_flight" fieldLabel="Departure Flight 8 *">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" id="departure_flight" name="departure_flight" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="departure_city" fieldLabel="Departure City">
+                            <x-forms.label fieldId="departure_city" fieldLabel="Departure City *">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" id="departure_city" name="departure_city" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="phone_number_other_country" fieldLabel="Phone Number (of other country)">
+                            <x-forms.label fieldId="phone_number_other_country" fieldLabel="Phone Number (of other country) *">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" id="phone_number_other_country" name="phone_number_other_country" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                     </div>
                     <div class="form-group mb-3">
-                        <x-forms.label fieldId="place_to_visit" fieldLabel="Place To Visit USA">
+                        <x-forms.label fieldId="place_to_visit" fieldLabel="Place To Visit USA *">
                         </x-forms.label>
                         <textarea class="form-control f-14" id="place_to_visit" name="place_to_visit" rows="3" style="border: 1px solid #E9E6F5; border-radius: 4px;"></textarea>
                     </div>
                     <div class="form-group mb-3">
-                        <x-forms.label fieldId="address_stay" fieldLabel="Address Where You Will Stay">
+                        <x-forms.label fieldId="address_stay" fieldLabel="Address Where You Will Stay *">
                         </x-forms.label>
                         <textarea class="form-control f-14" id="address_stay" name="address_stay" rows="3" style="border: 1px solid #E9E6F5; border-radius: 4px;"></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="city" fieldLabel="City">
+                            <x-forms.label fieldId="city" fieldLabel="City *">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" id="city" name="city" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="state" fieldLabel="State">
+                            <x-forms.label fieldId="state" fieldLabel="State *">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" id="state" name="state" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                         <div class="col-md-3 col-sm-6 mb-3">
-                            <x-forms.label fieldId="postal_code" fieldLabel="Postal/Zip Code">
+                            <x-forms.label fieldId="postal_code" fieldLabel="Postal/Zip Code *">
                             </x-forms.label>
                             <input type="text" class="form-control height-35 f-14" id="postal_code" name="postal_code" style="border: 1px solid #E9E6F5; border-radius: 4px;">
                         </div>
                     </div>
                     <div class="form-group mb-3">
-                        <x-forms.label fieldId="person_paying" fieldLabel="Person Paying For Your Trip (Details)">
+                        <x-forms.label fieldId="person_paying" fieldLabel="Person Paying For Your Trip (Details) *">
                         </x-forms.label>
                         <textarea class="form-control f-14" id="person_paying" name="person_paying" rows="3" style="border: 1px solid #E9E6F5; border-radius: 4px;"></textarea>
                     </div>

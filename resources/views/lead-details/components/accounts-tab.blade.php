@@ -14,7 +14,7 @@
                             <p class="text-muted mb-3">No invoice has been created for this Lead.</p>
                             <p class="text-muted">To create an Invoice, click on <i class="fa fa-plus"></i> at the top right corner</p>
                         </div>
-                                            <!-- Upload Documents Section -->
+                    <!-- Upload Documents Section -->
                     <div class="info-section mb-1">
                         <div class="upload-documents-list">
                             <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
@@ -68,37 +68,37 @@
                             <!-- Client Information Section -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <x-forms.label fieldId="client_name" fieldLabel="Client Name">
+                                    <x-forms.label fieldId="client_name" fieldLabel="Client Name *">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" id="client_name" name="client_name" value="Kishan Ghaghada">
+                                    <input type="text" class="form-control height-35 f-14" id="client_name" name="client_name" value="Kishan Ghaghada" disabled>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <x-forms.label fieldId="invoice_date" fieldLabel="Invoice Date">
+                                    <x-forms.label fieldId="invoice_date" fieldLabel="Invoice Date *">
                                     </x-forms.label>
-                                    <input type="date" class="form-control height-35 f-14" id="invoice_date" name="invoice_date" value="2023-07-17">
+                                    <input type="date" class="form-control height-35 f-14" id="invoice_date" name="invoice_date" value="2023-07-17" disabled>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <x-forms.label fieldId="phone" fieldLabel="Phone">
+                                    <x-forms.label fieldId="phone" fieldLabel="Phone *">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" id="phone" name="phone" value="+91 123 4567 890">
+                                    <input type="text" class="form-control height-35 f-14" id="phone" name="phone" value="+91 123 4567 890" disabled>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <x-forms.label fieldId="email" fieldLabel="Email">
+                                    <x-forms.label fieldId="email" fieldLabel="Email *">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" id="email" name="email" value="abc@gmail.com">
+                                    <input type="text" class="form-control height-35 f-14" id="email" name="email" value="abc@gmail.com" disabled>
                                 </div>
                                 <div class="col-md-12 mb-3">
-                                    <x-forms.label fieldId="address" fieldLabel="Address">
+                                    <x-forms.label fieldId="address" fieldLabel="Address *">
                                     </x-forms.label>
-                                    <textarea class="form-control f-14" id="address" name="address" rows="2">906- A, Appartment, Sindhubhavan Road, Appartment, Sindhubhavan Road, Ahmedabad</textarea>
+                                    <textarea class="form-control f-14" id="address" name="address" rows="2" disabled>906- A, Appartment, Sindhubhavan Road, Appartment, Sindhubhavan Road, Ahmedabad</textarea>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <x-forms.label fieldId="bill_to" fieldLabel="Bill To">
+                                    <x-forms.label fieldId="bill_to" fieldLabel="Bill To *">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" id="bill_to" name="bill_to" value="Vrajesh Ghaghada">
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <x-forms.label fieldId="invoice_belongs" fieldLabel="Invoice Belongs To">
+                                    <x-forms.label fieldId="invoice_belongs" fieldLabel="Invoice Belongs To *">
                                     </x-forms.label>
                                     <select class="form-control select-picker height-35 f-14" id="invoice_belongs" name="invoice_belongs">
                                         <option value="">Select Agent</option>
@@ -118,12 +118,12 @@
                                         <input type="text" class="form-control height-35 f-14" id="service" name="service" value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <x-forms.label fieldId="price" fieldLabel="Price">
+                                        <x-forms.label fieldId="price" fieldLabel="Price *">
                                         </x-forms.label>
                                         <input type="number" class="form-control height-35 f-14" id="price" name="price" value="50000">
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <x-forms.label fieldId="tax" fieldLabel="Tax">
+                                        <x-forms.label fieldId="tax" fieldLabel="Tax *">
                                         </x-forms.label>
                                         <select class="form-control select-picker height-35 f-14" id="tax" name="tax">
                                             <option value="GST 18%" selected>GST 18%</option>
@@ -159,7 +159,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-3" id="installment_months_container">
-                                    <x-forms.label fieldId="installment_months" fieldLabel="Installment Months">
+                                    <x-forms.label fieldId="installment_months" fieldLabel="Installment Months *">
                                     </x-forms.label>
                                     <select class="form-control select-picker height-35 f-14" id="installment_months" name="installment_months">
                                         <option value="">Select month</option>
@@ -185,23 +185,23 @@
                         <div class="col-md-4">
                             <div class="total-summary-box" style="background-color: #F1EBFF; border: 1px solid #E9E6F5; border-radius: 8px; padding: 20px; position: sticky; top: 20px;">
                                 <h6 class="mb-3" style="font-weight: 600; font-size: 14px; color: #000; margin-bottom: 16px;">Summary</h6>
-                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #E9E6F5;">
+                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px;">
                                     <span class="f-14" style="color: #6C6C6C;">Sub Total</span>
                                     <span class="f-14" style="color: #000; font-weight: 500;" id="summary_sub_total">INR 50,000</span>
                                 </div>
-                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #E9E6F5;">
+                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px;">
                                     <span class="f-14" style="color: #6C6C6C;">Discount</span>
                                     <span class="f-14" style="color: #000; font-weight: 500;" id="summary_discount">INR 5,000</span>
                                 </div>
-                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #E9E6F5;">
+                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 2px solid #713ED9;">
                                     <span class="f-14" style="color: #6C6C6C;">Tax Amount</span>
                                     <span class="f-14" style="color: #000; font-weight: 500;" id="summary_tax_amount">INR 500</span>
                                 </div>
-                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 16px; margin-bottom: 16px; border-bottom: 2px solid #713ED9;">
+                                <div class="summary-item" style="display: flex; justify-content: space-between; padding-bottom: 6px;">
                                     <span class="f-14" style="color: #000; font-weight: 600;">Total Amount</span>
                                     <span class="f-14" style="color: #713ED9; font-weight: 600;" id="summary_total_amount">INR 45,500</span>
                                 </div>
-                                <div class="installment-note" id="installment_note" style="padding-top: 12px; border-top: 1px solid #E9E6F5;">
+                                <div class="installment-note" id="installment_note">
                                     <span class="f-12" style="color: #6C6C6C;" id="installment_note_text">Installment Rs.5687.5 for 8 months</span>
                                 </div>
                             </div>

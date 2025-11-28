@@ -35,6 +35,20 @@
     min-width: 150px;
 }
 
+/* Status and Quality dropdown button styling */
+.status-dropdown .bootstrap-select .dropdown-toggle,
+.lead-quality-dropdown .bootstrap-select .dropdown-toggle {
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.status-dropdown .bootstrap-select .dropdown-toggle:focus,
+.lead-quality-dropdown .bootstrap-select .dropdown-toggle:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
 .client-mobile,
 .client-email {
     font-size: 12px;
