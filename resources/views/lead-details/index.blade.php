@@ -1,5 +1,9 @@
 ﻿@extends('layouts.app')
 
+@push('datatable-styles')
+    @include('sections.datatable_css')
+@endpush
+
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/lead-details.css') }}">
     <style>
@@ -1407,6 +1411,314 @@
                     } catch (e) {}
                 }
             });
+        });
+
+        // ========== ACCOUNTS FUNCTIONALITY ==========
+        
+        // Handle Add Account button click
+        $(document).on('click', '#addAccountBtn', function(e) {
+            e.preventDefault();
+            var leadId = $('#account_lead_id_details').val();
+            if (!leadId) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Lead ID is missing.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Lead ID is missing.');
+                    }
+                } catch (e) {}
+                return;
+            }
+            $('#account_id_details').val('');
+            $('#addAccountModalLabel').text('ADD INVOICE');
+            $('#accountFormDetails')[0].reset();
+            $('#account_lead_id_details').val(leadId);
+            $('#installment_months_container').hide();
+            $('#installment_payment_toggle').prop('checked', false);
+            calculateAccountSummary();
+            $('#addAccountModal').modal('show');
+        });
+
+        // Handle Edit Account button click
+        $(document).on('click', '.edit-account-btn', function(e) {
+            e.preventDefault();
+            var accountId = $(this).data('account-id');
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.account-get', ':id') }}".replace(':id', accountId),
+                type: "GET",
+                blockUI: true,
+                success: function(response) {
+                    if (response.status == "success" && response.account) {
+                        var account = response.account;
+                        $('#account_id_details').val(account.id);
+                        $('#addAccountModalLabel').text('EDIT INVOICE');
+                        $('#account_lead_id_details').val(account.new_lead_id);
+                        $('#invoice_date').val(account.invoice_date ? moment(account.invoice_date).format('{{ company()->moment_date_format }}') : '');
+                        $('#bill_to').val(account.bill_to || '');
+                        $('#agent').val(account.agent || '').selectpicker('refresh');
+                        $('#service').val(account.service || '');
+                        $('#price').val(account.price || 0);
+                        $('#tax').val(account.tax || 'GST 18%').selectpicker('refresh');
+                        $('#discount').val(account.discount || 0);
+                        $('#service_description').val(account.service_description || '');
+                        $('#installment_payment_toggle').prop('checked', account.installment_payment == 1 || account.installment_payment === true);
+                        if (account.installment_payment) {
+                            $('#installment_months_container').show();
+                            $('#installment_months').val(account.installment_months || '').selectpicker('refresh');
+                        } else {
+                            $('#installment_months_container').hide();
+                        }
+                        $('#invoice_notes').val(account.invoice_notes || '');
+                        calculateAccountSummary();
+                        $('#addAccountModal').modal('show');
+                    }
+                }
+            });
+        });
+
+        // Handle View Account button click
+        $(document).on('click', '.view-account-btn', function(e) {
+            e.preventDefault();
+            // For now, same as edit - can be customized later
+            $(this).closest('.dropdown').find('.edit-account-btn').click();
+        });
+
+        // Handle Delete Account button click
+        $(document).on('click', '.delete-account-btn', function(e) {
+            e.preventDefault();
+            var accountId = $(this).data('account-id');
+            
+            Swal.fire({
+                title: "@lang('messages.sweetAlertTitle')",
+                text: "@lang('messages.recoverRecord')",
+                icon: 'warning',
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: "@lang('messages.confirmDelete')",
+                cancelButtonText: "@lang('app.cancel')",
+                customClass: {
+                    confirmButton: 'btn btn-primary mr-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                showClass: {
+                    popup: 'swal2-noanimation',
+                    backdrop: 'swal2-noanimation'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.easyAjax({
+                        url: "{{ route('new-leads.account-delete', ':id') }}".replace(':id', accountId),
+                        type: "DELETE",
+                        blockUI: true,
+                        success: function(response) {
+                            if (response.status == "success") {
+                                // Refresh accounts list via AJAX
+                                var leadId = $('#account_lead_id_details').val() || "{{ isset($lead) && $lead ? $lead->id : '' }}";
+                                if (leadId) {
+                                    var accountsUrl = "{{ route('new-leads.accounts', ':id') }}".replace(':id', leadId);
+                                    
+                                    $.easyAjax({
+                                        url: accountsUrl,
+                                        type: "GET",
+                                        blockUI: false,
+                                        success: function(accountsResponse) {
+                                            var html = null;
+                                            if (accountsResponse.status == "success" && accountsResponse.data && accountsResponse.data.html) {
+                                                html = accountsResponse.data.html;
+                                            } else if (accountsResponse.html) {
+                                                html = accountsResponse.html;
+                                            } else if (accountsResponse.data && accountsResponse.data.html) {
+                                                html = accountsResponse.data.html;
+                                            }
+                                            
+                                            if (html) {
+                                                $('#accountsContent').html(html);
+                                            }
+                                        },
+                                        error: function(xhr, status, error) {
+                                            // Silent fail
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        // Calculate account summary
+        function calculateAccountSummary() {
+            var price = parseFloat($('#price').val()) || 0;
+            var discount = parseFloat($('#discount').val()) || 0;
+            var tax = $('#tax').val() || 'GST 0%';
+            
+            // Extract tax percentage from tax field (e.g., "GST 18%" -> 18)
+            var taxPercent = 0;
+            var taxMatch = tax.match(/(\d+(?:\.\d+)?)/);
+            if (taxMatch) {
+                taxPercent = parseFloat(taxMatch[1]);
+            }
+            
+            // Calculate: Tax Amount = Price * (Tax Percentage / 100)
+            // Convert tax percentage to actual value based on price
+            var taxAmount = (price * taxPercent) / 100;
+            
+            // Calculate: Sub Total = Price (for display purposes)
+            var subTotal = price;
+            
+            // Calculate: Total Amount = Price + Tax Amount - Discount
+            // This is the same formula for both Net Amount and Summary Total Amount
+            var totalAmount = price + taxAmount - discount;
+            totalAmount = Math.max(0, totalAmount); // Ensure non-negative
+            
+            // Get currency symbol safely
+            var currencySymbol = '₹';
+            try {
+                @php
+                    try {
+                        $currencySymbol = company()->currency ? company()->currency->currency_symbol : '₹';
+                    } catch (\Exception $e) {
+                        $currencySymbol = '₹';
+                    }
+                @endphp
+                currencySymbol = '{{ $currencySymbol }}';
+            } catch (e) {
+                currencySymbol = '₹';
+            }
+            
+            // Update summary display
+            $('#summary_sub_total').text(currencySymbol + ' ' + subTotal.toFixed(2));
+            $('#summary_discount').text(currencySymbol + ' ' + discount.toFixed(2));
+            $('#summary_tax_amount').text(currencySymbol + ' ' + taxAmount.toFixed(2));
+            $('#summary_total_amount').text(currencySymbol + ' ' + totalAmount.toFixed(2));
+            
+            // Update Net Amount field: Same as Total Amount = Price + Tax - Discount
+            $('#net_amount').val(totalAmount.toFixed(2));
+            
+            // Calculate installment if enabled
+            if ($('#installment_payment_toggle').is(':checked')) {
+                var months = parseInt($('#installment_months').val()) || 1;
+                if (months > 0) {
+                    var installmentAmount = totalAmount / months;
+                    $('#installment_note').show();
+                    $('#installment_note_text').text('Installment ' + currencySymbol + ' ' + installmentAmount.toFixed(2) + ' for ' + months + ' months');
+                } else {
+                    $('#installment_note').hide();
+                }
+            } else {
+                $('#installment_note').hide();
+            }
+        }
+
+        // Update summary on price, discount, tax change
+        $(document).on('input change', '#price, #discount, #tax, #installment_months', function() {
+            calculateAccountSummary();
+        });
+
+        // Toggle installment months container
+        $(document).on('change', '#installment_payment_toggle', function() {
+            if ($(this).is(':checked')) {
+                $('#installment_months_container').slideDown();
+            } else {
+                $('#installment_months_container').slideUp();
+            }
+            calculateAccountSummary();
+        });
+
+        // Save account
+        $('#save-account-btn').click(function() {
+            // Enable disabled fields temporarily for form submission
+            $('#client_name, #phone, #email, #address').prop('disabled', false);
+            
+            var formData = $('#accountFormDetails').serialize();
+            var accountId = $('#account_id_details').val();
+            var url = accountId ? "{{ route('new-leads.account-store') }}" : "{{ route('new-leads.account-store') }}";
+            
+            $.easyAjax({
+                url: url,
+                container: '#accountFormDetails',
+                type: "POST",
+                blockUI: true,
+                data: formData,
+                success: function(response) {
+                    // Re-disable fields after submission
+                    $('#client_name, #phone, #email, #address').prop('disabled', true);
+                    
+                    if (response.status == "success") {
+                            $('#addAccountModal').modal('hide');
+                            $('#accountFormDetails')[0].reset();
+                            $('#account_id_details').val('');
+                            $('#addAccountModalLabel').text('ADD INVOICE');
+                            
+                            // Refresh accounts list via AJAX
+                            var leadId = $('#account_lead_id_details').val();
+                            if (leadId) {
+                                var accountsUrl = "{{ route('new-leads.accounts', ':id') }}".replace(':id', leadId);
+                                
+                                $.easyAjax({
+                                    url: accountsUrl,
+                                    type: "GET",
+                                    blockUI: false,
+                                    success: function(accountsResponse) {
+                                        var html = null;
+                                        if (accountsResponse.status == "success" && accountsResponse.data && accountsResponse.data.html) {
+                                            html = accountsResponse.data.html;
+                                        } else if (accountsResponse.html) {
+                                            html = accountsResponse.html;
+                                        } else if (accountsResponse.data && accountsResponse.data.html) {
+                                            html = accountsResponse.data.html;
+                                        }
+                                        
+                                        if (html) {
+                                            $('#accountsContent').html(html);
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        // Silent fail - accounts will refresh on next page load
+                                    }
+                                });
+                            }
+                        }
+                }
+            });
+        });
+
+        // Reset form when account modal is closed
+        $('#addAccountModal').on('hidden.bs.modal', function () {
+            $('#accountFormDetails')[0].reset();
+            $('#account_id_details').val('');
+            $('#addAccountModalLabel').text('ADD INVOICE');
+            $('#installment_months_container').hide();
+            $('#installment_payment_toggle').prop('checked', false);
+            $('.select-picker').selectpicker('refresh');
+        });
+
+        // Initialize date picker for invoice date
+        $('#addAccountModal').on('shown.bs.modal', function() {
+            $('.select-picker').selectpicker();
+            if ($('#invoice_date').length && typeof datepicker !== 'undefined') {
+                // Destroy existing datepicker if any
+                const dateInput = document.getElementById('invoice_date');
+                if (dateInput && dateInput._datepicker) {
+                    dateInput._datepicker.destroy();
+                }
+                // Initialize datepicker
+                const dp = datepicker('#invoice_date', {
+                    position: 'bl',
+                    ...datepickerConfig
+                });
+            }
+        });
+        
+        // Destroy datepicker when modal is hidden
+        $('#addAccountModal').on('hidden.bs.modal', function() {
+            const dateInput = document.getElementById('invoice_date');
+            if (dateInput && dateInput._datepicker) {
+                dateInput._datepicker.destroy();
+            }
         });
     </script>
 @endpush

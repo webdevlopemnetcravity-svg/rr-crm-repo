@@ -552,6 +552,10 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::delete('new-leads/follow-up/{id}', [LeadContactController::class, 'deleteNewLeadFollowUp'])->name('new-leads.follow-up-delete');
     Route::post('new-leads/file-note-store', [LeadContactController::class, 'storeNewLeadFileNote'])->name('new-leads.file-note-store');
     Route::get('new-leads/file-notes/{id}', [LeadContactController::class, 'getNewLeadFileNotes'])->name('new-leads.file-notes');
+    Route::post('new-leads/account-store', [LeadContactController::class, 'storeNewLeadAccount'])->name('new-leads.account-store');
+    Route::get('new-leads/account/{id}', [LeadContactController::class, 'getNewLeadAccount'])->name('new-leads.account-get');
+    Route::delete('new-leads/account/{id}', [LeadContactController::class, 'deleteNewLeadAccount'])->name('new-leads.account-delete');
+    Route::get('new-leads/accounts/{id}', [LeadContactController::class, 'getNewLeadAccounts'])->name('new-leads.accounts');
     Route::get('new-leads/documents-tab/{id}', [LeadContactController::class, 'getNewLeadDocumentsTab'])->name('new-leads.documents-tab');
     Route::post('new-leads/{leadId}/upload-document', [LeadContactController::class, 'uploadLeadDocument'])->name('new-leads.upload-document');
     Route::post('new-leads/process-store', [LeadContactController::class, 'storeNewLeadProcess'])->name('new-leads.process-store');

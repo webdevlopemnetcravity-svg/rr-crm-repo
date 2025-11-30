@@ -31,6 +31,7 @@ use App\Models\LeadStatus;
 use App\Models\Product;
 use App\Models\User;
 use App\Traits\ImportExcel;
+use Illuminate\Support\Facades\Schema;
 use App\Mail\LeadConfirmation;
 use App\Mail\LeadCreatedNotification;
 use Illuminate\Http\Request;
@@ -232,7 +233,7 @@ class LeadContactController extends AccountBaseController
         $this->allExpectedDocuments = [];
         
         if ($id) {
-            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process'])->find($id);
+            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process', 'accounts.agentUser', 'accounts.addedBy'])->find($id);
             if (!$this->lead) {
                 abort(404, 'Lead not found');
             }
@@ -4114,6 +4115,146 @@ class LeadContactController extends AccountBaseController
         $process->save();
 
         return Reply::success(__('messages.recordSaved'));
+    }
+
+    /**
+     * Store or update new lead account
+     */
+    public function storeNewLeadAccount(Request $request)
+    {
+        $lead = NewLead::findOrFail($request->new_lead_id);
+        
+        $rules = [
+            'new_lead_id' => 'required|exists:new_leads,id',
+            'invoice_date' => 'required|date_format:"' . company()->date_format . '"',
+            'bill_to' => 'required|string|max:255',
+            'service' => 'nullable|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'tax' => 'required|string|max:255',
+            'discount' => 'nullable|numeric|min:0',
+            'service_description' => 'nullable|string',
+            'installment_payment' => 'nullable|boolean',
+            'installment_months' => 'nullable|integer|min:1',
+            'invoice_notes' => 'nullable|string',
+        ];
+
+        $request->validate($rules);
+
+        // Parse invoice date from company format to Y-m-d
+        $invoiceDate = null;
+        if ($request->invoice_date) {
+            try {
+                $invoiceDate = \Carbon\Carbon::createFromFormat(
+                    company()->date_format,
+                    $request->invoice_date
+                )->format('Y-m-d');
+            } catch (\Exception $e) {
+                // If parsing fails, try standard date parsing
+                try {
+                    $invoiceDate = \Carbon\Carbon::parse($request->invoice_date)->format('Y-m-d');
+                } catch (\Exception $e2) {
+                    return Reply::error('Invalid invoice date format.');
+                }
+            }
+        }
+
+        // Calculate net amount
+        $price = floatval($request->price ?? 0);
+        $discount = floatval($request->discount ?? 0);
+        $tax = $request->tax ?? 'GST 0%';
+        
+        // Extract tax percentage from tax field (e.g., "GST 18%" -> 18)
+        $taxPercent = 0;
+        if (preg_match('/(\d+(?:\.\d+)?)/', $tax, $matches)) {
+            $taxPercent = floatval($matches[1]);
+        }
+        
+        // Calculate: Tax Amount = Price * (Tax Percentage / 100)
+        $taxAmount = ($price * $taxPercent) / 100;
+        
+        // Calculate: Sub Total = Price
+        $subTotal = $price;
+        
+        // Calculate: Net Amount = Price + Tax Amount - Discount
+        $netAmount = $price + $taxAmount - $discount;
+        $netAmount = max(0, $netAmount); // Ensure non-negative
+        
+        // Calculate: Total Amount = Net Amount
+        $totalAmount = $netAmount;
+
+        // Check if account exists for update
+        if ($request->id) {
+            $account = \App\Models\NewLeadAccount::findOrFail($request->id);
+            $account->last_updated_by = user()->id;
+        } else {
+            $account = new \App\Models\NewLeadAccount();
+            $account->added_by = user()->id;
+        }
+
+        // Fill account data
+        $account->new_lead_id = $request->new_lead_id;
+        $account->client_name = $request->client_name ?? $lead->client_name;
+        $account->invoice_date = $invoiceDate;
+        $account->phone = $request->phone ?? $lead->mobile;
+        $account->email = $request->email ?? $lead->client_email;
+        $account->address = $request->address;
+        $account->bill_to = $request->bill_to;
+        $account->agent = $request->agent ?: null;
+        $account->service = $request->service;
+        $account->price = $price;
+        $account->tax = $tax;
+        $account->discount = $discount;
+        $account->net_amount = $netAmount;
+        $account->sub_total = $subTotal;
+        $account->tax_amount = $taxAmount;
+        $account->discount_amount = $discount;
+        $account->total_amount = $totalAmount;
+        $account->service_description = $request->service_description;
+        $account->installment_payment = $request->has('installment_payment') ? true : false;
+        $account->installment_months = $request->installment_months;
+        $account->invoice_notes = $request->invoice_notes;
+
+        $account->save();
+
+        return Reply::success(__('messages.recordSaved'));
+    }
+
+    /**
+     * Get account data for editing
+     */
+    public function getNewLeadAccount($id)
+    {
+        $account = \App\Models\NewLeadAccount::with(['agentUser', 'newLead'])->findOrFail($id);
+        
+        return Reply::dataOnly([
+            'status' => 'success',
+            'account' => $account
+        ]);
+    }
+
+    /**
+     * Delete account
+     */
+    public function deleteNewLeadAccount($id)
+    {
+        $account = \App\Models\NewLeadAccount::findOrFail($id);
+        $account->delete();
+
+        return Reply::success(__('messages.deleteSuccess'));
+    }
+
+    /**
+     * Get accounts list for a lead via AJAX
+     */
+    public function getNewLeadAccounts($id)
+    {
+        $lead = NewLead::with(['accounts.agentUser', 'accounts.addedBy'])->findOrFail($id);
+        
+        $this->lead = $lead;
+        
+        $html = view('lead-details.components.accounts-list', $this->data)->render();
+        
+        return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
     }
 
 }

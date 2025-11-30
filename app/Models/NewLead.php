@@ -113,4 +113,12 @@ class NewLead extends BaseModel
     {
         return $this->hasOne(NewLeadProcess::class, 'new_lead_id');
     }
+
+    /**
+     * Get the accounts for this lead.
+     */
+    public function accounts(): HasMany
+    {
+        return $this->hasMany(NewLeadAccount::class, 'new_lead_id');
+    }
 }
