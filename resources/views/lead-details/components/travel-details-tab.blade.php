@@ -110,7 +110,7 @@
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="phone_number_other_country" fieldLabel="Phone Number (of other country)">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="phone_number_other_country" id="phone_number_other_country" value="{{ $travelData ? $travelData->phone_number_other_country : '' }}">
+                            <input type="text" class="form-control height-35 f-14" name="phone_number_other_country" id="phone_number_other_country" value="{{ $travelData ? $travelData->phone_number_other_country : '' }}" pattern="[0-9]{10}" minlength="10" maxlength="10" inputmode="numeric" title="Please enter exactly 10 digits (numbers only)">
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
                         <div class="col-md-3 mb-3">
                             <x-forms.label fieldId="postal_code" fieldLabel="Postal/Zip Code *">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="postal_code" id="postal_code" value="{{ $travelData ? $travelData->postal_code : '' }}" required>
+                            <input type="text" class="form-control height-35 f-14" name="postal_code" id="postal_code" value="{{ $travelData ? $travelData->postal_code : '' }}" pattern="[0-9]{6}" minlength="6" maxlength="6" inputmode="numeric" title="Please enter exactly 6 digits (numbers only)" required>
                         </div>
                     </div>
                 </div>

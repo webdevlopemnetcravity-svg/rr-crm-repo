@@ -1557,6 +1557,24 @@
             removeTravelDetailsFieldErrors();
         });
 
+        // Restrict Phone Number (other country) input to numbers only and max 10 digits
+        $(document).on('input', '#phone_number_other_country', function(e) {
+            var value = $(this).val().replace(/[^0-9]/g, '');
+            if (value.length > 10) {
+                value = value.substring(0, 10);
+            }
+            $(this).val(value);
+        });
+
+        // Restrict Postal/Zip Code input to numbers only and max 6 digits
+        $(document).on('input', '#postal_code', function(e) {
+            var value = $(this).val().replace(/[^0-9]/g, '');
+            if (value.length > 6) {
+                value = value.substring(0, 6);
+            }
+            $(this).val(value);
+        });
+
         // Save Travel Details Button Click (from header or form bottom)
         $(document).on('click', '#saveTravelDetailsBtn, #saveTravelDetailsFormBtn', function(e) {
             e.preventDefault();
@@ -1611,6 +1629,26 @@
                     showTravelDetailsFieldError(field.id, field.name + ' is required');
                 }
             });
+            
+            // Validate Phone Number (other country) - must be exactly 10 digits if provided
+            var phoneNumber = $('#phone_number_other_country').val();
+            if (phoneNumber && phoneNumber.trim() !== '') {
+                var phoneRegex = /^[0-9]{10}$/;
+                if (!phoneRegex.test(phoneNumber)) {
+                    isValid = false;
+                    showTravelDetailsFieldError('#phone_number_other_country', 'Phone Number must be exactly 10 digits (numbers only)');
+                }
+            }
+            
+            // Validate Postal/Zip Code - must be exactly 6 digits
+            var postalCode = $('#postal_code').val();
+            if (postalCode && postalCode.trim() !== '') {
+                var postalRegex = /^[0-9]{6}$/;
+                if (!postalRegex.test(postalCode)) {
+                    isValid = false;
+                    showTravelDetailsFieldError('#postal_code', 'Postal/Zip Code must be exactly 6 digits (numbers only)');
+                }
+            }
             
             if (!isValid) {
                 return false;
