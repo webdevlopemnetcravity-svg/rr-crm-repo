@@ -560,6 +560,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::get('new-leads/documents-tab/{id}', [LeadContactController::class, 'getNewLeadDocumentsTab'])->name('new-leads.documents-tab');
     Route::post('new-leads/{leadId}/upload-document', [LeadContactController::class, 'uploadLeadDocument'])->name('new-leads.upload-document');
     Route::post('new-leads/process-store', [LeadContactController::class, 'storeNewLeadProcess'])->name('new-leads.process-store');
+    Route::post('new-leads/travel-details-store', [LeadContactController::class, 'storeNewLeadTravelDetails'])->name('new-leads.travel-details-store');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
     // Specific routes must come before generic route
     Route::get('lead-details/{leadId}/download-document/{documentKey}', [LeadContactController::class, 'downloadLeadDocument'])->name('lead-details.download-document');

@@ -1419,6 +1419,291 @@
             });
         });
 
+        // ========== TRAVEL DETAILS TAB FUNCTIONALITY ==========
+        
+        // Helper function to show error message below a field
+        function showTravelDetailsFieldError(fieldId, errorMessage) {
+            const $field = $(fieldId);
+            
+            // Find the parent column container
+            const $parentColumn = $field.closest('.col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-12');
+            
+            // Check if it's a bootstrap-select field first
+            const $bootstrapSelect = $field.closest('.bootstrap-select');
+            
+            // Remove ALL existing error messages comprehensively
+            if ($parentColumn.length) {
+                // Remove from entire parent column
+                $parentColumn.find('.invalid-feedback').remove();
+            }
+            // Remove from field itself and siblings
+            $field.next('.invalid-feedback').remove();
+            $field.siblings('.invalid-feedback').remove();
+            
+            if ($bootstrapSelect.length) {
+                // For bootstrap-select, add is-invalid to the wrapper
+                $bootstrapSelect.addClass('is-invalid');
+                
+                // Remove errors from wrapper and its parent
+                $bootstrapSelect.next('.invalid-feedback').remove();
+                $bootstrapSelect.siblings('.invalid-feedback').remove();
+                $bootstrapSelect.parent().find('.invalid-feedback').remove();
+                
+                // Add error after the wrapper (only once)
+                $bootstrapSelect.after('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+            } else {
+                // For regular inputs, add is-invalid to the field
+                $field.addClass('is-invalid');
+                // Add error message below the field
+                $field.after('<div class="invalid-feedback d-block">' + errorMessage + '</div>');
+            }
+        }
+        
+        // Function to remove all field errors
+        function removeTravelDetailsFieldErrors() {
+            $('#travelDetailsFormSection .invalid-feedback').remove();
+            $('#travelDetailsFormSection .is-invalid').removeClass('is-invalid');
+        }
+        
+        // Function to update the travel details display section with form data
+        function updateTravelDetailsDisplay() {
+            // Helper function to format date
+            function formatDate(dateString) {
+                if (!dateString) return '-';
+                try {
+                    var date = new Date(dateString);
+                    var day = String(date.getDate()).padStart(2, '0');
+                    var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    var month = monthNames[date.getMonth()];
+                    var year = date.getFullYear();
+                    return day + '-' + month + '-' + year;
+                } catch (e) {
+                    return dateString;
+                }
+            }
+            
+            // Helper function to get value or default
+            function getValue(value, defaultValue) {
+                return value && value.trim() !== '' ? value : (defaultValue || '-');
+            }
+            
+            // Get all value elements in order
+            var $valueElements = $('#travelDetailsDetailsSection').find('.info-field-value-text');
+            
+            // Update Travel Details Section (indices 0-8)
+            if ($valueElements.length > 0) $valueElements.eq(0).text(getValue($('#purpose_of_trip').val()));
+            if ($valueElements.length > 1) $valueElements.eq(1).text(getValue($('#place_to_visit').val()));
+            if ($valueElements.length > 2) $valueElements.eq(2).text(formatDate($('#date_of_arrival').val()));
+            if ($valueElements.length > 3) $valueElements.eq(3).text(getValue($('#arrival_flight').val()));
+            if ($valueElements.length > 4) $valueElements.eq(4).text(getValue($('#arrival_city').val()));
+            if ($valueElements.length > 5) $valueElements.eq(5).text(formatDate($('#date_of_departure').val()));
+            if ($valueElements.length > 6) $valueElements.eq(6).text(getValue($('#departure_flight').val()));
+            if ($valueElements.length > 7) $valueElements.eq(7).text(getValue($('#departure_city').val()));
+            if ($valueElements.length > 8) $valueElements.eq(8).text(getValue($('#phone_number_other_country').val()));
+            
+            // Update Address Section (indices 9-12)
+            if ($valueElements.length > 9) $valueElements.eq(9).text(getValue($('#address_stay').val()));
+            if ($valueElements.length > 10) $valueElements.eq(10).text(getValue($('#city').val()));
+            if ($valueElements.length > 11) $valueElements.eq(11).text(getValue($('#state').val()));
+            if ($valueElements.length > 12) $valueElements.eq(12).text(getValue($('#postal_code').val()));
+            
+            // Update Personal Information Section (indices 13-16)
+            if ($valueElements.length > 13) $valueElements.eq(13).text(getValue($('#person_paying').val()));
+            
+            // Update relatives fields (handle select pickers)
+            var motherInCountry = $('#mother_in_country').selectpicker('val') || $('#mother_in_country').val();
+            var immediateRelatives = $('#immediate_relatives').selectpicker('val') || $('#immediate_relatives').val();
+            var otherRelatives = $('#other_relatives').selectpicker('val') || $('#other_relatives').val();
+            
+            if ($valueElements.length > 14) {
+                var motherValue = motherInCountry ? motherInCountry.charAt(0).toUpperCase() + motherInCountry.slice(1) : '-';
+                $valueElements.eq(14).text(motherValue);
+            }
+            if ($valueElements.length > 15) {
+                var immediateValue = immediateRelatives ? immediateRelatives.charAt(0).toUpperCase() + immediateRelatives.slice(1) : '-';
+                $valueElements.eq(15).text(immediateValue);
+            }
+            if ($valueElements.length > 16) {
+                var otherValue = otherRelatives ? otherRelatives.charAt(0).toUpperCase() + otherRelatives.slice(1) : '-';
+                $valueElements.eq(16).text(otherValue);
+            }
+        }
+        
+        // Edit Travel Details Button Click
+        $(document).on('click', '#editTravelDetailsBtn', function(e) {
+            e.preventDefault();
+            // Hide details section and show form section
+            $('#travelDetailsDetailsSection').hide();
+            $('#travelDetailsFormSection').show();
+            // Hide edit button and show save/cancel buttons
+            $('#editTravelDetailsBtn').hide();
+            $('#travelDetailsFormActions').show();
+            // Initialize select pickers
+            $('.select-picker').selectpicker('refresh');
+            // Remove any previous errors
+            removeTravelDetailsFieldErrors();
+        });
+
+        // Cancel Travel Details Button Click
+        $(document).on('click', '#cancelTravelDetailsBtn', function(e) {
+            e.preventDefault();
+            // Show details section and hide form section
+            $('#travelDetailsDetailsSection').show();
+            $('#travelDetailsFormSection').hide();
+            // Show edit button and hide save/cancel buttons
+            $('#editTravelDetailsBtn').show();
+            $('#travelDetailsFormActions').hide();
+            // Remove any errors
+            removeTravelDetailsFieldErrors();
+        });
+
+        // Save Travel Details Button Click (from header or form bottom)
+        $(document).on('click', '#saveTravelDetailsBtn, #saveTravelDetailsFormBtn', function(e) {
+            e.preventDefault();
+            
+            // Remove previous errors
+            removeTravelDetailsFieldErrors();
+            
+            var form = $('#travelDetailsForm')[0];
+            var isValid = true;
+            
+            // Basic HTML5 validation
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                isValid = false;
+            }
+            
+            var leadId = $('#travel_details_lead_id').val();
+            if (!leadId) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Lead ID is missing.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Lead ID is missing.');
+                    }
+                } catch (e) {}
+                return false;
+            }
+            
+            // Custom validation for required fields
+            var requiredFields = [
+                { id: '#purpose_of_trip', name: 'Purpose of Trip' },
+                { id: '#place_to_visit', name: 'Place To Visit' },
+                { id: '#date_of_arrival', name: 'Date of Arrival' },
+                { id: '#arrival_flight', name: 'Arrival Flight' },
+                { id: '#arrival_city', name: 'Arrival City' },
+                { id: '#date_of_departure', name: 'Date of Departure From' },
+                { id: '#departure_flight', name: 'Departure Flight' },
+                { id: '#departure_city', name: 'Departure City' },
+                { id: '#address_stay', name: 'Address Where You Will Stay' },
+                { id: '#city', name: 'City' },
+                { id: '#state', name: 'State' },
+                { id: '#postal_code', name: 'Postal/Zip Code' },
+                { id: '#person_paying', name: 'Person Paying For Your Trip (Details)' }
+            ];
+            
+            requiredFields.forEach(function(field) {
+                var $field = $(field.id);
+                var value = $field.val();
+                
+                if (!value || value.trim() === '') {
+                    isValid = false;
+                    showTravelDetailsFieldError(field.id, field.name + ' is required');
+                }
+            });
+            
+            if (!isValid) {
+                return false;
+            }
+            
+            // Get select picker values and add to form
+            $('#mother_in_country, #immediate_relatives, #other_relatives').each(function() {
+                var $select = $(this);
+                var selectedValue = $select.selectpicker('val');
+                if (selectedValue) {
+                    $select.val(selectedValue);
+                }
+            });
+            
+            // Ensure form exists and is visible
+            var $form = $('#travelDetailsForm');
+            if ($form.length === 0) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Form not found. Please refresh the page.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Form not found. Please refresh the page.');
+                    }
+                } catch (e) {}
+                return false;
+            }
+            
+            // Serialize form data
+            var formData = $form.serialize();
+            
+            // Check if form data is empty
+            if (!formData || formData.trim() === '') {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('No form data to submit. Please fill in the required fields.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('No form data to submit. Please fill in the required fields.');
+                    }
+                } catch (e) {}
+                return false;
+            }
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.travel-details-store') }}",
+                container: '#travelDetailsForm',
+                type: "POST",
+                blockUI: true,
+                disableButton: true,
+                buttonSelector: "#saveTravelDetailsBtn, #saveTravelDetailsFormBtn",
+                data: formData,
+                success: function(response) {
+                    if (response.status == "success") {
+                        try {
+                            if (typeof $.showToastr === 'function') {
+                                $.showToastr(response.message || 'Travel details saved successfully', 'success');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message || 'Travel details saved successfully');
+                            }
+                        } catch (e) {}
+                        
+                        // Update the details section with the form data we just saved
+                        updateTravelDetailsDisplay();
+                        
+                        // Show details section and hide form section
+                        $('#travelDetailsDetailsSection').show();
+                        $('#travelDetailsFormSection').hide();
+                        $('#editTravelDetailsBtn').show();
+                        $('#travelDetailsFormActions').hide();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Handle validation errors from server
+                    if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                        var errors = xhr.responseJSON.errors;
+                        $.each(errors, function(field, messages) {
+                            var fieldId = '#' + field;
+                            showTravelDetailsFieldError(fieldId, messages[0]);
+                        });
+                    } else {
+                        try {
+                            if (typeof $.showToastr === 'function') {
+                                $.showToastr('An error occurred while saving the travel details. Please try again.', 'error');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.error('An error occurred while saving the travel details. Please try again.');
+                            }
+                        } catch (e) {}
+                    }
+                }
+            });
+            
+            return false;
+        });
+
         // ========== ACCOUNTS FUNCTIONALITY ==========
         
         // Handle Add Account button click

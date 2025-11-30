@@ -233,7 +233,7 @@ class LeadContactController extends AccountBaseController
         $this->allExpectedDocuments = [];
         
         if ($id) {
-            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process', 'accounts.agentUser', 'accounts.addedBy'])->find($id);
+            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process', 'accounts.agentUser', 'accounts.addedBy', 'travelDetails'])->find($id);
             if (!$this->lead) {
                 abort(404, 'Lead not found');
             }
@@ -4318,6 +4318,71 @@ class LeadContactController extends AccountBaseController
             \Log::error('Account ID: ' . $id);
             return response()->json(['error' => 'Failed to generate PDF: ' . $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Store or update new lead travel details
+     */
+    public function storeNewLeadTravelDetails(Request $request)
+    {
+        $newLead = NewLead::findOrFail($request->new_lead_id);
+        
+        $rules = [
+            'new_lead_id' => 'required|exists:new_leads,id',
+            'purpose_of_trip' => 'required|string',
+            'place_to_visit' => 'required|string',
+            'date_of_arrival' => 'required|date',
+            'arrival_flight' => 'required|string|max:255',
+            'arrival_city' => 'required|string|max:255',
+            'date_of_departure' => 'required|date',
+            'departure_flight' => 'required|string|max:255',
+            'departure_city' => 'required|string|max:255',
+            'phone_number_other_country' => 'nullable|string|max:255',
+            'address_stay' => 'required|string',
+            'city' => 'required|string|max:255',
+            'state' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:255',
+            'person_paying' => 'required|string',
+            'mother_in_country' => 'nullable|string|in:yes,no',
+            'immediate_relatives' => 'nullable|string|in:yes,no',
+            'other_relatives' => 'nullable|string|in:yes,no',
+        ];
+        
+        $request->validate($rules);
+
+        // Check if travel details exist
+        $travelDetails = \App\Models\NewLeadTravelDetail::where('new_lead_id', $request->new_lead_id)->first();
+        
+        if (!$travelDetails) {
+            $travelDetails = new \App\Models\NewLeadTravelDetail();
+            $travelDetails->new_lead_id = $request->new_lead_id;
+            $travelDetails->added_by = user()->id;
+        } else {
+            $travelDetails->last_updated_by = user()->id;
+        }
+
+        // Fill fields
+        $travelDetails->purpose_of_trip = $request->purpose_of_trip;
+        $travelDetails->place_to_visit = $request->place_to_visit;
+        $travelDetails->date_of_arrival = $request->date_of_arrival;
+        $travelDetails->arrival_flight = $request->arrival_flight;
+        $travelDetails->arrival_city = $request->arrival_city;
+        $travelDetails->date_of_departure = $request->date_of_departure;
+        $travelDetails->departure_flight = $request->departure_flight;
+        $travelDetails->departure_city = $request->departure_city;
+        $travelDetails->phone_number_other_country = $request->phone_number_other_country;
+        $travelDetails->address_stay = $request->address_stay;
+        $travelDetails->city = $request->city;
+        $travelDetails->state = $request->state;
+        $travelDetails->postal_code = $request->postal_code;
+        $travelDetails->person_paying = $request->person_paying;
+        $travelDetails->mother_in_country = $request->mother_in_country;
+        $travelDetails->immediate_relatives = $request->immediate_relatives;
+        $travelDetails->other_relatives = $request->other_relatives;
+
+        $travelDetails->save();
+
+        return Reply::success(__('messages.recordSaved'));
     }
 
 }

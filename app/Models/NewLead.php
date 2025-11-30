@@ -121,4 +121,12 @@ class NewLead extends BaseModel
     {
         return $this->hasMany(NewLeadAccount::class, 'new_lead_id');
     }
+
+    /**
+     * Get the travel details for this lead.
+     */
+    public function travelDetails(): HasOne
+    {
+        return $this->hasOne(NewLeadTravelDetail::class, 'new_lead_id');
+    }
 }
