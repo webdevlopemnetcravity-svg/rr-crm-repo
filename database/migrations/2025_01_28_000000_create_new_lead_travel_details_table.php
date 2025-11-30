@@ -17,8 +17,7 @@ return new class extends Migration
         
         Schema::create('new_lead_travel_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('new_lead_id');
-            $table->foreign('new_lead_id')->references('id')->on('new_leads')->onDelete('cascade')->onUpdate('cascade');
+            $table->unsignedBigInteger('new_lead_id')->index();
             
             // Travel Details
             $table->text('purpose_of_trip')->nullable();
@@ -44,10 +43,13 @@ return new class extends Migration
             $table->string('other_relatives')->nullable();
             
             $table->unsignedInteger('added_by')->nullable();
-            $table->foreign('added_by')->references('id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->unsignedInteger('last_updated_by')->nullable();
-            $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('set null')->onUpdate('cascade');
             $table->timestamps();
+            
+            // Add foreign keys after all columns are defined
+            $table->foreign('new_lead_id')->references('id')->on('new_leads')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('added_by')->references('id')->on('users')->onDelete('set null')->onUpdate('cascade');
+            $table->foreign('last_updated_by')->references('id')->on('users')->onDelete('set null')->onUpdate('cascade');
         });
     }
 
