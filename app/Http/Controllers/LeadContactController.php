@@ -4257,5 +4257,68 @@ class LeadContactController extends AccountBaseController
         return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
     }
 
+    /**
+     * Download account invoice as PDF
+     */
+    public function downloadAccountInvoice($id)
+    {
+        try {
+            $account = \App\Models\NewLeadAccount::with(['agentUser', 'newLead'])->findOrFail($id);
+            
+            // Get lead ID formatted
+            $leadId = $account->newLead ? 'LEAD-' . str_pad($account->newLead->id, 4, '0', STR_PAD_LEFT) : '--';
+            
+            // Get currency symbol
+            try {
+                $currencySymbol = company()->currency ? company()->currency->currency_symbol : '₹';
+            } catch (\Exception $e) {
+                $currencySymbol = '₹';
+            }
+            
+            // Get invoice setting for logo
+            $invoiceSetting = invoice_setting();
+            $companyLogo = $invoiceSetting ? $invoiceSetting->logo_url : (company()->light_logo_url ?? global_setting()->light_logo_url ?? '');
+            
+            // Get company data for template
+            $company = company();
+            $companyPhone = $company->phone ?? '1800 571 2844';
+            $companyEmail = $company->company_email ?? 'info.rrpei@gmail.com';
+            $companyAddress = $company->address ?? '3rd Floor, Aaron Spectra, 302, Rajpath Rangoli Rd, behind Rajpath Club, Bodakdev, Ahmedabad, Gujarat 380059';
+            $dateFormat = company()->date_format ?? 'd-m-Y';
+            
+            // Generate PDF
+            $pdf = app('dompdf.wrapper');
+            $pdf->setOption('enable_php', true);
+            $pdf->setOption('isHtml5ParserEnabled', true);
+            $pdf->setOption('isRemoteEnabled', true);
+            
+            $customCss = '<style>
+                * { text-transform: none !important; }
+            </style>';
+            
+            $html = view('lead-details.pdf.account-invoice', [
+                'account' => $account,
+                'leadId' => $leadId,
+                'currencySymbol' => $currencySymbol,
+                'companyLogo' => $companyLogo,
+                'companyPhone' => $companyPhone,
+                'companyEmail' => $companyEmail,
+                'companyAddress' => $companyAddress,
+                'dateFormat' => $dateFormat,
+            ])->render();
+            
+            $pdf->loadHTML($customCss . $html);
+            
+            $filename = 'Invoice-' . $leadId . '-' . date('Y-m-d');
+            
+            return $pdf->download($filename . '.pdf');
+        } catch (\Exception $e) {
+            \Log::error('Error downloading account invoice: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('Account ID: ' . $id);
+            return response()->json(['error' => 'Failed to generate PDF: ' . $e->getMessage()], 500);
+        }
+    }
+
 }
 

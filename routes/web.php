@@ -553,6 +553,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('new-leads/file-note-store', [LeadContactController::class, 'storeNewLeadFileNote'])->name('new-leads.file-note-store');
     Route::get('new-leads/file-notes/{id}', [LeadContactController::class, 'getNewLeadFileNotes'])->name('new-leads.file-notes');
     Route::post('new-leads/account-store', [LeadContactController::class, 'storeNewLeadAccount'])->name('new-leads.account-store');
+    Route::get('new-leads/account/{id}/download', [LeadContactController::class, 'downloadAccountInvoice'])->name('new-leads.account-download');
     Route::get('new-leads/account/{id}', [LeadContactController::class, 'getNewLeadAccount'])->name('new-leads.account-get');
     Route::delete('new-leads/account/{id}', [LeadContactController::class, 'deleteNewLeadAccount'])->name('new-leads.account-delete');
     Route::get('new-leads/accounts/{id}', [LeadContactController::class, 'getNewLeadAccounts'])->name('new-leads.accounts');

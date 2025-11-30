@@ -129,6 +129,8 @@
 
     {{-- Include file for widgets if exist --}}
     @includeif('sections.custom_script')
+    
+    @stack('head-scripts')
 
     <script>
         const checkMiniSidebar = localStorage.getItem("mini-sidebar");

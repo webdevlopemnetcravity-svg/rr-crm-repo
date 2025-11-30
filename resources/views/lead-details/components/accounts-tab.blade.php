@@ -93,7 +93,43 @@
                                             $address = '--';
                                             if(isset($lead) && $lead) {
                                                 $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : ($lead->step_1_data ?? []);
-                                                $address = $step1Data['address'] ?? '--';
+                                                
+                                                // Check if mailing address same as home address
+                                                $mailingSameAsHome = !empty($step1Data['mailing_same_as_home']) && $step1Data['mailing_same_as_home'] == '1';
+                                                
+                                                if ($mailingSameAsHome) {
+                                                    // Use home address if mailing same as home
+                                                    $addressParts = [];
+                                                    if (!empty($step1Data['home_address'])) {
+                                                        $addressParts[] = $step1Data['home_address'];
+                                                    }
+                                                    if (!empty($step1Data['home_city'])) {
+                                                        $addressParts[] = $step1Data['home_city'];
+                                                    }
+                                                    if (!empty($step1Data['home_state'])) {
+                                                        $addressParts[] = $step1Data['home_state'];
+                                                    }
+                                                    if (!empty($step1Data['home_pin_code'])) {
+                                                        $addressParts[] = $step1Data['home_pin_code'];
+                                                    }
+                                                    $address = !empty($addressParts) ? implode(', ', $addressParts) : '--';
+                                                } else {
+                                                    // Use mailing address
+                                                    $addressParts = [];
+                                                    if (!empty($step1Data['mailing_address'])) {
+                                                        $addressParts[] = $step1Data['mailing_address'];
+                                                    }
+                                                    if (!empty($step1Data['mailing_city'])) {
+                                                        $addressParts[] = $step1Data['mailing_city'];
+                                                    }
+                                                    if (!empty($step1Data['mailing_state'])) {
+                                                        $addressParts[] = $step1Data['mailing_state'];
+                                                    }
+                                                    if (!empty($step1Data['mailing_pin_code'])) {
+                                                        $addressParts[] = $step1Data['mailing_pin_code'];
+                                                    }
+                                                    $address = !empty($addressParts) ? implode(', ', $addressParts) : '--';
+                                                }
                                             }
                                         @endphp
                                         <textarea class="form-control f-14" id="address" name="address" rows="3" disabled style="background-color: #F5F5F5; cursor: not-allowed;">{{ $address }}</textarea>
@@ -235,6 +271,153 @@
                         <x-forms.button-primary id="save-account-btn" icon="check">Save</x-forms.button-primary>
                     </div>
                 </x-form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Invoice Modal -->
+    <div class="modal fade" id="viewInvoiceModal" tabindex="-1" role="dialog" aria-labelledby="viewInvoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header invoice-view-header">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <h5 class="modal-title invoice-view-title">VIEW INVOICE</h5>
+                        <div class="d-flex align-items-center">
+                            <button type="button" class="btn invoice-download-btn">
+                                <i class="fa fa-download mr-1"></i> Download Invoice
+                            </button>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body invoice-view-body">
+                    <!-- Invoice Title and Company Info Section -->
+                    <div class="invoice-header-row mb-4 d-flex justify-content-between align-items-start">
+                        <!-- Invoice Title Section (Left) -->
+                        <div class="invoice-title-section">
+                            <h2 class="invoice-main-title">INVOICE</h2>
+                            <p class="invoice-lead-number" id="view_invoice_lead_number">--</p>
+                        </div>
+                        <!-- Company Logo Section (Right) -->
+                        <div class="invoice-company-info">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="{{ company()->light_logo_url ?? global_setting()->light_logo_url }}" alt="Company Logo" class="company-logo-image">
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <!-- Client and Invoice Details Section -->
+                    <div class="invoice-details-grid mb-4">
+                        <div class="row">
+                            <!-- Row 1: Client Name | Email | Phone | Invoice Date -->
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Client Name</div>
+                                    <div class="invoice-detail-value" id="view_client_name">--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Email</div>
+                                    <div class="invoice-detail-value" id="view_email">--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Phone</div>
+                                    <div class="invoice-detail-value" id="view_phone">--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Invoice Date</div>
+                                    <div class="invoice-detail-value" id="view_invoice_date">--</div>
+                                </div>
+                            </div>
+                            <!-- Row 2: Bill to | Invoice Belongs To | Address -->
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Bill to</div>
+                                    <div class="invoice-detail-value" id="view_bill_to">--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Invoice Belongs To</div>
+                                    <div class="invoice-detail-value" id="view_agent_name">--</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="invoice-detail-item">
+                                    <div class="invoice-detail-label">Address</div>
+                                    <div class="invoice-detail-value" id="view_address">--</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <!-- Details Section -->
+                    <div class="invoice-service-section mb-4">
+                        <h4 class="invoice-section-title">DETAILS</h4>
+                        <div class="invoice-service-item mb-3">
+                            <div class="invoice-detail-label">Service</div>
+                            <div class="invoice-detail-value" id="view_service">--</div>
+                        </div>
+                        <div class="invoice-service-item">
+                            <div class="invoice-detail-label">Note</div>
+                            <div class="invoice-detail-value" id="view_service_description">--</div>
+                        </div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <!-- Payable Amount Section -->
+                    <div class="invoice-payable-section mb-4">
+                        <h4 class="invoice-section-title">PAYABLE AMOUNT</h4>
+                        <div class="invoice-amount-table">
+                            <div class="invoice-amount-row">
+                                <div class="invoice-amount-label">Sub Total :</div>
+                                <div class="invoice-amount-value" id="view_sub_total">--</div>
+                            </div>
+                            <div class="invoice-amount-row">
+                                <div class="invoice-amount-label">Discount :</div>
+                                <div class="invoice-amount-value" id="view_discount">--</div>
+                            </div>
+                            <div class="invoice-amount-row">
+                                <div class="invoice-amount-label">Tax Amount :</div>
+                                <div class="invoice-amount-value" id="view_tax_amount">--</div>
+                            </div>
+                            <div class="invoice-amount-row total">
+                                <div class="invoice-amount-label total">Total Amount :</div>
+                                <div class="invoice-amount-value total" id="view_total_amount">--</div>
+                            </div>
+                            <div class="invoice-installment-note" id="view_installment_note" style="display: none;">
+                                <span id="view_installment_note_text"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <!-- Footer Section -->
+                    <div class="invoice-footer-section">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="{{ company()->light_logo_url ?? global_setting()->light_logo_url }}" alt="Company Logo" class="company-logo-image-footer">
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3 text-center">
+                                <div class="footer-label">Toll-Free Number</div>
+                                <div class="footer-toll-free">{{ company()->phone ?? '1800 571 2844' }}</div>
+                                <div class="footer-email">{{ company()->company_email ?? 'info.rrpei@gmail.com' }}</div>
+                            </div>
+                            <div class="col-md-4 mb-3 text-right">
+                                <div class="footer-address">{{ company()->address ?? '3rd Floor, Aaron Spectra, 302, Rajpath Rangoli Rd, behind Rajpath Club, Bodakdev, Ahmedabad, Gujarat 380059' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -14,6 +14,12 @@
     </style>
 @endpush
 
+@push('head-scripts')
+    <script src="{{ asset('vendor/jquery/html2pdf.bundle.min.js') }}"></script>
+@endpush
+
+
+
 @section('content')
     <!-- CONTENT WRAPPER START -->
     <div class="content-wrapper">
@@ -1480,8 +1486,126 @@
         // Handle View Account button click
         $(document).on('click', '.view-account-btn', function(e) {
             e.preventDefault();
-            // For now, same as edit - can be customized later
-            $(this).closest('.dropdown').find('.edit-account-btn').click();
+            var accountId = $(this).data('account-id');
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.account-get', ':id') }}".replace(':id', accountId),
+                type: "GET",
+                blockUI: true,
+                success: function(response) {
+                    if (response.status == "success" && response.account) {
+                        var account = response.account;
+                        var leadId = account.new_lead_id ? 'LEAD-' + String(account.new_lead_id).padStart(4, '0') : '--';
+                        
+                        // Get currency symbol
+                        var currencySymbol = '₹';
+                        try {
+                            @php
+                                try {
+                                    $currencySymbol = company()->currency ? company()->currency->currency_symbol : '₹';
+                                } catch (\Exception $e) {
+                                    $currencySymbol = '₹';
+                                }
+                            @endphp
+                            currencySymbol = '{{ $currencySymbol }}';
+                        } catch (e) {
+                            currencySymbol = '₹';
+                        }
+                        
+                        // Format amounts
+                        var formatAmount = function(amount) {
+                            return currencySymbol + ' ' + (amount ? parseFloat(amount).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00');
+                        };
+                        
+                        // Populate modal
+                        $('#view_invoice_lead_number').text(leadId);
+                        $('#view_client_name').text(account.client_name || '--');
+                        $('#view_email').text(account.email || '--');
+                        $('#view_phone').text(account.phone || '--');
+                        $('#view_invoice_date').text(account.invoice_date ? moment(account.invoice_date).format('{{ company()->date_format }}') : '--');
+                        $('#view_bill_to').text(account.bill_to || '--');
+                        $('#view_agent_name').text((account.agent_user && account.agent_user.name) ? account.agent_user.name : ((account.agentUser && account.agentUser.name) ? account.agentUser.name : '--'));
+                        $('#view_address').text(account.address || '--');
+                        $('#view_service').text(account.service || '--');
+                        $('#view_service_description').text(account.service_description || account.invoice_notes || '--');
+                        $('#view_sub_total').text(formatAmount(account.sub_total || account.price || 0));
+                        $('#view_discount').text(formatAmount(account.discount_amount || account.discount || 0));
+                        $('#view_tax_amount').text(formatAmount(account.tax_amount || 0));
+                        $('#view_total_amount').text(formatAmount(account.total_amount || account.net_amount || 0));
+                        
+                        // Installment note
+                        if (account.installment_payment && account.installment_months) {
+                            var installmentAmount = (account.total_amount || account.net_amount || 0) / account.installment_months;
+                            $('#view_installment_note').show();
+                            $('#view_installment_note_text').text('Installment ' + currencySymbol + ' ' + installmentAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' for ' + account.installment_months + ' months');
+                        } else {
+                            $('#view_installment_note').hide();
+                        }
+                        
+                        // Store account ID for download
+                        $('#viewInvoiceModal').data('account-id', accountId);
+                        console.log('Account ID stored for download:', accountId);
+                        
+                        $('#viewInvoiceModal').modal('show');
+                    }
+                }
+            });
+        });
+        
+        // Handle Download Invoice button click
+        $(document).on('click', '.invoice-download-btn', function(e) {
+            e.preventDefault();
+            
+            // Check if html2pdf is loaded
+            if (typeof html2pdf === 'undefined') {
+                alert('PDF library is loading. Please wait a moment and try again.');
+                console.error('html2pdf library is not loaded');
+                return;
+            }
+            
+            // Get the invoice view body content
+            var invoiceBody = document.querySelector('#viewInvoiceModal .invoice-view-body');
+            
+            if (!invoiceBody) {
+                alert('Invoice content not found. Please try viewing the invoice again.');
+                return;
+            }
+            
+            // Get lead number for filename
+            var leadNumber = $('#view_invoice_lead_number').text() || 'Invoice';
+            var filename = leadNumber + '-' + moment().format('YYYY-MM-DD') + '.pdf';
+            
+            // Configure html2pdf options
+            var opt = {
+                margin: [10, 10, 10, 10],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
+            };
+            
+            // Show loading message
+            var btn = $(this);
+            var originalText = btn.html();
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Generating PDF...');
+            
+            // Generate and download PDF
+            html2pdf().set(opt).from(invoiceBody).save().then(function() {
+                // Restore button
+                btn.prop('disabled', false).html(originalText);
+            }).catch(function(error) {
+                console.error('PDF generation error:', error);
+                alert('Failed to generate PDF. Please try again.');
+                btn.prop('disabled', false).html(originalText);
+            });
         });
 
         // Handle Delete Account button click
@@ -1508,9 +1632,16 @@
                 buttonsStyling: false
             }).then((result) => {
                 if (result.isConfirmed) {
+                    var url = "{{ route('new-leads.account-delete', ':id') }}".replace(':id', accountId);
+                    var token = "{{ csrf_token() }}";
+                    
                     $.easyAjax({
-                        url: "{{ route('new-leads.account-delete', ':id') }}".replace(':id', accountId),
-                        type: "DELETE",
+                        url: url,
+                        type: "POST",
+                        data: {
+                            '_token': token,
+                            '_method': 'DELETE'
+                        },
                         blockUI: true,
                         success: function(response) {
                             if (response.status == "success") {
