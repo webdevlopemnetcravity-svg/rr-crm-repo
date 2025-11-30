@@ -99,14 +99,14 @@
                                 <div class="col-md-6">
                                     <x-forms.datepicker fieldId="next_follow_up_date_details"
                                         fieldLabel="Next Follow Up Date" fieldName="next_follow_up_date"
-                                        :fieldValue="now(company()->timezone)->format(company()->date_format)"
+                                        :fieldValue="''"
                                         :fieldPlaceholder="__('placeholders.date')" />
                                 </div>
                                 <div class="col-md-6">
                                     <div class="bootstrap-timepicker timepicker">
                                         <x-forms.text fieldLabel="Time" :fieldPlaceholder="__('placeholders.hours')"
                                             fieldName="next_follow_up_time" fieldId="next_follow_up_time_details"
-                                            :fieldValue="now(company()->timezone)->format(company()->time_format)" />
+                                            :fieldValue="''" />
                                     </div>
                                 </div>
                             </div>

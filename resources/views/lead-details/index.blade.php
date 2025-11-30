@@ -47,9 +47,19 @@
                 <div class="lead-contact-info d-flex align-items-center">
                     @if(isset($lead) && $lead)
                         @php
-                            $step1Data = $lead->step_1_data ?? [];
+                            $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : ($lead->step_1_data ?? []);
                             $primaryPhone = $step1Data['primary_phone'] ?? $lead->mobile ?? '';
                             $email = $step1Data['email_address'] ?? $lead->client_email ?? '';
+                            $resumeFile = $step1Data['upload_resume'] ?? null;
+                            $resumeUrl = null;
+                            if ($resumeFile) {
+                                try {
+                                    $filePath = 'lead-resume-files/' . $resumeFile;
+                                    $resumeUrl = asset_url_local_s3($filePath);
+                                } catch (\Exception $e) {
+                                    $resumeUrl = null;
+                                }
+                            }
                         @endphp
                         @if($primaryPhone)
                             <div class="contact-info-item mr-4">
@@ -84,7 +94,15 @@
                 </div>
 
                 <!-- View Resume Button -->
-                <button class="btn btn-success btn-sm">View Resume</button>
+                @if(isset($lead) && $lead && !empty($resumeFile))
+                    @if($resumeUrl)
+                        <a href="{{ $resumeUrl }}" target="_blank" class="btn btn-success btn-sm">View Resume</a>
+                    @else
+                        <a href="{{ route('lead-details.download-document', ['leadId' => $lead->id, 'documentKey' => 'upload_resume']) }}" target="_blank" class="btn btn-success btn-sm">View Resume</a>
+                    @endif
+                @else
+                    <button class="btn btn-success btn-sm" disabled>View Resume</button>
+                @endif
 
                 <!-- Service Name and Action Icons -->
                 <div class="lead-header-right-group d-flex align-items-center">
@@ -522,6 +540,9 @@
                 $('#addFollowUpModalLabel').text('Add Follow-Up');
                 $('#followUpFormDetails')[0].reset();
                 $('#follow_up_lead_id_details').val(leadId); // Set lead ID again after reset
+                // Explicitly clear date and time fields
+                $('#next_follow_up_date_details').val('');
+                $('#next_follow_up_time_details').val('');
                 $('.next_follow_up_datetime_div_details, .send_reminder_div_details, .follow_up_subject_line_div_details').addClass('d-none');
                 $('#send_reminder_details').prop('checked', false);
                 $('#send_reminder_details').trigger('change');
@@ -534,6 +555,12 @@
                 
                 // Check if this is edit mode
                 var isEditMode = $('#follow_up_id_details').val() !== '';
+                
+                // Clear date and time fields if not in edit mode
+                if (!isEditMode) {
+                    $('#next_follow_up_date_details').val('');
+                    $('#next_follow_up_time_details').val('');
+                }
                 
                 // Initialize date picker - only allow future dates for new follow-ups
                 const dp = datepicker('#next_follow_up_date_details', {
@@ -802,6 +829,9 @@
                 $('#followUpFormDetails')[0].reset();
                 $('#follow_up_id_details').val('');
                 $('#addFollowUpModalLabel').text('Add Follow-Up');
+                // Explicitly clear date and time fields
+                $('#next_follow_up_date_details').val('');
+                $('#next_follow_up_time_details').val('');
                 $('.next_follow_up_datetime_div_details, .send_reminder_div_details, .follow_up_subject_line_div_details').addClass('d-none');
                 $('#send_reminder_details').prop('checked', false);
             });

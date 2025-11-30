@@ -270,14 +270,14 @@
                                 <div class="col-md-6">
                                     <x-forms.datepicker fieldId="next_follow_up_date"
                                         fieldLabel="Next Follow Up Date" fieldName="next_follow_up_date"
-                                        :fieldValue="now(company()->timezone)->format(company()->date_format)"
+                                        :fieldValue="''"
                                         :fieldPlaceholder="__('placeholders.date')" />
                                 </div>
                                 <div class="col-md-6">
                                     <div class="bootstrap-timepicker timepicker">
                                         <x-forms.text fieldLabel="Time" :fieldPlaceholder="__('placeholders.hours')"
                                             fieldName="next_follow_up_time" fieldId="next_follow_up_time"
-                                            :fieldValue="now(company()->timezone)->format(company()->time_format)" />
+                                            :fieldValue="''" />
                                     </div>
                                 </div>
                             </div>
@@ -739,6 +739,9 @@
             $('#addFollowUpModalListLabel').text('Add Follow-Up');
             $('#followUpFormList')[0].reset();
             $('#follow_up_lead_id').val(leadId); // Set lead ID again after reset
+            // Explicitly clear date and time fields
+            $('#next_follow_up_date').val('');
+            $('#next_follow_up_time').val('');
             $('.next_follow_up_datetime_div, .send_reminder_div, .follow_up_subject_line_div').addClass('d-none');
             $('#send_reminder').prop('checked', false);
             // Trigger change event to ensure UI is in sync
@@ -855,6 +858,12 @@
             
             // Check if this is edit mode
             var isEditMode = $('#follow_up_id').val() !== '';
+            
+            // Clear date and time fields if not in edit mode
+            if (!isEditMode) {
+                $('#next_follow_up_date').val('');
+                $('#next_follow_up_time').val('');
+            }
             
             // Initialize date picker - only allow future dates for new follow-ups
             const dp = datepicker('#next_follow_up_date', {
