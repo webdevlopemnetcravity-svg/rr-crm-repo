@@ -1053,6 +1053,10 @@
                 $('.select-picker').selectpicker('refresh');
                 // Remove any previous errors
                 removeProcessFieldErrors();
+                // Initialize additional documents when form is shown (with delay to ensure DOM is ready)
+                setTimeout(function() {
+                    window.initializeAdditionalDocuments();
+                }, 300);
             });
 
             // Cancel Process Button Click
@@ -1321,18 +1325,101 @@
                 addDocumentRow();
             });
 
+            // Function to update document row numbers sequentially
+            function updateDocumentRowNumbers() {
+                const $rows = $('#additional-documents-container .document-row');
+                $rows.each(function(index) {
+                    const newNum = index + 1;
+                    const $row = $(this);
+                    const oldNum = $row.data('document-index');
+                    
+                    // Skip if number is already correct
+                    if (oldNum == newNum) {
+                        return;
+                    }
+                    
+                    // Update row ID
+                    $row.attr('id', 'document-row-' + newNum);
+                    $row.attr('data-document-index', newNum);
+                    
+                    // Update document title
+                    $row.find('h6').text('Document ' + newNum);
+                    
+                    // Update remove button data attribute
+                    $row.find('.remove-document').attr('data-row-id', newNum);
+                    
+                    // Update all field IDs and names
+                    $row.find('[id*="additional_document_name_' + oldNum + '"]').each(function() {
+                        const $field = $(this);
+                        const oldId = $field.attr('id');
+                        const newId = oldId.replace('_' + oldNum, '_' + newNum);
+                        $field.attr('id', newId);
+                        if ($field.attr('name')) {
+                            $field.attr('name', $field.attr('name').replace('_' + oldNum, '_' + newNum));
+                        }
+                    });
+                    
+                    $row.find('[id*="additional_document_file_' + oldNum + '"]').each(function() {
+                        const $field = $(this);
+                        const oldId = $field.attr('id');
+                        const newId = oldId.replace('_' + oldNum, '_' + newNum);
+                        $field.attr('id', newId);
+                        if ($field.attr('name')) {
+                            $field.attr('name', $field.attr('name').replace('_' + oldNum, '_' + newNum));
+                        }
+                        if ($field.attr('data-document-index')) {
+                            $field.attr('data-document-index', newNum);
+                        }
+                    });
+                    
+                    // Update label for attributes
+                    $row.find('label[for*="additional_document_name_' + oldNum + '"]').each(function() {
+                        const $label = $(this);
+                        const oldFor = $label.attr('for');
+                        const newFor = oldFor.replace('_' + oldNum, '_' + newNum);
+                        $label.attr('for', newFor);
+                    });
+                    
+                    $row.find('label[for*="additional_document_file_' + oldNum + '"]').each(function() {
+                        const $label = $(this);
+                        const oldFor = $label.attr('for');
+                        const newFor = oldFor.replace('_' + oldNum, '_' + newNum);
+                        $label.attr('for', newFor);
+                    });
+                });
+                
+                // Update documentCounter to match the highest number
+                documentCounter = $rows.length;
+            }
+
             // Remove document row
             $(document).on('click', '.remove-document', function() {
                 const rowId = $(this).data('row-id');
                 $('#document-row-' + rowId).remove();
+                // Update row numbers after removal
+                updateDocumentRowNumbers();
             });
 
-            // Initialize additional documents if process data exists
-            @if(isset($processData) && $processData && $processData->additional_documents)
+            // Store additional documents data in JavaScript variable
+            var additionalDocumentsData = [];
+            
+            // Get processData from lead (same way as in process-tab.blade.php)
+            @php
+                $processDataForJS = null;
+                if (isset($lead) && $lead && $lead->process) {
+                    $processDataForJS = $lead->process;
+                }
+            @endphp
+            
+            @if($processDataForJS && $processDataForJS->additional_documents)
                 @php
-                    $additionalDocs = is_string($processData->additional_documents) 
-                        ? json_decode($processData->additional_documents, true) 
-                        : $processData->additional_documents;
+                    // Get additional_documents - handle both JSON string and array (from cast)
+                    $additionalDocsRaw = $processDataForJS->additional_documents;
+                    if (is_string($additionalDocsRaw)) {
+                        $additionalDocs = json_decode($additionalDocsRaw, true);
+                    } else {
+                        $additionalDocs = $additionalDocsRaw;
+                    }
                     $additionalDocs = is_array($additionalDocs) ? $additionalDocs : [];
                     
                     // Helper function to get document URL (same as in process-tab)
@@ -1351,31 +1438,91 @@
                     };
                 @endphp
                 @if(count($additionalDocs) > 0)
-                    $(document).ready(function() {
+                    additionalDocumentsData = [
                         @foreach($additionalDocs as $index => $doc)
                             @php
                                 $docName = $doc['document_name'] ?? '';
                                 $docFile = $doc['document_file'] ?? '';
                                 $docUrl = $getDocumentUrl($docFile);
                             @endphp
-                            addDocumentRow({
+                            {
                                 document_name: {!! json_encode($docName) !!},
-                                document_file: {!! json_encode($docFile) !!}
-                            });
-                            
-                            // Update file link URL after row is added
-                            setTimeout(function() {
-                                @if($docUrl)
-                                    var $fileLink = $('#additional-documents-container').find('.existing-file-link[data-file="' + {!! json_encode($docFile) !!} + '"]').last();
-                                    if ($fileLink.length > 0) {
-                                        $fileLink.attr('href', {!! json_encode($docUrl) !!});
-                                    }
-                                @endif
-                            }, 100);
+                                document_file: {!! json_encode($docFile) !!},
+                                document_url: {!! json_encode($docUrl) !!}
+                            }@if(!$loop->last),@endif
                         @endforeach
-                    });
+                    ];
                 @endif
             @endif
+
+            // Function to initialize additional documents (make it globally accessible)
+            window.initializeAdditionalDocuments = function() {
+                // Wait for form section to be visible
+                var $container = $('#additional-documents-container');
+                var $formSection = $('#processFormSection');
+                
+                // Check if container exists and form section is visible
+                if ($container.length === 0 || !$formSection.is(':visible')) {
+                    // Retry after a short delay (max 5 retries)
+                    if (!window.initRetryCount) window.initRetryCount = 0;
+                    if (window.initRetryCount < 5) {
+                        window.initRetryCount++;
+                        setTimeout(function() {
+                            window.initializeAdditionalDocuments();
+                        }, 200);
+                    } else {
+                        window.initRetryCount = 0;
+                    }
+                    return;
+                }
+                
+                window.initRetryCount = 0; // Reset counter on success
+                
+                // Clear existing documents first to avoid duplicates
+                $container.empty();
+                documentCounter = 0;
+                
+                // Check if helper functions are available
+                if (typeof addDocumentRow !== 'function') {
+                    return;
+                }
+                if (typeof getNextDocumentNumber !== 'function') {
+                    return;
+                }
+                
+                // Load documents from stored data
+                if (additionalDocumentsData && Array.isArray(additionalDocumentsData) && additionalDocumentsData.length > 0) {
+                    additionalDocumentsData.forEach(function(doc, index) {
+                        if (doc && doc.document_name) {
+                            try {
+                                addDocumentRow({
+                                    document_name: doc.document_name || '',
+                                    document_file: doc.document_file || ''
+                                });
+                                
+                                // Update file link URL after row is added
+                                if (doc.document_url) {
+                                    setTimeout(function() {
+                                        var $fileLink = $('#additional-documents-container').find('.existing-file-link[data-file="' + doc.document_file + '"]').last();
+                                        if ($fileLink.length > 0) {
+                                            $fileLink.attr('href', doc.document_url);
+                                        }
+                                    }, 300);
+                                }
+                            } catch (e) {
+                                // Silently handle errors
+                            }
+                        }
+                    });
+                }
+            };
+
+            // Initialize additional documents on page load if form is visible
+            $(document).ready(function() {
+                if ($('#processFormSection').is(':visible')) {
+                    window.initializeAdditionalDocuments();
+                }
+            });
 
             // File size validation for additional documents
             $(document).on('change', '#additional-documents-container input[type="file"][data-max-size]', function() {
@@ -2073,7 +2220,6 @@
                         
                         // Store account ID for download
                         $('#viewInvoiceModal').data('account-id', accountId);
-                        console.log('Account ID stored for download:', accountId);
                         
                         $('#viewInvoiceModal').modal('show');
                     }
@@ -2088,7 +2234,7 @@
             // Check if html2pdf is loaded
             if (typeof html2pdf === 'undefined') {
                 alert('PDF library is loading. Please wait a moment and try again.');
-                console.error('html2pdf library is not loaded');
+                // html2pdf library is not loaded
                 return;
             }
             
@@ -2131,7 +2277,7 @@
                 // Restore button
                 btn.prop('disabled', false).html(originalText);
             }).catch(function(error) {
-                console.error('PDF generation error:', error);
+                // PDF generation error occurred
                 alert('Failed to generate PDF. Please try again.');
                 btn.prop('disabled', false).html(originalText);
             });
