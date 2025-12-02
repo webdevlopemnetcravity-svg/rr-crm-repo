@@ -1166,6 +1166,43 @@
                     }
                 });
                 
+                // Collect additional documents data
+                var additionalDocuments = [];
+                $('#additional-documents-container .document-row').each(function() {
+                    var $row = $(this);
+                    var docIndex = $row.data('document-index');
+                    var docName = $('#additional_document_name_' + docIndex).val();
+                    var docFileInput = $('#additional_document_file_' + docIndex)[0];
+                    var hasNewFile = docFileInput && docFileInput.files && docFileInput.files.length > 0;
+                    var existingFile = $row.find('.existing-file-link').attr('data-file');
+                    
+                    // Only add if document name is provided
+                    if (docName && docName.trim() !== '') {
+                        // Validate that either new file or existing file is present
+                        if (!hasNewFile && !existingFile) {
+                            isValid = false;
+                            showProcessFieldError('#additional_document_file_' + docIndex, 'Document file is required');
+                            return false;
+                        }
+                        
+                        var docData = {
+                            document_name: docName,
+                            document_file: hasNewFile ? 'NEW_FILE_' + docIndex : (existingFile || '')
+                        };
+                        additionalDocuments.push(docData);
+                    }
+                });
+                
+                // Add additional documents as JSON to form (remove any existing one first)
+                $('#processForm input[name="additional_documents_json"]').remove();
+                if (additionalDocuments.length > 0) {
+                    $('<input>').attr({
+                        type: 'hidden',
+                        name: 'additional_documents_json',
+                        value: JSON.stringify(additionalDocuments)
+                    }).appendTo('#processForm');
+                }
+                
                 $.easyAjax({
                     url: "{{ route('new-leads.process-store') }}",
                     container: '#processForm',
@@ -1211,6 +1248,160 @@
                 
                 return false;
             });
+
+            // ========== ADDITIONAL DOCUMENTS DYNAMIC FORM ==========
+            let documentCounter = 0;
+
+            // Function to get next document number
+            function getNextDocumentNumber() {
+                documentCounter++;
+                return documentCounter;
+            }
+
+            // Function to generate document row HTML
+            function generateDocumentRow(docNum, docData = null) {
+                const docName = docData && docData.document_name ? docData.document_name : '';
+                const docFile = docData && docData.document_file ? docData.document_file : '';
+                const fileName = docFile ? docFile.split('/').pop() : '';
+                const existingFileHtml = docFile ? `<div class="mt-1"><small class="text-muted file-name-display">Current: <a href="#" class="existing-file-link" data-file="${docFile}" target="_blank">${fileName}</a></small></div>` : '';
+                
+                return `
+                    <div class="document-row mb-3 p-3 border rounded" id="document-row-${docNum}" data-document-index="${docNum}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0 f-14 font-weight-bold">Document ${docNum}</h6>
+                            <button type="button" class="btn btn-danger btn-sm remove-document" data-row-id="${docNum}">
+                                <i class="fa fa-trash mr-1"></i> Remove
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <x-forms.label fieldId="additional_document_name_${docNum}" fieldLabel="Document Name *">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="additional_document_name_${docNum}" id="additional_document_name_${docNum}" value="${docName}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <x-forms.label fieldId="additional_document_file_${docNum}" fieldLabel="Upload Document ${docFile ? '' : '*'}" fieldRequired="${!docFile}">
+                                </x-forms.label>
+                                <input type="file" class="form-control height-35 f-14" name="additional_document_file_${docNum}" id="additional_document_file_${docNum}" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" data-max-size="5242880" data-document-index="${docNum}" ${!docFile ? 'required' : ''}>
+                                ${existingFileHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Function to add a document row
+            function addDocumentRow(docData = null) {
+                const docNum = getNextDocumentNumber();
+                const newRow = generateDocumentRow(docNum, docData);
+                
+                // Append to the container
+                $('#additional-documents-container').append(newRow);
+                
+                // Update file URL for existing file if docData is provided
+                if (docData && docData.document_file) {
+                    const $docRow = $('#document-row-' + docNum);
+                    const fileUrl = getDocumentFileUrl(docData.document_file);
+                    const $fileLink = $docRow.find('.existing-file-link[data-file="' + docData.document_file + '"]');
+                    if ($fileLink.length > 0 && fileUrl) {
+                        $fileLink.attr('href', fileUrl).attr('target', '_blank');
+                    }
+                }
+            }
+
+            // Function to get document file URL (will be set when document row is added with existing data)
+            function getDocumentFileUrl(fileName) {
+                if (!fileName) return null;
+                // The URL will be set from PHP when loading existing documents
+                return null; // Will be updated by PHP when rendering
+            }
+
+            // Add More Document button click handler
+            $(document).on('click', '#add-more-document', function() {
+                addDocumentRow();
+            });
+
+            // Remove document row
+            $(document).on('click', '.remove-document', function() {
+                const rowId = $(this).data('row-id');
+                $('#document-row-' + rowId).remove();
+            });
+
+            // Initialize additional documents if process data exists
+            @if(isset($processData) && $processData && $processData->additional_documents)
+                @php
+                    $additionalDocs = is_string($processData->additional_documents) 
+                        ? json_decode($processData->additional_documents, true) 
+                        : $processData->additional_documents;
+                    $additionalDocs = is_array($additionalDocs) ? $additionalDocs : [];
+                    
+                    // Helper function to get document URL (same as in process-tab)
+                    $getDocumentUrl = function($fileName) use ($lead) {
+                        if (empty($fileName)) return null;
+                        try {
+                            if (strpos($fileName, 'public/') === 0) {
+                                $filePath = $fileName;
+                            } else {
+                                $filePath = 'public/' . $fileName;
+                            }
+                            return asset_url_local_s3($filePath);
+                        } catch (\Exception $e) {
+                            return null;
+                        }
+                    };
+                @endphp
+                @if(count($additionalDocs) > 0)
+                    $(document).ready(function() {
+                        @foreach($additionalDocs as $index => $doc)
+                            @php
+                                $docName = $doc['document_name'] ?? '';
+                                $docFile = $doc['document_file'] ?? '';
+                                $docUrl = $getDocumentUrl($docFile);
+                            @endphp
+                            addDocumentRow({
+                                document_name: {!! json_encode($docName) !!},
+                                document_file: {!! json_encode($docFile) !!}
+                            });
+                            
+                            // Update file link URL after row is added
+                            setTimeout(function() {
+                                @if($docUrl)
+                                    var $fileLink = $('#additional-documents-container').find('.existing-file-link[data-file="' + {!! json_encode($docFile) !!} + '"]').last();
+                                    if ($fileLink.length > 0) {
+                                        $fileLink.attr('href', {!! json_encode($docUrl) !!});
+                                    }
+                                @endif
+                            }, 100);
+                        @endforeach
+                    });
+                @endif
+            @endif
+
+            // File size validation for additional documents
+            $(document).on('change', '#additional-documents-container input[type="file"][data-max-size]', function() {
+                const file = this.files[0];
+                const maxSize = $(this).data('max-size'); // 5242880 = 5MB
+                const fieldId = $(this).attr('id');
+                
+                // Remove previous error
+                $(this).removeClass('is-invalid');
+                $(this).closest('.document-row').find('.invalid-feedback').remove();
+                
+                if (file && file.size > maxSize) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File Too Large',
+                            text: 'File size must be less than 5MB.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                    $(this).val('');
+                    $(this).addClass('is-invalid');
+                    return false;
+                }
+            });
+            // ========== END ADDITIONAL DOCUMENTS ==========
 
             // Send Template Document via Email
             $(document).on('click', '.send-template-email', function(e) {

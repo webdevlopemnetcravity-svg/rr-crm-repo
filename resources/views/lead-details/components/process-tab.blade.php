@@ -253,6 +253,23 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Additional Documents Section -->
+                <div class="info-section mb-1">
+                    <div class="info-section-title mb-3">
+                        <h4 class="f-16 font-weight-bold">Additional Documents</h4>
+                    </div>
+                    <!-- Dynamic Additional Documents Rows Container -->
+                    <div id="additional-documents-container"></div>
+                    
+                    <!-- Add More Document Button -->
+                    <div class="mt-3 mb-3">
+                        <button type="button" class="btn btn-secondary btn-sm" id="add-more-document">
+                            <i class="fa fa-plus mr-1"></i> Add More Document
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Save Button at bottom of form -->
                 <div class="mt-4">
                     <button type="button" class="btn btn-primary" id="saveProcessFormBtn">
@@ -532,6 +549,55 @@
                                 @endif
                             </div>
                         </div>
+                    @endif
+                    
+                    <!-- Additional Documents -->
+                    @if($processData && $processData->additional_documents)
+                        @php
+                            $additionalDocs = is_string($processData->additional_documents) 
+                                ? json_decode($processData->additional_documents, true) 
+                                : $processData->additional_documents;
+                            $additionalDocs = is_array($additionalDocs) ? $additionalDocs : [];
+                            
+                            // Helper function to get document URL
+                            $getAdditionalDocUrl = function($fileName) use ($lead) {
+                                if (empty($fileName)) return null;
+                                try {
+                                    if (strpos($fileName, 'public/') === 0) {
+                                        $filePath = $fileName;
+                                    } else {
+                                        $filePath = 'public/' . $fileName;
+                                    }
+                                    return asset_url_local_s3($filePath);
+                                } catch (\Exception $e) {
+                                    return null;
+                                }
+                            };
+                        @endphp
+                        @if(count($additionalDocs) > 0)
+                            @foreach($additionalDocs as $doc)
+                                @php
+                                    $docName = $doc['document_name'] ?? 'N/A';
+                                    $docFile = $doc['document_file'] ?? '';
+                                    $docUrl = $getAdditionalDocUrl($docFile);
+                                @endphp
+                                @if($docFile)
+                                    <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
+                                        <div class="d-flex align-items-center">
+                                            <div class="upload-document-icon mr-3">
+                                                <i class="fa fa-file-pdf text-danger"></i>
+                                            </div>
+                                            <span class="upload-document-name f-14 font-weight-400">{{ $docName }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            @if($docUrl)
+                                                <a href="{{ $docUrl }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        @endif
                     @endif
                 </div>
             </div>

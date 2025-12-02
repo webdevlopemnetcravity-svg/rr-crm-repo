@@ -4221,6 +4221,62 @@ class LeadContactController extends AccountBaseController
             }
         }
 
+        // Handle additional documents
+        $additionalDocuments = [];
+        if ($request->has('additional_documents_json')) {
+            $documentsData = json_decode($request->additional_documents_json, true);
+            if (is_array($documentsData)) {
+                foreach ($documentsData as $docData) {
+                    $docName = $docData['document_name'] ?? '';
+                    $docFileIndicator = $docData['document_file'] ?? '';
+                    
+                    if (empty($docName)) {
+                        continue;
+                    }
+                    
+                    $documentFile = null;
+                    
+                    // Check if it's a new file indicator (NEW_FILE_{index})
+                    if (strpos($docFileIndicator, 'NEW_FILE_') === 0) {
+                        // Extract the index from NEW_FILE_{index}
+                        $fileIndex = str_replace('NEW_FILE_', '', $docFileIndicator);
+                        $fileFieldName = 'additional_document_file_' . $fileIndex;
+                        
+                        // Check if new file is uploaded
+                        if ($request->hasFile($fileFieldName)) {
+                            $file = $request->file($fileFieldName);
+                            $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                            $folderPath = 'public/process_documents/' . $newLead->id;
+                            \App\Helper\Files::fileStore($file, $folderPath, $customFileName);
+                            
+                            // Also store using Storage for consistency
+                            $fileVisibility = [];
+                            if (config('filesystems.default') == 'local') {
+                                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                            }
+                            \Storage::disk(config('filesystems.default'))->putFileAs($folderPath, $file, $customFileName, $fileVisibility);
+                            
+                            $documentFile = $folderPath . '/' . $customFileName;
+                        }
+                    } elseif (!empty($docFileIndicator)) {
+                        // Keep existing file
+                        $documentFile = $docFileIndicator;
+                    }
+                    
+                    // Only add if we have a file (either new or existing)
+                    if ($documentFile) {
+                        $additionalDocuments[] = [
+                            'document_name' => $docName,
+                            'document_file' => $documentFile
+                        ];
+                    }
+                }
+            }
+        }
+        
+        // Store additional documents as JSON
+        $process->additional_documents = !empty($additionalDocuments) ? json_encode($additionalDocuments) : null;
+
         $process->save();
 
         return Reply::success(__('messages.recordSaved'));

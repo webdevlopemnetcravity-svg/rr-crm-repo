@@ -33,6 +33,7 @@ class NewLeadProcess extends BaseModel
         'medical_letter',
         'air_ticket',
         'accommodation_letter',
+        'additional_documents',
         'added_by',
         'last_updated_by',
     ];
@@ -42,6 +43,7 @@ class NewLeadProcess extends BaseModel
         'remaining_fees_due_date' => 'date',
         'bank_cheque_handover_date' => 'date',
         'passport_handover_date' => 'date',
+        'additional_documents' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
