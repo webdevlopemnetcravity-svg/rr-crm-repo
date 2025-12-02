@@ -413,7 +413,7 @@
                                 <div class="footer-email">{{ company()->company_email ?? 'info.rrpei@gmail.com' }}</div>
                             </div>
                             <div class="col-md-4 mb-3 text-right">
-                                <div class="footer-address">{{ company()->address ?? '3rd Floor, Aaron Spectra, 302, Rajpath Rangoli Rd, behind Rajpath Club, Bodakdev, Ahmedabad, Gujarat 380059' }}</div>
+                                <div class="footer-address">3rd Floor, Aaron Spectra, 302, Rajpath Rangoli Rd, behind Rajpath Club, Bodakdev, Ahmedabad, Gujarat 380059 </div>
                             </div>
                         </div>
                     </div>
