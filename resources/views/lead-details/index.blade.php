@@ -1184,43 +1184,9 @@
                                 }
                             } catch (e) {}
                             
-                            // Refresh only the Process tab content without reloading the page
-                            var leadId = $('#process_lead_id').val();
-                            if (leadId) {
-                                // Fetch updated Process tab content via AJAX
-                                $.ajax({
-                                    url: "{{ route('new-leads.process-tab', ['id' => ':leadId']) }}".replace(':leadId', leadId),
-                                    type: "GET",
-                                    success: function(response) {
-                                        if (response.status == "success" && response.data && response.data.html) {
-                                            // Replace the Process tab content
-                                            $('#processTab').html(response.data.html);
-                                            
-                                            // Show details section and hide form section
-                                            $('#processDetailsSection').show();
-                                            $('#processFormSection').hide();
-                                            $('#editProcessBtn').show();
-                                            $('#processFormActions').hide();
-                                            
-                                            // Remove any previous errors
-                                            removeProcessFieldErrors();
-                                        } else {
-                                            // Fallback: reload page if response is invalid
-                                            window.location.hash = 'processTab';
-                                            window.location.reload();
-                                        }
-                                    },
-                                    error: function() {
-                                        // Fallback: reload page on error
-                                        window.location.hash = 'processTab';
-                                        window.location.reload();
-                                    }
-                                });
-                            } else {
-                                // Fallback: reload page if no lead ID
-                                window.location.hash = 'processTab';
-                                window.location.reload();
-                            }
+                            // Refresh the page to show updated data
+                            window.location.hash = 'processTab';
+                            window.location.reload();
                         }
                     },
                     error: function(xhr, status, error) {
