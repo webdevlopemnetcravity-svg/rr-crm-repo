@@ -35,6 +35,37 @@
     min-width: 150px;
 }
 
+/* Remove padding and border from priority dropdown only */
+.priority-dropdown .bootstrap-select .dropdown-toggle {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+.priority-dropdown .bootstrap-select .dropdown-toggle:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.priority-dropdown .bootstrap-select .dropdown-toggle .filter-option {
+    padding: 0 !important;
+}
+
+/* Style for priority dropdown menu items */
+.priority-dropdown .bootstrap-select .dropdown-menu li a {
+    padding: 8px 12px;
+}
+
+.priority-dropdown .bootstrap-select .dropdown-menu li a .d-flex {
+    align-items: center;
+}
+
+.priority-dropdown .bootstrap-select .dropdown-menu li a img {
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+}
+
 /* Status and Quality dropdown button styling */
 .status-dropdown .bootstrap-select .dropdown-toggle,
 .lead-quality-dropdown .bootstrap-select .dropdown-toggle {

@@ -523,6 +523,92 @@
                 });
             }
 
+            // Function to update priority dropdown display with icon
+            // Note: bootstrap-select should automatically render from data-content attribute,
+            // but we use this as a fallback to ensure icons are displayed correctly
+            function updatePriorityDisplay($select) {
+                if (!$select || !$select.length) {
+                    return false;
+                }
+                
+                try {
+                    var priority = $select.val();
+                    if (!priority) {
+                        return false;
+                    }
+                    
+                    // Wait a bit to ensure bootstrap-select has rendered
+                    var $bootstrapSelect = $select.closest('.bootstrap-select');
+                    
+                    if (!$bootstrapSelect.length) {
+                        // Try parent if closest doesn't work
+                        $bootstrapSelect = $select.parent('.bootstrap-select');
+                    }
+                    
+                    if (!$bootstrapSelect.length) {
+                        return false;
+                    }
+                    
+                    // Find the filter-option element - check if it exists and is not null
+                    var $filterOption = $bootstrapSelect.find('.filter-option');
+                    
+                    if (!$filterOption.length) {
+                        // Try alternative selectors
+                        $filterOption = $bootstrapSelect.find('.filter-option-inner');
+                    }
+                    
+                    if (!$filterOption.length) {
+                        $filterOption = $bootstrapSelect.find('.dropdown-toggle .filter-option');
+                    }
+                    
+                    // If still not found, return early to avoid null reference error
+                    if (!$filterOption.length || $filterOption.length === 0) {
+                        return false;
+                    }
+                    
+                    // Double check the element exists before manipulating
+                    var filterOptionElement = $filterOption[0];
+                    if (!filterOptionElement) {
+                        return false;
+                    }
+                    
+                    var priorityIconMap = {
+                        'Select Priority': '',
+                        '1st Priority': '1st_Priority.svg',
+                        '2nd Priority': '2nd_Priority.svg',
+                        '3rd Priority': '3rd_Priority.svg',
+                        '4th Priority': '4th_Priority.svg',
+                        '5th Priority': '5th_Priority.svg',
+                    };
+                    
+                    var iconFile = priorityIconMap[priority] || '';
+                    
+                    // Only update if we have an icon and element exists, otherwise let bootstrap-select handle it via data-content
+                    if (iconFile && priority !== 'Select Priority' && filterOptionElement) {
+                        var iconPath = '{{ asset("img/icon") }}/' + iconFile;
+                        var $existingContent = $filterOption.find('img');
+                        if (!$existingContent.length && filterOptionElement.innerHTML !== undefined) {
+                            // Only update if icon is not already there and element is ready
+                            filterOptionElement.innerHTML = '<div class="d-flex align-items-center"><img src="' + iconPath + '" style="width: 18px; height: 18px; margin-right: 6px;"><span>' + priority + '</span></div>';
+                        }
+                    } else if (priority === 'Select Priority' && filterOptionElement && filterOptionElement.textContent !== undefined) {
+                        // For Select Priority, ensure it shows the text
+                        var currentText = filterOptionElement.textContent.trim();
+                        if (currentText !== priority && currentText !== 'No Priority Set') {
+                            filterOptionElement.textContent = priority;
+                        }
+                    }
+                    
+                    return true;
+                } catch (e) {
+                    // Silently fail - bootstrap-select should handle rendering via data-content
+                    return false;
+                }
+            }
+            
+            // Make function globally accessible
+            window.updatePriorityDisplay = updatePriorityDisplay;
+
             // Initialize select pickers and tooltips after table draw
             $('#new-leads-table').on('draw.dt', function() {
                 $('.priority-select, .status-select, .quality-select').selectpicker();
@@ -530,6 +616,18 @@
                 setTimeout(function() {
                     initFollowUpTooltips();
                     applyAllDropdownColors();
+                    // Update priority displays with icons after selectpicker has fully rendered
+                    setTimeout(function() {
+                        $('.priority-select').each(function() {
+                            try {
+                                if (typeof updatePriorityDisplay === 'function') {
+                                    updatePriorityDisplay($(this));
+                                }
+                            } catch (e) {
+                                // Silently fail - bootstrap-select should handle rendering via data-content
+                            }
+                        });
+                    }, 200);
                 }, 100);
             });
 
@@ -537,6 +635,12 @@
             setTimeout(function() {
                 initFollowUpTooltips();
                 applyAllDropdownColors();
+                // Update priority displays with icons
+                $('.priority-select').each(function() {
+                    if (typeof updatePriorityDisplay === 'function') {
+                        updatePriorityDisplay($(this));
+                    }
+                });
             }, 500);
         });
 
@@ -631,6 +735,17 @@
             
             previousValues[key] = priority;
             
+            // Let bootstrap-select render first via data-content, then update if needed
+            setTimeout(function() {
+                try {
+                    if (typeof updatePriorityDisplay === 'function') {
+                        updatePriorityDisplay($select);
+                    }
+                } catch (e) {
+                    // Silently fail - bootstrap-select should handle rendering via data-content
+                }
+            }, 200);
+            
             $.easyAjax({
                 url: "{{ route('new-leads.update_priority') }}",
                 type: "POST",
@@ -641,12 +756,41 @@
                 },
                 success: function(response) {
                     if (response.status == 'success') {
-                        // Optionally show a success message
+                        // Refresh selectpicker to ensure correct display
+                        setTimeout(function() {
+                            try {
+                                $select.selectpicker('refresh');
+                                // Wait for refresh to complete, then update display
+                                setTimeout(function() {
+                                    try {
+                                        if (typeof updatePriorityDisplay === 'function') {
+                                            updatePriorityDisplay($select);
+                                        }
+                                    } catch (e) {
+                                        // Silently fail - bootstrap-select should handle rendering via data-content
+                                    }
+                                }, 100);
+                            } catch (e) {
+                                // Silently fail
+                            }
+                        }, 100);
                     }
                 },
                 error: function() {
                     // Reset previous value on error
                     delete previousValues[key];
+                    // Revert display
+                    try {
+                        $select.selectpicker('val', previousValue);
+                        $select.selectpicker('refresh');
+                        setTimeout(function() {
+                            if (typeof updatePriorityDisplay === 'function') {
+                                updatePriorityDisplay($select);
+                            }
+                        }, 100);
+                    } catch (e) {
+                        console.error('Error reverting priority:', e);
+                    }
                 }
             });
         });

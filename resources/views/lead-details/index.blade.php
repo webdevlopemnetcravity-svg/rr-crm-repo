@@ -30,16 +30,33 @@
                 <div class="lead-header-left-group d-flex align-items-center">
                     <div class="lead-avatar-section d-flex align-items-center">
                         <div class="lead-avatar-circle text-white rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
-                            <img src="{{ asset('img/icon/user.svg') }}">
+                            <img src="{{ asset('img/icon/User.svg') }}">
                         </div>
                         <div class="lead-info-group">
                             <div class="lead-priority d-flex align-items-center mb-1">
                                 @if(isset($lead) && $lead)
-                                    <img src="{{ asset('img/icon/' . str_replace(' ', '_', $lead->priority) . '.svg') }}">
-                                    <span class="f-12 pl-1">{{ $lead->priority ?? 'Select Priority' }}</span>
+                                    @php
+                                        $priority = $lead->priority ?? 'Select Priority';
+                                    @endphp
+                                    @if($priority == 'Select Priority')
+                                        <span class="f-12">No Priority Set</span>
+                                    @else
+                                        @php
+                                            // Map priority to icon filename
+                                            $priorityIconMap = [
+                                                '1st Priority' => '1st_Priority.svg',
+                                                '2nd Priority' => '2nd_Priority.svg',
+                                                '3rd Priority' => '3rd_Priority.svg',
+                                                '4th Priority' => '4th_Priority.svg',
+                                                '5th Priority' => '5th_Priority.svg',
+                                            ];
+                                            $iconFile = $priorityIconMap[$priority] ?? '1st_Priority.svg';
+                                        @endphp
+                                        <img src="{{ asset('img/icon/' . $iconFile) }}">
+                                        <span class="f-12 pl-1">{{ $priority }}</span>
+                                    @endif
                                 @else
-                                    <img src="{{ asset('img/icon/1st_Priority.svg') }}">
-                                    <span class="f-12 pl-1">1st Priority</span>
+                                    <span class="f-12">No Priority Set</span>
                                 @endif
                             </div>
                             <div class="lead-id-header f-14 font-weight-bold">

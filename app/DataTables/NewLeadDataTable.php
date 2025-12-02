@@ -95,10 +95,29 @@ class NewLeadDataTable extends BaseDataTable
             $priorityOptions = ['Select Priority', '1st Priority', '2nd Priority', '3rd Priority', '4th Priority', '5th Priority'];
             $currentPriority = $row->priority ?? 'Select Priority';
             
+            // Map priorities to icon files
+            $priorityIconMap = [
+                'Select Priority' => '',
+                '1st Priority' => '1st_Priority.svg',
+                '2nd Priority' => '2nd_Priority.svg',
+                '3rd Priority' => '3rd_Priority.svg',
+                '4th Priority' => '4th_Priority.svg',
+                '5th Priority' => '5th_Priority.svg',
+            ];
+            
             $prioritySelect = '<select class="form-control select-picker priority-select f-14" data-lead-id="' . $row->id . '" data-size="8">';
             foreach ($priorityOptions as $option) {
                 $selected = ($currentPriority == $option) ? 'selected' : '';
-                $prioritySelect .= '<option value="' . $option . '" ' . $selected . '>' . $option . '</option>';
+                $iconFile = $priorityIconMap[$option] ?? '';
+                
+                // Build data-content with icon if available
+                if ($iconFile && $option != 'Select Priority') {
+                    $iconPath = asset('img/icon/' . $iconFile);
+                    $content = '<div class="d-flex align-items-center"><img src="' . $iconPath . '" style="width: 18px; height: 18px; margin-right: 6px;"><span>' . htmlspecialchars($option) . '</span></div>';
+                    $prioritySelect .= '<option value="' . htmlspecialchars($option) . '" ' . $selected . ' data-content="' . htmlspecialchars($content, ENT_QUOTES) . '">' . htmlspecialchars($option) . '</option>';
+                } else {
+                    $prioritySelect .= '<option value="' . htmlspecialchars($option) . '" ' . $selected . '>' . htmlspecialchars($option) . '</option>';
+                }
             }
             $prioritySelect .= '</select>';
             
