@@ -558,10 +558,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::delete('new-leads/account/{id}', [LeadContactController::class, 'deleteNewLeadAccount'])->name('new-leads.account-delete');
     Route::get('new-leads/accounts/{id}', [LeadContactController::class, 'getNewLeadAccounts'])->name('new-leads.accounts');
     Route::get('new-leads/documents-tab/{id}', [LeadContactController::class, 'getNewLeadDocumentsTab'])->name('new-leads.documents-tab');
+    Route::get('new-leads/process-tab/{id}', [LeadContactController::class, 'getNewLeadProcessTab'])->name('new-leads.process-tab');
     Route::post('new-leads/{leadId}/upload-document', [LeadContactController::class, 'uploadLeadDocument'])->name('new-leads.upload-document');
     Route::post('new-leads/process-store', [LeadContactController::class, 'storeNewLeadProcess'])->name('new-leads.process-store');
     Route::post('new-leads/travel-details-store', [LeadContactController::class, 'storeNewLeadTravelDetails'])->name('new-leads.travel-details-store');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');
+    Route::get('lead-details/{leadId}/view-process-document/{documentField}', [LeadContactController::class, 'viewProcessDocument'])->name('lead-details.view-process-document');
     // Specific routes must come before generic route
     Route::get('lead-details/{leadId}/download-document/{documentKey}', [LeadContactController::class, 'downloadLeadDocument'])->name('lead-details.download-document');
     Route::post('lead-details/{leadId}/send-template-document/{documentId}', [LeadContactController::class, 'sendTemplateDocumentEmail'])->name('lead-details.send-template-document');

@@ -3394,6 +3394,83 @@ class LeadContactController extends AccountBaseController
     }
     
     /**
+     * View process document
+     */
+    public function viewProcessDocument($leadId, $documentField)
+    {
+        try {
+            $lead = NewLead::findOrFail($leadId);
+            $process = $lead->process;
+            
+            if (!$process) {
+                abort(404, 'Process data not found');
+            }
+            
+            // Valid document fields
+            $validFields = ['contract_letter', 'grant_letter', 'offer_letter', 'medical_letter', 'air_ticket', 'accommodation_letter'];
+            
+            if (!in_array($documentField, $validFields)) {
+                abort(404, 'Invalid document field');
+            }
+            
+            $fileName = $process->$documentField;
+            
+            if (!$fileName) {
+                abort(404, 'Document not found');
+            }
+            
+            \Log::info('Process document request - Lead ID: ' . $leadId . ', Field: ' . $documentField . ', FileName: ' . $fileName);
+            
+            // Files are stored using storeAs('public', $fileName), so they're in storage/app/public/
+            // The fileName stored in DB is like: process_documents/6/contract_letter_1234567890.pdf
+            // Check if file exists in public storage
+            if (!\Storage::disk('public')->exists($fileName)) {
+                \Log::error('Process document not found in storage: ' . $fileName);
+                \Log::error('Storage path: ' . storage_path('app/public/' . $fileName));
+                \Log::error('Full path: ' . \Storage::disk('public')->path($fileName));
+                abort(404, 'File not found: ' . $fileName);
+            }
+            
+            // Files are stored in public/user-uploads/public/process_documents/{leadId}/{filename}
+            // The fileName stored in DB might be: process_documents/5/contract_letter_1234567890.pdf
+            // Or: public/process_documents/5/contract_letter_1234567890.pdf
+            
+            // Ensure fileName is properly formatted
+            $fileName = ltrim($fileName, '/');
+            
+            // Check if fileName already includes 'public/'
+            if (strpos($fileName, 'public/') === 0) {
+                // Already has public/ prefix, use as is
+                $filePath = $fileName;
+            } else {
+                // Add public/ prefix
+                $filePath = 'public/' . $fileName;
+            }
+            
+            // Use asset_url_local_s3 which handles user-uploads path correctly
+            // asset_url_local_s3 adds 'user-uploads/' prefix automatically
+            $fileUrl = asset_url_local_s3($filePath);
+            
+            \Log::info('Generated file URL: ' . $fileUrl);
+            \Log::info('FileName from DB: ' . $fileName);
+            \Log::info('File path used: ' . $filePath);
+            
+            // If using S3 or other storage, use the configured default disk
+            if (in_array(config('filesystems.default'), \App\Models\StorageSetting::S3_COMPATIBLE_STORAGE)) {
+                // For S3, use the default disk which should be configured
+                $fileUrl = \Storage::disk(config('filesystems.default'))->url($filePath);
+            }
+            
+            return redirect($fileUrl);
+        } catch (\Exception $e) {
+            \Log::error('Error viewing process document: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('Lead ID: ' . $leadId . ', Document Field: ' . $documentField);
+            abort(404, 'Document not found: ' . $e->getMessage());
+        }
+    }
+    
+    /**
      * Get documents tab content for AJAX refresh
      */
     public function getNewLeadDocumentsTab($leadId)
@@ -3415,6 +3492,27 @@ class LeadContactController extends AccountBaseController
             \Log::error('Error in getNewLeadDocumentsTab: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
             return Reply::error('Failed to load documents: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Get process tab content for AJAX refresh
+     */
+    public function getNewLeadProcessTab($leadId)
+    {
+        try {
+            $lead = NewLead::with(['process'])->findOrFail($leadId);
+            
+            $this->lead = $lead;
+            $this->data['lead'] = $lead;
+            
+            $html = view('lead-details.components.process-tab', $this->data)->render();
+            
+            return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
+        } catch (\Exception $e) {
+            \Log::error('Error in getNewLeadProcessTab: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return Reply::error('Failed to load process tab: ' . $e->getMessage());
         }
     }
 
@@ -4106,9 +4204,20 @@ class LeadContactController extends AccountBaseController
         foreach ($fileFields as $field) {
             if ($request->hasFile($field)) {
                 $file = $request->file($field);
-                $fileName = 'process_documents/' . $newLead->id . '/' . $field . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('public', $fileName);
-                $process->$field = $fileName;
+                // Use Files::fileStore to match other document uploads (stores in user-uploads)
+                $customFileName = \App\Helper\Files::generateFileNameWithOriginal($file->getClientOriginalName());
+                $folderPath = 'public/process_documents/' . $newLead->id;
+                \App\Helper\Files::fileStore($file, $folderPath, $customFileName);
+                
+                // Also store using Storage for consistency
+                $fileVisibility = [];
+                if (config('filesystems.default') == 'local') {
+                    $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+                }
+                \Storage::disk(config('filesystems.default'))->putFileAs($folderPath, $file, $customFileName, $fileVisibility);
+                
+                // Store relative path: public/process_documents/{leadId}/{filename}
+                $process->$field = $folderPath . '/' . $customFileName;
             }
         }
 

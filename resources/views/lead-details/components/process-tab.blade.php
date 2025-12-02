@@ -208,7 +208,7 @@
                             </x-forms.label>
                             <input type="file" class="form-control height-35 f-14" name="contract_letter" id="contract_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->contract_letter ? 'required' : '' }}>
                             @if($processData && $processData->contract_letter)
-                                <small class="text-muted d-block mt-1">Current: <a href="{{ asset('storage/' . $processData->contract_letter) }}" target="_blank">View</a></small>
+                                <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'contract_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
@@ -216,7 +216,7 @@
                             </x-forms.label>
                             <input type="file" class="form-control height-35 f-14" name="grant_letter" id="grant_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->grant_letter ? 'required' : '' }}>
                             @if($processData && $processData->grant_letter)
-                                <small class="text-muted d-block mt-1">Current: <a href="{{ asset('storage/' . $processData->grant_letter) }}" target="_blank">View</a></small>
+                                <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'grant_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
@@ -224,7 +224,7 @@
                             </x-forms.label>
                             <input type="file" class="form-control height-35 f-14" name="offer_letter" id="offer_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->offer_letter ? 'required' : '' }}>
                             @if($processData && $processData->offer_letter)
-                                <small class="text-muted d-block mt-1">Current: <a href="{{ asset('storage/' . $processData->offer_letter) }}" target="_blank">View</a></small>
+                                <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'offer_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
@@ -232,7 +232,7 @@
                             </x-forms.label>
                             <input type="file" class="form-control height-35 f-14" name="medical_letter" id="medical_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->medical_letter ? 'required' : '' }}>
                             @if($processData && $processData->medical_letter)
-                                <small class="text-muted d-block mt-1">Current: <a href="{{ asset('storage/' . $processData->medical_letter) }}" target="_blank">View</a></small>
+                                <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'medical_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
@@ -240,7 +240,7 @@
                             </x-forms.label>
                             <input type="file" class="form-control height-35 f-14" name="air_ticket" id="air_ticket" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->air_ticket ? 'required' : '' }}>
                             @if($processData && $processData->air_ticket)
-                                <small class="text-muted d-block mt-1">Current: <a href="{{ asset('storage/' . $processData->air_ticket) }}" target="_blank">View</a></small>
+                                <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'air_ticket']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
@@ -248,7 +248,7 @@
                             </x-forms.label>
                             <input type="file" class="form-control height-35 f-14" name="accommodation_letter" id="accommodation_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->accommodation_letter ? 'required' : '' }}>
                             @if($processData && $processData->accommodation_letter)
-                                <small class="text-muted d-block mt-1">Current: <a href="{{ asset('storage/' . $processData->accommodation_letter) }}" target="_blank">View</a></small>
+                                <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'accommodation_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                     </div>
@@ -375,7 +375,48 @@
                     <div class="info-section-divider"></div>
                 </div>
                 <div class="upload-documents-list">
+                    @php
+                        // Helper function to get document URL
+                        $getDocumentUrl = function($fileName) use ($lead) {
+                            if (empty($fileName)) {
+                                return null;
+                            }
+                            try {
+                                // Files are stored in public/user-uploads/public/process_documents/{leadId}/{filename}
+                                // The fileName stored in DB might be: process_documents/5/contract_letter_1234567890.pdf
+                                // Or: public/process_documents/5/contract_letter_1234567890.pdf
+                                
+                                // Check if fileName already includes 'public/'
+                                if (strpos($fileName, 'public/') === 0) {
+                                    // Already has public/ prefix, use as is
+                                    $filePath = $fileName;
+                                } else {
+                                    // Add public/ prefix
+                                    $filePath = 'public/' . $fileName;
+                                }
+                                
+                                // Use asset_url_local_s3 which handles user-uploads path correctly
+                                // asset_url_local_s3 adds 'user-uploads/' prefix automatically
+                                return asset_url_local_s3($filePath);
+                            } catch (\Exception $e) {
+                                // Fallback to direct asset if helper fails
+                                try {
+                                    // Try with user-uploads/public/ prefix
+                                    if (strpos($fileName, 'public/') === 0) {
+                                        return asset('user-uploads/' . $fileName);
+                                    } else {
+                                        return asset('user-uploads/public/' . $fileName);
+                                    }
+                                } catch (\Exception $e2) {
+                                    return null;
+                                }
+                            }
+                        };
+                    @endphp
                     @if($processData && $processData->contract_letter)
+                        @php
+                            $contractLetterUrl = $getDocumentUrl($processData->contract_letter);
+                        @endphp
                         <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
                             <div class="d-flex align-items-center">
                                 <div class="upload-document-icon mr-3">
@@ -384,11 +425,18 @@
                                 <span class="upload-document-name f-14 font-weight-500">Contract Letter</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <a href="{{ asset('storage/' . $processData->contract_letter) }}" target="_blank" class="mr-3"><i class="fas fa-eye document-view-icon"></i></a>
+                                @if($contractLetterUrl)
+                                    <a href="{{ $contractLetterUrl }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @else
+                                    <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'contract_letter']) }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @endif
                             </div>
                         </div>
                     @endif
                     @if($processData && $processData->grant_letter)
+                        @php
+                            $grantLetterUrl = $getDocumentUrl($processData->grant_letter);
+                        @endphp
                         <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
                             <div class="d-flex align-items-center">
                                 <div class="upload-document-icon mr-3">
@@ -397,11 +445,18 @@
                                 <span class="upload-document-name f-14 font-weight-400">Grant Letter</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <a href="{{ asset('storage/' . $processData->grant_letter) }}" target="_blank" class="mr-3"><i class="fas fa-eye document-view-icon"></i></a>
+                                @if($grantLetterUrl)
+                                    <a href="{{ $grantLetterUrl }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @else
+                                    <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'grant_letter']) }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @endif
                             </div>
                         </div>
                     @endif
                     @if($processData && $processData->offer_letter)
+                        @php
+                            $offerLetterUrl = $getDocumentUrl($processData->offer_letter);
+                        @endphp
                         <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
                             <div class="d-flex align-items-center">
                                 <div class="upload-document-icon mr-3">
@@ -410,11 +465,18 @@
                                 <span class="upload-document-name f-14 font-weight-400">Offer Letter/Sponsor Letter</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <a href="{{ asset('storage/' . $processData->offer_letter) }}" target="_blank" class="mr-3"><i class="fas fa-eye document-view-icon"></i></a>
+                                @if($offerLetterUrl)
+                                    <a href="{{ $offerLetterUrl }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @else
+                                    <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'offer_letter']) }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @endif
                             </div>
                         </div>
                     @endif
                     @if($processData && $processData->medical_letter)
+                        @php
+                            $medicalLetterUrl = $getDocumentUrl($processData->medical_letter);
+                        @endphp
                         <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
                             <div class="d-flex align-items-center">
                                 <div class="upload-document-icon mr-3">
@@ -423,11 +485,18 @@
                                 <span class="upload-document-name f-14 font-weight-400">Medical Letter</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <a href="{{ asset('storage/' . $processData->medical_letter) }}" target="_blank" class="mr-3"><i class="fas fa-eye document-view-icon"></i></a>
+                                @if($medicalLetterUrl)
+                                    <a href="{{ $medicalLetterUrl }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @else
+                                    <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'medical_letter']) }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @endif
                             </div>
                         </div>
                     @endif
                     @if($processData && $processData->air_ticket)
+                        @php
+                            $airTicketUrl = $getDocumentUrl($processData->air_ticket);
+                        @endphp
                         <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
                             <div class="d-flex align-items-center">
                                 <div class="upload-document-icon mr-3">
@@ -436,11 +505,18 @@
                                 <span class="upload-document-name f-14 font-weight-400">Air Ticket</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <a href="{{ asset('storage/' . $processData->air_ticket) }}" target="_blank" class="mr-3"><i class="fas fa-eye document-view-icon"></i></a>
+                                @if($airTicketUrl)
+                                    <a href="{{ $airTicketUrl }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @else
+                                    <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'air_ticket']) }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @endif
                             </div>
                         </div>
                     @endif
                     @if($processData && $processData->accommodation_letter)
+                        @php
+                            $accommodationLetterUrl = $getDocumentUrl($processData->accommodation_letter);
+                        @endphp
                         <div class="upload-document-item d-flex align-items-center justify-content-between mb-2 p-2 bg-light rounded">
                             <div class="d-flex align-items-center">
                                 <div class="upload-document-icon mr-3">
@@ -449,7 +525,11 @@
                                 <span class="upload-document-name f-14 font-weight-400">Accommodation Configuration Letter</span>
                             </div>
                             <div class="d-flex align-items-center">
-                                <a href="{{ asset('storage/' . $processData->accommodation_letter) }}" target="_blank" class="mr-3"><i class="fas fa-eye document-view-icon"></i></a>
+                                @if($accommodationLetterUrl)
+                                    <a href="{{ $accommodationLetterUrl }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @else
+                                    <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'accommodation_letter']) }}" target="_blank" class="mr-3 document-view-icon" title="View Document"><i class="fas fa-eye"></i></a>
+                                @endif
                             </div>
                         </div>
                     @endif
