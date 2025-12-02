@@ -31,6 +31,17 @@
         
         <p>This lead has been assigned to you. Please review the lead details in the system and take appropriate action.</p>
         
+        @php
+            $viewLeadUrl = route('lead-details.index', ['id' => $lead->id]);
+            if (isset($lead->company) && $lead->company) {
+                $viewLeadUrl = getDomainSpecificUrl($viewLeadUrl, $lead->company);
+            }
+        @endphp
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="{{ $viewLeadUrl }}" style="display: inline-block; background-color: #007bff; color: #ffffff; text-decoration: none; padding: 12px 30px; border-radius: 5px; font-weight: bold; font-size: 16px;">View Lead</a>
+        </div>
+        
         <p style="margin-top: 30px;">
             @lang('email.regards'),<br>
             <strong>{{ config('app.name') }}</strong>
