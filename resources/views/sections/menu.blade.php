@@ -43,31 +43,12 @@
             @if ($sidebarUserPermissions['view_lead'] != 5 && $sidebarUserPermissions['view_lead'] != 'none')
             <div class="accordionItemContent ">
                 <x-sub-menu-item :link="route('lead-dashboard.index')" :text="__('app.leadDashboard')" />
-                <x-sub-menu-item :link="route('lead-contact.index')" :text="__('app.leadContact')" />
                 <x-sub-menu-item :link="route('lead-list.index')" :text="__('app.leadList')" />
 
             </div>
             @endif
-            @if ($sidebarUserPermissions['view_deals'] != 5 && $sidebarUserPermissions['view_deals'] != 'none')
-                <div class="accordionItemContent ">
-                    <x-sub-menu-item :link="route('deals.index')" :text="__('app.deal')" />
-                </div>
-            @endif
         </x-menu-item>
     @endif
-    @if (!in_array('client', user_roles()) 
-    && (in_array('immigrations', user_modules()) || true) 
-    && (!isset($sidebarUserPermissions['view_immigrations']) 
-        || ($sidebarUserPermissions['view_immigrations'] != 5 
-            && $sidebarUserPermissions['view_immigrations'] != 'none')))
-    <x-menu-item icon="passport" :text="__('app.menu.immigration')" :link="route('immigrations.index')">
-        <x-slot name="iconPath">
-            <path d="M4 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm1 2v12h6V2H5z"/>
-        </x-slot>
-    </x-menu-item>
-@endif
-
-
 
     @if (!in_array('client', user_roles()) && in_array('clients', user_modules()) && $sidebarUserPermissions['view_clients'] != 5 && $sidebarUserPermissions['view_clients'] != 'none')
         <x-menu-item icon="building" :text="__('app.menu.clients')" :link="route('clients.index')">
