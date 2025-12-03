@@ -1350,6 +1350,7 @@
     color: #000000;
     font-size: 12px;
     line-height: 1.5;
+    text-align: left !important;
 }
 
 /* Responsive Design for Invoice View Modal */
