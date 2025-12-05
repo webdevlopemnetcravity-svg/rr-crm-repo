@@ -311,6 +311,48 @@
         </div>
     </div>
 
+    <!-- Reassign Lead Modal -->
+    <div class="modal fade" id="reassignLeadModal" tabindex="-1" role="dialog" aria-labelledby="reassignLeadModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reassignLeadModalLabel">@lang('app.reassignLead')</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <x-form id="reassignLeadForm" method="POST" class="ajax-form">
+                    <div class="modal-body">
+                        <input type="hidden" name="lead_id" id="reassign_lead_id">
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">@lang('app.lead') @lang('app.number')</label>
+                            <p class="f-14 text-dark-grey" id="reassign_lead_number"></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">@lang('app.client')</label>
+                            <p class="f-14 text-dark-grey" id="reassign_client_name"></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">@lang('app.currentLeadAssignedTo')</label>
+                            <p class="f-14 text-dark-grey" id="reassign_current_owner"></p>
+                        </div>
+                        <div class="form-group">
+                            <x-forms.label fieldId="reassign_employee_id" :fieldLabel="__('app.changeLeadTo')" fieldRequired="true">
+                            </x-forms.label>
+                            <select class="form-control select-picker height-35 f-14" name="employee_id" id="reassign_employee_id" data-live-search="true" data-size="8">
+                                <option value="">@lang('app.select') @lang('app.employee')</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang('app.cancel')</button>
+                        <x-forms.button-primary id="save-reassign-lead" icon="check">@lang('app.reassign')</x-forms.button-primary>
+                    </div>
+                </x-form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -1174,6 +1216,76 @@
                         $('#followUpFormList')[0].reset();
                         $('#follow_up_id').val('');
                         $('#addFollowUpModalListLabel').text('Add Follow-Up');
+                        showTable();
+                    }
+                }
+            });
+        });
+
+        // Reassign Lead functionality
+        $(document).on('click', '.reassign-lead-btn', function() {
+            var leadId = $(this).data('lead-id');
+            var leadNumber = $(this).data('lead-number');
+            var clientName = $(this).data('client-name');
+            var currentOwner = $(this).data('current-owner');
+            
+            $('#reassign_lead_id').val(leadId);
+            $('#reassign_lead_number').text(leadNumber);
+            $('#reassign_client_name').text(clientName);
+            $('#reassign_current_owner').text(currentOwner);
+            
+            // Load employees for dropdown
+            $.easyAjax({
+                url: "{{ route('new-leads.get-employees') }}",
+                type: "GET",
+                dataType: "json",
+                success: function(response) {
+                    if (response.status == 'success') {
+                        var select = $('#reassign_employee_id');
+                        select.empty();
+                        select.append('<option value="">@lang('app.select') @lang('app.employee')</option>');
+                        
+                        $.each(response.employees, function(index, employee) {
+                            var option = $('<option></option>')
+                                .attr('value', employee.id)
+                                .text(employee.name)
+                                .attr('data-content', '<div class="d-inline-block mr-1"><img class="taskEmployeeImg rounded-circle" src="' + employee.image_url + '" style="width: 20px; height: 20px;"></div> ' + employee.name);
+                            select.append(option);
+                        });
+                        
+                        select.selectpicker('refresh');
+                        $('#reassignLeadModal').modal('show');
+                    }
+                }
+            });
+        });
+
+        // Handle reassign form submission
+        $('#save-reassign-lead').click(function() {
+            var employeeId = $('#reassign_employee_id').val();
+            
+            if (!employeeId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select an employee to reassign the lead.',
+                    confirmButtonText: 'OK'
+                });
+                return false;
+            }
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.reassign') }}",
+                container: '#reassignLeadForm',
+                type: "POST",
+                disableButton: true,
+                buttonSelector: "#save-reassign-lead",
+                data: $('#reassignLeadForm').serialize(),
+                blockUI: true,
+                success: function(response) {
+                    if (response.status == 'success') {
+                        $('#reassignLeadModal').modal('hide');
+                        $('#reassignLeadForm')[0].reset();
                         showTable();
                     }
                 }

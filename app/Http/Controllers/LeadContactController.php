@@ -1262,6 +1262,64 @@ class LeadContactController extends AccountBaseController
         return Reply::success(__('messages.updateSuccess'));
     }
 
+    /**
+     * Get employees for reassign dropdown
+     */
+    public function getEmployeesForReassign()
+    {
+        $employees = User::allEmployees(null, 'active');
+        
+        $employeeData = [];
+        foreach ($employees as $employee) {
+            $employeeData[] = [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'image_url' => $employee->image_url,
+            ];
+        }
+        
+        return Reply::dataOnly(['status' => 'success', 'employees' => $employeeData]);
+    }
+
+    /**
+     * Reassign lead to another employee
+     */
+    public function reassignLead(Request $request)
+    {
+        $lead = NewLead::findOrFail($request->lead_id);
+        
+        // Check permissions: only admins can reassign leads
+        $userRoles = user_roles();
+        $isAdmin = in_array('admin', $userRoles);
+        
+        abort_403(!$isAdmin);
+        
+        // Validate employee
+        $newEmployee = User::findOrFail($request->employee_id);
+        
+        // Store old owner for email notification
+        $oldOwnerId = $lead->lead_owner;
+        
+        // Update lead owner
+        $lead->lead_owner = $request->employee_id;
+        $lead->last_updated_by = user()->id;
+        $lead->save();
+        
+        // Send email notification to new assigned employee
+        try {
+            if ($newEmployee->email) {
+                // Reload lead with company relationship for email template
+                $lead->refresh();
+                $lead->load('company');
+                Mail::to($newEmployee->email)->send(new \App\Mail\LeadReassignedNotification($lead, $newEmployee));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send lead reassigned notification email: ' . $e->getMessage());
+        }
+        
+        return Reply::success(__('messages.updateSuccess'));
+    }
+
     public function importLead()
     {
         $this->pageTitle = __('app.importExcel') . ' ' . __('app.menu.lead');

@@ -376,6 +376,25 @@ class NewLeadDataTable extends BaseDataTable
                             </a>';
             }
             
+            // Add Reassign Lead button - visible only to admins
+            $userRoles = user_roles();
+            $isAdmin = in_array('admin', $userRoles);
+            
+            if ($isAdmin) {
+                $leadNumber = 'LEAD-' . str_pad($row->id, 4, '0', STR_PAD_LEFT);
+                $currentOwnerName = $row->leadOwner ? htmlspecialchars($row->leadOwner->name, ENT_QUOTES) : 'Not Assigned';
+                $clientName = htmlspecialchars($row->client_name ?? 'N/A', ENT_QUOTES);
+                
+                $action .= '<button type="button" class="btn btn-sm btn-secondary ml-2 reassign-lead-btn" 
+                                data-lead-id="' . $row->id . '" 
+                                data-lead-number="' . htmlspecialchars($leadNumber, ENT_QUOTES) . '"
+                                data-client-name="' . $clientName . '"
+                                data-current-owner="' . $currentOwnerName . '"
+                                title="' . __('app.reassignLead') . '">
+                                <i class="fa fa-user-plus"></i>
+                            </button>';
+            }
+            
             $action .= '</div>';
             
             return $action;
