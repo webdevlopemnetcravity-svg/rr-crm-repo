@@ -258,7 +258,7 @@
                         <hr class="my-4">
 
                         <!-- Visa Status Section -->
-                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.lastFiveYearsVisaStatus') <span class="text-danger">*</span></h6>
+                        <h6 class="mb-3 f-15 font-weight-bold">@lang('app.lastFiveYearsVisaStatus')</h6>
                         
                         <!-- Visa Status Radio Buttons -->
                         <div class="row mb-3">
@@ -281,17 +281,17 @@
                         <!-- Visa Granted Fields -->
                         <div class="row" id="visa_granted_fields" style="display: none;">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_issue_date" :fieldLabel="__('app.visaIssueDate')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="visa_issue_date" :fieldLabel="__('app.visaIssueDate')">
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_issue_date" id="visa_issue_date" max="{{ date('Y-m') }}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_expire_date" :fieldLabel="__('app.visaExpireDate')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="visa_expire_date" :fieldLabel="__('app.visaExpireDate')">
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_expire_date" id="visa_expire_date">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_category" :fieldLabel="__('app.visaCategory')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="visa_category" :fieldLabel="__('app.visaCategory')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="visa_category" id="visa_category">
                             </div>
@@ -1537,17 +1537,17 @@
                         </div>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_rejection_date_${refusalNum}" :fieldLabel="__('app.visaRejectionDate')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="visa_rejection_date_${refusalNum}" :fieldLabel="__('app.visaRejectionDate')">
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_rejection_date_${refusalNum}" id="visa_rejection_date_${refusalNum}" max="{{ date('Y-m') }}" value="${date}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="visa_refusal_category_${refusalNum}" :fieldLabel="__('app.visaCategory')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_category_${refusalNum}" :fieldLabel="__('app.visaCategory')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="visa_refusal_category_${refusalNum}" id="visa_refusal_category_${refusalNum}" value="${category}">
                             </div>
                             <div class="col-md-5">
-                                <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${refusalNum}" :fieldLabel="__('app.reason')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${refusalNum}" :fieldLabel="__('app.reason')">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="2" name="visa_refusal_reason_${refusalNum}" id="visa_refusal_reason_${refusalNum}">${reason}</textarea>
                             </div>
@@ -3850,61 +3850,6 @@
                         if (!$('#upload_resume').val() && !$('#upload_resume_hidden').length) {
                             isValid = false;
                             showFieldError('#upload_resume', 'Upload Resume is required');
-                        }
-                        // Visa Status validation
-                        if (!$('input[name="visa_status"]:checked').val()) {
-                            isValid = false;
-                            const $visaStatusContainer = $('input[name="visa_status"]').closest('.row').first();
-                            $visaStatusContainer.find('.invalid-feedback').remove();
-                            $visaStatusContainer.append('<div class="invalid-feedback d-block col-12">@lang('app.lastFiveYearsVisaStatus') is required</div>');
-                            $('input[name="visa_status"]').closest('.form-check').addClass('is-invalid');
-                        } else {
-                            const visaStatus = $('input[name="visa_status"]:checked').val();
-                            // Visa Granted fields validation
-                            if (visaStatus === 'granted') {
-                                if (!$('#visa_issue_date').val()) {
-                                    isValid = false;
-                                    showFieldError('#visa_issue_date', '@lang('app.visaIssueDate') is required');
-                                }
-                                if (!$('#visa_expire_date').val()) {
-                                    isValid = false;
-                                    showFieldError('#visa_expire_date', '@lang('app.visaExpireDate') is required');
-                                }
-                                const visaCategoryVal = ($('#visa_category').val() || '').trim();
-                                if (!visaCategoryVal) {
-                                    isValid = false;
-                                    showFieldError('#visa_category', '@lang('app.visaCategory') is required');
-                                }
-                            }
-                            // Visa Refusal fields validation
-                            if (visaStatus === 'refusal') {
-                                // Validate all dynamic visa refusal rows
-                                $('.visa-refusal-row').each(function() {
-                                    const refusalIndex = $(this).data('refusal-index');
-                                    const date = $('#visa_rejection_date_' + refusalIndex).val();
-                                    const category = $('#visa_refusal_category_' + refusalIndex).val() || '';
-                                    const reason = $('#visa_refusal_reason_' + refusalIndex).val() || '';
-                                    
-                                    if (!date) {
-                                        isValid = false;
-                                        showFieldError('#visa_rejection_date_' + refusalIndex, '@lang('app.visaRejectionDate') is required');
-                                    }
-                                    if (!category.trim()) {
-                                        isValid = false;
-                                        showFieldError('#visa_refusal_category_' + refusalIndex, '@lang('app.visaCategory') is required');
-                                    }
-                                    if (!reason.trim()) {
-                                        isValid = false;
-                                        showFieldError('#visa_refusal_reason_' + refusalIndex, '@lang('app.reason') is required');
-                                    }
-                                });
-                                
-                                // Ensure at least one visa refusal exists
-                                if ($('.visa-refusal-row').length === 0) {
-                                    isValid = false;
-                                    showFieldError('#visa_refusal_fields', 'At least one visa refusal entry is required');
-                                }
-                            }
                         }
                         // Languages Spoken validation
                         const languagesSpokenVal = ($('#languages_spoken').val() || '').trim();
