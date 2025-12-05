@@ -1516,19 +1516,19 @@ class LeadContactController extends AccountBaseController
 
             case 3:
                 // Step 3 - Passport Details
+                // All passport fields are optional
                 $rules = [
-                    'passport_number' => 'required|string|max:255',
-                    'issuing_country' => 'required|string|max:255',
-                    'city_where_issued' => 'required|string|max:255',
-                    'issuance_date' => 'required|date',
-                    'expiration_date' => 'required|date|after:issuance_date',
+                    'passport_number' => 'nullable|string|max:255',
+                    'issuing_country' => 'nullable|string|max:255',
+                    'city_where_issued' => 'nullable|string|max:255',
+                    'issuance_date' => 'nullable|date',
+                    'expiration_date' => 'nullable|date',
+                    'passport_file_upload' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
                 ];
                 
-                // Passport file is required if not already uploaded
-                if (!$request->hasFile('passport_file_upload') && !$request->passport_file_upload_existing) {
-                    $rules['passport_file_upload'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
-                } else {
-                    $rules['passport_file_upload'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
+                // Validate expiration_date is after issuance_date only if both are provided
+                if ($request->issuance_date && $request->expiration_date) {
+                    $rules['expiration_date'] = 'nullable|date|after:issuance_date';
                 }
                 break;
 
