@@ -183,13 +183,29 @@
     <!-- CONTENT WRAPPER START -->
     <div class="content-wrapper">
         <!-- Add Lead Button Start -->
-        <div class="d-flex justify-content-between action-bar mb-3">
-            <div id="table-actions" class="d-block d-lg-flex align-items-center">
+        <div class="d-block d-lg-flex d-md-flex justify-content-between">
+            <div id="table-actions" class="flex-grow-1 align-items-center mb-2 mb-lg-0 mb-md-0">
                 @if ($addLeadPermission == 'all' || $addLeadPermission == 'added')
                     <x-forms.link-primary :link="route('add-lead.index')" class="mr-3 mb-2 mb-lg-0" icon="plus">
                         @lang('app.addLead')
                     </x-forms.link-primary>
                 @endif
+            </div>
+            <!-- Lead Statistics Start -->
+            <!-- All Leads Statistic -->
+            <div class="mb-0 f-18 font-weight-bold text-dark-grey d-grid align-items-center mr-3">
+                <span id="dashboard-clock">{{ $allLeadsCount ?? 0 }}</span>
+                <span class="f-13 font-weight-normal">All Leads</span>
+            </div>
+            <!-- My Leads Statistic -->
+            <div class="mb-0 f-18 font-weight-bold text-dark-grey d-grid align-items-center mr-3">
+                <span id="dashboard-clock">{{ $myLeadsCount ?? 0 }}</span>
+                <span class="f-13 font-weight-normal">My Leads</span>
+            </div>
+            <!-- Lead Statistics End -->
+
+            <div class="btn-group mt-2 mt-lg-0 mt-md-0 ml-0 ml-lg-3 ml-md-3" role="group">
+                <a href="javascript:;" class="img-lightbox btn btn-secondary f-14" data-image-url="http://127.0.0.1:8000/img/estimate-lc.png" data-toggle="tooltip" data-original-title="The system allows for the addition of further information regarding a lead directly from this view. To access and edit the detailed profile of any specific lead, users may click on the respective entry, which will navigate them to the dedicated Lead Detail Page."><i class="side-icon bi bi-question-circle"></i></a>
             </div>
 
             <!-- Quick Actions Start -->

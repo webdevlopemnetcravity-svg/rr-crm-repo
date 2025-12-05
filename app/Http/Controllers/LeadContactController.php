@@ -135,6 +135,29 @@ class LeadContactController extends AccountBaseController
                 'Student Visa (Subclass 500)',
                 'Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)'
             ])->sort()->values();
+            
+            // Calculate lead counts for statistics
+            $allLeadsQuery = NewLead::query();
+            $myLeadsQuery = NewLead::query();
+            
+            // Apply view permission filters for "All Leads"
+            if ($viewPermission == 'owned') {
+                $allLeadsQuery->where('lead_owner', user()->id);
+            } elseif ($viewPermission == 'added') {
+                $allLeadsQuery->where('added_by', user()->id);
+            } elseif ($viewPermission == 'both') {
+                $allLeadsQuery->where(function ($query) {
+                    $query->where('lead_owner', user()->id)
+                          ->orWhere('added_by', user()->id);
+                });
+            }
+            // If 'all', no filter needed
+            
+            // "My Leads" - only leads assigned to current user (lead_owner)
+            $myLeadsQuery->where('lead_owner', user()->id);
+            
+            $this->allLeadsCount = $allLeadsQuery->count();
+            $this->myLeadsCount = $myLeadsQuery->count();
         }
 
         return $dataTable->render('lead-list.index', $this->data);
