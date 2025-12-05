@@ -628,27 +628,27 @@
                     <div class="tab-pane fade" id="nav-passport" role="tabpanel" aria-labelledby="nav-passport-tab">
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="passport_number" fieldLabel="Passport Number" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="passport_number" fieldLabel="Passport Number">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="passport_number" id="passport_number">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="issuing_country" fieldLabel="Issuing Country" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="issuing_country" fieldLabel="Issuing Country">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="issuing_country" id="issuing_country">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="city_where_issued" fieldLabel="City Where Issued" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="city_where_issued" fieldLabel="City Where Issued">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="city_where_issued" id="city_where_issued">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="issuance_date" fieldLabel="Issue Date" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="issuance_date" fieldLabel="Issue Date">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="issuance_date" id="issuance_date" max="{{ date('Y-m-d') }}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="expiration_date" fieldLabel="Expiration Date" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="expiration_date" fieldLabel="Expiration Date">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="expiration_date" id="expiration_date">
                                 <script>
@@ -663,7 +663,7 @@
                                 </script>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="passport_file_upload" fieldLabel="Add Passport" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="passport_file_upload" fieldLabel="Add Passport">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" id="passport_file_upload" name="passport_file_upload" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
@@ -3926,36 +3926,8 @@
                         
                     case 3:
                         // Step 3 - Passport Details
-                        const issuingCountryVal = $('#issuing_country').val() || '';
-                        if (!issuingCountryVal.trim()) {
-                            isValid = false;
-                            showFieldError('#issuing_country', 'Issuing Country is required');
-                        }
-                        const cityWhereIssuedVal = $('#city_where_issued').val() || '';
-                        if (!cityWhereIssuedVal.trim()) {
-                            isValid = false;
-                            showFieldError('#city_where_issued', 'City Where Issued is required');
-                        }
-                        if (!$('#issuance_date').val()) {
-                            isValid = false;
-                            showFieldError('#issuance_date', 'Issue Date is required');
-                        }
-                        if (!$('#expiration_date').val()) {
-                            isValid = false;
-                            showFieldError('#expiration_date', 'Expiration Date is required');
-                        }
-                        // Passport Number validation
-                        const passportNumberVal = ($('#passport_number').val() || '').trim();
-                        if (!passportNumberVal) {
-                            isValid = false;
-                            showFieldError('#passport_number', 'Passport Number is required');
-                        }
-                        // Passport file validation
-                        if (!$('#passport_file_upload').val() && !$('#passport_file_upload_hidden').length) {
-                            isValid = false;
-                            showFieldError('#passport_file_upload', 'Passport file is required');
-                        }
-                        // Expiration Date should be greater than Issuance Date
+                        // All passport fields are optional - no validation required
+                        // Only validate date logic if both dates are provided
                         const issuanceDate = $('#issuance_date').val();
                         const expirationDate = $('#expiration_date').val();
                         if (issuanceDate && expirationDate && expirationDate <= issuanceDate) {
