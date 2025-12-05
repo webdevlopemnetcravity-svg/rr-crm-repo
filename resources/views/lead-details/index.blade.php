@@ -188,9 +188,15 @@
                         <a class="nav-item-lead nav-link-lead f-14" data-tab="documentsTab" href="#">
                             <div class="tab-item"><img src="{{ asset('img/icon/Documents.svg') }}"></div>Documents
                         </a>
+                        @php
+                            $userRoles = user_roles();
+                            $isAdmin = in_array('admin', $userRoles);
+                        @endphp
+                        @if($isAdmin)
                         <a class="nav-item-lead nav-link-lead f-14" data-tab="accountsTab" href="#">
                             <div class="tab-item"><img src="{{ asset('img/icon/Accounts.svg') }}"></div>Accounts
                         </a>
+                        @endif
                         <a class="nav-item-lead nav-link-lead f-14" data-tab="templateDocumentTab" href="#">
                             <div class="tab-item"><img src="{{ asset('img/icon/Communication.svg') }}"></div>Template Document
                         </a>
@@ -215,7 +221,13 @@
                 <!-- Documents Tab Content -->
                 @include('lead-details.components.documents-tab')
                 <!-- Accounts Tab Content -->
+                @php
+                    $userRoles = user_roles();
+                    $isAdmin = in_array('admin', $userRoles);
+                @endphp
+                @if($isAdmin)
                 @include('lead-details.components.accounts-tab')
+                @endif
                 <!-- Template Document Tab Content -->
                 @include('lead-details.components.template-document-tab')
                 <!-- Follow Up Tab Content -->
