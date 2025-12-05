@@ -34,9 +34,9 @@
     <div class="tab-section-header">
         <div class="tab-section-header-content d-flex justify-content-between align-items-center">
             <h3 class="tab-section-title">Travel Details</h3>
-            <div class="tab-header-actions">
+            <div class="tab-header-actions d-flex align-items-center">
                 <!-- Notify Client Button (shown when data exists and not in edit mode) -->
-                <button type="button" class="btn-primary btn-sm ml-2" id="notifyClientTravelDetailsBtn" style="{{ $hasTravelData ? '' : 'display:none;' }}">
+                <button type="button" class="btn-primary btn-sm mr-2" id="notifyClientTravelDetailsBtn" style="{{ $hasTravelData ? '' : 'display:none;' }}">
                     <i class="fa fa-bell mr-1"></i> Notify Client
                 </button>
                 <!-- Edit Button (shown when data exists and not in edit mode) -->
@@ -45,7 +45,7 @@
                 </button>
                 <!-- Save and Cancel Buttons (shown when in edit mode) -->
                 <div id="travelDetailsFormActions" style="display:none;">
-                    <button type="button" class="btn btn-success btn-sm" id="saveTravelDetailsBtn">
+                    <button type="button" class="btn btn-primary btn-sm" id="saveTravelDetailsBtn">
                         <i class="fa fa-save mr-1"></i> Save
                     </button>
                     <button type="button" class="btn btn-secondary btn-sm ml-2" id="cancelTravelDetailsBtn">

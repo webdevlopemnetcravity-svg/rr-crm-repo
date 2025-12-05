@@ -1974,8 +1974,9 @@
             // Hide details section and show form section
             $('#travelDetailsDetailsSection').hide();
             $('#travelDetailsFormSection').show();
-            // Hide edit button and show save/cancel buttons
+            // Hide edit button and notify button, show save/cancel buttons
             $('#editTravelDetailsBtn').hide();
+            $('#notifyClientTravelDetailsBtn').hide();
             $('#travelDetailsFormActions').show();
             // Initialize select pickers
             $('.select-picker').selectpicker('refresh');
@@ -1989,8 +1990,9 @@
             // Show details section and hide form section
             $('#travelDetailsDetailsSection').show();
             $('#travelDetailsFormSection').hide();
-            // Show edit button and hide save/cancel buttons
+            // Show edit button and notify button, hide save/cancel buttons
             $('#editTravelDetailsBtn').show();
+            $('#notifyClientTravelDetailsBtn').show();
             $('#travelDetailsFormActions').hide();
             // Remove any errors
             removeTravelDetailsFieldErrors();
@@ -2155,6 +2157,7 @@
                         $('#travelDetailsDetailsSection').show();
                         $('#travelDetailsFormSection').hide();
                         $('#editTravelDetailsBtn').show();
+                        $('#notifyClientTravelDetailsBtn').show();
                         $('#travelDetailsFormActions').hide();
                     }
                 },
