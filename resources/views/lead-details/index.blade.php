@@ -1113,12 +1113,7 @@
                     { id: '#remaining_fees', name: 'Remaining Fees' },
                     { id: '#remaining_fees_due_date', name: 'Remaining Fees Due Date' },
                     { id: '#agent_fees', name: 'Agent Fees' },
-                    { id: '#submission_fees', name: 'Submission Fees' },
-                    { id: '#status', name: 'Status' },
-                    { id: '#processing_time', name: 'Processing Time' },
-                    { id: '#bank_cheque_handover_date', name: 'Bank Cheque Document Handover Date' },
-                    { id: '#passport_handover_date', name: 'Passport Handover Date' },
-                    { id: '#process_note', name: 'Note related to agent or process' }
+                    { id: '#submission_fees', name: 'Submission Fees' }
                 ];
                 
                 requiredFields.forEach(function(field) {
@@ -1136,26 +1131,7 @@
                     }
                 });
                 
-                // Validate file uploads (only if no existing file)
-                var fileFields = [
-                    { id: '#contract_letter', name: 'Contract Letter' },
-                    { id: '#grant_letter', name: 'Grant Letter' },
-                    { id: '#offer_letter', name: 'Offer Letter/Sponsor Letter' },
-                    { id: '#medical_letter', name: 'Medical Letter' },
-                    { id: '#air_ticket', name: 'Air Ticket' },
-                    { id: '#accommodation_letter', name: 'Accommodation Configuration Letter' }
-                ];
-                
-                fileFields.forEach(function(field) {
-                    var $field = $(field.id);
-                    var hasFile = $field.val() && $field.val() !== '';
-                    var hasExistingFile = $field.closest('.col-md-3').find('small a').length > 0;
-                    
-                    if (!hasFile && !hasExistingFile) {
-                        isValid = false;
-                        showProcessFieldError(field.id, field.name + ' is required');
-                    }
-                });
+                // File uploads are optional - no validation needed
                 
                 if (!isValid) {
                     return false;

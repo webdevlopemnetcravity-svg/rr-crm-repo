@@ -1369,6 +1369,64 @@ class LeadContactController extends AccountBaseController
         return Reply::success(__('messages.updateSuccess'));
     }
 
+    /**
+     * Get employees for reassign dropdown
+     */
+    public function getEmployeesForReassign()
+    {
+        $employees = User::allEmployees(null, 'active');
+        
+        $employeeData = [];
+        foreach ($employees as $employee) {
+            $employeeData[] = [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'image_url' => $employee->image_url,
+            ];
+        }
+        
+        return Reply::dataOnly(['status' => 'success', 'employees' => $employeeData]);
+    }
+
+    /**
+     * Reassign lead to another employee
+     */
+    public function reassignLead(Request $request)
+    {
+        $lead = NewLead::findOrFail($request->lead_id);
+        
+        // Check permissions: only admins can reassign leads
+        $userRoles = user_roles();
+        $isAdmin = in_array('admin', $userRoles);
+        
+        abort_403(!$isAdmin);
+        
+        // Validate employee
+        $newEmployee = User::findOrFail($request->employee_id);
+        
+        // Store old owner for email notification
+        $oldOwnerId = $lead->lead_owner;
+        
+        // Update lead owner
+        $lead->lead_owner = $request->employee_id;
+        $lead->last_updated_by = user()->id;
+        $lead->save();
+        
+        // Send email notification to new assigned employee
+        try {
+            if ($newEmployee->email) {
+                // Reload lead with company relationship for email template
+                $lead->refresh();
+                $lead->load('company');
+                Mail::to($newEmployee->email)->send(new \App\Mail\LeadReassignedNotification($lead, $newEmployee));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send lead reassigned notification email: ' . $e->getMessage());
+        }
+        
+        return Reply::success(__('messages.updateSuccess'));
+    }
+
     public function importLead()
     {
         $this->pageTitle = __('app.importExcel') . ' ' . __('app.menu.lead');
@@ -4261,11 +4319,11 @@ class LeadContactController extends AccountBaseController
             'remaining_fees_due_date' => 'required|date',
             'agent_fees' => 'required|string|max:255',
             'submission_fees' => 'required|string|max:255',
-            'status' => 'required|string|max:255',
-            'processing_time' => 'required|string|max:255',
-            'bank_cheque_handover_date' => 'required|date',
-            'passport_handover_date' => 'required|date',
-            'process_note' => 'required|string',
+            'status' => 'nullable|string|max:255',
+            'processing_time' => 'nullable|string|max:255',
+            'bank_cheque_handover_date' => 'nullable|date',
+            'passport_handover_date' => 'nullable|date',
+            'process_note' => 'nullable|string',
             'contract_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
             'grant_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
             'offer_letter' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
@@ -4300,11 +4358,11 @@ class LeadContactController extends AccountBaseController
         $process->remaining_fees_due_date = $request->remaining_fees_due_date;
         $process->agent_fees = $request->agent_fees;
         $process->submission_fees = $request->submission_fees;
-        $process->status = $request->status;
-        $process->processing_time = $request->processing_time;
-        $process->bank_cheque_handover_date = $request->bank_cheque_handover_date;
-        $process->passport_handover_date = $request->passport_handover_date;
-        $process->process_note = $request->process_note;
+        $process->status = $request->status ?? null;
+        $process->processing_time = $request->processing_time ?? null;
+        $process->bank_cheque_handover_date = $request->bank_cheque_handover_date ?? null;
+        $process->passport_handover_date = $request->passport_handover_date ?? null;
+        $process->process_note = $request->process_note ?? null;
 
         // Handle file uploads
         $fileFields = ['contract_letter', 'grant_letter', 'offer_letter', 'medical_letter', 'air_ticket', 'accommodation_letter'];
