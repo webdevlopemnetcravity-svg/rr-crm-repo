@@ -166,33 +166,33 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="status" fieldLabel="Status Pending/Completed *">
+                            <x-forms.label fieldId="status" fieldLabel="Status Pending/Completed">
                             </x-forms.label>
-                            <select class="form-control select-picker height-35 f-14" name="status" id="status" required>
+                            <select class="form-control select-picker height-35 f-14" name="status" id="status">
                                 <option value="">Select</option>
                                 <option value="Pending" {{ $processData && $processData->status == 'Pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="Completed" {{ $processData && $processData->status == 'Completed' ? 'selected' : '' }}>Completed</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="processing_time" fieldLabel="Processing Time *">
+                            <x-forms.label fieldId="processing_time" fieldLabel="Processing Time">
                             </x-forms.label>
-                            <input type="text" class="form-control height-35 f-14" name="processing_time" id="processing_time" value="{{ $processData ? $processData->processing_time : '' }}" required>
+                            <input type="text" class="form-control height-35 f-14" name="processing_time" id="processing_time" value="{{ $processData ? $processData->processing_time : '' }}">
                         </div>
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="bank_cheque_handover_date" fieldLabel="Bank Cheque Document Handover Date *">
+                            <x-forms.label fieldId="bank_cheque_handover_date" fieldLabel="Bank Cheque Document Handover Date">
                             </x-forms.label>
-                            <input type="date" class="form-control height-35 f-14" name="bank_cheque_handover_date" id="bank_cheque_handover_date" value="{{ $processData && $processData->bank_cheque_handover_date ? $processData->bank_cheque_handover_date->format('Y-m-d') : '' }}" required>
+                            <input type="date" class="form-control height-35 f-14" name="bank_cheque_handover_date" id="bank_cheque_handover_date" value="{{ $processData && $processData->bank_cheque_handover_date ? $processData->bank_cheque_handover_date->format('Y-m-d') : '' }}">
                         </div>
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="passport_handover_date" fieldLabel="Passport Handover Date *">
+                            <x-forms.label fieldId="passport_handover_date" fieldLabel="Passport Handover Date">
                             </x-forms.label>
-                            <input type="date" class="form-control height-35 f-14" name="passport_handover_date" id="passport_handover_date" value="{{ $processData && $processData->passport_handover_date ? $processData->passport_handover_date->format('Y-m-d') : '' }}" required>
+                            <input type="date" class="form-control height-35 f-14" name="passport_handover_date" id="passport_handover_date" value="{{ $processData && $processData->passport_handover_date ? $processData->passport_handover_date->format('Y-m-d') : '' }}">
                         </div>
                         <div class="col-md-12 mb-3">
-                            <x-forms.label fieldId="process_note" fieldLabel="Note related to agent or process *">
+                            <x-forms.label fieldId="process_note" fieldLabel="Note related to agent or process">
                             </x-forms.label>
-                            <textarea class="form-control f-14" name="process_note" id="process_note" rows="3" required>{{ $processData ? $processData->process_note : '' }}</textarea>
+                            <textarea class="form-control f-14" name="process_note" id="process_note" rows="3">{{ $processData ? $processData->process_note : '' }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -204,49 +204,49 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="contract_letter" fieldLabel="Contract Letter *">
+                            <x-forms.label fieldId="contract_letter" fieldLabel="Contract Letter">
                             </x-forms.label>
-                            <input type="file" class="form-control height-35 f-14" name="contract_letter" id="contract_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->contract_letter ? 'required' : '' }}>
+                            <input type="file" class="form-control height-35 f-14" name="contract_letter" id="contract_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             @if($processData && $processData->contract_letter)
                                 <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'contract_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="grant_letter" fieldLabel="Grant Letter *">
+                            <x-forms.label fieldId="grant_letter" fieldLabel="Grant Letter">
                             </x-forms.label>
-                            <input type="file" class="form-control height-35 f-14" name="grant_letter" id="grant_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->grant_letter ? 'required' : '' }}>
+                            <input type="file" class="form-control height-35 f-14" name="grant_letter" id="grant_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             @if($processData && $processData->grant_letter)
                                 <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'grant_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="offer_letter" fieldLabel="Offer Letter/Sponsor Letter *">
+                            <x-forms.label fieldId="offer_letter" fieldLabel="Offer Letter/Sponsor Letter">
                             </x-forms.label>
-                            <input type="file" class="form-control height-35 f-14" name="offer_letter" id="offer_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->offer_letter ? 'required' : '' }}>
+                            <input type="file" class="form-control height-35 f-14" name="offer_letter" id="offer_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             @if($processData && $processData->offer_letter)
                                 <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'offer_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="medical_letter" fieldLabel="Medical Letter *">
+                            <x-forms.label fieldId="medical_letter" fieldLabel="Medical Letter">
                             </x-forms.label>
-                            <input type="file" class="form-control height-35 f-14" name="medical_letter" id="medical_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->medical_letter ? 'required' : '' }}>
+                            <input type="file" class="form-control height-35 f-14" name="medical_letter" id="medical_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             @if($processData && $processData->medical_letter)
                                 <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'medical_letter']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="air_ticket" fieldLabel="Air Ticket *">
+                            <x-forms.label fieldId="air_ticket" fieldLabel="Air Ticket">
                             </x-forms.label>
-                            <input type="file" class="form-control height-35 f-14" name="air_ticket" id="air_ticket" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->air_ticket ? 'required' : '' }}>
+                            <input type="file" class="form-control height-35 f-14" name="air_ticket" id="air_ticket" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             @if($processData && $processData->air_ticket)
                                 <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'air_ticket']) }}" target="_blank">View</a></small>
                             @endif
                         </div>
                         <div class="col-md-3 mb-3">
-                            <x-forms.label fieldId="accommodation_letter" fieldLabel="Accommodation Configuration Letter *">
+                            <x-forms.label fieldId="accommodation_letter" fieldLabel="Accommodation Configuration Letter">
                             </x-forms.label>
-                            <input type="file" class="form-control height-35 f-14" name="accommodation_letter" id="accommodation_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" {{ !$processData || !$processData->accommodation_letter ? 'required' : '' }}>
+                            <input type="file" class="form-control height-35 f-14" name="accommodation_letter" id="accommodation_letter" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             @if($processData && $processData->accommodation_letter)
                                 <small class="text-muted d-block mt-1">Current: <a href="{{ route('lead-details.view-process-document', ['leadId' => $lead->id, 'documentField' => 'accommodation_letter']) }}" target="_blank">View</a></small>
                             @endif
