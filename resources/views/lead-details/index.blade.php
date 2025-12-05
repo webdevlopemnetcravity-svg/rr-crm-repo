@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @push('datatable-styles')
     @include('sections.datatable_css')
@@ -1621,6 +1621,92 @@
                             },
                             error: function(xhr) {
                                 var errorMessage = 'Failed to send email. Please try again.';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                }
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: errorMessage,
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Send Template Document via WhatsApp
+            $(document).on('click', '.send-template-whatsapp', function(e) {
+                e.preventDefault();
+                
+                var leadId = $(this).data('lead-id');
+                var documentId = $(this).data('document-id');
+                
+                if (!leadId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Lead ID is missing.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                
+                if (!documentId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Document ID is missing.',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+                
+                // Show confirmation
+                Swal.fire({
+                    title: 'Send WhatsApp?',
+                    text: 'Do you want to send this template document via WhatsApp to the lead?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Send',
+                    cancelButtonText: 'Cancel',
+                    customClass: {
+                        confirmButton: 'btn btn-primary mr-3',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var url = "{{ route('lead-details.send-template-document-whatsapp', [':leadId', ':documentId']) }}";
+                        url = url.replace(':leadId', leadId).replace(':documentId', documentId);
+                        
+                        $.easyAjax({
+                            url: url,
+                            type: "POST",
+                            blockUI: true,
+                            data: {
+                                '_token': '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                if (response.status == "success") {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Success',
+                                        text: response.message || 'WhatsApp message sent successfully!',
+                                        confirmButtonText: 'OK'
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: response.message || 'Failed to send WhatsApp message.',
+                                        confirmButtonText: 'OK'
+                                    });
+                                }
+                            },
+                            error: function(xhr) {
+                                var errorMessage = 'Failed to send WhatsApp message. Please try again.';
                                 if (xhr.responseJSON && xhr.responseJSON.message) {
                                     errorMessage = xhr.responseJSON.message;
                                 }

@@ -38,6 +38,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Client;
 
 class LeadContactController extends AccountBaseController
 {
@@ -788,6 +789,112 @@ class LeadContactController extends AccountBaseController
         } catch (\Exception $e) {
             \Log::error('Failed to send template document email: ' . $e->getMessage());
             return Reply::error(__('Failed to send email. Please try again.'));
+        }
+    }
+
+    /**
+     * Send template document via WhatsApp to lead
+     */
+    public function sendTemplateDocumentWhatsApp(Request $request, $leadId, $documentId)
+    {
+        try {
+            $lead = NewLead::findOrFail($leadId);
+            $document = \App\Models\NewLeadTemplateDocument::findOrFail($documentId);
+
+            // Get lead phone number from step_1_data or mobile
+            $leadPhone = null;
+            if ($lead->step_1_data) {
+                $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : $lead->step_1_data;
+                if (is_array($step1Data)) {
+                    $leadPhone = $step1Data['primary_phone'] ?? null;
+                }
+            }
+            
+            // Fallback to mobile
+            if (empty($leadPhone)) {
+                $leadPhone = $lead->mobile;
+            }
+
+            if (empty($leadPhone)) {
+                return Reply::error(__('Lead phone number is not available.'));
+            }
+
+            // Remove any non-numeric characters and ensure it has country code
+            $leadPhone = preg_replace('/[^0-9]/', '', $leadPhone);
+            // Remove leading 0 if present
+            $leadPhone = ltrim($leadPhone, '0');
+            // Add 91 (India country code) if not present
+            if (!str_starts_with($leadPhone, '91')) {
+                $leadPhone = '91' . $leadPhone;
+            }
+
+            // Get user name
+            $userName = $lead->client_name ?? 'Client';
+
+            // Get document URL and filename
+            $documentUrl = $document->file_url;
+            $documentFilename = $document->file_name ?? $document->name ?? 'Document';
+
+            // Fixed values as per API requirements - read from environment variables
+            $apiKey = env('AISENSY_API_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzdmM2RjNmZhOGUxMDEzYzdlMDgzZSIsIm5hbWUiOiJSLlIgcGF0ZWwgIG5ldyIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2ODcyMzU5ZGRlNjFiYjMxOTgzMzc2NDMiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTc2MDM1NTc4OX0.6H8mv7r3R0ucc7APyDM1q0xew4-oBUVKqUHA38klVG4');
+            $campaignName = env('AISENSY_CAMPAIGN_NAME', 'testing102');
+            $source = env('AISENSY_SOURCE', 'new-landing-page form');
+
+            // Prepare API request payload
+            $payload = [
+                'apiKey' => $apiKey,
+                'campaignName' => $campaignName,
+                'destination' => $leadPhone,
+                'userName' => $userName,
+                'templateParams' => [],
+                'source' => $source,
+                'media' => [
+                    'url' => $documentUrl,
+                    'filename' => $documentFilename
+                ],
+                'buttons' => [],
+                'carouselCards' => [],
+                'location' => (object)[],
+                'attributes' => (object)[],
+                'paramsFallbackValue' => (object)[]
+            ];
+
+            // Make API call to AISensy
+            $client = new Client();
+            $response = $client->post('https://backend.aisensy.com/campaign/t1/api/v2', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $payload,
+                'timeout' => 30
+            ]);
+
+            $responseBody = json_decode($response->getBody()->getContents(), true);
+
+            if ($response->getStatusCode() === 200) {
+                return Reply::success(__('Template document sent successfully via WhatsApp to ') . $leadPhone);
+            } else {
+                \Log::error('AISensy API error: ' . json_encode($responseBody));
+                return Reply::error(__('Failed to send WhatsApp message. Please try again.'));
+            }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $errorMessage = $e->getMessage();
+            try {
+                $errorResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
+                if (is_array($errorResponse) && isset($errorResponse['message'])) {
+                    $errorMessage = $errorResponse['message'];
+                }
+            } catch (\Exception $ex) {
+                // If we can't parse the error response, use the original message
+            }
+            \Log::error('AISensy API client error: ' . $e->getMessage());
+            return Reply::error(__('Failed to send WhatsApp message: ') . $errorMessage);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            \Log::error('AISensy API request error: ' . $e->getMessage());
+            return Reply::error(__('Failed to send WhatsApp message. Please check your connection and try again.'));
+        } catch (\Exception $e) {
+            \Log::error('Failed to send template document via WhatsApp: ' . $e->getMessage());
+            return Reply::error(__('Failed to send WhatsApp message. Please try again.'));
         }
     }
 

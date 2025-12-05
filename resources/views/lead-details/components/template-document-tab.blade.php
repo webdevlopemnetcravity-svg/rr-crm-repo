@@ -49,7 +49,10 @@
                                             title="Send via Email">
                                         <i class="fa fa-envelope mr-1"></i> Email
                                     </button>
-                                    <button class="btn btn-sm document-whatsapp-btn" title="Send via WhatsApp">
+                                    <button class="btn btn-sm document-whatsapp-btn send-template-whatsapp" 
+                                            data-lead-id="{{ $lead->id ?? '' }}" 
+                                            data-document-id="{{ $document->id }}" 
+                                            title="Send via WhatsApp">
                                         <i class="fa fa-whatsapp mr-1"></i> WhatsApp
                                     </button>
                                 @endif

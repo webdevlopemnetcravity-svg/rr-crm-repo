@@ -569,6 +569,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     // Specific routes must come before generic route
     Route::get('lead-details/{leadId}/download-document/{documentKey}', [LeadContactController::class, 'downloadLeadDocument'])->name('lead-details.download-document');
     Route::post('lead-details/{leadId}/send-template-document/{documentId}', [LeadContactController::class, 'sendTemplateDocumentEmail'])->name('lead-details.send-template-document');
+    Route::post('lead-details/{leadId}/send-template-document-whatsapp/{documentId}', [LeadContactController::class, 'sendTemplateDocumentWhatsApp'])->name('lead-details.send-template-document-whatsapp');
     Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
     Route::post('lead-details/{leadId}/send-template-document/{documentId}', [LeadContactController::class, 'sendTemplateDocumentEmail'])->name('lead-details.send-template-document');
     Route::get('lead-dashboard', [LeadContactController::class, 'leadDashboard'])->name('lead-dashboard.index');
