@@ -963,14 +963,14 @@
 
             // Dynamic subclass filtering based on visa category
             function filterSubclassOptions() {
-                var selectedCategory = $('#visa_category').selectpicker('val');
+                var selectedVisaTypeId = $('#visa_category').selectpicker('val');
                 var $subclassSelect = $('#subclass');
                 var currentValue = $subclassSelect.selectpicker('val');
                 
-                // Show/hide options based on visa category
+                // Show/hide options based on visa type ID
                 $subclassSelect.find('option').each(function() {
                     var $option = $(this);
-                    var visaCategory = $option.data('visa-category');
+                    var optionVisaTypeId = $option.data('visa-type-id');
                     
                     // Always show the "Select" option
                     if ($option.val() === '') {
@@ -978,10 +978,10 @@
                         return;
                     }
                     
-                    // Enable/disable options based on visa category
-                    if (selectedCategory && visaCategory === selectedCategory) {
+                    // Enable/disable options based on visa type ID
+                    if (selectedVisaTypeId && optionVisaTypeId == selectedVisaTypeId) {
                         $option.prop('disabled', false);
-                    } else if (!selectedCategory) {
+                    } else if (!selectedVisaTypeId) {
                         // If no category selected, show all options
                         $option.prop('disabled', false);
                     } else {
@@ -989,10 +989,10 @@
                     }
                 });
                 
-                // If current value doesn't match selected category, clear it
-                if (selectedCategory && currentValue) {
-                    var currentOptionCategory = $subclassSelect.find('option[value="' + currentValue + '"]').data('visa-category');
-                    if (currentOptionCategory !== selectedCategory) {
+                // If current value doesn't match selected visa type, clear it
+                if (selectedVisaTypeId && currentValue) {
+                    var currentOptionVisaTypeId = $subclassSelect.find('option[value="' + currentValue + '"]').data('visa-type-id');
+                    if (currentOptionVisaTypeId != selectedVisaTypeId) {
                         $subclassSelect.val('').selectpicker('refresh');
                     } else {
                         $subclassSelect.selectpicker('refresh');

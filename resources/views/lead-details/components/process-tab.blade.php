@@ -77,10 +77,22 @@
                             </x-forms.label>
                             <select class="form-control select-picker height-35 f-14" name="visa_category" id="visa_category" required>
                                 <option value="">Select</option>
-                                <option value="PR" {{ $processData && $processData->visa_category == 'PR' ? 'selected' : '' }}>PR</option>
-                                <option value="Student Visa" {{ $processData && $processData->visa_category == 'Student Visa' ? 'selected' : '' }}>Student Visa</option>
-                                <option value="Visit Visa" {{ $processData && $processData->visa_category == 'Visit Visa' ? 'selected' : '' }}>Visit Visa</option>
-                                <option value="Work Permit" {{ $processData && $processData->visa_category == 'Work Permit' ? 'selected' : '' }}>Work Permit</option>
+                                @php
+                                    $visaTypes = $visaTypes ?? (isset($lead) && $lead ? \App\Models\NewLeadVisaType::where(function($query) {
+                                        $query->where('company_id', company()->id)
+                                              ->orWhereNull('company_id');
+                                    })->orderBy('name')->get() : collect());
+                                @endphp
+                                @foreach($visaTypes as $visaType)
+                                    @php
+                                        $isSelected = false;
+                                        if ($processData && $processData->visa_category) {
+                                            // Check if stored value matches ID or name (for backward compatibility)
+                                            $isSelected = ($processData->visa_category == $visaType->id || $processData->visa_category == $visaType->name);
+                                        }
+                                    @endphp
+                                    <option value="{{ $visaType->id }}" data-visa-type-id="{{ $visaType->id }}" {{ $isSelected ? 'selected' : '' }}>{{ $visaType->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -88,18 +100,30 @@
                             </x-forms.label>
                             <select class="form-control select-picker height-35 f-14" name="subclass" id="subclass" required>
                                 <option value="">Select</option>
-                                <!-- PR Subclasses -->
-                                <option value="PR - Employer Nomination Scheme (ENS)(Subclass 186)" data-visa-category="PR" {{ $processData && $processData->subclass == 'PR - Employer Nomination Scheme (ENS)(Subclass 186)' ? 'selected' : '' }}>PR - Employer Nomination Scheme (ENS)(Subclass 186)</option>
-                                <option value="PR - Skilled Nominated Visa (Subclass 190)" data-visa-category="PR" {{ $processData && $processData->subclass == 'PR - Skilled Nominated Visa (Subclass 190)' ? 'selected' : '' }}>PR - Skilled Nominated Visa (Subclass 190)</option>
-                                <option value="PR - Skilled Independent Visa (Subclass 189)" data-visa-category="PR" {{ $processData && $processData->subclass == 'PR - Skilled Independent Visa (Subclass 189)' ? 'selected' : '' }}>PR - Skilled Independent Visa (Subclass 189)</option>
-                                <!-- Student Visa Subclasses -->
-                                <option value="Student Visa (Subclass 500)" data-visa-category="Student Visa" {{ $processData && $processData->subclass == 'Student Visa (Subclass 500)' ? 'selected' : '' }}>Student Visa (Subclass 500)</option>
-                                <option value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)" data-visa-category="Student Visa" {{ $processData && $processData->subclass == 'Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)' ? 'selected' : '' }}>Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)</option>
-                                <!-- Visit Visa Subclasses -->
-                                <option value="Visitor Visa (Subclass 600)" data-visa-category="Visit Visa" {{ $processData && $processData->subclass == 'Visitor Visa (Subclass 600)' ? 'selected' : '' }}>Visitor Visa (Subclass 600)</option>
-                                <!-- Work Permit Subclasses -->
-                                <option value="Work Visa - Temporary Skill Shortage Visa (Subclass 482)" data-visa-category="Work Permit" {{ $processData && $processData->subclass == 'Work Visa - Temporary Skill Shortage Visa (Subclass 482)' ? 'selected' : '' }}>Work Visa - Temporary Skill Shortage Visa (Subclass 482)</option>
-                                <option value="Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)" data-visa-category="Work Permit" {{ $processData && $processData->subclass == 'Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)' ? 'selected' : '' }}>Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)</option>
+                                @php
+                                    $subclasses = $subclasses ?? (isset($lead) && $lead ? \App\Models\NewLeadSubclass::with('visaType')
+                                        ->where(function($query) {
+                                            $query->where('company_id', company()->id)
+                                                  ->orWhereNull('company_id');
+                                        })
+                                        ->orderBy('name')
+                                        ->get() : collect());
+                                @endphp
+                                @foreach($subclasses as $subclass)
+                                    @php
+                                        $isSelected = false;
+                                        if ($processData && $processData->subclass) {
+                                            // Check if stored value matches ID or name (for backward compatibility)
+                                            $isSelected = ($processData->subclass == $subclass->id || $processData->subclass == $subclass->name);
+                                        }
+                                    @endphp
+                                    <option value="{{ $subclass->id }}" 
+                                            data-visa-type-id="{{ $subclass->visaType->id ?? '' }}" 
+                                            data-visa-category="{{ $subclass->visaType->name ?? '' }}"
+                                            {{ $isSelected ? 'selected' : '' }}>
+                                        {{ $subclass->name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
@@ -308,11 +332,41 @@
                 <div class="info-grid-row row mt-3">
                     <div class="info-field-item col-md-6 mb-3">
                         <div class="info-field-label-text">Visa Category</div>
-                        <div class="info-field-value-text">{{ $getValue($processData ? $processData->visa_category : null) }}</div>
+                        <div class="info-field-value-text">
+                            @php
+                                $visaCategoryName = '-';
+                                if ($processData && $processData->visa_category) {
+                                    // Check if it's numeric (ID) or string (name for backward compatibility)
+                                    if (is_numeric($processData->visa_category)) {
+                                        $visaType = \App\Models\NewLeadVisaType::find($processData->visa_category);
+                                        $visaCategoryName = $visaType ? $visaType->name : $processData->visa_category;
+                                    } else {
+                                        // Backward compatibility: if it's a name, display it as is
+                                        $visaCategoryName = $processData->visa_category;
+                                    }
+                                }
+                            @endphp
+                            {{ $visaCategoryName }}
+                        </div>
                     </div>
                     <div class="info-field-item col-md-6 mb-3">
                         <div class="info-field-label-text">Subclass</div>
-                        <div class="info-field-value-text">{{ $getValue($processData ? $processData->subclass : null) }}</div>
+                        <div class="info-field-value-text">
+                            @php
+                                $subclassName = '-';
+                                if ($processData && $processData->subclass) {
+                                    // Check if it's numeric (ID) or string (name for backward compatibility)
+                                    if (is_numeric($processData->subclass)) {
+                                        $subclass = \App\Models\NewLeadSubclass::find($processData->subclass);
+                                        $subclassName = $subclass ? $subclass->name : $processData->subclass;
+                                    } else {
+                                        // Backward compatibility: if it's a name, display it as is
+                                        $subclassName = $processData->subclass;
+                                    }
+                                }
+                            @endphp
+                            {{ $subclassName }}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -256,6 +256,24 @@ class LeadContactController extends AccountBaseController
         $this->leadDocuments = [];
         $this->allExpectedDocuments = [];
         
+        // Load visa types and subclasses for process tab
+        $this->visaTypes = \App\Models\NewLeadVisaType::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+        
+        $this->subclasses = \App\Models\NewLeadSubclass::with('visaType')
+            ->where(function($query) {
+                $query->where('company_id', company()->id)
+                      ->orWhereNull('company_id');
+            })
+            ->orderBy('name')
+            ->get();
+        
+        // Add to data array for view access
+        $this->data['visaTypes'] = $this->visaTypes;
+        $this->data['subclasses'] = $this->subclasses;
+        
         if ($id) {
             $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process', 'accounts.agentUser', 'accounts.addedBy', 'travelDetails'])->find($id);
             if (!$this->lead) {
@@ -3694,6 +3712,20 @@ class LeadContactController extends AccountBaseController
             $this->lead = $lead;
             $this->data['lead'] = $lead;
             
+            // Load visa types and subclasses for process tab
+            $this->data['visaTypes'] = \App\Models\NewLeadVisaType::where(function($query) {
+                $query->where('company_id', company()->id)
+                      ->orWhereNull('company_id');
+            })->orderBy('name')->get();
+            
+            $this->data['subclasses'] = \App\Models\NewLeadSubclass::with('visaType')
+                ->where(function($query) {
+                    $query->where('company_id', company()->id)
+                          ->orWhereNull('company_id');
+                })
+                ->orderBy('name')
+                ->get();
+            
             $html = view('lead-details.components.process-tab', $this->data)->render();
             
             return Reply::dataOnly(['status' => 'success', 'data' => ['html' => $html]]);
@@ -4331,8 +4363,8 @@ class LeadContactController extends AccountBaseController
         $rules = [
             'new_lead_id' => 'required|exists:new_leads,id',
             'applicant_name' => 'required|string|max:255',
-            'visa_category' => 'required|string|max:255',
-            'subclass' => 'required|string|max:255',
+            'visa_category' => 'required|exists:new_lead_visa_type,id',
+            'subclass' => 'required|exists:new_lead_subclass,id',
             'passport_name' => 'required|string|max:255',
             'passport_number' => 'required|string|max:255',
             'agent_name' => 'required|string|max:255',
