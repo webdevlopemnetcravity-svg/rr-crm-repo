@@ -1,4 +1,4 @@
-﻿                <div class="tab-content px-4 pb-4" id="accountsTab">
+                <div class="tab-content px-4 pb-4" id="accountsTab">
                     <!-- Tab Header -->
                     <div class="tab-section-header">
                         <div class="tab-section-header-content">
@@ -162,7 +162,60 @@
                                         <div class="col-md-12 mb-3">
                                             <x-forms.label fieldId="service" fieldLabel="Service">
                                             </x-forms.label>
-                                            <input type="text" class="form-control height-35 f-14" id="service" name="service" value="">
+                                            @php
+                                                $serviceValue = '';
+                                                if (isset($lead) && $lead && $lead->step_2_data) {
+                                                    $step2Data = is_array($lead->step_2_data) ? $lead->step_2_data : json_decode($lead->step_2_data, true);
+                                                    if ($step2Data) {
+                                                        $subclassId = null;
+                                                        // Get subclass based on visa type
+                                                        if (isset($step2Data['visa_type'])) {
+                                                            $visaType = $step2Data['visa_type'];
+                                                            // Check if visa_type is numeric (ID) or string (old format)
+                                                            if (is_numeric($visaType)) {
+                                                                // New format: get section from visa type name mapping
+                                                                $visaTypeModel = \App\Models\NewLeadVisaType::find($visaType);
+                                                                if ($visaTypeModel) {
+                                                                    $visaTypeName = strtolower($visaTypeModel->name);
+                                                                    if (stripos($visaTypeName, 'pr') !== false || stripos($visaTypeName, 'permanent') !== false) {
+                                                                        $subclassId = $step2Data['pr_subclass'] ?? null;
+                                                                    } elseif (stripos($visaTypeName, 'visit') !== false) {
+                                                                        $subclassId = $step2Data['visit_subclass'] ?? null;
+                                                                    } elseif (stripos($visaTypeName, 'work') !== false) {
+                                                                        $subclassId = $step2Data['work_subclass'] ?? null;
+                                                                    } elseif (stripos($visaTypeName, 'student') !== false) {
+                                                                        $subclassId = $step2Data['student_subclass'] ?? null;
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                // Old format: direct mapping
+                                                                $visaTypeLower = strtolower($visaType);
+                                                                if ($visaTypeLower === 'pr') {
+                                                                    $subclassId = $step2Data['pr_subclass'] ?? null;
+                                                                } elseif ($visaTypeLower === 'visit') {
+                                                                    $subclassId = $step2Data['visit_subclass'] ?? null;
+                                                                } elseif ($visaTypeLower === 'work') {
+                                                                    $subclassId = $step2Data['work_subclass'] ?? null;
+                                                                } elseif ($visaTypeLower === 'student') {
+                                                                    $subclassId = $step2Data['student_subclass'] ?? null;
+                                                                }
+                                                            }
+                                                        }
+                                                        
+                                                        // Convert subclass ID to name
+                                                        if ($subclassId) {
+                                                            if (is_numeric($subclassId)) {
+                                                                $subclassModel = \App\Models\NewLeadSubclass::find($subclassId);
+                                                                $serviceValue = $subclassModel ? $subclassModel->name : '';
+                                                            } else {
+                                                                // Backward compatibility: if it's a string (old format), use it directly
+                                                                $serviceValue = $subclassId;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            @endphp
+                                            <input type="text" class="form-control height-35 f-14" id="service" name="service" value="{{ $serviceValue }}">
                                         </div>
                                         <div class="col-md-3 mb-3">
                                             <x-forms.label fieldId="price" fieldLabel="Price *">

@@ -1,16 +1,27 @@
                 <!-- Client Info Tab Content -->
                 <div class="tab-content px-4 pb-4 active" id="clientInfoTab">
                     @php
-                        // Extract step data
-                        $step1Data = isset($lead) && $lead ? ($lead->step_1_data ?? []) : [];
-                        $step2Data = isset($lead) && $lead ? ($lead->step_2_data ?? []) : [];
-                        $step3Data = isset($lead) && $lead ? ($lead->step_3_data ?? []) : [];
-                        $step4Data = isset($lead) && $lead ? ($lead->step_4_data ?? []) : [];
-                        $step5Data = isset($lead) && $lead ? ($lead->step_5_data ?? []) : [];
-                        $step6Data = isset($lead) && $lead ? ($lead->step_6_data ?? []) : [];
-                        $step7Data = isset($lead) && $lead ? ($lead->step_7_data ?? []) : [];
-                        $step8Data = isset($lead) && $lead ? ($lead->step_8_data ?? []) : [];
-                        $step9Data = isset($lead) && $lead ? ($lead->step_9_data ?? []) : [];
+                        // Extract step data - handle JSON strings
+                        $step1Data = isset($lead) && $lead ? (is_array($lead->step_1_data) ? $lead->step_1_data : (is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : [])) : [];
+                        $step2Data = isset($lead) && $lead ? (is_array($lead->step_2_data) ? $lead->step_2_data : (is_string($lead->step_2_data) ? json_decode($lead->step_2_data, true) : [])) : [];
+                        $step3Data = isset($lead) && $lead ? (is_array($lead->step_3_data) ? $lead->step_3_data : (is_string($lead->step_3_data) ? json_decode($lead->step_3_data, true) : [])) : [];
+                        $step4Data = isset($lead) && $lead ? (is_array($lead->step_4_data) ? $lead->step_4_data : (is_string($lead->step_4_data) ? json_decode($lead->step_4_data, true) : [])) : [];
+                        $step5Data = isset($lead) && $lead ? (is_array($lead->step_5_data) ? $lead->step_5_data : (is_string($lead->step_5_data) ? json_decode($lead->step_5_data, true) : [])) : [];
+                        $step6Data = isset($lead) && $lead ? (is_array($lead->step_6_data) ? $lead->step_6_data : (is_string($lead->step_6_data) ? json_decode($lead->step_6_data, true) : [])) : [];
+                        $step7Data = isset($lead) && $lead ? (is_array($lead->step_7_data) ? $lead->step_7_data : (is_string($lead->step_7_data) ? json_decode($lead->step_7_data, true) : [])) : [];
+                        $step8Data = isset($lead) && $lead ? (is_array($lead->step_8_data) ? $lead->step_8_data : (is_string($lead->step_8_data) ? json_decode($lead->step_8_data, true) : [])) : [];
+                        $step9Data = isset($lead) && $lead ? (is_array($lead->step_9_data) ? $lead->step_9_data : (is_string($lead->step_9_data) ? json_decode($lead->step_9_data, true) : [])) : [];
+                        
+                        // Ensure all step data are arrays
+                        $step1Data = is_array($step1Data) ? $step1Data : [];
+                        $step2Data = is_array($step2Data) ? $step2Data : [];
+                        $step3Data = is_array($step3Data) ? $step3Data : [];
+                        $step4Data = is_array($step4Data) ? $step4Data : [];
+                        $step5Data = is_array($step5Data) ? $step5Data : [];
+                        $step6Data = is_array($step6Data) ? $step6Data : [];
+                        $step7Data = is_array($step7Data) ? $step7Data : [];
+                        $step8Data = is_array($step8Data) ? $step8Data : [];
+                        $step9Data = is_array($step9Data) ? $step9Data : [];
                         
                         // Helper function to format date
                         $formatDate = function($date) {
@@ -278,13 +289,86 @@
                             </div>
                             @php
                                 $visaType = $step2Data['visa_type'] ?? null;
+                                $sectionId = null;
+                                
+                                // Determine section ID based on visa type
+                                if ($visaType) {
+                                    // Check if visa_type is numeric (new format) or string (old format)
+                                    if (is_numeric($visaType)) {
+                                        // New format: Look up visa type by ID
+                                        try {
+                                            $visaTypeModel = \App\Models\NewLeadVisaType::find($visaType);
+                                            if ($visaTypeModel) {
+                                                $visaTypeName = strtolower($visaTypeModel->name);
+                                                // Map visa type name to section identifier
+                                                if (stripos($visaTypeName, 'pr') !== false || stripos($visaTypeName, 'permanent') !== false) {
+                                                    $sectionId = 'pr';
+                                                } elseif (stripos($visaTypeName, 'visit') !== false) {
+                                                    $sectionId = 'visit';
+                                                } elseif (stripos($visaTypeName, 'work') !== false) {
+                                                    $sectionId = 'work';
+                                                } elseif (stripos($visaTypeName, 'student') !== false) {
+                                                    $sectionId = 'student';
+                                                }
+                                            }
+                                        } catch (\Exception $e) {
+                                            // If lookup fails, try to determine from subclass fields
+                                            if (!empty($step2Data['pr_subclass'])) {
+                                                $sectionId = 'pr';
+                                            } elseif (!empty($step2Data['visit_subclass'])) {
+                                                $sectionId = 'visit';
+                                            } elseif (!empty($step2Data['work_subclass'])) {
+                                                $sectionId = 'work';
+                                            } elseif (!empty($step2Data['student_subclass'])) {
+                                                $sectionId = 'student';
+                                            }
+                                        }
+                                    } else {
+                                        // Old format: direct mapping
+                                        $visaTypeLower = strtolower($visaType);
+                                        if (in_array($visaTypeLower, ['pr', 'visit', 'work', 'student'])) {
+                                            $sectionId = $visaTypeLower;
+                                        } else {
+                                            // Try to determine from subclass fields
+                                            if (!empty($step2Data['pr_subclass'])) {
+                                                $sectionId = 'pr';
+                                            } elseif (!empty($step2Data['visit_subclass'])) {
+                                                $sectionId = 'visit';
+                                            } elseif (!empty($step2Data['work_subclass'])) {
+                                                $sectionId = 'work';
+                                            } elseif (!empty($step2Data['student_subclass'])) {
+                                                $sectionId = 'student';
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    // No visa type, try to determine from subclass fields
+                                    if (!empty($step2Data['pr_subclass'])) {
+                                        $sectionId = 'pr';
+                                    } elseif (!empty($step2Data['visit_subclass'])) {
+                                        $sectionId = 'visit';
+                                    } elseif (!empty($step2Data['work_subclass'])) {
+                                        $sectionId = 'work';
+                                    } elseif (!empty($step2Data['student_subclass'])) {
+                                        $sectionId = 'student';
+                                    }
+                                }
                             @endphp
-                            @if($visaType == 'pr')
+                            @if($sectionId == 'pr')
                                 <!-- PR Visa Details -->
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Visa Type</div>
-                                        <div class="info-field-value-text">PR (Permanent Residence)</div>
+                                        <div class="info-field-value-text">
+                                            @php
+                                                $visaTypeName = 'PR (Permanent Residence)';
+                                                if (is_numeric($visaType)) {
+                                                    $visaTypeModel = \App\Models\NewLeadVisaType::find($visaType);
+                                                    $visaTypeName = $visaTypeModel ? $visaTypeModel->name : 'PR (Permanent Residence)';
+                                                }
+                                            @endphp
+                                            {{ $visaTypeName }}
+                                        </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Skill Assessment Letter</div>
@@ -309,12 +393,21 @@
                                         <div class="info-field-value-text">{{ $getSubclassName($step2Data['pr_subclass'] ?? null) }}</div>
                                     </div>
                                 </div>
-                            @elseif($visaType == 'visit')
+                            @elseif($sectionId == 'visit')
                                 <!-- Visit Visa Details -->
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Visa Type</div>
-                                        <div class="info-field-value-text">Visit Visa</div>
+                                        <div class="info-field-value-text">
+                                            @php
+                                                $visaTypeName = 'Visit Visa';
+                                                if (is_numeric($visaType)) {
+                                                    $visaTypeModel = \App\Models\NewLeadVisaType::find($visaType);
+                                                    $visaTypeName = $visaTypeModel ? $visaTypeModel->name : 'Visit Visa';
+                                                }
+                                            @endphp
+                                            {{ $visaTypeName }}
+                                        </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Purpose of Visit</div>
@@ -339,12 +432,21 @@
                                         <div class="info-field-value-text">{{ $getSubclassName($step2Data['visit_subclass'] ?? null) }}</div>
                                     </div>
                                 </div>
-                            @elseif($visaType == 'work')
+                            @elseif($sectionId == 'work')
                                 <!-- Work Visa Details -->
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Visa Type</div>
-                                        <div class="info-field-value-text">Work Visa</div>
+                                        <div class="info-field-value-text">
+                                            @php
+                                                $visaTypeName = 'Work Visa';
+                                                if (is_numeric($visaType)) {
+                                                    $visaTypeModel = \App\Models\NewLeadVisaType::find($visaType);
+                                                    $visaTypeName = $visaTypeModel ? $visaTypeModel->name : 'Work Visa';
+                                                }
+                                            @endphp
+                                            {{ $visaTypeName }}
+                                        </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Preferred Designation</div>
@@ -377,12 +479,21 @@
                                         <div class="info-field-value-text">{{ $getSubclassName($step2Data['work_subclass'] ?? null) }}</div>
                                     </div>
                                 </div>
-                            @elseif($visaType == 'student')
+                            @elseif($sectionId == 'student')
                                 <!-- Student Visa Details -->
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Visa Type</div>
-                                        <div class="info-field-value-text">Student Visa</div>
+                                        <div class="info-field-value-text">
+                                            @php
+                                                $visaTypeName = 'Student Visa';
+                                                if (is_numeric($visaType)) {
+                                                    $visaTypeModel = \App\Models\NewLeadVisaType::find($visaType);
+                                                    $visaTypeName = $visaTypeModel ? $visaTypeModel->name : 'Student Visa';
+                                                }
+                                            @endphp
+                                            {{ $visaTypeName }}
+                                        </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Preferred Course</div>

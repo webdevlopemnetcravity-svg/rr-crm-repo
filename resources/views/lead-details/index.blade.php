@@ -2281,9 +2281,81 @@
             $('#account_lead_id_details').val(leadId);
             $('#installment_months_container').hide();
             $('#installment_payment_toggle').prop('checked', false);
+            
+            // Service field will be set when modal is shown (handled in modal shown event)
+            
             calculateAccountSummary();
             $('#addAccountModal').modal('show');
         });
+        
+        // Function to set service field from step 2 data
+        function setServiceFromStep2Data(leadId) {
+            @if(isset($lead) && $lead && $lead->step_2_data)
+                // Only set if the lead ID matches (convert both to strings for comparison)
+                var currentLeadId = '{{ $lead->id ?? '' }}';
+                if (String(leadId) === String(currentLeadId)) {
+                    @php
+                        $step2Data = is_array($lead->step_2_data) ? $lead->step_2_data : json_decode($lead->step_2_data, true);
+                        $subclassId = null;
+                        $serviceName = '';
+                        
+                        if ($step2Data) {
+                            // Get subclass based on visa type
+                            if (isset($step2Data['visa_type'])) {
+                                $visaType = $step2Data['visa_type'];
+                                
+                                // Check if visa_type is numeric (ID) or string (old format)
+                                if (is_numeric($visaType)) {
+                                    // New format: get section from visa type name mapping
+                                    $visaTypeModel = \App\Models\NewLeadVisaType::find($visaType);
+                                    if ($visaTypeModel) {
+                                        $visaTypeName = strtolower($visaTypeModel->name);
+                                        if (stripos($visaTypeName, 'pr') !== false || stripos($visaTypeName, 'permanent') !== false) {
+                                            $subclassId = $step2Data['pr_subclass'] ?? null;
+                                        } elseif (stripos($visaTypeName, 'visit') !== false) {
+                                            $subclassId = $step2Data['visit_subclass'] ?? null;
+                                        } elseif (stripos($visaTypeName, 'work') !== false) {
+                                            $subclassId = $step2Data['work_subclass'] ?? null;
+                                        } elseif (stripos($visaTypeName, 'student') !== false) {
+                                            $subclassId = $step2Data['student_subclass'] ?? null;
+                                        }
+                                    }
+                                } else {
+                                    // Old format: direct mapping
+                                    $visaTypeLower = strtolower($visaType);
+                                    if ($visaTypeLower === 'pr') {
+                                        $subclassId = $step2Data['pr_subclass'] ?? null;
+                                    } elseif ($visaTypeLower === 'visit') {
+                                        $subclassId = $step2Data['visit_subclass'] ?? null;
+                                    } elseif ($visaTypeLower === 'work') {
+                                        $subclassId = $step2Data['work_subclass'] ?? null;
+                                    } elseif ($visaTypeLower === 'student') {
+                                        $subclassId = $step2Data['student_subclass'] ?? null;
+                                    }
+                                }
+                            }
+                            
+                            // Convert subclass ID to name
+                            if ($subclassId) {
+                                if (is_numeric($subclassId)) {
+                                    $subclassModel = \App\Models\NewLeadSubclass::find($subclassId);
+                                    $serviceName = $subclassModel ? $subclassModel->name : '';
+                                } else {
+                                    // Backward compatibility: if it's a string (old format), use it directly
+                                    $serviceName = $subclassId;
+                                }
+                            }
+                        }
+                    @endphp
+                    @if(!empty($serviceName))
+                        // Set service value with a small delay to ensure field is ready
+                        setTimeout(function() {
+                            $('#service').val('{{ addslashes($serviceName) }}').trigger('input');
+                        }, 50);
+                    @endif
+                }
+            @endif
+        }
 
         // Handle Edit Account button click
         $(document).on('click', '.edit-account-btn', function(e) {
@@ -2661,6 +2733,8 @@
             $('#accountFormDetails')[0].reset();
             $('#account_id_details').val('');
             $('#addAccountModalLabel').text('ADD INVOICE');
+            // Clear service field on modal close
+            $('#service').val('');
             $('#installment_months_container').hide();
             $('#installment_payment_toggle').prop('checked', false);
             $('.select-picker').selectpicker('refresh');
@@ -2680,6 +2754,12 @@
                     position: 'bl',
                     ...datepickerConfig
                 });
+            }
+            
+            // Set service field from step 2 data when modal is shown (if not already set)
+            var leadId = $('#account_lead_id_details').val();
+            if (leadId && !$('#service').val()) {
+                setServiceFromStep2Data(leadId);
             }
         });
         
