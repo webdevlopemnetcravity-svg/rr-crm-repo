@@ -538,6 +538,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('lead-contact/apply-quick-action', [LeadContactController::class, 'applyQuickAction'])->name('lead-contact.apply_quick_action');
     Route::get('lead-list', [LeadContactController::class, 'leadList'])->name('lead-list.index');
     Route::get('add-lead', [LeadContactController::class, 'addLead'])->name('add-lead.index');
+    Route::get('add-lead/get-subclasses/{visaTypeId}', [LeadContactController::class, 'getSubclassesByVisaType'])->name('add-lead.get-subclasses');
     Route::delete('new-leads/{id}', [LeadContactController::class, 'destroyNewLead'])->name('new-leads.destroy');
     Route::post('new-leads/apply-quick-action', [LeadContactController::class, 'applyQuickActionNewLeads'])->name('new-leads.apply_quick_action');
     Route::post('new-leads/update-priority', [LeadContactController::class, 'updateLeadPriority'])->name('new-leads.update_priority');

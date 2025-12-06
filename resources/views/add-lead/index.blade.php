@@ -331,21 +331,51 @@
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3 mb-3" fieldId="visa_type" :fieldLabel="__('app.selectVisaType')" fieldRequired="true">
                                 </x-forms.label>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_pr" value="pr">
-                                    <label class="form-check-label" for="visa_pr">@lang('app.pr')</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_visit" value="visit">
-                                    <label class="form-check-label" for="visa_visit">@lang('app.visitVisa')</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_work" value="work">
-                                    <label class="form-check-label" for="visa_work">@lang('app.workPermit')</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_student" value="student">
-                                    <label class="form-check-label" for="visa_student">@lang('app.studentVisa')</label>
+                                <div id="visa-type-radio-container">
+                                    @if(isset($visaTypes) && $visaTypes->count() > 0)
+                                        @foreach($visaTypes as $visaType)
+                                            @php
+                                                // Map visa type name to section identifier for backward compatibility
+                                                $sectionMap = [
+                                                    'PR' => 'pr',
+                                                    'Permanent Residence' => 'pr',
+                                                    'Visit Visa' => 'visit',
+                                                    'Work Permit' => 'work',
+                                                    'Student Visa' => 'student',
+                                                ];
+                                                $sectionId = strtolower(str_replace(' ', '_', $visaType->name));
+                                                // Try to find a match in the map
+                                                foreach($sectionMap as $key => $value) {
+                                                    if(stripos($visaType->name, $key) !== false) {
+                                                        $sectionId = $value;
+                                                        break;
+                                                    }
+                                                }
+                                            @endphp
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_{{ $visaType->id }}" value="{{ $visaType->id }}" data-section="{{ $sectionId }}">
+                                                <label class="form-check-label" for="visa_{{ $visaType->id }}">{{ $visaType->name }}</label>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        {{-- Fallback to hardcoded options if no visa types in database --}}
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_pr" value="pr" data-section="pr">
+                                            <label class="form-check-label" for="visa_pr">@lang('app.pr')</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_visit" value="visit" data-section="visit">
+                                            <label class="form-check-label" for="visa_visit">@lang('app.visitVisa')</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_work" value="work" data-section="work">
+                                            <label class="form-check-label" for="visa_work">@lang('app.workPermit')</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input visa-type" type="radio" name="visa_type" id="visa_student" value="student" data-section="student">
+                                            <label class="form-check-label" for="visa_student">@lang('app.studentVisa')</label>
+                                        </div>
+                                    @endif
                                 </div>
                     </div>
                 </div>
@@ -415,11 +445,8 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="pr_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="pr_subclass" id="pr_subclass">
+                                    <select class="form-control select-picker height-35 f-14 subclass-select" name="pr_subclass" id="pr_subclass" data-section="pr">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="PR - Employer Nomination Scheme (ENS)(Subclass 186)">PR - Employer Nomination Scheme (ENS)(Subclass 186)</option>
-                                        <option value="PR - Skilled Nominated Visa (Subclass 190)">PR - Skilled Nominated Visa (Subclass 190)</option>
-                                        <option value="PR - Skilled Independent Visa (Subclass 189)">PR - Skilled Independent Visa (Subclass 189)</option>
                                     </select>
                                 </div>
                             </div>
@@ -481,9 +508,8 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="visit_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="visit_subclass" id="visit_subclass">
+                                    <select class="form-control select-picker height-35 f-14 subclass-select" name="visit_subclass" id="visit_subclass" data-section="visit">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Visitor Visa (Subclass 600)">Visitor Visa (Subclass 600)</option>
                                     </select>
                                 </div>
                             </div>
@@ -576,10 +602,8 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="work_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="work_subclass" id="work_subclass">
+                                    <select class="form-control select-picker height-35 f-14 subclass-select" name="work_subclass" id="work_subclass" data-section="work">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Work Visa - Temporary Skill Shortage Visa (Subclass 482)">Work Visa - Temporary Skill Shortage Visa (Subclass 482)</option>
-                                        <option value="Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)">Work Visa - Skilled Work Regional Visa (Australia) (Subclass 491)</option>
                                     </select>
                                 </div>
                             </div>
@@ -615,10 +639,8 @@
                                 <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="student_subclass" :fieldLabel="__('app.subclass')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="student_subclass" id="student_subclass">
+                                    <select class="form-control select-picker height-35 f-14 subclass-select" name="student_subclass" id="student_subclass" data-section="student">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Student Visa (Subclass 500)">Student Visa (Subclass 500)</option>
-                                        <option value="Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)">Student Visa - Temporary Graduate Visa (Australia)(Subclass 485)</option>
                                     </select>
                                 </div>
                             </div>
@@ -1617,13 +1639,18 @@
             // Tab navigation - Previous button (old handler - will be replaced by the one below)
             // This is kept for backward compatibility but the main handler is below
 
-            // Handle visa type radio buttons for Client Preference tab
-            $('input[name="visa_type"]').on('change', function() {
+            // Flag to prevent subclass loading during form data load
+            let isLoadingFormData = false;
+            
+            // Handle visa type radio buttons for Client Preference tab (dynamic)
+            $(document).on('change', 'input[name="visa_type"]', function() {
                 const selectedValue = $(this).val();
+                const sectionId = $(this).data('section');
+                const visaTypeId = selectedValue; // This is now the visa type ID from database
                 
                 // Clear ALL other visa type forms when any visa type is selected
                 // Clear PR fields (if not selected)
-                if (selectedValue !== 'pr') {
+                if (sectionId !== 'pr') {
                     $('#skill_assessment_letter, #pr_preferred_country, #pr_preferred_state, #pr_family, #pr_subclass').val('').selectpicker('refresh');
                     $('#pr_assessment_letter_file').val('');
                     // Remove hidden file input if exists
@@ -1633,32 +1660,37 @@
                 }
                 
                 // Clear Visit Visa fields (if not selected)
-                if (selectedValue !== 'visit') {
+                if (sectionId !== 'visit') {
                     $('#purpose_of_visit, #visit_family, #visit_preferred_country, #visit_preferred_state, #visit_subclass').val('').selectpicker('refresh');
                 }
                 
                 // Clear Work Permit fields (if not selected)
-                if (selectedValue !== 'work') {
+                if (sectionId !== 'work') {
                     $('#preferred_designation, #work_industry, #on_role_off_role, #work_preferred_country, #work_preferred_state, #work_category, #work_subclass').val('').selectpicker('refresh');
                 }
                 
                 // Clear Student Visa fields (if not selected)
-                if (selectedValue !== 'student') {
+                if (sectionId !== 'student') {
                     $('#preferred_course, #student_country, #university, #term_intake, #student_subclass').val('').selectpicker('refresh');
                 }
                 
                 // Hide all sections
                 $('#prSection, #visitSection, #workSection, #studentSection').addClass('d-none');
                 
-                // Show selected section
-                if (selectedValue === 'pr') {
+                // Show selected section based on data-section attribute
+                if (sectionId === 'pr') {
                     $('#prSection').removeClass('d-none');
-                } else if (selectedValue === 'visit') {
+                } else if (sectionId === 'visit') {
                     $('#visitSection').removeClass('d-none');
-                } else if (selectedValue === 'work') {
+                } else if (sectionId === 'work') {
                     $('#workSection').removeClass('d-none');
-                } else if (selectedValue === 'student') {
+                } else if (sectionId === 'student') {
                     $('#studentSection').removeClass('d-none');
+                }
+                
+                // Load subclasses for the selected visa type (only if not loading form data)
+                if (visaTypeId && !isNaN(visaTypeId) && !isLoadingFormData) {
+                    loadSubclassesForVisaType(visaTypeId, sectionId);
                 }
                 
                 // Reinitialize select picker for the visible section
@@ -1672,6 +1704,90 @@
                     });
                 }, 100);
             });
+            
+            // Function to load subclasses for a visa type
+            function loadSubclassesForVisaType(visaTypeId, sectionId, callback) {
+                // Find the subclass select field for this section
+                const subclassSelect = $('.subclass-select[data-section="' + sectionId + '"]');
+                
+                if (subclassSelect.length === 0) {
+                    if (callback) callback();
+                    return;
+                }
+                
+                // Show loading state
+                subclassSelect.prop('disabled', true);
+                
+                // Make AJAX request to get subclasses
+                $.ajax({
+                    url: "{{ route('add-lead.get-subclasses', ':visaTypeId') }}".replace(':visaTypeId', visaTypeId),
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.status === 'success' && response.options) {
+                            // Clear existing options except the first "Select" option
+                            subclassSelect.empty();
+                            subclassSelect.html(response.options);
+                            
+                            // Reinitialize selectpicker
+                            if (subclassSelect.data('selectpicker')) {
+                                subclassSelect.selectpicker('destroy');
+                            }
+                            subclassSelect.selectpicker();
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading subclasses:', xhr);
+                        // On error, just ensure the select has at least the default option
+                        if (subclassSelect.find('option').length === 0) {
+                            subclassSelect.html('<option value="">@lang('app.select')</option>');
+                        }
+                    },
+                    complete: function() {
+                        subclassSelect.prop('disabled', false);
+                        if (subclassSelect.data('selectpicker')) {
+                            subclassSelect.selectpicker('refresh');
+                        }
+                        // Execute callback if provided
+                        if (callback) {
+                            callback();
+                        }
+                    }
+                });
+            }
+            
+            // Function to set subclass value after subclasses are loaded
+            function setSubclassValue(sectionId, data) {
+                const subclassFieldMap = {
+                    'pr': 'pr_subclass',
+                    'visit': 'visit_subclass',
+                    'work': 'work_subclass',
+                    'student': 'student_subclass'
+                };
+                
+                const fieldName = subclassFieldMap[sectionId];
+                if (fieldName && data[fieldName]) {
+                    const subclassSelect = $('#' + fieldName);
+                    if (subclassSelect.length > 0) {
+                        // Set the value
+                        subclassSelect.val(data[fieldName]);
+                        
+                        // Ensure selectpicker is initialized and refreshed
+                        if (!subclassSelect.data('selectpicker')) {
+                            subclassSelect.selectpicker();
+                        }
+                        
+                        // Refresh with a small delay to ensure options are loaded
+                        setTimeout(function() {
+                            subclassSelect.selectpicker('refresh');
+                            // Double-check the value is set after refresh
+                            if (subclassSelect.val() !== data[fieldName]) {
+                                subclassSelect.val(data[fieldName]);
+                                subclassSelect.selectpicker('refresh');
+                            }
+                        }, 100);
+                    }
+                }
+            }
             
             // Handle PR Assessment Letter file input change
             $('#pr_assessment_letter_file').on('change', function() {
@@ -3159,8 +3275,64 @@
                     const data = stepData.step_2_data;
                     
                     // Set visa type first to show the correct section
+                    // Handle both new format (ID) and old format (string like 'pr', 'visit', etc.)
                     if (data.visa_type) {
-                        $('input[name="visa_type"][value="' + data.visa_type + '"]').prop('checked', true).trigger('change');
+                        // Set flag to prevent change handler from loading subclasses
+                        isLoadingFormData = true;
+                        
+                        const visaTypeValue = data.visa_type;
+                        const isNumericId = !isNaN(visaTypeValue) && !isNaN(parseFloat(visaTypeValue));
+                        
+                        // Try to find by value (works for both ID and old string format)
+                        const visaTypeInput = $('input[name="visa_type"][value="' + visaTypeValue + '"]');
+                        let sectionId = null;
+                        
+                        if (visaTypeInput.length > 0) {
+                            sectionId = visaTypeInput.data('section');
+                            visaTypeInput.prop('checked', true);
+                            
+                            // If it's a numeric ID, load subclasses first, then trigger change
+                            if (isNumericId) {
+                                loadSubclassesForVisaType(visaTypeValue, sectionId, function() {
+                                    // After subclasses are loaded, set the subclass value if exists
+                                    setSubclassValue(sectionId, data);
+                                    // Trigger change to show the section (but don't load subclasses again)
+                                    visaTypeInput.trigger('change');
+                                    // Reset flag after a delay to allow change handler to complete
+                                    setTimeout(function() {
+                                        isLoadingFormData = false;
+                                    }, 500);
+                                });
+                            } else {
+                                // Old format - just trigger change
+                                visaTypeInput.trigger('change');
+                                // Reset flag after a delay
+                                setTimeout(function() {
+                                    isLoadingFormData = false;
+                                }, 500);
+                            }
+                        } else {
+                            // If not found, might be old format - try to find by data-section attribute
+                            // Map old string values to section IDs
+                            const oldToSectionMap = {
+                                'pr': 'pr',
+                                'visit': 'visit',
+                                'work': 'work',
+                                'student': 'student'
+                            };
+                            sectionId = oldToSectionMap[visaTypeValue.toLowerCase()];
+                            if (sectionId) {
+                                const sectionInput = $('input[name="visa_type"][data-section="' + sectionId + '"]').first();
+                                sectionInput.prop('checked', true).trigger('change');
+                                // For old format, set subclass value directly (no need to load from API)
+                                setTimeout(function() {
+                                    setSubclassValue(sectionId, data);
+                                    isLoadingFormData = false;
+                                }, 500);
+                            } else {
+                                isLoadingFormData = false;
+                            }
+                        }
                         
                         // Wait a bit for the section to show, then populate fields
                         setTimeout(function() {
@@ -3210,9 +3382,7 @@
                             if (data.pr_family) {
                                 $('#pr_family').val(data.pr_family).selectpicker('refresh');
                             }
-                            if (data.pr_subclass) {
-                                $('#pr_subclass').val(data.pr_subclass).selectpicker('refresh');
-                            }
+                            // pr_subclass will be set by setSubclassValue function after subclasses are loaded
                             
                             // Visit Section fields
                             if (data.purpose_of_visit) {
@@ -3237,9 +3407,7 @@
                             if (data.visit_preferred_state) {
                                 $('#visit_preferred_state').val(data.visit_preferred_state).selectpicker('refresh');
                             }
-                            if (data.visit_subclass) {
-                                $('#visit_subclass').val(data.visit_subclass).selectpicker('refresh');
-                            }
+                            // visit_subclass will be set by setSubclassValue function after subclasses are loaded
                             
                             // Work Section fields
                             if (data.preferred_designation) {
@@ -3270,9 +3438,7 @@
                             if (data.work_category) {
                                 $('#work_category').val(data.work_category).selectpicker('refresh');
                             }
-                            if (data.work_subclass) {
-                                $('#work_subclass').val(data.work_subclass).selectpicker('refresh');
-                            }
+                            // work_subclass will be set by setSubclassValue function after subclasses are loaded
                             
                             // Student Section fields
                             if (data.preferred_course) {
@@ -3284,9 +3450,7 @@
                             if (data.university) {
                                 $('#university').val(data.university);
                             }
-                            if (data.student_subclass) {
-                                $('#student_subclass').val(data.student_subclass).selectpicker('refresh');
-                            }
+                            // student_subclass will be set by setSubclassValue function after subclasses are loaded
                         }, 300);
                     }
                 }

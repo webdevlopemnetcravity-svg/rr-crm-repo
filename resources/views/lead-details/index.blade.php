@@ -140,14 +140,25 @@
                                     @php
                                         $step2Data = $lead->step_2_data ?? [];
                                         $serviceName = '--';
+                                        $subclassId = null;
+                                        
                                         if (isset($step2Data['pr_subclass']) && !empty($step2Data['pr_subclass'])) {
-                                            $serviceName = $step2Data['pr_subclass'];
+                                            $subclassId = $step2Data['pr_subclass'];
                                         } elseif (isset($step2Data['visit_subclass']) && !empty($step2Data['visit_subclass'])) {
-                                            $serviceName = $step2Data['visit_subclass'];
+                                            $subclassId = $step2Data['visit_subclass'];
                                         } elseif (isset($step2Data['work_subclass']) && !empty($step2Data['work_subclass'])) {
-                                            $serviceName = $step2Data['work_subclass'];
+                                            $subclassId = $step2Data['work_subclass'];
                                         } elseif (isset($step2Data['student_subclass']) && !empty($step2Data['student_subclass'])) {
-                                            $serviceName = $step2Data['student_subclass'];
+                                            $subclassId = $step2Data['student_subclass'];
+                                        }
+                                        
+                                        // If subclassId is numeric, get name from database, otherwise use as-is (backward compatibility)
+                                        if ($subclassId && is_numeric($subclassId)) {
+                                            $subclassModel = \App\Models\NewLeadSubclass::find($subclassId);
+                                            $serviceName = $subclassModel ? $subclassModel->name : '--';
+                                        } elseif ($subclassId) {
+                                            // Backward compatibility: if it's a string (old format), use it directly
+                                            $serviceName = $subclassId;
                                         }
                                     @endphp
                                     {{ $serviceName }}

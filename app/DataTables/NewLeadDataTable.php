@@ -150,14 +150,24 @@ class NewLeadDataTable extends BaseDataTable
                 $step2Data = is_array($row->step_2_data) ? $row->step_2_data : json_decode($row->step_2_data, true);
                 if ($step2Data) {
                     // Check for different visa type subclasses
+                    $subclassId = null;
                     if (isset($step2Data['pr_subclass']) && !empty($step2Data['pr_subclass'])) {
-                        $subclass = $step2Data['pr_subclass'];
+                        $subclassId = $step2Data['pr_subclass'];
                     } elseif (isset($step2Data['visit_subclass']) && !empty($step2Data['visit_subclass'])) {
-                        $subclass = $step2Data['visit_subclass'];
+                        $subclassId = $step2Data['visit_subclass'];
                     } elseif (isset($step2Data['work_subclass']) && !empty($step2Data['work_subclass'])) {
-                        $subclass = $step2Data['work_subclass'];
+                        $subclassId = $step2Data['work_subclass'];
                     } elseif (isset($step2Data['student_subclass']) && !empty($step2Data['student_subclass'])) {
-                        $subclass = $step2Data['student_subclass'];
+                        $subclassId = $step2Data['student_subclass'];
+                    }
+                    
+                    // If subclassId is numeric, get name from database, otherwise use as-is (backward compatibility)
+                    if ($subclassId && is_numeric($subclassId)) {
+                        $subclassModel = \App\Models\NewLeadSubclass::find($subclassId);
+                        $subclass = $subclassModel ? $subclassModel->name : '--';
+                    } elseif ($subclassId) {
+                        // Backward compatibility: if it's a string (old format), use it directly
+                        $subclass = $subclassId;
                     }
                 }
             }

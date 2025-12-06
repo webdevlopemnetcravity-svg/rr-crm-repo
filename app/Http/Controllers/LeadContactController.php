@@ -204,6 +204,12 @@ class LeadContactController extends AccountBaseController
         // Get employees from the same organization
         $this->employees = User::allEmployees(null, 'active', null, company()->id);
 
+        // Load visa types from master datatable
+        $this->visaTypes = \App\Models\NewLeadVisaType::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
         // Check if editing existing new lead
         $leadId = request('lead_id');
         $this->newLead = null;
@@ -227,6 +233,27 @@ class LeadContactController extends AccountBaseController
         }
 
         return view('add-lead.index', $this->data);
+    }
+
+    /**
+     * Get subclasses by visa type ID
+     */
+    public function getSubclassesByVisaType($visaTypeId)
+    {
+        $subclasses = \App\Models\NewLeadSubclass::where('visa_type_id', $visaTypeId)
+            ->where(function($query) {
+                $query->where('company_id', company()->id)
+                      ->orWhereNull('company_id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $options = '<option value="">' . __('app.select') . '</option>';
+        foreach ($subclasses as $subclass) {
+            $options .= '<option value="' . $subclass->id . '">' . htmlspecialchars($subclass->name, ENT_QUOTES, 'UTF-8') . '</option>';
+        }
+
+        return Reply::dataOnly(['status' => 'success', 'options' => $options, 'subclasses' => $subclasses]);
     }
 
     public function leadDetails($id = null)
@@ -1680,15 +1707,55 @@ class LeadContactController extends AccountBaseController
 
             case 2:
                 // Step 2 - Client Preference
-                $rules = [
-                    'visa_type' => 'required|string|in:pr,visit,work,student,PR,Visit,Work,Student',
-                ];
+                // Accept visa type ID (numeric) or old string values (for backward compatibility)
+                $visaTypeId = $request->visa_type;
+                $visaType = null;
+                $sectionId = null;
                 
-                // Normalize visa_type to handle both lowercase and uppercase
-                $visaType = strtolower($request->visa_type);
+                // Check if it's a numeric ID (new format) or string (old format)
+                if (is_numeric($visaTypeId)) {
+                    // New format: Look up visa type by ID
+                    $visaTypeModel = \App\Models\NewLeadVisaType::find($visaTypeId);
+                    if ($visaTypeModel) {
+                        $visaType = $visaTypeModel->name;
+                        // Map visa type name to section identifier
+                        $sectionMap = [
+                            'PR' => 'pr',
+                            'Permanent Residence' => 'pr',
+                            'Visit Visa' => 'visit',
+                            'Work Permit' => 'work',
+                            'Student Visa' => 'student',
+                        ];
+                        $sectionId = strtolower(str_replace(' ', '_', $visaType));
+                        // Try to find a match in the map
+                        foreach($sectionMap as $key => $value) {
+                            if(stripos($visaType, $key) !== false) {
+                                $sectionId = $value;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // Old format: string values like 'pr', 'visit', etc.
+                    $visaType = strtolower($visaTypeId);
+                    $sectionId = $visaType;
+                }
+                
+                // Validation rules
+                if (is_numeric($visaTypeId)) {
+                    // New format: validate visa type ID exists
+                    $rules = [
+                        'visa_type' => 'required|numeric|exists:new_lead_visa_type,id',
+                    ];
+                } else {
+                    // Old format: validate string values
+                    $rules = [
+                        'visa_type' => 'required|string|in:pr,visit,work,student,PR,Visit,Work,Student',
+                    ];
+                }
                 
                 // PR Visa specific fields (only fields with *)
-                if ($visaType === 'pr') {
+                if ($sectionId === 'pr') {
                     $rules['skill_assessment_letter'] = 'required|string';
                     // pr_assessment_letter_file is required if not already uploaded
                     if (!$request->hasFile('pr_assessment_letter_file') && !$request->pr_assessment_letter_file_existing) {
@@ -1700,18 +1767,18 @@ class LeadContactController extends AccountBaseController
                 }
                 
                 // Visit Visa specific fields (only fields with *)
-                if ($visaType === 'visit') {
+                if ($sectionId === 'visit') {
                     $rules['purpose_of_visit'] = 'required|string|max:500';
                     $rules['visit_family'] = 'required|string';
                 }
                 
                 // Work Visa specific fields (only fields with *)
-                if ($visaType === 'work') {
+                if ($sectionId === 'work') {
                     $rules['preferred_designation'] = 'required|string|max:255';
                 }
                 
                 // Student Visa specific fields (only fields with *)
-                if ($visaType === 'student') {
+                if ($sectionId === 'student') {
                     $rules['term_intake'] = 'required|string';
                 }
                 

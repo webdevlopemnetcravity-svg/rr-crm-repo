@@ -1,4 +1,4 @@
-﻿                <!-- Client Info Tab Content -->
+                <!-- Client Info Tab Content -->
                 <div class="tab-content px-4 pb-4 active" id="clientInfoTab">
                     @php
                         // Extract step data
@@ -29,6 +29,21 @@
                         // Helper function to get value or default
                         $getValue = function($value, $default = '-') {
                             return !empty($value) ? $value : $default;
+                        };
+                        
+                        // Helper function to get subclass name from ID
+                        $getSubclassName = function($subclassId) {
+                            if (empty($subclassId)) {
+                                return '-';
+                            }
+                            // If subclassId is numeric, get name from database, otherwise use as-is (backward compatibility)
+                            if (is_numeric($subclassId)) {
+                                $subclassModel = \App\Models\NewLeadSubclass::find($subclassId);
+                                return $subclassModel ? $subclassModel->name : '-';
+                            } else {
+                                // Backward compatibility: if it's a string (old format), use it directly
+                                return $subclassId;
+                            }
                         };
                     @endphp
                     <!-- Tab Header -->
@@ -291,7 +306,7 @@
                                     </div>
                                     <div class="info-field-item col-md-9 mb-3">
                                         <div class="info-field-label-text">Subclass</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['pr_subclass'] ?? null) }}</div>
+                                        <div class="info-field-value-text">{{ $getSubclassName($step2Data['pr_subclass'] ?? null) }}</div>
                                     </div>
                                 </div>
                             @elseif($visaType == 'visit')
@@ -321,7 +336,7 @@
                                     </div>
                                     <div class="info-field-item col-md-9 mb-3">
                                         <div class="info-field-label-text">Subclass</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['visit_subclass'] ?? null) }}</div>
+                                        <div class="info-field-value-text">{{ $getSubclassName($step2Data['visit_subclass'] ?? null) }}</div>
                                     </div>
                                 </div>
                             @elseif($visaType == 'work')
@@ -359,7 +374,7 @@
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Subclass</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['work_subclass'] ?? null) }}</div>
+                                        <div class="info-field-value-text">{{ $getSubclassName($step2Data['work_subclass'] ?? null) }}</div>
                                     </div>
                                 </div>
                             @elseif($visaType == 'student')
@@ -389,7 +404,7 @@
                                     </div>
                                     <div class="info-field-item col-md-9 mb-3">
                                         <div class="info-field-label-text">Subclass</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['student_subclass'] ?? null) }}</div>
+                                        <div class="info-field-value-text">{{ $getSubclassName($step2Data['student_subclass'] ?? null) }}</div>
                                     </div>
                                 </div>
                             @else
