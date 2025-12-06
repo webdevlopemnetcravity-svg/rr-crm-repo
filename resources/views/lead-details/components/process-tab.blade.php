@@ -41,7 +41,7 @@
                 </button>
                 <!-- Save and Cancel Buttons (shown when in edit mode) -->
                 <div id="processFormActions" style="display:none;">
-                    <button type="button" class="btn btn-success btn-sm" id="saveProcessBtn">
+                    <button type="button" class="btn btn-primary btn-sm" id="saveProcessBtn">
                         <i class="fa fa-save mr-1"></i> Save
                     </button>
                     <button type="button" class="btn btn-secondary btn-sm ml-2" id="cancelProcessBtn">

@@ -976,7 +976,17 @@
             function filterSubclassOptions() {
                 var selectedVisaTypeId = $('#visa_category').selectpicker('val');
                 var $subclassSelect = $('#subclass');
-                var currentValue = $subclassSelect.selectpicker('val');
+                
+                // Get current value - try multiple methods to ensure we get the saved value
+                var currentValue = $subclassSelect.val() || $subclassSelect.selectpicker('val') || $subclassSelect.find('option:selected').val();
+                
+                // If no value from selectpicker, check the HTML selected attribute
+                if (!currentValue) {
+                    var selectedOption = $subclassSelect.find('option[selected]');
+                    if (selectedOption.length > 0) {
+                        currentValue = selectedOption.val();
+                    }
+                }
                 
                 // Show/hide options based on visa type ID
                 $subclassSelect.find('option').each(function() {
@@ -1000,15 +1010,29 @@
                     }
                 });
                 
-                // If current value doesn't match selected visa type, clear it
+                // Refresh selectpicker first
+                $subclassSelect.selectpicker('refresh');
+                
+                // After refresh, check if we need to set/clear the value
                 if (selectedVisaTypeId && currentValue) {
-                    var currentOptionVisaTypeId = $subclassSelect.find('option[value="' + currentValue + '"]').data('visa-type-id');
+                    var currentOption = $subclassSelect.find('option[value="' + currentValue + '"]');
+                    var currentOptionVisaTypeId = currentOption.data('visa-type-id');
+                    
+                    // If current value doesn't match selected visa type, clear it
                     if (currentOptionVisaTypeId != selectedVisaTypeId) {
                         $subclassSelect.val('').selectpicker('refresh');
                     } else {
+                        // Ensure the value is set correctly after filtering
+                        $subclassSelect.val(currentValue);
                         $subclassSelect.selectpicker('refresh');
                     }
-                } else {
+                } else if (currentValue && !selectedVisaTypeId) {
+                    // If there's a value but no visa category selected, preserve it
+                    $subclassSelect.val(currentValue);
+                    $subclassSelect.selectpicker('refresh');
+                } else if (currentValue) {
+                    // If there's a value, try to preserve it
+                    $subclassSelect.val(currentValue);
                     $subclassSelect.selectpicker('refresh');
                 }
             }
@@ -1016,7 +1040,22 @@
             // Initialize subclass filtering when form section is shown or on page load
             function initializeSubclassFiltering() {
                 if ($('#processFormSection').is(':visible')) {
+                    // Store current value before filtering
+                    var $subclassSelect = $('#subclass');
+                    var savedValue = $subclassSelect.val() || $subclassSelect.find('option[selected]').val();
+                    
                     filterSubclassOptions();
+                    
+                    // Restore value after filtering if it exists
+                    if (savedValue) {
+                        setTimeout(function() {
+                            var option = $subclassSelect.find('option[value="' + savedValue + '"]');
+                            if (option.length > 0 && !option.prop('disabled')) {
+                                $subclassSelect.val(savedValue);
+                                $subclassSelect.selectpicker('refresh');
+                            }
+                        }, 150);
+                    }
                 }
             }
             
@@ -1032,9 +1071,31 @@
             
             // Re-initialize when edit button is clicked
             $(document).on('click', '#editProcessBtn', function() {
+                // Wait for selectpickers to be initialized first
                 setTimeout(function() {
+                    // Store the current subclass value before filtering
+                    var $subclassSelect = $('#subclass');
+                    var savedValue = $subclassSelect.val() || $subclassSelect.find('option[selected]').val();
+                    
+                    // Filter options
                     filterSubclassOptions();
-                }, 100);
+                    
+                    // After filtering, restore the saved value if it's still valid
+                    if (savedValue) {
+                        setTimeout(function() {
+                            var selectedVisaTypeId = $('#visa_category').selectpicker('val');
+                            var option = $subclassSelect.find('option[value="' + savedValue + '"]');
+                            
+                            // Only set if the option exists and is not disabled, and matches visa type
+                            if (option.length > 0 && !option.prop('disabled')) {
+                                if (!selectedVisaTypeId || option.data('visa-type-id') == selectedVisaTypeId) {
+                                    $subclassSelect.val(savedValue);
+                                    $subclassSelect.selectpicker('refresh');
+                                }
+                            }
+                        }, 150);
+                    }
+                }, 200);
             });
 
             // File size validation and file name display for all file inputs (similar to add-lead)
@@ -1072,10 +1133,25 @@
                 // Hide edit button and show save/cancel buttons
                 $('#editProcessBtn').hide();
                 $('#processFormActions').show();
+                
+                // Store subclass value before initializing selectpickers
+                var $subclassSelect = $('#subclass');
+                var savedSubclassValue = $subclassSelect.find('option[selected]').val() || $subclassSelect.val();
+                
                 // Initialize select pickers
                 $('.select-picker').selectpicker('refresh');
+                
+                // Restore subclass value after selectpicker initialization
+                if (savedSubclassValue) {
+                    setTimeout(function() {
+                        $subclassSelect.val(savedSubclassValue);
+                        $subclassSelect.selectpicker('refresh');
+                    }, 100);
+                }
+                
                 // Remove any previous errors
                 removeProcessFieldErrors();
+                
                 // Initialize additional documents when form is shown (with delay to ensure DOM is ready)
                 setTimeout(function() {
                     window.initializeAdditionalDocuments();
