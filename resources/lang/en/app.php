@@ -1231,7 +1231,7 @@ return array(
     'notify' => 'Notify',
     'moduleNotifySwitchMessage' => 'This will hide/show new update message on dashboard for :name module',
     'leadContact' => 'Lead Contact',
-    'leadList' => 'Lead List',
+    'leadList' => 'lead',
     'addLead' => 'Add Lead',
     'leadDetails' => 'Lead Details',
     'leadDashboard' => 'Lead Dashboard',
