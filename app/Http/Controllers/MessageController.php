@@ -10,6 +10,8 @@ use App\Models\UserChat;
 use App\Models\ProjectMember;
 use App\Http\Requests\ChatStoreRequest;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class MessageController extends AccountBaseController
 {
@@ -186,45 +188,83 @@ class MessageController extends AccountBaseController
      */
     public function store(ChatStoreRequest $request)
     {
-        if ($request->user_type == 'client') {
-            $receiverID = $request->client_id;
-        }
-        else {
-            $receiverID = $request->user_id;
-        }
-
-        $message = $request->message;
-
-        if($request->types == 'chat')
-        {
-            $validateModule = $this->validateModule($message);
-
-            if($validateModule['status'] == false)
-            {
-                return Reply::error($validateModule ['message'] );
+        try {
+            if ($request->user_type == 'client') {
+                $receiverID = $request->client_id;
+            }
+            else {
+                $receiverID = $request->user_id;
             }
 
-        }
+            // Validate receiver ID exists
+            if (!$receiverID || !User::find($receiverID)) {
+                return Reply::error(__('messages.invalidRequest') ?: 'Invalid recipient selected.');
+            }
 
-            $message = new UserChat();
-            $message->message         = $request->message;
-            $message->user_one        = user()->id;
-            $message->user_id         = $receiverID;
-            $message->from            = user()->id;
-            $message->to              = $receiverID;
-            $message->notification_sent = 0;
-            $message->save();
+            $message = $request->message;
 
+            if($request->types == 'chat')
+            {
+                $validateModule = $this->validateModule($message);
+
+                if($validateModule['status'] == false)
+                {
+                    return Reply::error($validateModule ['message'] );
+                }
+
+            }
+
+            // Use database transaction to ensure data integrity
+            $savedMessage = DB::transaction(function () use ($request, $receiverID) {
+                $message = new UserChat();
+                $message->message         = $request->message;
+                $message->user_one        = user()->id;
+                $message->user_id         = $receiverID;
+                $message->from            = user()->id;
+                $message->to              = $receiverID;
+                $message->notification_sent = 0;
+                $message->save();
+
+                // Load relationships immediately to avoid N+1 queries
+                $message->load('toUser');
+                
+                return $message;
+            });
+
+            // Optimize: Only fetch what we need for the response
+            // Get user list efficiently
             $userLists = UserChat::userListLatest(user()->id, null);
             $messageIds = collect($userLists)->pluck('id');
-            $this->userLists = UserChat::with('fromUser', 'toUser')->whereIn('id', $messageIds)->orderByDesc('id')->get();
+            $this->userLists = UserChat::with(['fromUser' => function ($q) {
+                $q->withCount(['unreadMessages']);
+            }, 'toUser' => function ($q) {
+                $q->withCount(['unreadMessages']);
+            }])
+            ->whereIn('id', $messageIds)->orderByDesc('id')->get();
             $userList = view('messages.user_list', $this->data)->render();
 
+            // Get chat details with the new message included
             $this->chatDetails = UserChat::chatDetail($receiverID, user()->id);
             $messageList = view('messages.message_list', $this->data)->render();
 
-            return Reply::dataOnly(['user_list' => $userList, 'message_list' => $messageList, 'message_id' => $message->id, 'receiver_id' => $receiverID, 'userName' => $message->toUser->name]);
+            return Reply::dataOnly([
+                'status' => 'success',
+                'user_list' => $userList, 
+                'message_list' => $messageList, 
+                'message_id' => $savedMessage->id, 
+                'receiver_id' => $receiverID, 
+                'userName' => $savedMessage->toUser->name
+            ]);
 
+        } catch (\Exception $e) {
+            Log::error('Message send error: ' . $e->getMessage(), [
+                'request' => $request->all(),
+                'user_id' => user()->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return Reply::error(__('messages.invalidRequest') ?: 'Failed to send message. Please try again.');
+        }
     }
 
     /**

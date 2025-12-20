@@ -260,12 +260,40 @@
 
         // Submitting message
         $('body').on('click', '#sendMessage', function (e) {
-        var note = document.getElementById('submitTexts').children[0].innerHTML;
-        document.getElementById('message-text').value = note;
-        var mention_user_id = $('#submitTexts span[data-id]').map(function(){
-                            return $(this).attr('data-id')
-                        }).get();
-        $('#mentionUserId').val(mention_user_id.join(','));
+            e.preventDefault();
+            
+            // Get message content
+            var note = document.getElementById('submitTexts').children[0].innerHTML;
+            var messageText = note.trim();
+            
+            // Client-side validation: Check if message is empty
+            if (!messageText || messageText === '' || messageText === '<p><br></p>' || messageText === '<p></p>') {
+                // Check if there are files to upload
+                if (taskDropzone.getQueuedFiles().length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        text: '@lang("messages.fileMessage")',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    return false;
+                }
+            }
+            
+            document.getElementById('message-text').value = note;
+            var mention_user_id = $('#submitTexts span[data-id]').map(function(){
+                                return $(this).attr('data-id')
+                            }).get();
+            $('#mentionUserId').val(mention_user_id.join(','));
+            
+            // Prevent multiple submissions
+            var $sendButton = $(this);
+            if ($sendButton.prop('disabled')) {
+                return false;
+            }
+            
             //getting values by input fields
             var url = "{{ route('messages.store') }}";
 
@@ -277,17 +305,33 @@
                 blockUI: true,
                 buttonSelector: "#sendMessage",
                 data: $('#sendMessageForm').serialize(),
+                timeout: 30000, // 30 second timeout
                 success: function (response) {
-                    if (response.status === 'fail') {
-                            $('#message-text').html(`<div class="alert alert-danger">${response.message}</div>`);
-                        }
-                    if(response.status != 'fail')
+                    if (response.status === 'fail' || response.status === 'error') {
+                        var errorMsg = response.message || 'Failed to send message. Please try again.';
+                        Swal.fire({
+                            icon: 'error',
+                            text: errorMsg,
+                            toast: true,
+                            position: 'top-end',
+                            timer: 4000,
+                            showConfirmButton: false
+                        });
+                        $.easyUnblockUI();
+                        return;
+                    }
+                    
+                    if(response.status === 'success' || response.status != 'fail')
                     {
                         $('#user_list').val(response.user_list);
                         $('#message_list').val(response.message_list);
                         $('#receiver_id').val(response.receiver_id);
 
-                        // Reload left user-list
+                        // Update chat box immediately with the new message list
+                        $('#chatBox').html(response.message_list);
+                        scrollChat();
+
+                        // Reload left user-list (but don't block on it)
                         fetchUserList();
 
                         if (taskDropzone.getQueuedFiles().length > 0) {
@@ -298,6 +342,30 @@
                             showContent();
                         }
                     }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    var errorMsg = 'Failed to send message. ';
+                    if (textStatus === 'timeout') {
+                        errorMsg += 'Request timed out. Please check your connection and try again.';
+                    } else if (jqXHR.status === 0) {
+                        errorMsg += 'No connection. Please check your internet connection.';
+                    } else if (jqXHR.status >= 500) {
+                        errorMsg += 'Server error. Please try again later.';
+                    } else {
+                        errorMsg += 'Please try again.';
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        text: errorMsg,
+                        toast: true,
+                        position: 'top-end',
+                        timer: 5000,
+                        showConfirmButton: false
+                    });
+                    
+                    $.easyUnblockUI();
+                    $sendButton.prop('disabled', false);
                 }
             });
 
@@ -312,7 +380,12 @@
             $('.file-container').addClass('d-none');
             taskDropzone.removeAllFiles(true);
 
-            fetchUserMessages();
+            // Only fetch messages if we have a current user selected
+            // This prevents unnecessary AJAX calls
+            var currentUserId = $('#current_user_id').val();
+            if (currentUserId && currentUserId !== '') {
+                fetchUserMessages();
+            }
         }
 
         $('#new-chat, #new-chat-mbl').click(function () {
@@ -491,12 +564,20 @@
             $.easyAjax({
                 url: url,
                 type: "GET",
+                blockUI: false, // Don't block UI for this background update
                 success: function (response) {
-                    $('#msgLeft').html(response.user_list);
+                    if (response && response.user_list) {
+                        $('#msgLeft').html(response.user_list);
 
-                    let receiverId = $('#chatBox').data('chat-for-user');
-                    $('#user-no-' + receiverId + ' a').addClass('active');
-
+                        let receiverId = $('#chatBox').data('chat-for-user');
+                        if (receiverId) {
+                            $('#user-no-' + receiverId + ' a').addClass('active');
+                        }
+                    }
+                },
+                error: function() {
+                    // Silently fail - user list update is not critical
+                    console.log('Failed to update user list');
                 }
             });
         }
@@ -504,7 +585,7 @@
         function fetchUserMessages(scrollChatBox = true) {
             var currentUserId = $('#current_user_id').val();
 
-            if (currentUserId === '') {
+            if (currentUserId === '' || !currentUserId) {
                 return false;
             }
             var url = "{{ route('messages.fetch_messages', ':id') }}";
@@ -516,15 +597,23 @@
                 url: url,
                 container: '#sendMessageForm',
                 type: "POST",
+                blockUI: false, // Don't block UI for message refresh
+                timeout: 15000, // 15 second timeout
                 data: {
                     '_token': token,
                 },
                 success: function (response) {
-                    $('#chatBox').html(response.message_list);
-                    if(scrollChatBox){
-                        scrollChat();
+                    if (response && response.message_list) {
+                        $('#chatBox').html(response.message_list);
+                        if(scrollChatBox){
+                            scrollChat();
+                        }
+                        $('#msgContentRight').addClass('d-block');
                     }
-                    $('#msgContentRight').addClass('d-block');
+                },
+                error: function() {
+                    // Silently fail - message refresh is not critical for sending
+                    console.log('Failed to refresh messages');
                 }
             });
         }
