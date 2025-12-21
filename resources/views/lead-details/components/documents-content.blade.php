@@ -12,6 +12,11 @@
                     <i class="fas fa-chevron-down"></i>
                     {{ $familyDetails['main_applicant']['name'] }} (Main Applicant)
                 </h4>
+                <button type="button" class="btn btn-sm btn-primary add-required-document-btn" 
+                        data-applicant-type="main_applicant"
+                        data-section-name="{{ $familyDetails['main_applicant']['name'] }} (Main Applicant)">
+                    <i class="fa fa-plus"></i> Add Required Document
+                </button>
             </div>
             <div class="collapse show" id="mainApplicantDocuments">
                 <div class="document-section-body">
@@ -33,6 +38,11 @@
                     <i class="fas fa-chevron-down"></i>
                     {{ $familyDetails['father']['name'] }} (Dependent - Father)
                 </h4>
+                <button type="button" class="btn btn-sm btn-primary add-required-document-btn" 
+                        data-applicant-type="father"
+                        data-section-name="{{ $familyDetails['father']['name'] }} (Dependent - Father)">
+                    <i class="fa fa-plus"></i> Add Required Document
+                </button>
             </div>
             <div class="collapse" id="fatherDocuments">
                 <div class="document-section-body">
@@ -54,6 +64,11 @@
                     <i class="fas fa-chevron-down"></i>
                     {{ $familyDetails['mother']['name'] }} (Dependent - Mother)
                 </h4>
+                <button type="button" class="btn btn-sm btn-primary add-required-document-btn" 
+                        data-applicant-type="mother"
+                        data-section-name="{{ $familyDetails['mother']['name'] }} (Dependent - Mother)">
+                    <i class="fa fa-plus"></i> Add Required Document
+                </button>
             </div>
             <div class="collapse" id="motherDocuments">
                 <div class="document-section-body">
@@ -75,6 +90,11 @@
                     <i class="fas fa-chevron-down"></i>
                     {{ $familyDetails['spouse']['name'] }} (Dependent - Spouse)
                 </h4>
+                <button type="button" class="btn btn-sm btn-primary add-required-document-btn" 
+                        data-applicant-type="spouse"
+                        data-section-name="{{ $familyDetails['spouse']['name'] }} (Dependent - Spouse)">
+                    <i class="fa fa-plus"></i> Add Required Document
+                </button>
             </div>
             <div class="collapse" id="spouseDocuments">
                 <div class="document-section-body">
@@ -108,6 +128,12 @@
                         <i class="fas fa-chevron-down"></i>
                         {{ $childName }} (Dependent - Child {{ $childIndex }})
                     </h4>
+                    <button type="button" class="btn btn-sm btn-primary add-required-document-btn" 
+                            data-applicant-type="child"
+                            data-child-index="{{ $childIndex }}"
+                            data-section-name="{{ $childName }} (Dependent - Child {{ $childIndex }})">
+                        <i class="fa fa-plus"></i> Add Required Document
+                    </button>
                 </div>
                 <div class="collapse" id="child{{ $childIndex }}Documents">
                     <div class="document-section-body">

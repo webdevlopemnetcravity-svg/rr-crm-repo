@@ -459,38 +459,42 @@ class LeadContactController extends AccountBaseController
             return $checklists;
         }
         
-        // Get master document lists
+        // Get master document lists (keyed by ID for lookup)
         $mainDocuments = \App\Models\NewLeadMainDocument::where(function($query) {
             $query->where('company_id', company()->id)
                   ->orWhereNull('company_id');
-        })->orderBy('name')->get();
+        })->get()->keyBy('id');
         
         $dependsDocuments = \App\Models\NewLeadDependsDocument::where(function($query) {
             $query->where('company_id', company()->id)
                   ->orWhereNull('company_id');
-        })->orderBy('name')->get();
+        })->get()->keyBy('id');
         
         // Get uploaded documents
         $leadDocument = \App\Models\NewLeadDocument::where('lead_id', $lead->id)->first();
         
-        // Main Applicant Checklist
-        foreach ($mainDocuments as $doc) {
-            $docKey = strtolower(str_replace(' ', '_', $doc->name));
-            $uploadedDoc = $leadDocument && $leadDocument->main_applicant_documents 
-                ? ($leadDocument->main_applicant_documents[$docKey] ?? null)
-                : null;
+        // Main Applicant Checklist - Use document_master_id as key
+        if ($leadDocument && $leadDocument->main_applicant_documents) {
+            // Convert old format if needed
+            $mainDocs = $this->convertDocumentKeysToIds($leadDocument->main_applicant_documents, true);
             
-            $checklists['main_applicant'][] = [
-                'document_master_id' => $doc->id,
-                'name' => $doc->name,
-                'key' => $docKey,
-                'file_url' => $uploadedDoc['file_url'] ?? null,
-                'status' => $uploadedDoc['status'] ?? 'pending',
-                'uploaded_at' => $uploadedDoc['uploaded_at'] ?? null
-            ];
+            foreach ($mainDocs as $docId => $docData) {
+                $docIdInt = (int)$docId;
+                $masterDoc = $mainDocuments->get($docIdInt);
+                if ($masterDoc) {
+                    $checklists['main_applicant'][] = [
+                        'document_master_id' => $docIdInt,
+                        'name' => $docData['document_name'] ?? $masterDoc->name,
+                        'key' => (string)$docIdInt,
+                        'file_url' => $docData['file_url'] ?? null,
+                        'status' => $docData['status'] ?? 'pending',
+                        'uploaded_at' => $docData['uploaded_at'] ?? null
+                    ];
+                }
+            }
         }
         
-        // Dependents Checklists (Father, Mother, Spouse)
+        // Dependents Checklists (Father, Mother, Spouse) - Use document_master_id as key
         $dependentTypes = ['father', 'mother', 'spouse'];
         foreach ($dependentTypes as $type) {
             $columnName = $type . '_documents';
@@ -498,22 +502,26 @@ class LeadContactController extends AccountBaseController
                 ? $leadDocument->$columnName 
                 : [];
             
-            foreach ($dependsDocuments as $doc) {
-                $docKey = strtolower(str_replace(' ', '_', $doc->name));
-                $uploadedDoc = $uploadedDocs[$docKey] ?? null;
-                
-                $checklists[$type][] = [
-                    'document_master_id' => $doc->id,
-                    'name' => $doc->name,
-                    'key' => $docKey,
-                    'file_url' => $uploadedDoc['file_url'] ?? null,
-                    'status' => $uploadedDoc['status'] ?? 'pending',
-                    'uploaded_at' => $uploadedDoc['uploaded_at'] ?? null
-                ];
+            // Convert old format if needed
+            $uploadedDocs = $this->convertDocumentKeysToIds($uploadedDocs, false);
+            
+            foreach ($uploadedDocs as $docId => $docData) {
+                $docIdInt = (int)$docId;
+                $masterDoc = $dependsDocuments->get($docIdInt);
+                if ($masterDoc) {
+                    $checklists[$type][] = [
+                        'document_master_id' => $docIdInt,
+                        'name' => $docData['document_name'] ?? $masterDoc->name,
+                        'key' => (string)$docIdInt,
+                        'file_url' => $docData['file_url'] ?? null,
+                        'status' => $docData['status'] ?? 'pending',
+                        'uploaded_at' => $docData['uploaded_at'] ?? null
+                    ];
+                }
             }
         }
         
-        // Children Checklist
+        // Children Checklist - Use document_master_id as key
         $childrenDocs = $leadDocument && $leadDocument->children_documents 
             ? $leadDocument->children_documents 
             : [];
@@ -522,9 +530,8 @@ class LeadContactController extends AccountBaseController
         $familyDetails = $this->getFamilyDetails($lead);
         foreach ($familyDetails['children'] as $child) {
             $childIndex = $child['index'];
-            $childData = $child['data'];
             
-            // Find or create child document entry
+            // Find child document entry
             $childDocEntry = null;
             foreach ($childrenDocs as $entry) {
                 if (isset($entry['child_index']) && $entry['child_index'] == $childIndex) {
@@ -537,19 +544,23 @@ class LeadContactController extends AccountBaseController
                 ? $childDocEntry['documents'] 
                 : [];
             
+            // Convert old format if needed
+            $childDocuments = $this->convertDocumentKeysToIds($childDocuments, false);
+            
             $childChecklist = [];
-            foreach ($dependsDocuments as $doc) {
-                $docKey = strtolower(str_replace(' ', '_', $doc->name));
-                $uploadedDoc = $childDocuments[$docKey] ?? null;
-                
-                $childChecklist[] = [
-                    'document_master_id' => $doc->id,
-                    'name' => $doc->name,
-                    'key' => $docKey,
-                    'file_url' => $uploadedDoc['file_url'] ?? null,
-                    'status' => $uploadedDoc['status'] ?? 'pending',
-                    'uploaded_at' => $uploadedDoc['uploaded_at'] ?? null
-                ];
+            foreach ($childDocuments as $docId => $docData) {
+                $docIdInt = (int)$docId;
+                $masterDoc = $dependsDocuments->get($docIdInt);
+                if ($masterDoc) {
+                    $childChecklist[] = [
+                        'document_master_id' => $docIdInt,
+                        'name' => $docData['document_name'] ?? $masterDoc->name,
+                        'key' => (string)$docIdInt,
+                        'file_url' => $docData['file_url'] ?? null,
+                        'status' => $docData['status'] ?? 'pending',
+                        'uploaded_at' => $docData['uploaded_at'] ?? null
+                    ];
+                }
             }
             
             $checklists['children'][] = [
@@ -3374,13 +3385,24 @@ class LeadContactController extends AccountBaseController
                 
                 $fileUrl = null;
                 
+                // documentKey can be either document_master_id (new format) or old name-based key (backward compatibility)
+                $isNumericKey = is_numeric($documentKey);
+                $docIdStr = $isNumericKey ? (string)$documentKey : null;
+                
                 if ($applicantType === 'child' && $childIndex) {
                     // Get from children_documents
                     $childrenDocs = $leadDocument->children_documents ?? [];
                     foreach ($childrenDocs as $entry) {
                         if (isset($entry['child_index']) && $entry['child_index'] == $childIndex) {
-                            if (isset($entry['documents'][$documentKey]['file_url'])) {
-                                $fileUrl = $entry['documents'][$documentKey]['file_url'];
+                            $childDocuments = $entry['documents'] ?? [];
+                            // Convert old format if needed
+                            $childDocuments = $this->convertDocumentKeysToIds($childDocuments, false);
+                            
+                            if ($isNumericKey && isset($childDocuments[$docIdStr]['file_url'])) {
+                                $fileUrl = $childDocuments[$docIdStr]['file_url'];
+                            } elseif (!$isNumericKey && isset($childDocuments[$documentKey]['file_url'])) {
+                                // Old format fallback
+                                $fileUrl = $childDocuments[$documentKey]['file_url'];
                             }
                             break;
                         }
@@ -3389,7 +3411,13 @@ class LeadContactController extends AccountBaseController
                     // Get from main_applicant, father, mother, or spouse documents
                     $columnName = $this->getDocumentColumnName($applicantType);
                     $documents = $leadDocument->$columnName ?? [];
-                    if (isset($documents[$documentKey]['file_url'])) {
+                    // Convert old format if needed
+                    $documents = $this->convertDocumentKeysToIds($documents, $applicantType === 'main_applicant');
+                    
+                    if ($isNumericKey && isset($documents[$docIdStr]['file_url'])) {
+                        $fileUrl = $documents[$docIdStr]['file_url'];
+                    } elseif (!$isNumericKey && isset($documents[$documentKey]['file_url'])) {
+                        // Old format fallback
                         $fileUrl = $documents[$documentKey]['file_url'];
                     }
                 }
@@ -4009,13 +4037,13 @@ class LeadContactController extends AccountBaseController
         $lead = NewLead::findOrFail($leadId);
         
         $request->validate([
-            'document_key' => 'required|string',
+            'document_master_id' => 'required|integer',
             'applicant_type' => 'required|in:main_applicant,father,mother,spouse,child',
             'document_file' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
             'child_index' => 'nullable|integer|min:1',
         ]);
         
-        $documentKey = $request->document_key;
+        $documentMasterId = $request->document_master_id;
         $applicantType = $request->applicant_type;
         $childIndex = $request->child_index;
         $file = $request->file('document_file');
@@ -4026,6 +4054,23 @@ class LeadContactController extends AccountBaseController
         }
         
         try {
+            // Get document master to get name
+            if ($applicantType === 'main_applicant') {
+                $documentMaster = \App\Models\NewLeadMainDocument::where(function($query) {
+                    $query->where('company_id', company()->id)
+                          ->orWhereNull('company_id');
+                })->find($documentMasterId);
+            } else {
+                $documentMaster = \App\Models\NewLeadDependsDocument::where(function($query) {
+                    $query->where('company_id', company()->id)
+                          ->orWhereNull('company_id');
+                })->find($documentMasterId);
+            }
+            
+            if (!$documentMaster) {
+                return Reply::error('Document master not found.');
+            }
+            
             // Get or create document record
             $leadDocument = \App\Models\NewLeadDocument::firstOrNew(['lead_id' => $leadId]);
             
@@ -4035,32 +4080,20 @@ class LeadContactController extends AccountBaseController
                 $folderPath .= '/child_' . $childIndex;
             }
             
-            // Get document master ID from checklist
-            $documentMaster = null;
-            if ($applicantType === 'main_applicant') {
-                $documentMaster = \App\Models\NewLeadMainDocument::where(function($query) {
-                    $query->where('company_id', company()->id)
-                          ->orWhereNull('company_id');
-                })->whereRaw('LOWER(REPLACE(name, " ", "_")) = ?', [strtolower($documentKey)])->first();
-            } else {
-                $documentMaster = \App\Models\NewLeadDependsDocument::where(function($query) {
-                    $query->where('company_id', company()->id)
-                          ->orWhereNull('company_id');
-                })->whereRaw('LOWER(REPLACE(name, " ", "_")) = ?', [strtolower($documentKey)])->first();
-            }
-            
-            $documentMasterId = $documentMaster ? $documentMaster->id : null;
-            
             // Delete old file if exists
             $oldFileUrl = null;
             $columnName = $this->getDocumentColumnName($applicantType);
             $documents = $leadDocument->$columnName ?? [];
+            $docIdStr = (string)$documentMasterId;
             
             if ($applicantType === 'child') {
+                // Convert old format if needed
+                $childrenDocs = $this->convertDocumentKeysToIds($documents, false);
+                
                 // Find child entry
                 $childEntry = null;
                 $childEntryIndex = null;
-                foreach ($documents as $index => $entry) {
+                foreach ($childrenDocs as $index => $entry) {
                     if (isset($entry['child_index']) && $entry['child_index'] == $childIndex) {
                         $childEntry = $entry;
                         $childEntryIndex = $index;
@@ -4068,12 +4101,15 @@ class LeadContactController extends AccountBaseController
                     }
                 }
                 
-                if ($childEntry && isset($childEntry['documents'][$documentKey]['file_url'])) {
-                    $oldFileUrl = $childEntry['documents'][$documentKey]['file_url'];
+                if ($childEntry && isset($childEntry['documents'][$docIdStr]['file_url'])) {
+                    $oldFileUrl = $childEntry['documents'][$docIdStr]['file_url'];
                 }
             } else {
-                if (isset($documents[$documentKey]['file_url'])) {
-                    $oldFileUrl = $documents[$documentKey]['file_url'];
+                // Convert old format if needed
+                $documents = $this->convertDocumentKeysToIds($documents, $applicantType === 'main_applicant');
+                
+                if (isset($documents[$docIdStr]['file_url'])) {
+                    $oldFileUrl = $documents[$docIdStr]['file_url'];
                 }
             }
             
@@ -4109,7 +4145,7 @@ class LeadContactController extends AccountBaseController
             // Generate file URL
             $fileUrl = asset_url_local_s3($folderPath . '/' . $customFileName);
             
-            // Update JSON structure
+            // Update JSON structure using document_master_id as key
             if ($applicantType === 'child') {
                 // Update children_documents
                 $childrenDocs = $leadDocument->children_documents ?? [];
@@ -4132,24 +4168,33 @@ class LeadContactController extends AccountBaseController
                     $childEntryIndex = count($childrenDocs) - 1;
                 }
                 
-                // Update document in child entry
+                // Convert old format if needed
                 if (!isset($childrenDocs[$childEntryIndex]['documents'])) {
                     $childrenDocs[$childEntryIndex]['documents'] = [];
                 }
+                $childDocuments = $this->convertDocumentKeysToIds($childrenDocs[$childEntryIndex]['documents'], false);
                 
-                $childrenDocs[$childEntryIndex]['documents'][$documentKey] = [
+                // Update document using document_master_id as key
+                $childDocuments[$docIdStr] = [
                     'document_master_id' => $documentMasterId,
+                    'document_name' => $documentMaster->name,
                     'file_url' => $fileUrl,
                     'status' => 'uploaded',
                     'uploaded_at' => now()->toDateString()
                 ];
                 
+                $childrenDocs[$childEntryIndex]['documents'] = $childDocuments;
                 $leadDocument->children_documents = $childrenDocs;
             } else {
                 // Update main applicant, father, mother, or spouse documents
                 $documents = $leadDocument->$columnName ?? [];
-                $documents[$documentKey] = [
+                // Convert old format if needed
+                $documents = $this->convertDocumentKeysToIds($documents, $applicantType === 'main_applicant');
+                
+                // Update document using document_master_id as key
+                $documents[$docIdStr] = [
                     'document_master_id' => $documentMasterId,
+                    'document_name' => $documentMaster->name,
                     'file_url' => $fileUrl,
                     'status' => 'uploaded',
                     'uploaded_at' => now()->toDateString()
@@ -4181,6 +4226,322 @@ class LeadContactController extends AccountBaseController
         ];
         
         return $columnMap[$applicantType] ?? 'main_applicant_documents';
+    }
+    
+    /**
+     * Convert old name-based JSON keys to ID-based keys (backward compatibility)
+     */
+    private function convertDocumentKeysToIds($documents, $isMainApplicant = false)
+    {
+        if (empty($documents) || !is_array($documents)) {
+            return [];
+        }
+        
+        $converted = [];
+        $needsConversion = false;
+        
+        // Check if any key is non-numeric (old format)
+        foreach ($documents as $key => $value) {
+            if (!is_numeric($key)) {
+                $needsConversion = true;
+                break;
+            }
+        }
+        
+        if (!$needsConversion) {
+            // Already using ID-based keys, but ensure document_name exists
+            foreach ($documents as $key => $docData) {
+                if (!isset($docData['document_name'])) {
+                    // Get document name from master table
+                    $docId = (int)$key;
+                    if ($isMainApplicant) {
+                        $masterDoc = \App\Models\NewLeadMainDocument::find($docId);
+                    } else {
+                        $masterDoc = \App\Models\NewLeadDependsDocument::find($docId);
+                    }
+                    if ($masterDoc) {
+                        $docData['document_name'] = $masterDoc->name;
+                    }
+                }
+                $converted[$key] = $docData;
+            }
+            return $converted;
+        }
+        
+        // Get master documents for mapping
+        if ($isMainApplicant) {
+            $masterDocuments = \App\Models\NewLeadMainDocument::where(function($query) {
+                $query->where('company_id', company()->id)
+                      ->orWhereNull('company_id');
+            })->get()->keyBy(function($doc) {
+                return strtolower(str_replace(' ', '_', $doc->name));
+            });
+        } else {
+            $masterDocuments = \App\Models\NewLeadDependsDocument::where(function($query) {
+                $query->where('company_id', company()->id)
+                      ->orWhereNull('company_id');
+            })->get()->keyBy(function($doc) {
+                return strtolower(str_replace(' ', '_', $doc->name));
+            });
+        }
+        
+        // Convert old keys to new ID-based keys
+        foreach ($documents as $oldKey => $docData) {
+            if (is_numeric($oldKey)) {
+                // Already ID-based, keep as is but ensure document_name exists
+                $docId = (int)$oldKey;
+                if (!isset($docData['document_name'])) {
+                    $masterDoc = $isMainApplicant 
+                        ? \App\Models\NewLeadMainDocument::find($docId)
+                        : \App\Models\NewLeadDependsDocument::find($docId);
+                    if ($masterDoc) {
+                        $docData['document_name'] = $masterDoc->name;
+                    }
+                }
+                $converted[(string)$oldKey] = $docData;
+            } else {
+                // Old name-based key, convert to ID
+                $masterDoc = $masterDocuments->get($oldKey);
+                if ($masterDoc) {
+                    $docId = (string)$masterDoc->id;
+                    $converted[$docId] = [
+                        'document_master_id' => $masterDoc->id,
+                        'document_name' => $masterDoc->name,
+                        'file_url' => $docData['file_url'] ?? null,
+                        'status' => $docData['status'] ?? 'pending',
+                        'uploaded_at' => $docData['uploaded_at'] ?? null
+                    ];
+                }
+            }
+        }
+        
+        return $converted;
+    }
+    
+    /**
+     * Get master documents for add required document dialog
+     */
+    public function getMasterDocumentsForSection(Request $request, $leadId)
+    {
+        try {
+            $lead = NewLead::findOrFail($leadId);
+            $applicantType = $request->get('applicant_type');
+            $childIndex = $request->get('child_index');
+            
+            if (!in_array($applicantType, ['main_applicant', 'father', 'mother', 'spouse', 'child'])) {
+                return Reply::error('Invalid applicant type.');
+            }
+            
+            // Get master documents based on applicant type
+            if ($applicantType === 'main_applicant') {
+                $masterDocuments = \App\Models\NewLeadMainDocument::where(function($query) {
+                    $query->where('company_id', company()->id)
+                          ->orWhereNull('company_id');
+                })->orderBy('name')->get();
+            } else {
+                $masterDocuments = \App\Models\NewLeadDependsDocument::where(function($query) {
+                    $query->where('company_id', company()->id)
+                          ->orWhereNull('company_id');
+                })->orderBy('name')->get();
+            }
+            
+            // Get existing documents from JSON
+            $leadDocument = \App\Models\NewLeadDocument::where('lead_id', $leadId)->first();
+            $existingDocuments = [];
+            
+            if ($applicantType === 'child') {
+                if (!$childIndex) {
+                    return Reply::error('Child index is required for child documents.');
+                }
+                
+                $childrenDocs = $leadDocument && $leadDocument->children_documents 
+                    ? $leadDocument->children_documents 
+                    : [];
+                
+                // Find child entry
+                foreach ($childrenDocs as $entry) {
+                    if (isset($entry['child_index']) && $entry['child_index'] == $childIndex) {
+                        $existingDocuments = $entry['documents'] ?? [];
+                        break;
+                    }
+                }
+                
+                // Convert old format if needed
+                $existingDocuments = $this->convertDocumentKeysToIds($existingDocuments, false);
+            } else {
+                $columnName = $this->getDocumentColumnName($applicantType);
+                $existingDocuments = $leadDocument && $leadDocument->$columnName 
+                    ? $leadDocument->$columnName 
+                    : [];
+                
+                // Convert old format if needed
+                $existingDocuments = $this->convertDocumentKeysToIds($existingDocuments, $applicantType === 'main_applicant');
+            }
+            
+            // Build response with checkbox state (using document_master_id)
+            $documents = [];
+            foreach ($masterDocuments as $doc) {
+                $docIdStr = (string)$doc->id;
+                $isChecked = isset($existingDocuments[$docIdStr]);
+                
+                $documents[] = [
+                    'id' => $doc->id,
+                    'name' => $doc->name,
+                    'checked' => $isChecked
+                ];
+            }
+            
+            return Reply::dataOnly(['status' => 'success', 'data' => ['documents' => $documents]]);
+        } catch (\Exception $e) {
+            \Log::error('Error getting master documents: ' . $e->getMessage());
+            return Reply::error('Failed to load documents: ' . $e->getMessage());
+        }
+    }
+    
+    /**
+     * Add or remove required documents from section JSON
+     */
+    public function updateRequiredDocuments(Request $request, $leadId)
+    {
+        try {
+            $lead = NewLead::findOrFail($leadId);
+            
+            $request->validate([
+                'applicant_type' => 'required|in:main_applicant,father,mother,spouse,child',
+                'child_index' => 'nullable|integer|min:1',
+                'document_ids' => 'required|array',
+                'document_ids.*' => 'integer',
+            ]);
+            
+            $applicantType = $request->applicant_type;
+            $childIndex = $request->child_index;
+            $selectedDocumentIds = $request->document_ids; // Array of checked document master IDs
+            
+            // Validate child_index for child type
+            if ($applicantType === 'child' && !$childIndex) {
+                return Reply::error('Child index is required for child documents.');
+            }
+            
+            // Get or create document record
+            $leadDocument = \App\Models\NewLeadDocument::firstOrNew(['lead_id' => $leadId]);
+            
+            // Get master documents to get document names
+            if ($applicantType === 'main_applicant') {
+                $masterDocuments = \App\Models\NewLeadMainDocument::where(function($query) {
+                    $query->where('company_id', company()->id)
+                          ->orWhereNull('company_id');
+                })->get()->keyBy('id');
+            } else {
+                $masterDocuments = \App\Models\NewLeadDependsDocument::where(function($query) {
+                    $query->where('company_id', company()->id)
+                          ->orWhereNull('company_id');
+                })->get()->keyBy('id');
+            }
+            
+            if ($applicantType === 'child') {
+                // Handle children_documents
+                $childrenDocs = $leadDocument->children_documents ?? [];
+                
+                // Find or create child entry
+                $childEntryIndex = null;
+                foreach ($childrenDocs as $index => $entry) {
+                    if (isset($entry['child_index']) && $entry['child_index'] == $childIndex) {
+                        $childEntryIndex = $index;
+                        break;
+                    }
+                }
+                
+                if ($childEntryIndex === null) {
+                    // Create new child entry
+                    $childrenDocs[] = [
+                        'child_index' => $childIndex,
+                        'documents' => []
+                    ];
+                    $childEntryIndex = count($childrenDocs) - 1;
+                }
+                
+                if (!isset($childrenDocs[$childEntryIndex]['documents'])) {
+                    $childrenDocs[$childEntryIndex]['documents'] = [];
+                }
+                
+                // Convert old format if needed
+                $childDocuments = $this->convertDocumentKeysToIds($childrenDocs[$childEntryIndex]['documents'], false);
+                
+                // Get all master document IDs
+                $allMasterIds = $masterDocuments->keys()->toArray();
+                
+                // Update documents: add checked, remove unchecked
+                foreach ($allMasterIds as $docId) {
+                    $docIdStr = (string)$docId;
+                    $masterDoc = $masterDocuments->get($docId);
+                    
+                    if (in_array($docId, $selectedDocumentIds)) {
+                        // Document should be present - add if not exists
+                        if (!isset($childDocuments[$docIdStr])) {
+                            $childDocuments[$docIdStr] = [
+                                'document_master_id' => $docId,
+                                'document_name' => $masterDoc->name,
+                                'file_url' => null,
+                                'status' => 'pending',
+                                'uploaded_at' => null
+                            ];
+                        }
+                    } else {
+                        // Document should be removed - only remove if no file uploaded
+                        if (isset($childDocuments[$docIdStr]) && empty($childDocuments[$docIdStr]['file_url'])) {
+                            unset($childDocuments[$docIdStr]);
+                        }
+                    }
+                }
+                
+                $childrenDocs[$childEntryIndex]['documents'] = $childDocuments;
+                $leadDocument->children_documents = $childrenDocs;
+            } else {
+                // Handle main_applicant, father, mother, spouse
+                $columnName = $this->getDocumentColumnName($applicantType);
+                $documents = $leadDocument->$columnName ?? [];
+                
+                // Convert old format if needed
+                $documents = $this->convertDocumentKeysToIds($documents, $applicantType === 'main_applicant');
+                
+                // Get all master document IDs
+                $allMasterIds = $masterDocuments->keys()->toArray();
+                
+                // Update documents: add checked, remove unchecked
+                foreach ($allMasterIds as $docId) {
+                    $docIdStr = (string)$docId;
+                    $masterDoc = $masterDocuments->get($docId);
+                    
+                    if (in_array($docId, $selectedDocumentIds)) {
+                        // Document should be present - add if not exists
+                        if (!isset($documents[$docIdStr])) {
+                            $documents[$docIdStr] = [
+                                'document_master_id' => $docId,
+                                'document_name' => $masterDoc->name,
+                                'file_url' => null,
+                                'status' => 'pending',
+                                'uploaded_at' => null
+                            ];
+                        }
+                    } else {
+                        // Document should be removed - only remove if no file uploaded
+                        if (isset($documents[$docIdStr]) && empty($documents[$docIdStr]['file_url'])) {
+                            unset($documents[$docIdStr]);
+                        }
+                    }
+                }
+                
+                $leadDocument->$columnName = $documents;
+            }
+            
+            $leadDocument->save();
+            
+            return Reply::success(__('messages.recordSaved'));
+        } catch (\Exception $e) {
+            \Log::error('Error updating required documents: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return Reply::error('Failed to update documents: ' . $e->getMessage());
+        }
     }
     
     /**

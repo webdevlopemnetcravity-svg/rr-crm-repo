@@ -559,6 +559,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::delete('new-leads/account/{id}', [LeadContactController::class, 'deleteNewLeadAccount'])->name('new-leads.account-delete');
     Route::get('new-leads/accounts/{id}', [LeadContactController::class, 'getNewLeadAccounts'])->name('new-leads.accounts');
     Route::get('new-leads/documents-tab/{id}', [LeadContactController::class, 'getNewLeadDocumentsTab'])->name('new-leads.documents-tab');
+    Route::get('new-leads/{leadId}/master-documents', [LeadContactController::class, 'getMasterDocumentsForSection'])->name('new-leads.master-documents');
+    Route::post('new-leads/{leadId}/update-required-documents', [LeadContactController::class, 'updateRequiredDocuments'])->name('new-leads.update-required-documents');
     Route::get('new-leads/process-tab/{id}', [LeadContactController::class, 'getNewLeadProcessTab'])->name('new-leads.process-tab');
     Route::post('new-leads/{leadId}/upload-document', [LeadContactController::class, 'uploadLeadDocument'])->name('new-leads.upload-document');
     Route::post('new-leads/process-store', [LeadContactController::class, 'storeNewLeadProcess'])->name('new-leads.process-store');

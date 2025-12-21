@@ -25,6 +25,9 @@
             border-bottom: 1px solid #e0e0e0;
             cursor: pointer;
             transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         
         .document-section-header:hover {
@@ -44,6 +47,15 @@
             align-items: center;
             gap: 10px;
             text-transform: none !important;
+            flex: 1;
+            cursor: pointer;
+        }
+        
+        .add-required-document-btn {
+            margin-left: auto;
+            white-space: nowrap;
+            z-index: 10;
+            position: relative;
         }
         
         .document-section-title .fa-chevron-down {
@@ -63,6 +75,10 @@
             background: #f8f9fa;
             font-weight: 600;
             border-bottom: 2px solid #dee2e6;
+        }
+        .list-group-item .form-check-label {
+            vertical-align: sub;
+            margin-left: 10px;
         }
     </style>
 @endpush
@@ -1846,16 +1862,16 @@
         $(document).on('click', '.document-upload-btn, .document-change-link', function(e) {
             e.preventDefault();
             
-            var documentKey = $(this).data('document-key');
+            var documentMasterId = $(this).data('document-master-id') || $(this).data('document-key'); // Backward compatibility
             var documentName = $(this).data('document-name');
             var applicantType = $(this).data('applicant-type') || 'main_applicant';
             var childIndex = $(this).data('child-index') || '';
             
-            if (!documentKey) {
+            if (!documentMasterId) {
                 return;
             }
             
-            $('#document_key_input').val(documentKey);
+            $('#document_master_id_input').val(documentMasterId);
             $('#applicant_type_input').val(applicantType);
             $('#child_index_input').val(childIndex);
             $('#document_name_label').text(documentName || 'Document');
@@ -1868,15 +1884,15 @@
         $(document).on('click', '#save-document-btn', function(e) {
             e.preventDefault();
             
-            var documentKey = $('#document_key_input').val();
+            var documentMasterId = $('#document_master_id_input').val();
             var fileInput = $('#document_file_input')[0];
             
-            if (!documentKey) {
+            if (!documentMasterId) {
                 try {
                     if (typeof $.showToastr === 'function') {
-                        $.showToastr('Document key is missing.', 'error');
+                        $.showToastr('Document ID is missing.', 'error');
                     } else if (typeof toastr !== 'undefined') {
-                        toastr.error('Document key is missing.');
+                        toastr.error('Document ID is missing.');
                     }
                 } catch (e) {}
                 return;
@@ -1906,7 +1922,7 @@
             }
             
             var formData = new FormData();
-            formData.append('document_key', documentKey);
+            formData.append('document_master_id', documentMasterId);
             formData.append('applicant_type', $('#applicant_type_input').val() || 'main_applicant');
             var childIndex = $('#child_index_input').val();
             if (childIndex) {
@@ -1982,6 +1998,188 @@
                     } catch (e) {}
                 }
             });
+        });
+        
+        // ========== ADD REQUIRED DOCUMENT FUNCTIONALITY ==========
+        
+        // Handle "Add Required Document" button click
+        $(document).on('click', '.add-required-document-btn', function(e) {
+            e.preventDefault();
+            e.stopPropagation(); // Prevent collapse toggle
+            
+            var applicantType = $(this).data('applicant-type');
+            var childIndex = $(this).data('child-index') || '';
+            var sectionName = $(this).data('section-name') || '';
+            var leadId = {{ isset($lead) && $lead ? $lead->id : 'null' }};
+            
+            if (!leadId) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Lead ID is missing.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Lead ID is missing.');
+                    }
+                } catch (e) {}
+                return;
+            }
+            
+            // Set modal data
+            $('#add_doc_lead_id').val(leadId);
+            $('#add_doc_applicant_type').val(applicantType);
+            $('#add_doc_child_index').val(childIndex);
+            $('#add_doc_section_name').text('Section: ' + sectionName);
+            
+            // Show loading state
+            $('#documentChecklistContainer').html('<div class="text-center py-4"><i class="fa fa-spinner fa-spin"></i> Loading documents...</div>');
+            
+            // Load master documents
+            var url = "{{ route('new-leads.master-documents', ':leadId') }}".replace(':leadId', leadId);
+            var params = {
+                applicant_type: applicantType
+            };
+            if (childIndex) {
+                params.child_index = childIndex;
+            }
+            
+            $.easyAjax({
+                url: url,
+                type: "GET",
+                blockUI: false,
+                data: params,
+                success: function(response) {
+                    if (response.status == "success" && response.data && response.data.documents) {
+                        var documents = response.data.documents;
+                        var html = '<div class="list-group">';
+                        
+                        if (documents.length === 0) {
+                            html += '<div class="alert alert-info mb-0">No documents available in master list.</div>';
+                        } else {
+                            documents.forEach(function(doc) {
+                                var checked = doc.checked ? 'checked' : '';
+                                html += '<div class="list-group-item">';
+                                html += '<div class="form-check">';
+                                html += '<input class="form-check-input document-checkbox" type="checkbox" value="' + doc.id + '" id="doc_' + doc.id + '" ' + checked + '>';
+                                html += '<label class="form-check-label" for="doc_' + doc.id + '">' + doc.name + '</label>';
+                                html += '</div>';
+                                html += '</div>';
+                            });
+                        }
+                        
+                        html += '</div>';
+                        $('#documentChecklistContainer').html(html);
+                    } else {
+                        var errorMsg = 'Failed to load documents.';
+                        if (response.message) {
+                            errorMsg = response.message;
+                        }
+                        $('#documentChecklistContainer').html('<div class="alert alert-danger">' + errorMsg + '</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMsg = 'Error loading documents. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    $('#documentChecklistContainer').html('<div class="alert alert-danger">' + errorMsg + '</div>');
+                }
+            });
+            
+            $('#addRequiredDocumentModal').modal('show');
+        });
+        
+        // Handle save required documents
+        $(document).on('click', '#save-required-documents-btn', function(e) {
+            e.preventDefault();
+            
+            var leadId = $('#add_doc_lead_id').val();
+            var applicantType = $('#add_doc_applicant_type').val();
+            var childIndex = $('#add_doc_child_index').val();
+            
+            if (!leadId || !applicantType) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Missing required information.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Missing required information.');
+                    }
+                } catch (e) {}
+                return;
+            }
+            
+            // Get checked document IDs
+            var checkedDocumentIds = [];
+            $('.document-checkbox:checked').each(function() {
+                checkedDocumentIds.push(parseInt($(this).val()));
+            });
+            
+            var formData = {
+                applicant_type: applicantType,
+                document_ids: checkedDocumentIds,
+                _token: '{{ csrf_token() }}'
+            };
+            
+            if (childIndex) {
+                formData.child_index = childIndex;
+            }
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.update-required-documents', ':leadId') }}".replace(':leadId', leadId),
+                container: '#addRequiredDocumentForm',
+                type: "POST",
+                blockUI: true,
+                data: formData,
+                disableButton: true,
+                buttonSelector: "#save-required-documents-btn",
+                success: function(response) {
+                    if (response.status == "success") {
+                        $('#addRequiredDocumentModal').modal('hide');
+                        
+                        try {
+                            if (typeof $.showToastr === 'function') {
+                                $.showToastr(response.message || 'Documents updated successfully', 'success');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message || 'Documents updated successfully');
+                            }
+                        } catch (e) {}
+                        
+                        // Refresh only the documents tab content (not the whole page)
+                        var documentsUrl = "{{ route('new-leads.documents-tab', ':leadId') }}".replace(':leadId', leadId);
+                        $.easyAjax({
+                            url: documentsUrl,
+                            type: "GET",
+                            blockUI: false,
+                            disableButton: false,
+                            success: function(docResponse) {
+                                var html = null;
+                                if (docResponse.status == "success" && docResponse.data && docResponse.data.html) {
+                                    html = docResponse.data.html;
+                                } else if (docResponse.html) {
+                                    html = docResponse.html;
+                                } else if (docResponse.data && docResponse.data.html) {
+                                    html = docResponse.data.html;
+                                }
+                                
+                                if (html) {
+                                    $('#documentsContent').html(html);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Silent fail - documents will refresh on next page load
+                            }
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // Re-enable button on error
+                    $('#save-required-documents-btn').prop('disabled', false);
+                }
+            });
+        });
+        
+        // Reset modal when closed
+        $('#addRequiredDocumentModal').on('hidden.bs.modal', function () {
+            $('#documentChecklistContainer').html('<div class="text-center py-4"><i class="fa fa-spinner fa-spin"></i> Loading documents...</div>');
+            $('#addRequiredDocumentForm')[0].reset();
         });
 
         // ========== TRAVEL DETAILS TAB FUNCTIONALITY ==========
