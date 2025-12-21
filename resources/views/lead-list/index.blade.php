@@ -670,6 +670,44 @@
             // Initialize select pickers and tooltips after table draw
             $('#new-leads-table').on('draw.dt', function() {
                 $('.priority-select, .status-select, .quality-select').selectpicker();
+                
+                // Add data attributes and classes for unassigned leads
+                $('#new-leads-table tbody tr').each(function() {
+                    var $row = $(this);
+                    var rowId = $row.attr('id');
+                    if (rowId) {
+                        var leadId = rowId.replace('row-', '');
+                        var $actionCell = $row.find('td').last();
+                        
+                        // Check if lead is unassigned by checking if there's no owner image in action column
+                        var hasOwnerImage = $actionCell.find('img.rounded-circle').length > 0;
+                        var isUnassigned = !hasOwnerImage;
+                        
+                        // Get lead data from reassign button if it exists, otherwise use defaults
+                        var $reassignBtn = $actionCell.find('.reassign-lead-btn');
+                        var leadNumber = 'LEAD-' + String(leadId).padStart(4, '0');
+                        var clientName = 'N/A';
+                        var currentOwner = 'Not Assigned';
+                        
+                        if ($reassignBtn.length) {
+                            leadNumber = $reassignBtn.data('lead-number') || leadNumber;
+                            clientName = $reassignBtn.data('client-name') || clientName;
+                            currentOwner = $reassignBtn.data('current-owner') || currentOwner;
+                        }
+                        
+                        // Set data attributes
+                        $row.attr('data-lead-id', leadId);
+                        $row.attr('data-lead-number', leadNumber);
+                        $row.attr('data-client-name', clientName);
+                        $row.attr('data-is-unassigned', isUnassigned ? 'true' : 'false');
+                        
+                        // Add class for unassigned leads
+                        if (isUnassigned) {
+                            $row.addClass('unassigned-lead-row');
+                        }
+                    }
+                });
+                
                 // Small delay to ensure DOM is ready
                 setTimeout(function() {
                     initFollowUpTooltips();
@@ -1238,13 +1276,8 @@
             });
         });
 
-        // Reassign Lead functionality
-        $(document).on('click', '.reassign-lead-btn', function() {
-            var leadId = $(this).data('lead-id');
-            var leadNumber = $(this).data('lead-number');
-            var clientName = $(this).data('client-name');
-            var currentOwner = $(this).data('current-owner');
-            
+        // Function to open reassign dialog
+        function openReassignDialog(leadId, leadNumber, clientName, currentOwner) {
             $('#reassign_lead_id').val(leadId);
             $('#reassign_lead_number').text(leadNumber);
             $('#reassign_client_name').text(clientName);
@@ -1274,6 +1307,39 @@
                     }
                 }
             });
+        }
+
+        // Reassign Lead functionality - button click
+        $(document).on('click', '.reassign-lead-btn', function(e) {
+            e.stopPropagation(); // Prevent row click event
+            var leadId = $(this).data('lead-id');
+            var leadNumber = $(this).data('lead-number');
+            var clientName = $(this).data('client-name');
+            var currentOwner = $(this).data('current-owner');
+            
+            openReassignDialog(leadId, leadNumber, clientName, currentOwner);
+        });
+
+        // Open reassign dialog when clicking on unassigned lead row
+        $(document).on('click', '.unassigned-lead-row', function(e) {
+            // Don't trigger if clicking on buttons or links
+            if ($(e.target).closest('button, a, .selectpicker, .dropdown').length) {
+                return;
+            }
+            
+            var $row = $(this);
+            var leadId = $row.data('lead-id');
+            var isUnassigned = $row.data('is-unassigned') === 'true';
+            
+            // Only open dialog if lead is unassigned
+            if (isUnassigned && leadId) {
+                // Get lead data from row data attributes
+                var leadNumber = $row.data('lead-number') || 'LEAD-' + String(leadId).padStart(4, '0');
+                var clientName = $row.data('client-name') || 'N/A';
+                var currentOwner = 'Not Assigned';
+                
+                openReassignDialog(leadId, leadNumber, clientName, currentOwner);
+            }
         });
 
         // Handle reassign form submission

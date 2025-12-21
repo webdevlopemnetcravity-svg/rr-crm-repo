@@ -302,29 +302,61 @@ class LeadContactController extends AccountBaseController
         $this->data['subclasses'] = $this->subclasses;
         
         if ($id) {
-            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process', 'accounts.agentUser', 'accounts.addedBy', 'travelDetails'])->find($id);
-            if (!$this->lead) {
-                abort(404, 'Lead not found');
-            }
-            
-            // Extract all documents from step data
             try {
-                $this->leadDocuments = $this->extractAllDocuments($this->lead);
-                // Get all expected documents (including missing ones)
-                $this->allExpectedDocuments = $this->getAllExpectedDocuments($this->lead);
+                $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process', 'accounts.agentUser', 'accounts.addedBy', 'travelDetails'])->find($id);
+                if (!$this->lead) {
+                    abort(404, 'Lead not found');
+                }
+                
+                // Extract all documents from step data
+                try {
+                    $this->leadDocuments = $this->extractAllDocuments($this->lead);
+                    // Get all expected documents (including missing ones)
+                    $this->allExpectedDocuments = $this->getAllExpectedDocuments($this->lead);
+                } catch (\Exception $e) {
+                    \Log::error('Error extracting documents for lead ' . $id . ': ' . $e->getMessage());
+                    \Log::error('Stack trace: ' . $e->getTraceAsString());
+                    $this->leadDocuments = [];
+                    $this->allExpectedDocuments = [];
+                }
+                
+                // Explicitly add lead and documents to data array
+                $this->data['lead'] = $this->lead;
+                $this->data['leadDocuments'] = $this->leadDocuments;
+                $this->data['allExpectedDocuments'] = $this->allExpectedDocuments;
             } catch (\Exception $e) {
-                \Log::error('Error extracting documents for lead ' . $id . ': ' . $e->getMessage());
+                \Log::error('Error loading lead details for ID ' . $id . ': ' . $e->getMessage());
                 \Log::error('Stack trace: ' . $e->getTraceAsString());
-                $this->leadDocuments = [];
-                $this->allExpectedDocuments = [];
+                abort(500, 'Error loading lead details: ' . $e->getMessage());
             }
+        } else {
+            // Ensure variables are set even when no ID is provided
+            $this->data['lead'] = null;
+            $this->data['leadDocuments'] = [];
+            $this->data['allExpectedDocuments'] = [];
         }
 
         if (!request()->ajax()) {
-            $this->categories = LeadCategory::get();
-            $this->sources = LeadSource::get();
-            $this->employees = User::allEmployees(null, 'active');
-            $this->templateDocuments = \App\Models\NewLeadTemplateDocument::all();
+            try {
+                $this->categories = LeadCategory::get();
+                $this->sources = LeadSource::get();
+                $this->employees = User::allEmployees(null, 'active');
+                $this->templateDocuments = \App\Models\NewLeadTemplateDocument::all();
+                
+                // Explicitly add to data array
+                $this->data['categories'] = $this->categories;
+                $this->data['sources'] = $this->sources;
+                $this->data['employees'] = $this->employees;
+                $this->data['templateDocuments'] = $this->templateDocuments;
+            } catch (\Exception $e) {
+                \Log::error('Error loading lead details data: ' . $e->getMessage());
+                \Log::error('Stack trace: ' . $e->getTraceAsString());
+                // Set defaults to prevent view errors
+                $this->data['categories'] = collect([]);
+                $this->data['sources'] = collect([]);
+                $this->data['employees'] = collect([]);
+                $this->data['templateDocuments'] = collect([]);
+            }
         }
 
         return view('lead-details.index', $this->data);
@@ -1463,11 +1495,25 @@ class LeadContactController extends AccountBaseController
     {
         $lead = NewLead::findOrFail($request->lead_id);
         
-        // Check permissions: only admins can reassign leads
+        // Check permissions: admins can always reassign, or users with edit permission can assign unassigned leads
         $userRoles = user_roles();
         $isAdmin = in_array('admin', $userRoles);
+        $isUnassigned = is_null($lead->lead_owner);
         
-        abort_403(!$isAdmin);
+        if (!$isAdmin) {
+            // For unassigned leads, check edit permission similar to moveToLead
+            if ($isUnassigned) {
+                $this->editPermission = user()->permission('edit_lead');
+                abort_403(!($this->editPermission == 'all'
+                    || ($this->editPermission == 'added' && $lead->added_by == user()->id)
+                    || ($this->editPermission == 'owned' && $lead->lead_owner == user()->id)
+                    || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
+                ));
+            } else {
+                // For assigned leads, only admins can reassign
+                abort_403(true);
+            }
+        }
         
         // Validate employee
         $newEmployee = User::findOrFail($request->employee_id);
@@ -1479,6 +1525,13 @@ class LeadContactController extends AccountBaseController
         $lead->lead_owner = $request->employee_id;
         $lead->last_updated_by = user()->id;
         $lead->save();
+        
+        // Get or create step status
+        $stepStatus = LeadStepStatus::getOrCreateForLead($lead->id);
+        
+        // Set final status to complete
+        $stepStatus->final_status = 'complete';
+        $stepStatus->save();
         
         // Send email notification to new assigned employee
         try {

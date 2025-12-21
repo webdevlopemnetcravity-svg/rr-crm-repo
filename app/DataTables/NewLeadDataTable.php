@@ -386,11 +386,12 @@ class NewLeadDataTable extends BaseDataTable
                             </a>';
             }
             
-            // Add Reassign Lead button - visible only to admins
+            // Add Reassign Lead button - visible to admins or if lead is unassigned
             $userRoles = user_roles();
             $isAdmin = in_array('admin', $userRoles);
+            $isUnassigned = is_null($row->lead_owner);
             
-            if ($isAdmin) {
+            if ($isAdmin || $isUnassigned) {
                 $leadNumber = 'LEAD-' . str_pad($row->id, 4, '0', STR_PAD_LEFT);
                 $currentOwnerName = $row->leadOwner ? htmlspecialchars($row->leadOwner->name, ENT_QUOTES) : 'Not Assigned';
                 $clientName = htmlspecialchars($row->client_name ?? 'N/A', ENT_QUOTES);

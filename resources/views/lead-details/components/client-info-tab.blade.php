@@ -212,11 +212,11 @@
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Lead Added by</div>
-                                    <div class="info-field-value-text">{{ $getValue($lead->addedBy->name ?? null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue($lead->addedBy?->name ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Lead Assign to</div>
-                                    <div class="info-field-value-text">{{ $getValue($lead->leadOwner->name ?? null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue($lead->leadOwner?->name ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Country Of Origin (Nationality)</div>
@@ -1052,43 +1052,43 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Home</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['property_home'] ? '₹ ' . number_format($step8Data['property_home']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['property_home'] ?? null) ? '₹ ' . number_format($step8Data['property_home'] ?? 0) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Land</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['property_land'] ? '₹ ' . number_format($step8Data['property_land']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['property_land'] ?? null) ? '₹ ' . number_format($step8Data['property_land'] ?? 0) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Plot</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['property_plot'] ? '₹ ' . number_format($step8Data['property_plot']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['property_plot'] ?? null) ? '₹ ' . number_format($step8Data['property_plot'] ?? 0) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Commercials</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['property_commercials'] ? '₹ ' . number_format($step8Data['property_commercials']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['property_commercials'] ?? null) ? '₹ ' . number_format($step8Data['property_commercials'] ?? 0) : null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Other</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['property_other'] ? '₹ ' . number_format($step8Data['property_other']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['property_other'] ?? null) ? '₹ ' . number_format($step8Data['property_other'] ?? 0) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Shop</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['property_shop'] ? '₹ ' . number_format($step8Data['property_shop']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['property_shop'] ?? null) ? '₹ ' . number_format($step8Data['property_shop'] ?? 0) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Gold</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['property_gold'] ? '₹ ' . number_format($step8Data['property_gold']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['property_gold'] ?? null) ? '₹ ' . number_format($step8Data['property_gold'] ?? 0) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Silver</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['property_silver'] ? '₹ ' . number_format($step8Data['property_silver']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['property_silver'] ?? null) ? '₹ ' . number_format($step8Data['property_silver'] ?? 0) : null) }}</div>
                                 </div>
                             </div>
                             <div class="info-grid-row row mb-4">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Total Asset Valuation</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['total_valuation'] ? '₹ ' . number_format($step8Data['total_valuation']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['total_valuation'] ?? null) ? '₹ ' . number_format($step8Data['total_valuation'] ?? 0) : null) }}</div>
                                 </div>
                             </div>
 
@@ -1099,7 +1099,7 @@
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Total Loan Value</div>
-                                    <div class="info-field-value-text">{{ $getValue($step8Data['total_loan_value'] ? '₹ ' . number_format($step8Data['total_loan_value']) : null) }}</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['total_loan_value'] ?? null) ? '₹ ' . number_format($step8Data['total_loan_value'] ?? 0) : null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Loan Years</div>
