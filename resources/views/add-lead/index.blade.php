@@ -3180,8 +3180,11 @@
                             updateTabNavigation();
                             updateFooterButtons();
                             
-                            // Navigate to the appropriate step
-                            navigateToAppropriateStep();
+                            // Always default to step 1 on page load/refresh (not dynamic selection)
+                            // Ensure step 1 (nav-personal-tab) is always shown
+                            $('#nav-personal-tab').tab('show');
+                            currentStep = 1;
+                            updateFooterButtons();
                         }
                     },
                     error: function(xhr, status, error) {
@@ -4770,8 +4773,10 @@
                 // All tabs are now accessible, no restrictions
             });
 
-            // Initialize on page load
-            currentStep = getCurrentStep();
+            // Initialize on page load - always default to step 1
+            currentStep = 1;
+            // Ensure step 1 (nav-personal-tab) is always active on page load/refresh
+            $('#nav-personal-tab').tab('show');
             
             // Load existing lead data if lead_id exists (with a small delay to ensure DOM is ready)
             if (currentLeadId) {

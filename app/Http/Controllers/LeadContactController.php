@@ -1958,8 +1958,11 @@ class LeadContactController extends AccountBaseController
             $stepStatus->$stepField = true;
             $stepStatus->save();
 
-            // Update final status
-            $stepStatus->updateFinalStatus();
+            // Update final status (skip for step 9 as it's managed differently)
+            // Use loose comparison to handle both string "9" and integer 9
+            if ($stepNumber != 9 && $stepNumber !== 9 && (string)$stepNumber !== '9') {
+                $stepStatus->updateFinalStatus();
+            }
 
             // Log step completion
             $this->logStepCompletion($leadId, $stepNumber);
@@ -2296,7 +2299,10 @@ class LeadContactController extends AccountBaseController
             $lead->client_name = ($this->getRequestValue($request, 'surname', '') . ' ' . $this->getRequestValue($request, 'given_name', '')) ?: null;
             $lead->client_email = $this->getRequestValue($request, 'email_address') ?: $this->getRequestValue($request, 'email');
             $lead->mobile = $this->getRequestValue($request, 'primary_phone');
-            $lead->lead_owner = $this->getRequestValue($request, 'lead_assign_to') ?: user()->id;
+            // Only set lead_owner if explicitly provided in request, don't auto-assign
+            if ($request->has('lead_assign_to') && $request->lead_assign_to) {
+                $lead->lead_owner = $this->getRequestValue($request, 'lead_assign_to');
+            }
             $lead->lead_source = $this->getRequestValue($request, 'lead_source');
             $lead->last_updated_by = user()->id;
             $lead->save();
