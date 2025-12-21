@@ -3735,11 +3735,42 @@
                 'nav-financial-tab': 9       // Financial Status -> step_9_data (old step 9)
             };
 
+            // UI tab order sequence (as displayed in the interface)
+            const tabOrder = [
+                'nav-personal-tab',      // 1
+                'nav-education-tab',     // 2
+                'nav-experience-tab',    // 3
+                'nav-preference-tab',    // 4
+                'nav-passport-tab',      // 5
+                'nav-relative-tab',      // 6
+                'nav-family-tab',        // 7
+                'nav-property-tab',      // 8
+                'nav-financial-tab'      // 9
+            ];
+
             // Get current step from active tab
             function getCurrentStep() {
                 const activeTab = $('.nav-link-lead.active');
                 const tabId = activeTab.attr('id');
                 return tabStepMap[tabId] || 1;
+            }
+
+            // Get next tab in UI sequence order
+            function getNextTabInSequence(currentTabId) {
+                const currentIndex = tabOrder.indexOf(currentTabId);
+                if (currentIndex === -1 || currentIndex === tabOrder.length - 1) {
+                    return null; // Already at last tab
+                }
+                return tabOrder[currentIndex + 1];
+            }
+
+            // Get previous tab in UI sequence order
+            function getPreviousTabInSequence(currentTabId) {
+                const currentIndex = tabOrder.indexOf(currentTabId);
+                if (currentIndex === -1 || currentIndex === 0) {
+                    return null; // Already at first tab
+                }
+                return tabOrder[currentIndex - 1];
             }
             
             // Navigate to the appropriate step based on completion status
@@ -4558,39 +4589,16 @@
                                 },
                             });
                             
-                            // If not last step, move to next step
-                            if (currentStep < 9) {
+                            // If not last step, move to next step in UI sequence
+                            const currentTab = $('.nav-link-lead.active');
+                            const currentTabId = currentTab.attr('id');
+                            const nextTabId = getNextTabInSequence(currentTabId);
+                            
+                            if (nextTabId) {
                                 setTimeout(function() {
-                                    // Find the first incomplete step after current step
-                                    let nextStep = currentStep + 1;
-                                    for (let i = currentStep + 1; i <= 9; i++) {
-                                        const stepKey = 'step_' + i + '_completed';
-                                        if (!stepStatus[stepKey]) {
-                                            nextStep = i;
-                                            break;
-                                        }
-                                    }
-                                    
-                                    // If all steps after current are completed, go to step 9
-                                    const allAfterCompleted = stepStatus.step_1_completed && 
-                                                              stepStatus.step_2_completed && 
-                                                              stepStatus.step_3_completed && 
-                                                              stepStatus.step_4_completed && 
-                                                              stepStatus.step_5_completed && 
-                                                              stepStatus.step_6_completed && 
-                                                              stepStatus.step_7_completed && 
-                                                              stepStatus.step_8_completed &&
-                                                              stepStatus.step_9_completed;
-                                    if (allAfterCompleted) {
-                                        nextStep = 9;
-                                    }
-                                    
-                                    const nextTabId = Object.keys(tabStepMap).find(key => tabStepMap[key] === nextStep);
-                                    if (nextTabId) {
-                                        $('#' + nextTabId).tab('show');
-                                        currentStep = nextStep;
-                                        updateFooterButtons();
-                                    }
+                                    $('#' + nextTabId).tab('show');
+                                    currentStep = tabStepMap[nextTabId];
+                                    updateFooterButtons();
                                 }, 500);
                             } else {
                                 // Only show completion message on step 9 (last step)
@@ -4698,14 +4706,13 @@
             // Handle previous button click
             $('#btn-previous').on('click', function(e) {
                 e.preventDefault();
-                if (currentStep > 1) {
-                    const prevStep = currentStep - 1;
-                    const prevTabId = Object.keys(tabStepMap).find(key => tabStepMap[key] === prevStep);
-                    if (prevTabId) {
-                        // Use Bootstrap tab API to switch tabs properly
-                        $('#' + prevTabId).tab('show');
-                        // Update current step will be handled by the shown.bs.tab event
-                    }
+                const currentTab = $('.nav-link-lead.active');
+                const currentTabId = currentTab.attr('id');
+                const prevTabId = getPreviousTabInSequence(currentTabId);
+                if (prevTabId) {
+                    // Use Bootstrap tab API to switch tabs properly
+                    $('#' + prevTabId).tab('show');
+                    // Update current step will be handled by the shown.bs.tab event
                 }
             });
 
