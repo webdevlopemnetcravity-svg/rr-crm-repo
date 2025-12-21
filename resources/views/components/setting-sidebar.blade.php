@@ -119,6 +119,11 @@
                                  :text="__('app.menu.visaTypeSettings')"/>
         @endif
 
+        @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="lead_document_settings" :href="route('lead-document-settings.index')"
+                                 :text="__('app.menu.leadDocumentSettings')"/>
+        @endif
+
         @if (user()->permission('manage_time_log_setting') == 'all' && in_array('timelogs', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="timelog_settings" :href="route('timelog-settings.index')"
                                  :text="__('app.menu.timeLogSettings')"/>
