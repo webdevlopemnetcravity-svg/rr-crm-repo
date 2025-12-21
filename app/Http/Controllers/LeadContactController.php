@@ -1897,14 +1897,6 @@ class LeadContactController extends AccountBaseController
             // Get or create step status
             $stepStatus = LeadStepStatus::getOrCreateForLead($leadId);
 
-            // Check if previous step is completed (except for step 1)
-            if ($stepNumber > 1) {
-                $previousStepField = 'step_' . ($stepNumber - 1) . '_completed';
-                if (!$stepStatus->$previousStepField) {
-                    return Reply::error(__('app.pleaseCompletePreviousStepsFirst'));
-                }
-            }
-
             // Save step data using unified method for all steps
             $this->saveStepData($lead, $request, $stepNumber);
 

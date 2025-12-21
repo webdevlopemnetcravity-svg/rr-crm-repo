@@ -3729,52 +3729,17 @@
                 }
             }
 
-            // Update tab navigation based on step completion
+            // Update tab navigation - all tabs are always enabled
             function updateTabNavigation() {
                 $('.nav-link-lead').each(function() {
-                    const tabId = $(this).attr('id');
-                    const stepNum = tabStepMap[tabId];
-                    
-                    if (!stepNum) return;
-                    
-                    // Step 1 is always enabled
-                    if (stepNum === 1) {
-                        $(this).removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
-                        return;
-                    }
-                    
-                    // Check if previous step is completed
-                    const previousStep = 'step_' + (stepNum - 1) + '_completed';
-                    if (stepStatus[previousStep]) {
-                        $(this).removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
-                    } else {
-                        $(this).addClass('disabled').css('pointer-events', 'none').css('opacity', '0.5');
-                    }
+                    // Remove disabled class and enable all tabs
+                    $(this).removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
                 });
             }
 
-            // Prevent navigation to disabled tabs
+            // Handle tab navigation - all tabs are accessible
             $('.nav-link-lead').on('click', function(e) {
-                if ($(this).hasClass('disabled')) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        text: '@lang('app.pleaseCompletePreviousSteps')',
-                        toast: true,
-                        position: "top-end",
-                        timer: 3000,
-                        timerProgressBar: true,
-                        showConfirmButton: false,
-                        customClass: {
-                            confirmButton: "btn btn-primary",
-                        },
-                        showClass: {
-                            popup: "swal2-noanimation",
-                            backdrop: "swal2-noanimation",
-                        },
-                    });
-                    return false;
-                }
+                // All tabs are now accessible, no need to check for disabled state
                 currentStep = getCurrentStep();
             });
 
@@ -4725,29 +4690,9 @@
                 });
             }
             
-            // Handle tab click to prevent navigation to disabled tabs and ensure sync
+            // Handle tab click - all tabs are accessible
             $('.nav-link-lead').on('click', function(e) {
-                // Only proceed if tab is not disabled
-                if ($(this).hasClass('disabled')) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        text: '@lang('app.pleaseCompletePreviousSteps')',
-                        toast: true,
-                        position: "top-end",
-                        timer: 3000,
-                        timerProgressBar: true,
-                        showConfirmButton: false,
-                        customClass: {
-                            confirmButton: "btn btn-primary",
-                        },
-                        showClass: {
-                            popup: "swal2-noanimation",
-                            backdrop: "swal2-noanimation",
-                        },
-                    });
-                    return false;
-                }
+                // All tabs are now accessible, no restrictions
             });
 
             // Initialize on page load
