@@ -147,7 +147,8 @@
                                       fieldName="longitude" fieldId="longitude"/>
                     </div>
 
-                @if(!is_null(global_setting()->google_map_key))
+                {{-- Google Maps section commented out --}}
+                {{-- @if(!is_null(global_setting()->google_map_key))
                     <div class="col-lg-12">
                         <h4 class="f-16 font-weight-500 ">
                             @lang('modules.accountSettings.businessMapLocation')</h4>
@@ -205,7 +206,7 @@
                             </span>
                         </x-alert>
                     </div>
-                @endif
+                @endif --}}
             </div>
         </div>
     </div>
@@ -234,7 +235,8 @@
         })
     });
 </script>
-@if(!is_null(global_setting()->google_map_key))
+{{-- Google Maps script section commented out --}}
+{{-- @if(!is_null(global_setting()->google_map_key))
     <script
         src="https://maps.googleapis.com/maps/api/js?key={{global_setting()->google_map_key}}&callback=initMap&libraries=places&v=weekly"
         async>
@@ -376,5 +378,5 @@
             });
         }
     </script>
-@endif
+@endif --}}
 
