@@ -1613,32 +1613,31 @@ class LeadContactController extends AccountBaseController
         switch ($stepNumber) {
             case 1:
                 // Step 1 - Personal Details
+                // Only mandatory fields: Surname, Given Name, Primary Phone No, and Email
                 $rules = [
                     'surname' => 'required|string|max:255',
                     'given_name' => 'required|string|max:255',
-                    'gender' => 'required|string|in:Male,Female,Other',
-                    'marital_status' => 'required|string',
-                    'date_of_birth' => 'required|date',
-                    'country_of_origin' => 'required|string|max:255',
-                    'lead_source' => 'required|string',
-                    'lead_assign_to' => 'required|integer|exists:users,id',
-                    'home_address' => 'required|string|max:500',
-                    'home_city' => 'required|string|max:255',
-                    'home_state' => 'required|string|max:255',
-                    'home_pin_code' => 'required|string|max:20',
                     'primary_phone' => 'required|string|regex:/^[0-9]{10}$/',
                     'email_address' => 'required|email|max:255',
                 ];
                 
-                // Mailing address is required only if "same as home" is not checked
-                if (!$request->mailing_same_as_home) {
-                    $rules['mailing_address'] = 'required|string|max:500';
-                    $rules['mailing_city'] = 'required|string|max:255';
-                    $rules['mailing_state'] = 'required|string|max:255';
-                    $rules['mailing_pin_code'] = 'required|string|max:20';
-                }
+                // All other fields are optional - validate format only if provided
+                $rules['gender'] = 'nullable|string|in:Male,Female,Other';
+                $rules['marital_status'] = 'nullable|string';
+                $rules['date_of_birth'] = 'nullable|date';
+                $rules['country_of_origin'] = 'nullable|string|max:255';
+                $rules['lead_source'] = 'nullable|string';
+                $rules['lead_assign_to'] = 'nullable|integer|exists:users,id';
+                $rules['home_address'] = 'nullable|string|max:500';
+                $rules['home_city'] = 'nullable|string|max:255';
+                $rules['home_state'] = 'nullable|string|max:255';
+                $rules['home_pin_code'] = 'nullable|string|max:20';
+                $rules['mailing_address'] = 'nullable|string|max:500';
+                $rules['mailing_city'] = 'nullable|string|max:255';
+                $rules['mailing_state'] = 'nullable|string|max:255';
+                $rules['mailing_pin_code'] = 'nullable|string|max:20';
                 
-                // Optional phone fields validation
+                // Optional phone fields validation (format only, not required)
                 if ($request->has('secondary_phone') && $request->secondary_phone) {
                     $rules['secondary_phone'] = 'nullable|string|regex:/^[0-9]{10}$/';
                 }
@@ -1652,53 +1651,21 @@ class LeadContactController extends AccountBaseController
                     $rules['mobile'] = 'nullable|string|regex:/^[0-9]{10}$/';
                 }
                 
-                // Optional email validation
+                // Optional email validation (format only, not required)
                 if ($request->has('other_email') && $request->other_email) {
                     $rules['other_email'] = 'nullable|email|max:255';
                 }
                 
-                // Upload resume validation
-                // Required if no existing file exists in the database
-                $leadId = $request->lead_id;
-                $hasExistingFile = false;
-                
-                if ($leadId) {
-                    $lead = \App\Models\NewLead::find($leadId);
-                    if ($lead && isset($lead->step_1_data['upload_resume']) && !empty($lead->step_1_data['upload_resume'])) {
-                        $hasExistingFile = true;
-                    }
-                }
-                
-                // If no existing file in database, require upload_resume (unless file is being uploaded in this request)
-                if (!$hasExistingFile && !$request->hasFile('upload_resume')) {
-                    $rules['upload_resume'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:5120'; // 5MB max
-                } else {
-                    // If existing file exists OR file is being uploaded, make it optional but validate if provided
-                    $rules['upload_resume'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
-                }
+                // Upload resume is optional
+                $rules['upload_resume'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
                 
                 $messages = [
                     'surname.required' => __('validation.required', ['attribute' => __('app.surname')]),
                     'given_name.required' => __('validation.required', ['attribute' => __('app.givenName')]),
-                    'gender.required' => __('validation.required', ['attribute' => __('app.gender')]),
-                    'marital_status.required' => __('validation.required', ['attribute' => __('app.maritalStatus')]),
-                    'date_of_birth.required' => __('validation.required', ['attribute' => __('app.dateOfBirth')]),
-                    'country_of_origin.required' => __('validation.required', ['attribute' => __('app.countryOfOrigin')]),
-                    'lead_source.required' => __('validation.required', ['attribute' => __('modules.lead.leadSource')]),
-                    'lead_assign_to.required' => __('validation.required', ['attribute' => __('app.leadAssignTo')]),
-                    'home_address.required' => __('validation.required', ['attribute' => __('modules.lead.address')]),
-                    'home_city.required' => __('validation.required', ['attribute' => __('app.city')]),
-                    'home_state.required' => __('validation.required', ['attribute' => __('app.state')]),
-                    'home_pin_code.required' => __('validation.required', ['attribute' => __('app.pinCode')]),
-                    'mailing_address.required' => __('validation.required', ['attribute' => __('modules.lead.address')]),
-                    'mailing_city.required' => __('validation.required', ['attribute' => __('app.city')]),
-                    'mailing_state.required' => __('validation.required', ['attribute' => __('app.state')]),
-                    'mailing_pin_code.required' => __('validation.required', ['attribute' => __('app.pinCode')]),
                     'primary_phone.required' => __('validation.required', ['attribute' => __('app.primaryPhoneNo')]),
                     'primary_phone.regex' => __('validation.regex', ['attribute' => __('app.primaryPhoneNo')]),
                     'email_address.required' => __('validation.required', ['attribute' => __('modules.lead.email')]),
                     'email_address.email' => __('validation.email', ['attribute' => __('modules.lead.email')]),
-                    'upload_resume.required' => __('validation.required', ['attribute' => 'Upload Resume']),
                     'upload_resume.file' => 'Upload Resume must be a valid file.',
                     'upload_resume.mimes' => 'Upload Resume must be a file of type: pdf, jpg, jpeg, png.',
                     'upload_resume.max' => 'Upload Resume may not be greater than 5MB.',
@@ -1741,50 +1708,30 @@ class LeadContactController extends AccountBaseController
                     $sectionId = $visaType;
                 }
                 
-                // Validation rules
+                // All fields are optional - no validation required
+                // Validation rules (optional)
                 if (is_numeric($visaTypeId)) {
-                    // New format: validate visa type ID exists
+                    // New format: validate visa type ID exists if provided
                     $rules = [
-                        'visa_type' => 'required|numeric|exists:new_lead_visa_type,id',
+                        'visa_type' => 'nullable|numeric|exists:new_lead_visa_type,id',
                     ];
                 } else {
-                    // Old format: validate string values
+                    // Old format: validate string values if provided
                     $rules = [
-                        'visa_type' => 'required|string|in:pr,visit,work,student,PR,Visit,Work,Student',
+                        'visa_type' => 'nullable|string|in:pr,visit,work,student,PR,Visit,Work,Student',
                     ];
                 }
                 
-                // PR Visa specific fields (only fields with *)
-                if ($sectionId === 'pr') {
-                    $rules['skill_assessment_letter'] = 'required|string';
-                    // pr_assessment_letter_file is required if not already uploaded
-                    if (!$request->hasFile('pr_assessment_letter_file') && !$request->pr_assessment_letter_file_existing) {
-                        $rules['pr_assessment_letter_file'] = 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
-                    } else {
-                        $rules['pr_assessment_letter_file'] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
-                    }
-                    $rules['pr_family'] = 'required|string';
-                }
+                // All visa-specific fields are optional
+                $rules['skill_assessment_letter'] = 'nullable|string';
+                $rules['pr_assessment_letter_file'] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
+                $rules['pr_family'] = 'nullable|string';
+                $rules['purpose_of_visit'] = 'nullable|string|max:500';
+                $rules['visit_family'] = 'nullable|string';
+                $rules['preferred_designation'] = 'nullable|string|max:255';
+                $rules['term_intake'] = 'nullable|string';
                 
-                // Visit Visa specific fields (only fields with *)
-                if ($sectionId === 'visit') {
-                    $rules['purpose_of_visit'] = 'required|string|max:500';
-                    $rules['visit_family'] = 'required|string';
-                }
-                
-                // Work Visa specific fields (only fields with *)
-                if ($sectionId === 'work') {
-                    $rules['preferred_designation'] = 'required|string|max:255';
-                }
-                
-                // Student Visa specific fields (only fields with *)
-                if ($sectionId === 'student') {
-                    $rules['term_intake'] = 'required|string';
-                }
-                
-                $messages = [
-                    'visa_type.required' => __('validation.required', ['attribute' => __('app.selectVisaType')]),
-                ];
+                $messages = [];
                 break;
 
             case 3:
@@ -1811,48 +1758,34 @@ class LeadContactController extends AccountBaseController
                 break;
 
             case 5:
-                // Step 5 - Family Information (same fields as Step 4, but may have additional spouse/child fields)
-                // For now, validate the same required fields as Step 4
+                // Step 5 - Family Information
+                // All fields are optional - no validation required
                 $rules = [
-                    'father_surname' => 'required|string|max:255',
-                    'father_given_name' => 'required|string|max:255',
-                    'father_date_of_birth' => 'required|date',
-                    'father_occupation' => 'required|string|max:255',
-                    'father_have_passport' => 'required|string|in:Yes,No',
-                    'mother_surname' => 'required|string|max:255',
-                    'mother_given_name' => 'required|string|max:255',
-                    'mother_date_of_birth' => 'required|date',
-                    'mother_occupation' => 'required|string|max:255',
-                    'mother_have_passport' => 'required|string|in:Yes,No',
+                    'father_surname' => 'nullable|string|max:255',
+                    'father_given_name' => 'nullable|string|max:255',
+                    'father_date_of_birth' => 'nullable|date',
+                    'father_occupation' => 'nullable|string|max:255',
+                    'father_have_passport' => 'nullable|string|in:Yes,No',
+                    'mother_surname' => 'nullable|string|max:255',
+                    'mother_given_name' => 'nullable|string|max:255',
+                    'mother_date_of_birth' => 'nullable|date',
+                    'mother_occupation' => 'nullable|string|max:255',
+                    'mother_have_passport' => 'nullable|string|in:Yes,No',
+                    'father_passport_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+                    'mother_passport_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+                    'spouse_passport_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
                 ];
-                
-                // Father passport file is required if father has passport = Yes
-                if ($request->father_have_passport === 'Yes') {
-                    if (!$request->hasFile('father_passport_file') && !$request->father_passport_file_existing) {
-                        $rules['father_passport_file'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
-                    } else {
-                        $rules['father_passport_file'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
-                    }
-                }
-                
-                // Mother passport file is required if mother has passport = Yes
-                if ($request->mother_have_passport === 'Yes') {
-                    if (!$request->hasFile('mother_passport_file') && !$request->mother_passport_file_existing) {
-                        $rules['mother_passport_file'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:5120';
-                    } else {
-                        $rules['mother_passport_file'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120';
-                    }
-                }
                 break;
 
             case 6:
                 // Step 6 - Education
+                // All fields are optional - no validation required
                 $rules = [
-                    'tenth_passing_year' => 'required|integer|min:1950|max:' . date('Y'),
-                    'tenth_percentage' => 'required|numeric|min:0|max:100',
-                    'tenth_result_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
-                    'tenth_board_name' => 'required|string|max:255',
-                    'tenth_trial' => 'required|string|max:255',
+                    'tenth_passing_year' => 'nullable|integer|min:1950|max:' . date('Y'),
+                    'tenth_percentage' => 'nullable|numeric|min:0|max:100',
+                    'tenth_result_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+                    'tenth_board_name' => 'nullable|string|max:255',
+                    'tenth_trial' => 'nullable|string|max:255',
                 ];
                 break;
 
@@ -1863,15 +1796,16 @@ class LeadContactController extends AccountBaseController
 
             case 8:
                 // Step 8 - Property Details
+                // All fields are optional - no validation required
                 $rules = [
-                    'property_home' => 'required|numeric|min:0',
-                    'property_land' => 'required|numeric|min:0',
-                    'property_plot' => 'required|numeric|min:0',
-                    'property_commercials' => 'required|numeric|min:0',
-                    'property_other' => 'required|numeric|min:0',
-                    'property_shop' => 'required|numeric|min:0',
-                    'property_gold' => 'required|numeric|min:0',
-                    'property_silver' => 'required|numeric|min:0',
+                    'property_home' => 'nullable|numeric|min:0',
+                    'property_land' => 'nullable|numeric|min:0',
+                    'property_plot' => 'nullable|numeric|min:0',
+                    'property_commercials' => 'nullable|numeric|min:0',
+                    'property_other' => 'nullable|numeric|min:0',
+                    'property_shop' => 'nullable|numeric|min:0',
+                    'property_gold' => 'nullable|numeric|min:0',
+                    'property_silver' => 'nullable|numeric|min:0',
                 ];
                 break;
 

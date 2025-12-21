@@ -54,7 +54,7 @@
                         <!-- Personal Details Section -->
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="lead_source" :fieldLabel="__('modules.lead.leadSource')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="lead_source" :fieldLabel="__('modules.lead.leadSource')">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="lead_source" id="lead_source">
                                     <option value="">@lang('app.select') @lang('modules.lead.leadSource')</option>
@@ -73,7 +73,7 @@
                                 <input type="text" class="form-control height-35 f-14" id="lead_added_by" name="lead_added_by" value="{{ user()->name }}" readonly style="background-color: #e9ecef;">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="lead_assign_to" :fieldLabel="__('app.leadAssignTo')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="lead_assign_to" :fieldLabel="__('app.leadAssignTo')">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="lead_assign_to" id="lead_assign_to">
                                     <option value="">@lang('app.select') @lang('app.leadAssignTo')</option>
@@ -87,7 +87,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="upload_resume" fieldLabel="Upload Resume" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="upload_resume" fieldLabel="Upload Resume">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" id="upload_resume" name="upload_resume" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
@@ -102,7 +102,7 @@
                                 <input type="text" class="form-control height-35 f-14" name="given_name" id="given_name">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="gender" :fieldLabel="__('app.gender')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="gender" :fieldLabel="__('app.gender')">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="gender" id="gender">
                                     <option value="">@lang('app.select')</option>
@@ -112,7 +112,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="marital_status" :fieldLabel="__('app.maritalStatus')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="marital_status" :fieldLabel="__('app.maritalStatus')">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="marital_status" id="marital_status">
                                     <option value="">@lang('app.select')</option>
@@ -123,12 +123,12 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="date_of_birth" :fieldLabel="__('app.dateOfBirth')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="date_of_birth" :fieldLabel="__('app.dateOfBirth')">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="date_of_birth" id="date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="country_of_origin" :fieldLabel="__('app.countryOfOrigin')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="country_of_origin" :fieldLabel="__('app.countryOfOrigin')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="country_of_origin" id="country_of_origin">
                             </div>
@@ -140,22 +140,22 @@
                         <h6 class="mb-3 f-15 font-weight-bold">@lang('app.homeAddress')</h6>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="home_address" :fieldLabel="__('modules.lead.address')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="home_address" :fieldLabel="__('modules.lead.address')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="home_address" id="home_address">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="home_city" :fieldLabel="__('app.city')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="home_city" :fieldLabel="__('app.city')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="home_city" id="home_city">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="home_state" :fieldLabel="__('app.state')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="home_state" :fieldLabel="__('app.state')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="home_state" id="home_state">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="home_pin_code" :fieldLabel="__('app.pinCode')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="home_pin_code" :fieldLabel="__('app.pinCode')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="home_pin_code" id="home_pin_code" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
                             </div>
@@ -175,22 +175,22 @@
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mailing_address" :fieldLabel="__('modules.lead.address')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mailing_address" :fieldLabel="__('modules.lead.address')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mailing_address" id="mailing_address">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mailing_city" :fieldLabel="__('app.city')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mailing_city" :fieldLabel="__('app.city')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mailing_city" id="mailing_city">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mailing_state" :fieldLabel="__('app.state')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mailing_state" :fieldLabel="__('app.state')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mailing_state" id="mailing_state">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mailing_pin_code" :fieldLabel="__('app.pinCode')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mailing_pin_code" :fieldLabel="__('app.pinCode')">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mailing_pin_code" id="mailing_pin_code" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits">
                             </div>
@@ -317,7 +317,7 @@
                         <!-- Languages Spoken Section -->
                 <div class="row">
                             <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="languages_spoken" :fieldLabel="__('app.languagesSpoken')" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="languages_spoken" :fieldLabel="__('app.languagesSpoken')">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="2" name="languages_spoken" id="languages_spoken"></textarea>
                             </div>
@@ -329,7 +329,7 @@
                         <!-- Visa Type Selection -->
                         <div class="row mb-4">
                             <div class="col-md-12">
-                                <x-forms.label class="mt-3 mb-3" fieldId="visa_type" :fieldLabel="__('app.selectVisaType')" fieldRequired="true">
+                                <x-forms.label class="mt-3 mb-3" fieldId="visa_type" :fieldLabel="__('app.selectVisaType')">
                                 </x-forms.label>
                                 <div id="visa-type-radio-container">
                                     @if(isset($visaTypes) && $visaTypes->count() > 0)
@@ -384,7 +384,7 @@
                         <div id="prSection" class="form-section d-none">
                 <div class="row">
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="skill_assessment_letter" :fieldLabel="__('app.skillAssessmentLetter')" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="skill_assessment_letter" :fieldLabel="__('app.skillAssessmentLetter')">
                                     </x-forms.label>
                                     <select class="form-control select-picker height-35 f-14" name="skill_assessment_letter" id="skill_assessment_letter">
                                         <option value="">@lang('app.select')</option>
@@ -393,7 +393,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_assessment_letter_file" :fieldLabel="__('app.addAssessmentLetter')" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="pr_assessment_letter_file" :fieldLabel="__('app.addAssessmentLetter')">
                                     </x-forms.label>
                                     <input class="form-control height-35 f-14" type="file" id="pr_assessment_letter_file" name="pr_assessment_letter_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                                 </div>
@@ -432,7 +432,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_family" :fieldLabel="__('app.family')" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="pr_family" :fieldLabel="__('app.family')">
                                     </x-forms.label>
                                     <select class="form-control select-picker height-35 f-14" name="pr_family" id="pr_family">
                                         <option value="">@lang('app.select')</option>
@@ -456,12 +456,12 @@
                         <div id="visitSection" class="form-section d-none">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="purpose_of_visit" :fieldLabel="__('app.purposeOfVisit')" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="purpose_of_visit" :fieldLabel="__('app.purposeOfVisit')">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" name="purpose_of_visit" id="purpose_of_visit">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_family" :fieldLabel="__('app.family')" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="visit_family" :fieldLabel="__('app.family')">
                                     </x-forms.label>
                                     <select class="form-control select-picker height-35 f-14" name="visit_family" id="visit_family">
                                         <option value="">@lang('app.select')</option>
@@ -519,7 +519,7 @@
                         <div id="workSection" class="form-section d-none">
                             <div class="row">
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="preferred_designation" :fieldLabel="__('app.preferredDesignation')" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="preferred_designation" :fieldLabel="__('app.preferredDesignation')">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" name="preferred_designation" id="preferred_designation" placeholder="@lang('app.enterDesignation')">
                                 </div>
@@ -632,7 +632,7 @@
                                     <input type="text" class="form-control height-35 f-14" name="university" id="university">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="term_intake" :fieldLabel="__('app.termIntake')" fieldRequired="true">
+                                    <x-forms.label class="mt-3" fieldId="term_intake" :fieldLabel="__('app.termIntake')">
                                     </x-forms.label>
                                     <input type="text" class="form-control height-35 f-14" name="term_intake" id="term_intake">
                                 </div>
@@ -717,27 +717,27 @@
                         <h6 class="mb-3 f-15 font-weight-bold">@lang('app.fatherDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="father_surname" fieldLabel="Father's Surname" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="father_surname" fieldLabel="Father's Surname">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="father_surname" id="father_surname">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="father_given_name" fieldLabel="Father's Given Name" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="father_given_name" fieldLabel="Father's Given Name">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="father_given_name" id="father_given_name">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="father_date_of_birth" fieldLabel="Father's Date of Birth" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="father_date_of_birth" fieldLabel="Father's Date of Birth">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="father_date_of_birth" id="father_date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="father_occupation" fieldLabel="Father's Occupation" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="father_occupation" fieldLabel="Father's Occupation">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="father_occupation" id="father_occupation">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="father_have_passport" fieldLabel="Have Passport" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="father_have_passport" fieldLabel="Have Passport">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="father_have_passport" id="father_have_passport">
                                     <option value="">@lang('app.select')</option>
@@ -758,27 +758,27 @@
                         <h6 class="mb-3 f-15 font-weight-bold">@lang('app.motherDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mother_surname" fieldLabel="Mother's Surname" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mother_surname" fieldLabel="Mother's Surname">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mother_surname" id="mother_surname">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mother_given_name" fieldLabel="Mother's Given Name" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mother_given_name" fieldLabel="Mother's Given Name">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mother_given_name" id="mother_given_name">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mother_date_of_birth" fieldLabel="Mother's Date of Birth" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mother_date_of_birth" fieldLabel="Mother's Date of Birth">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="mother_date_of_birth" id="mother_date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mother_occupation" fieldLabel="Mother's Occupation" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mother_occupation" fieldLabel="Mother's Occupation">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mother_occupation" id="mother_occupation">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mother_have_passport" fieldLabel="Have Passport" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mother_have_passport" fieldLabel="Have Passport">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="mother_have_passport" id="mother_have_passport">
                                     <option value="">@lang('app.select')</option>
@@ -787,7 +787,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3" id="mother_passport_file_container" style="display: none;">
-                                <x-forms.label class="mt-3" fieldId="mother_passport_file" fieldLabel="Add Mother Passport" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="mother_passport_file" fieldLabel="Add Mother Passport">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" id="mother_passport_file" name="mother_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
@@ -833,7 +833,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3" id="spouse_passport_file_container" style="display: none;">
-                                <x-forms.label class="mt-3" fieldId="spouse_passport_file" fieldLabel="Add Spouse Passport" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="spouse_passport_file" fieldLabel="Add Spouse Passport">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" id="spouse_passport_file" name="spouse_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
@@ -948,7 +948,7 @@
                         <h6 class="mb-3 f-15 font-weight-bold">@lang('app.tenthExamDetails')</h6>
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="tenth_passing_year" fieldLabel="10th Passing Year" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="tenth_passing_year" fieldLabel="10th Passing Year">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="tenth_passing_year" id="tenth_passing_year">
                                     <option value="">@lang('app.select')</option>
@@ -958,7 +958,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="tenth_percentage" fieldLabel="Percentage" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="tenth_percentage" fieldLabel="Percentage">
                                 </x-forms.label>
                                 <div class="input-group">
                                     <input type="number" class="form-control height-35 f-14" name="tenth_percentage" id="tenth_percentage" min="0" max="100" step="0.01" maxlength="5">
@@ -968,17 +968,17 @@
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="tenth_board_name" fieldLabel="Board Name" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="tenth_board_name" fieldLabel="Board Name">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="tenth_board_name" id="tenth_board_name">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="tenth_trial" fieldLabel="Trial" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="tenth_trial" fieldLabel="Trial">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14" name="tenth_trial" id="tenth_trial">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="tenth_result_file" fieldLabel="Add 10th Result" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="tenth_result_file" fieldLabel="Add 10th Result">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" id="tenth_result_file" name="tenth_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
@@ -1214,42 +1214,42 @@
                         <!-- Property Valuation Inputs -->
                         <div class="row">
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="property_home" fieldLabel="Home" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="property_home" fieldLabel="Home">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_home" id="property_home">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="property_land" fieldLabel="Land" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="property_land" fieldLabel="Land">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_land" id="property_land">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="property_plot" fieldLabel="Plot" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="property_plot" fieldLabel="Plot">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_plot" id="property_plot">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="property_commercials" fieldLabel="Commercials" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="property_commercials" fieldLabel="Commercials">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_commercials" id="property_commercials">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="property_other" fieldLabel="Other" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="property_other" fieldLabel="Other">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_other" id="property_other">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="property_shop" fieldLabel="Shop" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="property_shop" fieldLabel="Shop">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_shop" id="property_shop">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="property_gold" fieldLabel="Gold" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="property_gold" fieldLabel="Gold">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_gold" id="property_gold">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="property_silver" fieldLabel="Silver" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="property_silver" fieldLabel="Silver">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14 valuation-input" name="property_silver" id="property_silver">
                             </div>
@@ -2087,7 +2087,7 @@
                                 </select>
                             </div>
                             <div class="col-md-3" id="child_passport_file_container_${childNum}" ${showPassportContainer}>
-                                <x-forms.label class="mt-3" fieldId="child_passport_file_${childNum}" fieldLabel="Add Child Passport" fieldRequired="true">
+                                <x-forms.label class="mt-3" fieldId="child_passport_file_${childNum}" fieldLabel="Add Child Passport">
                                 </x-forms.label>
                                 <input class="form-control height-35 f-14" type="file" name="child_passport_file_${childNum}" id="child_passport_file_${childNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-child-index="${childNum}">
                                 ${childData && childData.child_passport_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${childData.child_passport_file}" target="_blank">${childData.child_passport_file}</a></small></div>` : ''}
@@ -3879,6 +3879,7 @@
                 switch (currentStep) {
                     case 1:
                         // Step 1 - Personal Details
+                        // Only validate mandatory fields: Surname, Given Name, Primary Phone No, and Email
                         const surnameVal = $('#surname').val() || '';
                         if (!surnameVal.trim()) {
                             isValid = false;
@@ -3888,82 +3889,6 @@
                         if (!givenNameVal.trim()) {
                             isValid = false;
                             showFieldError('#given_name', '@lang('app.givenName') is required');
-                        }
-                        // Gender validation (select field)
-                        const genderVal = getSelectValue('#gender');
-                        if (!genderVal || genderVal === '' || genderVal === null || (Array.isArray(genderVal) && genderVal.length === 0)) {
-                            isValid = false;
-                            showFieldError('#gender', '@lang('app.gender') is required');
-                        }
-                        // Marital Status validation (select field)
-                        const maritalStatusVal = getSelectValue('#marital_status');
-                        if (!maritalStatusVal || maritalStatusVal === '' || maritalStatusVal === null || (Array.isArray(maritalStatusVal) && maritalStatusVal.length === 0)) {
-                            isValid = false;
-                            showFieldError('#marital_status', '@lang('app.maritalStatus') is required');
-                        }
-                        if (!$('#date_of_birth').val()) {
-                            isValid = false;
-                            showFieldError('#date_of_birth', '@lang('app.dateOfBirth') is required');
-                        }
-                        const countryOfOriginVal = $('#country_of_origin').val() || '';
-                        if (!countryOfOriginVal.trim()) {
-                            isValid = false;
-                            showFieldError('#country_of_origin', '@lang('app.countryOfOrigin') is required');
-                        }
-                        // Lead Source validation (select field)
-                        const leadSourceVal = getSelectValue('#lead_source');
-                        if (!leadSourceVal || leadSourceVal === '' || leadSourceVal === null || (Array.isArray(leadSourceVal) && leadSourceVal.length === 0)) {
-                            isValid = false;
-                            showFieldError('#lead_source', '@lang('modules.lead.leadSource') is required');
-                        }
-                        // Lead Assign To validation (select field)
-                        const leadAssignToVal = getSelectValue('#lead_assign_to');
-                        if (!leadAssignToVal || leadAssignToVal === '' || leadAssignToVal === null || (Array.isArray(leadAssignToVal) && leadAssignToVal.length === 0)) {
-                            isValid = false;
-                            showFieldError('#lead_assign_to', '@lang('app.leadAssignTo') is required');
-                        }
-                        const homeAddressVal = $('#home_address').val() || '';
-                        if (!homeAddressVal.trim()) {
-                            isValid = false;
-                            showFieldError('#home_address', '@lang('modules.lead.address') is required');
-                        }
-                        const homeCityVal = $('#home_city').val() || '';
-                        if (!homeCityVal.trim()) {
-                            isValid = false;
-                            showFieldError('#home_city', '@lang('app.city') is required');
-                        }
-                        const homeStateVal = $('#home_state').val() || '';
-                        if (!homeStateVal.trim()) {
-                            isValid = false;
-                            showFieldError('#home_state', '@lang('app.state') is required');
-                        }
-                        const homePinCodeVal = $('#home_pin_code').val() || '';
-                        if (!homePinCodeVal.trim()) {
-                            isValid = false;
-                            showFieldError('#home_pin_code', '@lang('app.pinCode') is required');
-                        }
-                        // Mailing address validation (only if not same as home)
-                        if (!$('#mailing_same_as_home').is(':checked')) {
-                            const mailingAddressVal = $('#mailing_address').val() || '';
-                            if (!mailingAddressVal.trim()) {
-                                isValid = false;
-                                showFieldError('#mailing_address', '@lang('modules.lead.address') is required');
-                            }
-                            const mailingCityVal = $('#mailing_city').val() || '';
-                            if (!mailingCityVal.trim()) {
-                                isValid = false;
-                                showFieldError('#mailing_city', '@lang('app.city') is required');
-                            }
-                            const mailingStateVal = $('#mailing_state').val() || '';
-                            if (!mailingStateVal.trim()) {
-                                isValid = false;
-                                showFieldError('#mailing_state', '@lang('app.state') is required');
-                            }
-                            const mailingPinCodeVal = $('#mailing_pin_code').val() || '';
-                            if (!mailingPinCodeVal.trim()) {
-                                isValid = false;
-                                showFieldError('#mailing_pin_code', '@lang('app.pinCode') is required');
-                            }
                         }
                         // Primary phone validation
                         const primaryPhone = ($('#primary_phone').val() || '').trim();
@@ -3983,7 +3908,7 @@
                             isValid = false;
                             showFieldError('#email_address', '@lang('modules.lead.email') must be a valid email address');
                         }
-                        // Optional phone fields validation
+                        // Optional phone fields validation (format only, not required)
                         const secondaryPhone = ($('#secondary_phone').val() || '').trim();
                         if (secondaryPhone && !/^[0-9]{10}$/.test(secondaryPhone)) {
                             isValid = false;
@@ -4004,88 +3929,17 @@
                             isValid = false;
                             showFieldError('#mobile', '@lang('app.mobile') must be 10 digits');
                         }
-                        // Optional email validation
+                        // Optional email validation (format only, not required)
                         const otherEmail = ($('#other_email').val() || '').trim();
                         if (otherEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(otherEmail)) {
                             isValid = false;
                             showFieldError('#other_email', '@lang('app.otherEmail') must be a valid email address');
                         }
-                        // Upload Resume validation
-                        if (!$('#upload_resume').val() && !$('#upload_resume_hidden').length) {
-                            isValid = false;
-                            showFieldError('#upload_resume', 'Upload Resume is required');
-                        }
-                        // Languages Spoken validation
-                        const languagesSpokenVal = ($('#languages_spoken').val() || '').trim();
-                        if (!languagesSpokenVal) {
-                            isValid = false;
-                            showFieldError('#languages_spoken', '@lang('app.languagesSpoken') is required');
-                        }
                         break;
                         
                     case 2:
                         // Step 2 - Client Preference
-                        if (!$('input[name="visa_type"]:checked').val()) {
-                            isValid = false;
-                            // Show error on visa type radio buttons container
-                            const $visaTypeContainer = $('input[name="visa_type"]').closest('.row').first();
-                            $visaTypeContainer.find('.invalid-feedback').remove();
-                            $visaTypeContainer.append('<div class="invalid-feedback d-block col-12">@lang('app.selectVisaType') is required</div>');
-                            $('input[name="visa_type"]').closest('.form-check').addClass('is-invalid');
-                        } else {
-                            const visaType = $('input[name="visa_type"]:checked').val();
-                            
-                            // PR Visa validation (only fields with *)
-                            if (visaType === 'PR' || visaType === 'pr') {
-                                const skillAssessmentLetterVal = getSelectValue('#skill_assessment_letter');
-                                if (!skillAssessmentLetterVal || skillAssessmentLetterVal === '' || skillAssessmentLetterVal === null || (Array.isArray(skillAssessmentLetterVal) && skillAssessmentLetterVal.length === 0)) {
-                                    isValid = false;
-                                    showFieldError('#skill_assessment_letter', '@lang('app.skillAssessmentLetter') is required');
-                                }
-                                // pr_assessment_letter_file is required if not already uploaded
-                                if (!$('#pr_assessment_letter_file').val() && !$('#pr_assessment_letter_file_hidden').length) {
-                                    isValid = false;
-                                    showFieldError('#pr_assessment_letter_file', '@lang('app.addAssessmentLetter') is required');
-                                }
-                                const prFamilyVal = getSelectValue('#pr_family');
-                                if (!prFamilyVal || prFamilyVal === '' || prFamilyVal === null || (Array.isArray(prFamilyVal) && prFamilyVal.length === 0)) {
-                                    isValid = false;
-                                    showFieldError('#pr_family', '@lang('app.family') is required');
-                                }
-                            }
-                            
-                            // Visit Visa validation (only fields with *)
-                            if (visaType === 'Visit' || visaType === 'visit') {
-                                const purposeOfVisitVal = $('#purpose_of_visit').val() || '';
-                                if (!purposeOfVisitVal.trim()) {
-                                    isValid = false;
-                                    showFieldError('#purpose_of_visit', '@lang('app.purposeOfVisit') is required');
-                                }
-                                const visitFamilyVal = getSelectValue('#visit_family');
-                                if (!visitFamilyVal || visitFamilyVal === '' || visitFamilyVal === null || (Array.isArray(visitFamilyVal) && visitFamilyVal.length === 0)) {
-                                    isValid = false;
-                                    showFieldError('#visit_family', '@lang('app.family') is required');
-                                }
-                            }
-                            
-                            // Work Visa validation (only fields with *)
-                            if (visaType === 'Work' || visaType === 'work') {
-                                const preferredDesignationVal = $('#preferred_designation').val() || '';
-                                if (!preferredDesignationVal.trim()) {
-                                    isValid = false;
-                                    showFieldError('#preferred_designation', '@lang('app.preferredDesignation') is required');
-                                }
-                            }
-                            
-                            // Student Visa validation (only fields with *)
-                            if (visaType === 'Student' || visaType === 'student') {
-                                const termIntakeVal = ($('#term_intake').val() || '').trim();
-                                if (!termIntakeVal) {
-                                    isValid = false;
-                                    showFieldError('#term_intake', '@lang('app.termIntake') is required');
-                                }
-                            }
-                        }
+                        // All fields are optional - no validation required
                         break;
                         
                     case 3:
@@ -4133,193 +3987,17 @@
                         
                     case 6:
                         // Step 6 - Education
-                        if (!$('#tenth_passing_year').val()) {
-                            isValid = false;
-                            showFieldError('#tenth_passing_year', '10th Passing Year is required');
-                        }
-                        if (!$('#tenth_percentage').val()) {
-                            isValid = false;
-                            showFieldError('#tenth_percentage', '10th Percentage is required');
-                        }
-                        const tenthBoardNameVal = ($('#tenth_board_name').val() || '').trim();
-                        if (!tenthBoardNameVal) {
-                            isValid = false;
-                            showFieldError('#tenth_board_name', '10th Board Name is required');
-                        }
-                        const tenthTrialVal = ($('#tenth_trial').val() || '').trim();
-                        if (!tenthTrialVal) {
-                            isValid = false;
-                            showFieldError('#tenth_trial', '10th Trial is required');
-                        }
-                        // 10th Result file is required
-                        if (!$('#tenth_result_file').val() && !$('#tenth_result_file_hidden').length) {
-                            isValid = false;
-                            showFieldError('#tenth_result_file', '10th Result file is required');
-                        }
+                        // All fields are optional - no validation required
                         break;
                         
                     case 5:
                         // Step 5 - Family Information
-                        const step5FatherSurnameVal = $('#father_surname').val() || '';
-                        if (!step5FatherSurnameVal.trim()) {
-                            isValid = false;
-                            showFieldError('#father_surname', 'Father\'s Surname is required');
-                        }
-                        const step5FatherGivenNameVal = $('#father_given_name').val() || '';
-                        if (!step5FatherGivenNameVal.trim()) {
-                            isValid = false;
-                            showFieldError('#father_given_name', 'Father\'s Given Name is required');
-                        }
-                        if (!$('#father_date_of_birth').val()) {
-                            isValid = false;
-                            showFieldError('#father_date_of_birth', 'Father\'s Date of Birth is required');
-                        }
-                        const step5FatherOccupationVal = $('#father_occupation').val() || '';
-                        if (!step5FatherOccupationVal.trim()) {
-                            isValid = false;
-                            showFieldError('#father_occupation', 'Father\'s Occupation is required');
-                        }
-                        const step5FatherHavePassportVal = getSelectValue('#father_have_passport');
-                        if (!step5FatherHavePassportVal || step5FatherHavePassportVal === '' || step5FatherHavePassportVal === null || (Array.isArray(step5FatherHavePassportVal) && step5FatherHavePassportVal.length === 0)) {
-                            isValid = false;
-                            showFieldError('#father_have_passport', 'Father\'s Have Passport is required');
-                        }
-                        const step5MotherSurnameVal = $('#mother_surname').val() || '';
-                        if (!step5MotherSurnameVal.trim()) {
-                            isValid = false;
-                            showFieldError('#mother_surname', 'Mother\'s Surname is required');
-                        }
-                        const step5MotherGivenNameVal = $('#mother_given_name').val() || '';
-                        if (!step5MotherGivenNameVal.trim()) {
-                            isValid = false;
-                            showFieldError('#mother_given_name', 'Mother\'s Given Name is required');
-                        }
-                        if (!$('#mother_date_of_birth').val()) {
-                            isValid = false;
-                            showFieldError('#mother_date_of_birth', 'Mother\'s Date of Birth is required');
-                        }
-                        const step5MotherOccupationVal = $('#mother_occupation').val() || '';
-                        if (!step5MotherOccupationVal.trim()) {
-                            isValid = false;
-                            showFieldError('#mother_occupation', 'Mother\'s Occupation is required');
-                        }
-                        const step5MotherHavePassportVal = getSelectValue('#mother_have_passport');
-                        if (!step5MotherHavePassportVal || step5MotherHavePassportVal === '' || step5MotherHavePassportVal === null || (Array.isArray(step5MotherHavePassportVal) && step5MotherHavePassportVal.length === 0)) {
-                            isValid = false;
-                            showFieldError('#mother_have_passport', 'Mother\'s Have Passport is required');
-                        }
-                        // Mother passport file is required if mother has passport = Yes
-                        if (step5MotherHavePassportVal === 'Yes') {
-                            if (!$('#mother_passport_file').val() && !$('#mother_passport_file_hidden').length) {
-                                isValid = false;
-                                showFieldError('#mother_passport_file', 'Mother\'s Passport file is required');
-                            }
-                        }
-                        // Father passport file is required if father has passport = Yes
-                        if (step5FatherHavePassportVal === 'Yes') {
-                            if (!$('#father_passport_file').val() && !$('#father_passport_file_hidden').length) {
-                                isValid = false;
-                                showFieldError('#father_passport_file', 'Father\'s Passport file is required');
-                            }
-                        }
-                        // Spouse passport file is required if spouse has passport = Yes
-                        const step5SpouseHavePassportVal = getSelectValue('#spouse_have_passport');
-                        if (step5SpouseHavePassportVal === 'Yes') {
-                            if (!$('#spouse_passport_file').val() && !$('#spouse_passport_file_hidden').length) {
-                                isValid = false;
-                                showFieldError('#spouse_passport_file', 'Spouse\'s Passport file is required');
-                            }
-                        }
-                        // Validate dynamic child passport and document fields
-                        $('[id^="child_have_passport_"]').each(function() {
-                            const childNum = $(this).attr('id').replace('child_have_passport_', '');
-                            const childHavePassport = getSelectValue('#' + $(this).attr('id'));
-                            const $childRow = $(this).closest('.child-row');
-                            
-                            // Validate passport file if child has passport
-                            if (childHavePassport === 'Yes') {
-                                const passportFileId = `#child_passport_file_${childNum}`;
-                                const passportFileInput = document.getElementById('child_passport_file_' + childNum);
-                                
-                                // Check for existing passport file link in the same row
-                                const $passportFileContainer = $childRow.find('#child_passport_file_container_' + childNum);
-                                const hasExistingPassportFile = $passportFileContainer.find('.existing-file-link[data-file]').length > 0;
-                                
-                                if (!passportFileInput || !passportFileInput.files || passportFileInput.files.length === 0) {
-                                    if (!hasExistingPassportFile) {
-                                        isValid = false;
-                                        showFieldError(passportFileId, 'Child\'s Passport file is required');
-                                    }
-                                }
-                            }
-                            
-                            // Validate document file (always required for each child with data)
-                            const documentFileId = `#child_document_file_${childNum}`;
-                            const documentFileInput = document.getElementById('child_document_file_' + childNum);
-                            
-                            // Check for existing document file link in the same row
-                            const $documentFileContainer = $childRow.find('#child_document_file_' + childNum).closest('.col-md-3');
-                            const hasExistingDocumentFile = $documentFileContainer.find('.existing-file-link[data-file]').length > 0;
-                            
-                            // Check if child has any data (name, age, etc.) - if yes, document file is required
-                            const childName = $('#child_name_' + childNum).val() || '';
-                            const childAge = $('#child_age_' + childNum).val() || '';
-                            const childDob = $('#child_date_of_birth_' + childNum).val() || '';
-                            
-                            if (childName || childAge || childDob) {
-                                // Child has data, so document file is required
-                                if (!documentFileInput || !documentFileInput.files || documentFileInput.files.length === 0) {
-                                    if (!hasExistingDocumentFile) {
-                                        isValid = false;
-                                        showFieldError(documentFileId, 'Child\'s Document file is required');
-                                    }
-                                }
-                            }
-                        });
+                        // All fields are optional - no validation required
                         break;
                         
                     case 8:
                         // Step 8 - Property Details
-                        const propertyHomeVal = $('#property_home').val();
-                        if (propertyHomeVal === '' || propertyHomeVal === null || propertyHomeVal === undefined) {
-                            isValid = false;
-                            showFieldError('#property_home', 'Property Home is required');
-                        }
-                        const propertyLandVal = $('#property_land').val();
-                        if (propertyLandVal === '' || propertyLandVal === null || propertyLandVal === undefined) {
-                            isValid = false;
-                            showFieldError('#property_land', 'Property Land is required');
-                        }
-                        const propertyPlotVal = $('#property_plot').val();
-                        if (propertyPlotVal === '' || propertyPlotVal === null || propertyPlotVal === undefined) {
-                            isValid = false;
-                            showFieldError('#property_plot', 'Property Plot is required');
-                        }
-                        const propertyCommercialsVal = $('#property_commercials').val();
-                        if (propertyCommercialsVal === '' || propertyCommercialsVal === null || propertyCommercialsVal === undefined) {
-                            isValid = false;
-                            showFieldError('#property_commercials', 'Property Commercials is required');
-                        }
-                        const propertyOtherVal = $('#property_other').val();
-                        if (propertyOtherVal === '' || propertyOtherVal === null || propertyOtherVal === undefined) {
-                            isValid = false;
-                            showFieldError('#property_other', 'Property Other is required');
-                        }
-                        const propertyShopVal = $('#property_shop').val();
-                        if (propertyShopVal === '' || propertyShopVal === null || propertyShopVal === undefined) {
-                            isValid = false;
-                            showFieldError('#property_shop', 'Property Shop is required');
-                        }
-                        const propertyGoldVal = $('#property_gold').val();
-                        if (propertyGoldVal === '' || propertyGoldVal === null || propertyGoldVal === undefined) {
-                            isValid = false;
-                            showFieldError('#property_gold', 'Property Gold is required');
-                        }
-                        const propertySilverVal = $('#property_silver').val();
-                        if (propertySilverVal === '' || propertySilverVal === null || propertySilverVal === undefined) {
-                            isValid = false;
-                            showFieldError('#property_silver', 'Property Silver is required');
-                        }
+                        // All fields are optional - no validation required
                         break;
                 }
                 
