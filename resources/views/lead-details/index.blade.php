@@ -1953,6 +1953,12 @@
                             }
                         } catch (e) {}
                         
+                        // Save which sections are currently expanded before refresh
+                        var expandedSections = [];
+                        $('#documentsContent .collapse.show').each(function() {
+                            expandedSections.push($(this).attr('id'));
+                        });
+                        
                         // Refresh only the documents tab content
                         var leadId = {{ $lead->id ?? 0 }};
                         if (leadId) {
@@ -1975,6 +1981,18 @@
                                     
                                     if (html) {
                                         $('#documentsContent').html(html);
+                                        
+                                        // Restore expanded sections after refresh
+                                        if (expandedSections.length > 0) {
+                                            expandedSections.forEach(function(sectionId) {
+                                                var $section = $('#' + sectionId);
+                                                if ($section.length) {
+                                                    $section.addClass('show');
+                                                    // Update aria-expanded on header
+                                                    $section.closest('.document-section').find('.document-section-header').attr('aria-expanded', 'true');
+                                                }
+                                            });
+                                        }
                                     }
                                 },
                                 error: function(xhr, status, error) {
@@ -2142,6 +2160,12 @@
                             }
                         } catch (e) {}
                         
+                        // Save which sections are currently expanded before refresh
+                        var expandedSections = [];
+                        $('#documentsContent .collapse.show').each(function() {
+                            expandedSections.push($(this).attr('id'));
+                        });
+                        
                         // Refresh only the documents tab content (not the whole page)
                         var documentsUrl = "{{ route('new-leads.documents-tab', ':leadId') }}".replace(':leadId', leadId);
                         $.easyAjax({
@@ -2161,6 +2185,18 @@
                                 
                                 if (html) {
                                     $('#documentsContent').html(html);
+                                    
+                                    // Restore expanded sections after refresh
+                                    if (expandedSections.length > 0) {
+                                        expandedSections.forEach(function(sectionId) {
+                                            var $section = $('#' + sectionId);
+                                            if ($section.length) {
+                                                $section.addClass('show');
+                                                // Update aria-expanded on header
+                                                $section.closest('.document-section').find('.document-section-header').attr('aria-expanded', 'true');
+                                            }
+                                        });
+                                    }
                                 }
                             },
                             error: function(xhr, status, error) {
