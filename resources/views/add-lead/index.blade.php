@@ -17,6 +17,12 @@
                         <a class="nav-item-lead nav-link-lead f-14 active" id="nav-personal-tab" data-toggle="tab" href="#nav-personal" role="tab" aria-controls="nav-personal" aria-selected="true">
                             <div class="tab-item"><img src="{{ asset('img/icon/Personal_Details.svg') }}"></div>@lang('app.personalDetails')
                         </a>
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-education-tab" data-toggle="tab" href="#nav-education" role="tab" aria-controls="nav-education" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Education.svg') }}"></div>@lang('app.education')
+                        </a>
+                        <a class="nav-item-lead nav-link-lead f-14" id="nav-experience-tab" data-toggle="tab" href="#nav-experience" role="tab" aria-controls="nav-experience" aria-selected="false">
+                            <div class="tab-item"><img src="{{ asset('img/icon/Professional_Experience.svg') }}"></div>@lang('app.professionalExperience')
+                        </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-preference-tab" data-toggle="tab" href="#nav-preference" role="tab" aria-controls="nav-preference" aria-selected="false">
                             <div class="tab-item"><img src="{{ asset('img/icon/Client_Preference.svg') }}"></div>@lang('app.clientPreference')
                         </a>
@@ -28,12 +34,6 @@
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-family-tab" data-toggle="tab" href="#nav-family" role="tab" aria-controls="nav-family" aria-selected="false">
                             <div class="tab-item"><img src="{{ asset('img/icon/Financial_Status.svg') }}"></div>@lang('app.familyInformation')
-                        </a>
-                        <a class="nav-item-lead nav-link-lead f-14" id="nav-education-tab" data-toggle="tab" href="#nav-education" role="tab" aria-controls="nav-education" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Education.svg') }}"></div>@lang('app.education')
-                        </a>
-                        <a class="nav-item-lead nav-link-lead f-14" id="nav-experience-tab" data-toggle="tab" href="#nav-experience" role="tab" aria-controls="nav-experience" aria-selected="false">
-                            <div class="tab-item"><img src="{{ asset('img/icon/Professional_Experience.svg') }}"></div>@lang('app.professionalExperience')
                         </a>
                         <a class="nav-item-lead nav-link-lead f-14" id="nav-property-tab" data-toggle="tab" href="#nav-property" role="tab" aria-controls="nav-property" aria-selected="false">
                             <div class="tab-item"><img src="{{ asset('img/icon/Property_Details.svg') }}"></div>@lang('app.propertyDetails')
@@ -3659,17 +3659,18 @@
                 }
             }
 
-            // Map tab IDs to step numbers
+            // Map tab IDs to step numbers (mapped to original database step numbers)
+            // This allows UI tab reordering without changing database structure
             const tabStepMap = {
-                'nav-personal-tab': 1,
-                'nav-preference-tab': 2,
-                'nav-passport-tab': 3,
-                'nav-relative-tab': 4,
-                'nav-family-tab': 5,
-                'nav-education-tab': 6,
-                'nav-experience-tab': 7,
-                'nav-property-tab': 8,
-                'nav-financial-tab': 9 // Financial Status is step 9
+                'nav-personal-tab': 1,      // Personal Details -> step_1_data (old step 1)
+                'nav-education-tab': 6,      // Education -> step_6_data (old step 6)
+                'nav-experience-tab': 7,     // Professional Experience -> step_7_data (old step 7)
+                'nav-preference-tab': 2,     // Client Preference -> step_2_data (old step 2)
+                'nav-passport-tab': 3,       // Passport Details -> step_3_data (old step 3)
+                'nav-relative-tab': 4,       // Relative Contact Information -> step_4_data (old step 4)
+                'nav-family-tab': 5,         // Family Information -> step_5_data (old step 5)
+                'nav-property-tab': 8,       // Property Details -> step_8_data (old step 8)
+                'nav-financial-tab': 9       // Financial Status -> step_9_data (old step 9)
             };
 
             // Get current step from active tab
