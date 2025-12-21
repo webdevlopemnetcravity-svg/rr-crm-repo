@@ -61,8 +61,8 @@
                     <div class="tab-section-header">
                         <div class="tab-section-header-content">
                             <h3 class="tab-section-title">Client Info</h3>
-                            <button type="button" class="btn-primary rounded" id="downloadClientInfoBtn">
-                                Download Client Info
+                            <button type="button" class="btn-primary rounded" id="viewClientInfoBtn">
+                                View Client Info
                             </button>
                         </div>
                     </div>
@@ -1157,3 +1157,75 @@
                         </div>
                     </div>
                 </div>
+
+    <!-- View Client Info Modal -->
+    <div class="modal fade" id="viewClientInfoModal" tabindex="-1" role="dialog" aria-labelledby="viewClientInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header invoice-view-header">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <h5 class="modal-title invoice-view-title">VIEW CLIENT INFO</h5>
+                        <div class="d-flex align-items-center">
+                            <button type="button" class="btn invoice-download-btn client-info-download-btn">
+                                <i class="fa fa-download mr-1"></i> Download Client Info
+                            </button>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body invoice-view-body client-info-view-body">
+                    <!-- Client Info Title and Company Info Section -->
+                    <div class="invoice-header-row mb-4 d-flex justify-content-between align-items-start">
+                        <!-- Client Info Title Section (Left) -->
+                        <div class="invoice-title-section">
+                            <h2 class="invoice-main-title">CLIENT INFO</h2>
+                            <p class="invoice-lead-number" id="view_client_info_lead_number">--</p>
+                        </div>
+                        <!-- Company Logo Section (Right) -->
+                        <div class="invoice-company-info">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="{{ company()->light_logo_url ?? global_setting()->light_logo_url }}" alt="Company Logo" class="company-logo-image">
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="invoice-divider">
+                    <!-- Client Info Content -->
+                    <div id="clientInfoModalContent" class="tab-section-content">
+                        <!-- Content will be populated here -->
+                    </div>
+                    <style>
+                        #viewClientInfoModal .tab-section-content > div[style*="border: 1px solid #B5B5B5"],
+                        #viewClientInfoModal .tab-section-content > div[style*="border: 1px solid #B5B5B5"] {
+                            border: none !important;
+                        }
+                        #viewClientInfoModal .tab-section-content div[style*="border"] {
+                            border: none !important;
+                        }
+                    </style>
+                    <hr class="invoice-divider">
+                    <!-- Footer Section -->
+                    <div class="invoice-footer-section">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="{{ company()->light_logo_url ?? global_setting()->light_logo_url }}" alt="Company Logo" class="company-logo-image-footer">
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3 text-center">
+                                <div class="footer-label">Toll-Free Number</div>
+                                <div class="footer-toll-free">{{ company()->phone ?? '1800 571 2844' }}</div>
+                                <div class="footer-email">{{ company()->company_email ?? 'info.rrpei@gmail.com' }}</div>
+                            </div>
+                            <div class="col-md-4 mb-3 text-right">
+                                <div class="footer-address">3rd Floor, Aaron Spectra, 302, Rajpath Rangoli Rd, behind Rajpath Club, Bodakdev, Ahmedabad, Gujarat 380059 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

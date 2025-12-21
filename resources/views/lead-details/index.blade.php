@@ -2519,6 +2519,96 @@
             });
         });
 
+        // Handle View Client Info button click - opens modal
+        $(document).on('click', '#viewClientInfoBtn', function(e) {
+            e.preventDefault();
+            
+            // Get the client info content
+            var clientInfoContent = document.querySelector('#clientInfoTab .tab-section-content');
+            
+            if (!clientInfoContent) {
+                alert('Client info content not found.');
+                return;
+            }
+            
+            // Get lead number
+            var leadNumber = $('.lead-id-header').text().trim() || 'Client-Info';
+            
+            // Populate modal with content
+            var contentClone = clientInfoContent.cloneNode(true);
+            $('#clientInfoModalContent').html(contentClone.innerHTML);
+            $('#view_client_info_lead_number').text(leadNumber);
+            
+            // Remove borders from content divs in modal
+            $('#viewClientInfoModal .tab-section-content > div').each(function() {
+                var $div = $(this);
+                var style = $div.attr('style') || '';
+                if (style.includes('border: 1px solid #B5B5B5') || style.includes('border:1px solid #B5B5B5')) {
+                    style = style.replace(/border:\s*1px\s+solid\s+#B5B5B5/gi, 'border: none');
+                    $div.attr('style', style);
+                }
+            });
+            
+            // Show modal
+            $('#viewClientInfoModal').modal('show');
+        });
+
+        // Handle Download Client Info button click in modal
+        $(document).on('click', '.client-info-download-btn', function(e) {
+            e.preventDefault();
+            
+            // Check if html2pdf is loaded
+            if (typeof html2pdf === 'undefined') {
+                alert('PDF library is loading. Please wait a moment and try again.');
+                return;
+            }
+            
+            // Get the client info view body content from modal
+            var clientInfoBody = document.querySelector('#viewClientInfoModal .client-info-view-body');
+            
+            if (!clientInfoBody) {
+                alert('Client info content not found. Please try viewing the client info again.');
+                return;
+            }
+            
+            // Get lead number for filename
+            var leadNumber = $('#view_client_info_lead_number').text() || 'Client-Info';
+            var filename = leadNumber + '-Client-Info-' + moment().format('YYYY-MM-DD') + '.pdf';
+            
+            // Configure html2pdf options
+            var opt = {
+                margin: [10, 10, 10, 10],
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
+            };
+            
+            // Show loading message
+            var btn = $(this);
+            var originalText = btn.html();
+            btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Generating PDF...');
+            
+            // Generate and download PDF
+            html2pdf().set(opt).from(clientInfoBody).save().then(function() {
+                // Restore button
+                btn.prop('disabled', false).html(originalText);
+            }).catch(function(error) {
+                // PDF generation error occurred
+                console.error('PDF generation error:', error);
+                alert('Failed to generate PDF. Please try again.');
+                btn.prop('disabled', false).html(originalText);
+            });
+        });
+
         // Handle Delete Account button click
         $(document).on('click', '.delete-account-btn', function(e) {
             e.preventDefault();
