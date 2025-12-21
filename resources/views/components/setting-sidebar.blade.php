@@ -36,48 +36,48 @@
         <x-setting-menu-item :active="$activeMenu" menu="profile_settings" :href="route('profile-settings.index')"
                              :text="__('app.menu.profileSettings')"/>
 
-        @if (user()->permission('manage_notification_setting') == 'all')
+        {{-- @if (user()->permission('manage_notification_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="notification_settings" :href="route('notifications.index')"
                                  :text="__('app.menu.notificationSettings')"/>
-        @endif
+        @endif --}}
 
-        @if (user()->permission('manage_currency_setting') == 'all')
+        {{-- @if (user()->permission('manage_currency_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="currency_settings" :href="route('currency-settings.index')"
                                  :text="__('app.menu.currencySettings')"/>
-        @endif
+        @endif --}}
 
-        @if (user()->permission('manage_payment_setting') == 'all')
+        {{-- @if (user()->permission('manage_payment_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="payment_gateway_settings"
                                  :href="route('payment-gateway-settings.index')"
                                  :text="__('app.menu.paymentGatewayCredential')"/>
-        @endif
+        @endif --}}
 
-        @if (user()->permission('manage_finance_setting') == 'all' && (in_array('invoices', user_modules()) ||
+        {{-- @if (user()->permission('manage_finance_setting') == 'all' && (in_array('invoices', user_modules()) ||
         in_array('estimates', user_modules()) || in_array('orders', user_modules()) || in_array('leads', user_modules()) || in_array('payments', user_modules())))
             <x-setting-menu-item :active="$activeMenu" menu="invoice_settings" :href="route('invoice-settings.index')"
                                  :text="__('app.menu.financeSettings')"/>
-        @endif
+        @endif --}}
 
 
-        @if (user()->permission('manage_contract_setting') == 'all' && in_array('contracts', user_modules()))
+        {{-- @if (user()->permission('manage_contract_setting') == 'all' && in_array('contracts', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="contract_settings" :href="route('contract-settings.index')"
                                  :text="__('app.menu.contractSettings')"/>
-        @endif
+        @endif --}}
 
-        @if (user()->permission('manage_tax') == 'all')
+        {{-- @if (user()->permission('manage_tax') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="tax_settings" :href="route('taxes.index')"
                                  :text="__('app.menu.taxSettings')"/>
-        @endif
+        @endif --}}
 
-        @if (user()->permission('manage_ticket_setting') == 'all' && in_array('tickets', user_modules()))
+        {{-- @if (user()->permission('manage_ticket_setting') == 'all' && in_array('tickets', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="ticket_settings" :href="route('ticket-settings.index')"
                                  :text="__('app.menu.ticketSettings')"/>
-        @endif
+        @endif --}}
 
-        @if (user()->permission('manage_project_setting') == 'all' && in_array('projects', user_modules()))
+        {{-- @if (user()->permission('manage_project_setting') == 'all' && in_array('projects', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="project_settings" :href="route('project-settings.index')"
                                  :text="__('app.menu.projectSettings')"/>
-        @endif
+        @endif --}}
 
         @if (user()->permission('manage_attendance_setting') == 'all' && in_array('attendance', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="attendance_settings"
@@ -89,25 +89,25 @@
                                  :text="__('app.menu.leaveSettings')"/>
         @endif
 
-        @if (user()->permission('manage_custom_field_setting') == 'all')
+        {{-- @if (user()->permission('manage_custom_field_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="custom_fields" :href="route('custom-fields.index')"
                                  :text="__('app.menu.customFields')"/>
-        @endif
+        @endif --}}
 
         @if (user()->permission('manage_role_permission_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="role_permissions" :href="route('role-permissions.index')"
                                  :text="__('app.menu.rolesPermission')"/>
         @endif
 
-        @if (user()->permission('manage_message_setting') == 'all' && in_array('messages', user_modules()))
+        {{-- @if (user()->permission('manage_message_setting') == 'all' && in_array('messages', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="message_settings" :href="route('message-settings.index')"
                                  :text="__('app.menu.messageSettings')"/>
-        @endif
+        @endif --}}
 
-        @if (user()->permission('manage_lead_setting') == 'all' && in_array('leads', user_modules()))
+        {{-- @if (user()->permission('manage_lead_setting') == 'all' && in_array('leads', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="lead_settings" :href="route('lead-settings.index')"
                                  :text="__('app.menu.leadSettings')"/>
-        @endif
+        @endif --}}
 
         @if (in_array('admin', user_roles()))
             <x-setting-menu-item :active="$activeMenu" menu="new_lead_template_documents" :href="route('new-lead-template-documents.index')"
@@ -124,14 +124,14 @@
                                  :text="__('app.menu.timeLogSettings')"/>
         @endif
 
-        @if (user()->permission('manage_task_setting') == 'all' && in_array('tasks', user_modules()))
+        {{-- @if (user()->permission('manage_task_setting') == 'all' && in_array('tasks', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="task_settings" :href="route('task-settings.index')"
                                  :text="__('app.menu.taskSettings')"/>
-        @endif
+        @endif --}}
 
 
-        <x-setting-menu-item :active="$activeMenu" menu="security_settings" :href="route('security-settings.index')"
-                             :text="__('app.menu.securitySettings')"/>
+        {{-- <x-setting-menu-item :active="$activeMenu" menu="security_settings" :href="route('security-settings.index')"
+                             :text="__('app.menu.securitySettings')"/> --}}
 
 
         @if (user()->permission('manage_theme_setting') == 'all')
@@ -139,57 +139,57 @@
                                  :text="__('app.menu.themeSettings')"/>
         @endif
 
-        @if (user()->permission('manage_module_setting') == 'all')
+        {{-- @if (user()->permission('manage_module_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="module_settings" :href="route('module-settings.index')"
                                  :text="__('app.menu.moduleSettings')"/>
-        @endif
+        @endif --}}
 
         @if(isWorksuite())
 
-            @if (user()->permission('manage_storage_setting') == 'all')
+            {{-- @if (user()->permission('manage_storage_setting') == 'all')
                 <x-setting-menu-item :active="$activeMenu" menu="storage_settings"
                                      :href="route('storage-settings.index')"
                                      :text="__('app.menu.storageSettings')"/>
-            @endif
+            @endif --}}
 
-            @if (user()->permission('manage_language_setting') == 'all')
+            {{-- @if (user()->permission('manage_language_setting') == 'all')
                 <x-setting-menu-item :active="$activeMenu" menu="language_settings"
                                      :href="route('language-settings.index')"
                                      :text="__('app.menu.languageSettings')"/>
-            @endif
+            @endif --}}
 
-            @if (user()->permission('manage_social_login_setting') == 'all')
+            {{-- @if (user()->permission('manage_social_login_setting') == 'all')
                 <x-setting-menu-item :active="$activeMenu" menu="social_auth_settings"
                                      :href="route('social-auth-settings.index')" :text="__('app.menu.socialLogin')"/>
-            @endif
+            @endif --}}
 
-            @if (user()->permission('manage_google_calendar_setting') == 'all')
+            {{-- @if (user()->permission('manage_google_calendar_setting') == 'all')
                 <x-setting-menu-item :active="$activeMenu" menu="google_calendar_settings"
                                      :href="route('google-calendar-settings.index')"
                                      :text="__('app.menu.googleCalendarSetting')"/>
-            @endif
+            @endif --}}
 
-            @if (user()->permission('manage_custom_link_setting') == 'all')
+            {{-- @if (user()->permission('manage_custom_link_setting') == 'all')
                 <x-setting-menu-item :active="$activeMenu" menu="custom_link_settings"
                                     :href="route('custom-link-settings.index')"
                                     :text="__('app.menu.customLinkSetting')"/>
-            @endif
+            @endif --}}
 
             @if (user()->permission('manage_gdpr_setting') == 'all' && in_array('client', user_modules()))
                 <x-setting-menu-item :active="$activeMenu" menu="gdpr_settings" :href="route('gdpr-settings.index')"
                                      :text="__('app.menu.gdprSettings')"/>
             @endif
 
-            @if (in_array('admin', user_roles()))
+            {{-- @if (in_array('admin', user_roles()))
                 <x-setting-menu-item :active="$activeMenu" menu="database_backup_settings"
                                      :href="route('database-backup-settings.index')"
                                      :text="__('app.menu.databaseBackupSetting')"/>
-            @endif
+            @endif --}}
 
-            @if (user()->permission('manage_company_setting') == 'all')
+            {{-- @if (user()->permission('manage_company_setting') == 'all')
                 <x-setting-menu-item :active="$activeMenu" menu="sign_up_setting" :href="route('sign-up-settings.index')"
                                     :text="__('app.menu.signUpSetting')"/>
-            @endif
+            @endif --}}
         @endif
 
         @foreach (worksuite_plugins() as $item)
@@ -197,10 +197,10 @@
         @endforeach
 
         @if(isWorksuite())
-            @if (in_array('admin', user_roles()) && global_setting()->system_update)
+            {{-- @if (in_array('admin', user_roles()) && global_setting()->system_update)
                 <x-setting-menu-item :active="$activeMenu" menu="update_settings" :href="route('update-settings.index')"
                                      :text="__('app.menu.updates')"/>
-            @endif
+            @endif --}}
         @endif
 
 
