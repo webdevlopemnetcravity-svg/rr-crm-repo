@@ -10,6 +10,19 @@
         <!-- Add Task Export Buttons End -->
 
         <div class="d-flex flex-column w-100 rounded bg-white">
+            <!-- Move to Lead Button -->
+            <div class="px-4 py-3 border-bottom-grey justify-content-between align-items-center" id="moveToLeadButtonContainer" style="display: none !important;">
+                <h3 id="leadNumberDisplay">
+                    @if(isset($newLead) && $newLead->id)
+                        LEAD-{{ str_pad($newLead->id, 4, '0', STR_PAD_LEFT) }}
+                    @else
+                        --
+                    @endif
+                </h3>
+                <button type="button" class="btn btn-primary" id="moveToLeadBtn" data-toggle="modal" data-target="#moveToLeadModal">
+                    <i class="fa fa-user-plus mr-1"></i>Move to Lead
+                </button>
+            </div>
             <!-- Tabs Navigation -->
             <div class="s-b-n-header" id="tabs">
                 <nav class="tabs px-4 border-bottom-grey">
@@ -65,25 +78,6 @@
                                     <option value="Reference">Reference</option>
                                     <option value="Website">Website</option>
                                     <option value="Email Marketing">Email Marketing</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="lead_added_by" :fieldLabel="__('app.leadAddedBy')">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" id="lead_added_by" name="lead_added_by" value="{{ user()->name }}" readonly style="background-color: #e9ecef;">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="lead_assign_to" :fieldLabel="__('app.leadAssignTo')">
-                                </x-forms.label>
-                                <select class="form-control select-picker height-35 f-14" name="lead_assign_to" id="lead_assign_to">
-                                    <option value="">@lang('app.select') @lang('app.leadAssignTo')</option>
-                                    @if(isset($employees) && $employees)
-                                        @foreach($employees as $employee)
-                                            <option value="{{ $employee->id }}" {{ (isset($newLead) && $newLead->lead_owner == $employee->id) || (!isset($newLead) && user()->id == $employee->id) ? 'selected' : '' }}>{{ $employee->name }}</option>
-                                        @endforeach
-                                    @else
-                                        <option value="{{ user()->id }}">{{ user()->name }}</option>
-                                    @endif
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -1367,10 +1361,65 @@
         </div>
     </div>
     <!-- CONTENT WRAPPER END -->
+
+    <!-- Move to Lead Modal -->
+    <div class="modal fade" id="moveToLeadModal" tabindex="-1" role="dialog" aria-labelledby="moveToLeadModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="moveToLeadModalLabel">Move to Lead</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="moveToLeadForm">
+                        <input type="hidden" name="lead_id" id="move_lead_id" value="{{ $newLead->id ?? '' }}">
+                        <div class="form-group">
+                            <x-forms.label fieldId="move_lead_assign_to" :fieldLabel="__('app.leadAssignTo')" fieldRequired="true">
+                            </x-forms.label>
+                            <select class="form-control select-picker height-35 f-14" name="lead_assign_to" id="move_lead_assign_to" required>
+                                <option value="">@lang('app.select') @lang('app.leadAssignTo')</option>
+                                @if(isset($employees) && $employees)
+                                    @foreach($employees as $employee)
+                                        <option value="{{ $employee->id }}" {{ (isset($newLead) && $newLead->lead_owner == $employee->id) || (!isset($newLead) && user()->id == $employee->id) ? 'selected' : '' }}>{{ $employee->name }}</option>
+                                    @endforeach
+                                @else
+                                    <option value="{{ user()->id }}">{{ user()->name }}</option>
+                                @endif
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang('app.cancel')</button>
+                    <button type="button" class="btn btn-primary" id="confirmMoveToLeadBtn">
+                        <i class="fa fa-check mr-1"></i>Move to Lead
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script>
+        // Hide Move to Lead button immediately if no lead_id in URL
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const leadId = urlParams.get('lead_id');
+            if (!leadId) {
+                // Hide button if no lead_id in URL - run immediately
+                setTimeout(function() {
+                    const btnContainer = document.getElementById('moveToLeadButtonContainer');
+                    if (btnContainer) {
+                        btnContainer.classList.remove('d-flex');
+                        btnContainer.style.display = 'none';
+                    }
+                }, 0);
+            }
+        })();
+        
         $(document).ready(function() {
             // Initialize select picker
             function initializeSelectPickers() {
@@ -3061,6 +3110,19 @@
             if (currentLeadId && !$('#lead_id').val()) {
                 $('#lead_id').val(currentLeadId);
             }
+            
+            // Show/hide Move to Lead button based on lead_id in URL
+            const urlLeadId = getLeadIdFromUrl();
+            if (urlLeadId) {
+                // Update lead number display
+                const leadNumber = 'LEAD-' + String(urlLeadId).padStart(4, '0');
+                $('#leadNumberDisplay').text(leadNumber);
+                $('#moveToLeadButtonContainer').addClass('d-flex').css('display', 'flex');
+            } else {
+                $('#leadNumberDisplay').text('--');
+                $('#moveToLeadButtonContainer').removeClass('d-flex').css('display', 'none');
+            }
+            
             let currentStep = 1;
             let stepStatus = {
                 step_1_completed: false,
@@ -4463,6 +4525,11 @@
                                 $('#lead_id').val(currentLeadId);
                                 // Update URL with lead_id so it persists on refresh
                                 updateUrlWithLeadId(currentLeadId);
+                                // Update lead number display
+                                const leadNumber = 'LEAD-' + String(currentLeadId).padStart(4, '0');
+                                $('#leadNumberDisplay').text(leadNumber);
+                                // Show Move to Lead button when lead_id is added to URL
+                                $('#moveToLeadButtonContainer').addClass('d-flex').css('display', 'flex');
                             }
                             
                             // Update step status
@@ -4717,6 +4784,129 @@
             
             updateTabNavigation();
             updateFooterButtons();
+
+            // Handle Move to Lead button click
+            $('#moveToLeadBtn').on('click', function() {
+                // Update the hidden lead_id field in modal
+                const currentLeadId = $('#lead_id').val();
+                $('#move_lead_id').val(currentLeadId);
+                
+                // Load current lead assignment if lead exists
+                if (currentLeadId) {
+                    $.ajax({
+                        url: '{{ route("add-lead.step-status", ":id") }}'.replace(':id', currentLeadId),
+                        type: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response && response.lead && response.lead.lead_owner) {
+                                $('#move_lead_assign_to').val(response.lead.lead_owner).selectpicker('refresh');
+                            }
+                        }
+                    });
+                }
+                
+                // Initialize select picker in modal
+                $('#move_lead_assign_to').selectpicker('refresh');
+            });
+
+            // Handle Confirm Move to Lead button click
+            $('#confirmMoveToLeadBtn').on('click', function() {
+                const $btn = $(this);
+                const originalHtml = $btn.html();
+                const leadId = $('#move_lead_id').val();
+                const leadAssignTo = $('#move_lead_assign_to').val();
+
+                if (!leadAssignTo) {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Please select a user to assign the lead.',
+                        toast: true,
+                        position: "top-end",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                    return;
+                }
+
+                if (!leadId) {
+                    Swal.fire({
+                        icon: 'error',
+                        text: 'Please save the lead first before moving to lead.',
+                        toast: true,
+                        position: "top-end",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                    return;
+                }
+
+                // Disable button and show loading
+                $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i>Moving...');
+
+                $.ajax({
+                    url: '{{ route("add-lead.move-to-lead") }}',
+                    type: 'POST',
+                    data: {
+                        lead_id: leadId,
+                        lead_assign_to: leadAssignTo
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                text: response.message || 'Lead moved successfully!',
+                                toast: true,
+                                position: "top-end",
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                            });
+                            
+                            // Close modal
+                            $('#moveToLeadModal').modal('hide');
+                            
+                            // Redirect to lead list or lead details page
+                            setTimeout(function() {
+                                window.location.href = response.redirect_url || '{{ route("lead-list.index") }}';
+                            }, 1000);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                text: response.message || 'Failed to move lead.',
+                                toast: true,
+                                position: "top-end",
+                                timer: 3000,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                            });
+                            $btn.prop('disabled', false).html(originalHtml);
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Failed to move lead.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            text: errorMessage,
+                            toast: true,
+                            position: "top-end",
+                            timer: 3000,
+                            timerProgressBar: true,
+                            showConfirmButton: false,
+                        });
+                        $btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
 
         });
     </script>

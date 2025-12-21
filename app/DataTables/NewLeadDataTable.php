@@ -366,7 +366,13 @@ class NewLeadDataTable extends BaseDataTable
                             </div>';
             }
             
-            // Add view/edit button - show edit icon if status is draft, view icon if complete
+            // Add edit button - always visible regardless of status
+            $editUrl = route('add-lead.index', ['lead_id' => $row->id]);
+            $action .= '<a href="' . $editUrl . '" class="btn btn-sm btn-secondary" title="' . __('app.edit') . '">
+                            <i class="fa fa-edit"></i>
+                        </a>';
+            
+            // Add view button - only visible if lead status is complete
             $isComplete = false;
             if ($row->stepStatus && $row->stepStatus->final_status == 'complete') {
                 $isComplete = true;
@@ -375,14 +381,8 @@ class NewLeadDataTable extends BaseDataTable
             if ($isComplete) {
                 // Complete status - show view icon and redirect to lead-details
                 $viewUrl = route('lead-details.index', ['id' => $row->id]);
-                $action .= '<a href="' . $viewUrl . '" class="btn btn-sm btn-secondary" title="' . __('app.view') . '">
+                $action .= '<a href="' . $viewUrl . '" class="btn btn-sm btn-secondary ml-2" title="' . __('app.view') . '">
                                 <i class="fa fa-eye"></i>
-                            </a>';
-            } else {
-                // Draft status - show edit icon and redirect to add-lead
-                $editUrl = route('add-lead.index', ['lead_id' => $row->id]);
-                $action .= '<a href="' . $editUrl . '" class="btn btn-sm btn-secondary" title="' . __('app.edit') . '">
-                                <i class="fa fa-edit"></i>
                             </a>';
             }
             

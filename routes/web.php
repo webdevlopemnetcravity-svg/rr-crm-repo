@@ -578,6 +578,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     // Step-by-step lead saving routes
     Route::post('add-lead/save-step/{stepNumber}', [LeadContactController::class, 'saveStep'])->name('add-lead.save-step');
     Route::get('add-lead/step-status/{id}', [LeadContactController::class, 'getLeadStepStatus'])->name('add-lead.step-status');
+    Route::post('add-lead/move-to-lead', [LeadContactController::class, 'moveToLead'])->name('add-lead.move-to-lead');
 
     Route::get('deals/get-stage/{id}', [DealController::class, 'getStages'])->name('deals.get-stage');
     Route::get('deals/get-deals/{id}', [DealController::class, 'getDeals'])->name('deals.get-deals');

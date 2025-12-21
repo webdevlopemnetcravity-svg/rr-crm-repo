@@ -3516,6 +3516,54 @@ class LeadContactController extends AccountBaseController
     }
 
     /**
+     * Move lead to assigned user and mark as complete
+     */
+    public function moveToLead(Request $request)
+    {
+        try {
+            $leadId = $request->lead_id;
+            $leadAssignTo = $request->lead_assign_to;
+
+            if (!$leadId) {
+                return Reply::error('Lead ID is required.');
+            }
+
+            if (!$leadAssignTo) {
+                return Reply::error('Please select a user to assign the lead.');
+            }
+
+            $lead = NewLead::findOrFail($leadId);
+            $this->editPermission = user()->permission('edit_lead');
+
+            abort_403(!($this->editPermission == 'all'
+                || ($this->editPermission == 'added' && $lead->added_by == user()->id)
+                || ($this->editPermission == 'owned' && $lead->lead_owner == user()->id)
+                || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
+            ));
+
+            // Update lead owner
+            $lead->lead_owner = $leadAssignTo;
+            $lead->save();
+
+            // Get or create step status
+            $stepStatus = LeadStepStatus::getOrCreateForLead($leadId);
+
+            // Set final status to complete
+            $stepStatus->final_status = 'complete';
+            $stepStatus->save();
+
+            // Redirect to lead list or lead details
+            $redirectUrl = route('lead-list.index');
+
+            return Reply::successWithData('Lead moved successfully!', [
+                'redirect_url' => $redirectUrl,
+            ]);
+        } catch (\Exception $e) {
+            return Reply::error($e->getMessage());
+        }
+    }
+
+    /**
      * Download assessment letter file
      */
     public function downloadAssessmentLetter($leadId, $fileName)
