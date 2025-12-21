@@ -81,11 +81,6 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="upload_resume" fieldLabel="Upload Resume">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="upload_resume" name="upload_resume" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                            </div>
-                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="surname" :fieldLabel="__('app.surname')" fieldRequired="true">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="surname" id="surname">
@@ -387,11 +382,6 @@
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_assessment_letter_file" :fieldLabel="__('app.addAssessmentLetter')">
-                                    </x-forms.label>
-                                    <input class="form-control height-35 f-14" type="file" id="pr_assessment_letter_file" name="pr_assessment_letter_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
-                                </div>
-                                <div class="col-md-3">
                                     <x-forms.label class="mt-3" fieldId="pr_preferred_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
                                     <select class="form-control select-picker height-35 f-14" name="pr_preferred_country" id="pr_preferred_country">
@@ -679,9 +669,6 @@
                                 </script>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="passport_file_upload" fieldLabel="Add Passport">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="passport_file_upload" name="passport_file_upload" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3" fieldId="lost_passport_history" fieldLabel="Lost Passport History">
@@ -740,9 +727,6 @@
                                 </select>
                             </div>
                             <div class="col-md-3" id="father_passport_file_container" style="display: none;">
-                                <x-forms.label class="mt-3" fieldId="father_passport_file" fieldLabel="Add Father Passport">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="father_passport_file" name="father_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -781,9 +765,6 @@
                                 </select>
                             </div>
                             <div class="col-md-3" id="mother_passport_file_container" style="display: none;">
-                                <x-forms.label class="mt-3" fieldId="mother_passport_file" fieldLabel="Add Mother Passport">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="mother_passport_file" name="mother_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -827,9 +808,6 @@
                                 </select>
                             </div>
                             <div class="col-md-3" id="spouse_passport_file_container" style="display: none;">
-                                <x-forms.label class="mt-3" fieldId="spouse_passport_file" fieldLabel="Add Spouse Passport">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="spouse_passport_file" name="spouse_passport_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3" fieldId="spouse_address" fieldLabel="Spouse's Address">
@@ -872,9 +850,6 @@
                                 <input type="number" class="form-control height-35 f-14" name="spouse_yearly_income" id="spouse_yearly_income">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="spouse_document_file" fieldLabel="Add Spouse Document">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="spouse_document_file" name="spouse_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -930,9 +905,6 @@
                                 <input type="number" class="form-control height-35 f-14" name="ielts_trial" id="ielts_trial">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="ielts_result_file" fieldLabel="Add IELTS/PTC/OET/TOEFL Result">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="ielts_result_file" name="ielts_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -972,9 +944,6 @@
                                 <input type="number" class="form-control height-35 f-14" name="tenth_trial" id="tenth_trial">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="tenth_result_file" fieldLabel="Add 10th Result">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="tenth_result_file" name="tenth_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -1025,9 +994,6 @@
                                 <input type="number" class="form-control height-35 f-14" name="twelfth_trial" id="twelfth_trial">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="twelfth_result_file" fieldLabel="Add 12th Result">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="twelfth_result_file" name="twelfth_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -1105,9 +1071,6 @@
                                 <input type="number" class="form-control height-35 f-14" name="graduation_trial" id="graduation_trial">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="graduation_result_file" fieldLabel="Add Graduation Result">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="graduation_result_file" name="graduation_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -1170,9 +1133,6 @@
                                 <input type="number" class="form-control height-35 f-14" name="post_graduation_trial" id="post_graduation_trial">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="post_graduation_result_file" fieldLabel="Add Post Graduation Result">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="post_graduation_result_file" name="post_graduation_result_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
 
@@ -1275,9 +1235,6 @@
                                 <input type="date" class="form-control height-35 f-14" name="loan_availed_on" id="loan_availed_on">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="valuation_report_file" fieldLabel="Add Valuation Report">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="valuation_report_file" name="valuation_report_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                         </div>
                     </div>
@@ -1308,24 +1265,12 @@
                                 <input type="number" class="form-control height-35 f-14 income-input" name="spouse_income" id="spouse_income">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="father_income_document_file" fieldLabel="Add Father's Income Document">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="father_income_document_file" name="father_income_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mother_income_document_file" fieldLabel="Add Mother's Income Document">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="mother_income_document_file" name="mother_income_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="candidate_income_document_file" fieldLabel="Add Candidate's Income Document">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="candidate_income_document_file" name="candidate_income_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="spouse_income_document_file" fieldLabel="Add Spouse Income Document">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" id="spouse_income_document_file" name="spouse_income_document_file" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_income" fieldLabel="Total Income">
@@ -1838,14 +1783,7 @@
                 }
             }
             
-            // Handle PR Assessment Letter file input change
-            $('#pr_assessment_letter_file').on('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    // Remove hidden input when new file is selected
-                    $('#pr_assessment_letter_file_hidden').remove();
-                }
-            });
+            // File inputs removed - no handlers needed
 
             // Relative Contact functionality - Dynamic relative contacts management
             let relativeContactCounter = 0;
@@ -2121,12 +2059,6 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="child_document_file_${childNum}" fieldLabel="Add Child Document">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="child_document_file_${childNum}" id="child_document_file_${childNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-child-index="${childNum}">
-                                ${childData && childData.child_document_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${childData.child_document_file}" target="_blank">${childData.child_document_file}</a></small></div>` : ''}
-                            </div>
-                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="child_have_passport_${childNum}" fieldLabel="Have Passport">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="child_have_passport_${childNum}" id="child_have_passport_${childNum}">
@@ -2136,10 +2068,6 @@
                                 </select>
                             </div>
                             <div class="col-md-3" id="child_passport_file_container_${childNum}" ${showPassportContainer}>
-                                <x-forms.label class="mt-3" fieldId="child_passport_file_${childNum}" fieldLabel="Add Child Passport">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="child_passport_file_${childNum}" id="child_passport_file_${childNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-child-index="${childNum}">
-                                ${childData && childData.child_passport_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${childData.child_passport_file}" target="_blank">${childData.child_passport_file}</a></small></div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -2421,12 +2349,6 @@
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14" name="other_degree_trial_${degreeNum}" id="other_degree_trial_${degreeNum}" value="${trial}">
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="other_degree_result_file_${degreeNum}" fieldLabel="Add Other Degree Result">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="other_degree_result_file_${degreeNum}" id="other_degree_result_file_${degreeNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-degree-index="${degreeNum}">
-                                ${degreeData && degreeData.other_degree_result_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${degreeData.other_degree_result_file}" target="_blank">${degreeData.other_degree_result_file}</a></small></div>` : ''}
-                            </div>
                         </div>
                     </div>
                 `;
@@ -2589,18 +2511,6 @@
                                 <x-forms.label class="mt-3" fieldId="job_salary_${jobNum}" fieldLabel="Salary">
                                 </x-forms.label>
                                 <input type="number" class="form-control height-35 f-14" name="job_salary_${jobNum}" id="job_salary_${jobNum}" value="${salary}">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_offer_letter_file_${jobNum}" fieldLabel="Add Offerletter">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="job_offer_letter_file_${jobNum}" id="job_offer_letter_file_${jobNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-job-index="${jobNum}">
-                                ${jobData && jobData.job_offer_letter_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${jobData.job_offer_letter_file}" target="_blank">${jobData.job_offer_letter_file}</a></small></div>` : ''}
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="job_experience_letter_file_${jobNum}" fieldLabel="Add Experience letter">
-                                </x-forms.label>
-                                <input class="form-control height-35 f-14" type="file" name="job_experience_letter_file_${jobNum}" id="job_experience_letter_file_${jobNum}" accept=".pdf,.jpg,.jpeg,.png" data-max-size="5242880" data-job-index="${jobNum}">
-                                ${jobData && jobData.job_experience_letter_file ? `<div class="mt-1"><small class="text-muted file-name-display"><a href="#" class="existing-file-link" data-file="${jobData.job_experience_letter_file}" target="_blank">${jobData.job_experience_letter_file}</a></small></div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -2996,34 +2906,7 @@
                 $(this).val(value);
             });
             
-            // File size validation and file name display for all file inputs
-            $(document).on('change', 'input[type="file"][data-max-size]', function() {
-                const file = this.files[0];
-                const maxSize = $(this).data('max-size'); // 5242880 = 5MB
-                const fieldId = $(this).attr('id');
-                
-                if (file && file.size > maxSize) {
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'File too large',
-                            text: 'File size must be less than 5MB',
-                            timer: 3000,
-                            showConfirmButton: false
-                        });
-                    } else {
-                        alert('File size must be less than 5MB');
-                    }
-                    $(this).val('');
-                    // Remove file display if exists
-                    $(this).next('.file-name-display').remove();
-                } else if (file) {
-                    // Show file name for newly selected file
-                    showFileName(fieldId, file.name);
-                    // Remove hidden field if exists (for existing files)
-                    $('#' + fieldId + '_hidden').remove();
-                }
-            });
+            // File inputs removed - no file handling needed
 
             // Function to filter states based on selected country
             function filterStatesByCountry(countrySelectId, stateSelectId) {
@@ -3688,25 +3571,9 @@
                             if ($field.length) {
                                 const value = stepDataObj[fieldName];
                                 
-                                // Check if this is a file field
-                                if ($field.is('input[type="file"]') && value) {
-                                    // Handle file field - create hidden input and show file name
-                                    const hiddenId = fieldName + '_hidden';
-                                    if ($('#' + hiddenId).length === 0) {
-                                        $('<input>').attr({
-                                            type: 'hidden',
-                                            id: hiddenId,
-                                            name: fieldName + '_existing',
-                                            value: value
-                                        }).insertAfter($field);
-                                    } else {
-                                        $('#' + hiddenId).val(value);
-                                    }
-                                    // Show file name with link - wait a bit for step 5 files to ensure containers are visible
-                                    setTimeout(function() {
-                                        const fileUrl = getFileUrl(fieldName, value);
-                                        showFileName(fieldName, value, fileUrl);
-                                    }, stepNum === 5 ? 300 : 0);
+                                // File inputs removed - skip file field handling
+                                if ($field.is('input[type="file"]')) {
+                                    return; // Skip file fields
                                 } else if ($field.is('select')) {
                                     $field.val(value).selectpicker('refresh');
                                 } else if ($field.is(':checkbox') || $field.is(':radio')) {
@@ -4089,69 +3956,6 @@
                 
                 const formData = new FormData($('#addLeadForm')[0]);
                 
-                // Ensure file is included if selected (for step 1)
-                if (currentStep === 1) {
-                    const uploadResumeInput = document.getElementById('upload_resume');
-                    if (uploadResumeInput && uploadResumeInput.files && uploadResumeInput.files.length > 0) {
-                        const file = uploadResumeInput.files[0];
-                        // Explicitly ensure file is in FormData
-                        formData.delete('upload_resume');
-                        formData.append('upload_resume', file);
-                        // Remove hidden field since new file is being uploaded
-                        $('#upload_resume_hidden').remove();
-                    } else {
-                        // If no new file but existing file exists, ensure hidden field is in FormData
-                        if ($('#upload_resume_hidden').length > 0) {
-                            const existingFileName = $('#upload_resume_hidden').val();
-                            if (existingFileName) {
-                                formData.append('upload_resume_existing', existingFileName);
-                            }
-                        }
-                    }
-                }
-                
-                // Ensure pr_assessment_letter_file is included if selected (for step 2)
-                if (currentStep === 2) {
-                    const prAssessmentLetterInput = document.getElementById('pr_assessment_letter_file');
-                    if (prAssessmentLetterInput && prAssessmentLetterInput.files && prAssessmentLetterInput.files.length > 0) {
-                        const file = prAssessmentLetterInput.files[0];
-                        // Explicitly ensure file is in FormData
-                        formData.delete('pr_assessment_letter_file');
-                        formData.append('pr_assessment_letter_file', file);
-                        // Remove hidden field since new file is being uploaded
-                        $('#pr_assessment_letter_file_hidden').remove();
-                    } else {
-                        // If no new file but existing file exists, ensure hidden field is in FormData
-                        if ($('#pr_assessment_letter_file_hidden').length > 0) {
-                            const existingFileName = $('#pr_assessment_letter_file_hidden').val();
-                            if (existingFileName) {
-                                formData.append('pr_assessment_letter_file_existing', existingFileName);
-                            }
-                        }
-                    }
-                }
-                
-                // Ensure passport_file_upload is included if selected (for step 3)
-                if (currentStep === 3) {
-                    const passportFileInput = document.getElementById('passport_file_upload');
-                    if (passportFileInput && passportFileInput.files && passportFileInput.files.length > 0) {
-                        const file = passportFileInput.files[0];
-                        // Explicitly ensure file is in FormData
-                        formData.delete('passport_file_upload');
-                        formData.append('passport_file_upload', file);
-                        // Remove hidden field since new file is being uploaded
-                        $('#passport_file_upload_hidden').remove();
-                    } else {
-                        // If no new file but existing file exists, ensure hidden field is in FormData
-                        if ($('#passport_file_upload_hidden').length > 0) {
-                            const existingFileName = $('#passport_file_upload_hidden').val();
-                            if (existingFileName) {
-                                formData.append('passport_file_upload_existing', existingFileName);
-                            }
-                        }
-                    }
-                }
-                
                 // Ensure step 4 relative contacts data is collected
                 if (currentStep === 4) {
                     // Collect relative contacts data
@@ -4204,38 +4008,6 @@
                         const childGender = getSelectValue('#child_gender_' + childIndex) || '';
                         const childHavePassport = getSelectValue('#child_have_passport_' + childIndex) || '';
                         
-                        // Get child passport file
-                        const childPassportFileInput = document.getElementById('child_passport_file_' + childIndex);
-                        let childPassportFile = '';
-                        if (childPassportFileInput && childPassportFileInput.files && childPassportFileInput.files.length > 0) {
-                            // File will be handled separately in FormData
-                            childPassportFile = 'NEW_FILE_' + childIndex;
-                        } else {
-                            // Check for existing file
-                            const existingPassportLink = $(this).find('.existing-file-link[data-file]').filter(function() {
-                                return $(this).closest('.col-md-3').find('#child_passport_file_' + childIndex).length > 0;
-                            });
-                            if (existingPassportLink.length > 0) {
-                                childPassportFile = existingPassportLink.attr('data-file');
-                            }
-                        }
-                        
-                        // Get child document file
-                        const childDocumentFileInput = document.getElementById('child_document_file_' + childIndex);
-                        let childDocumentFile = '';
-                        if (childDocumentFileInput && childDocumentFileInput.files && childDocumentFileInput.files.length > 0) {
-                            // File will be handled separately in FormData
-                            childDocumentFile = 'NEW_FILE_' + childIndex;
-                        } else {
-                            // Check for existing file
-                            const existingDocumentLink = $(this).find('.existing-file-link[data-file]').filter(function() {
-                                return $(this).closest('.col-md-3').find('#child_document_file_' + childIndex).length > 0;
-                            });
-                            if (existingDocumentLink.length > 0) {
-                                childDocumentFile = existingDocumentLink.attr('data-file');
-                            }
-                        }
-                        
                         // Only add child if at least one field has a value
                         if (childName || childAge || childDob || childCity || childGender || childHavePassport) {
                             const childData = {
@@ -4244,57 +4016,14 @@
                                 child_date_of_birth: childDob,
                                 child_city_of_birth: childCity,
                                 child_gender: childGender,
-                                child_have_passport: childHavePassport,
-                                child_passport_file: childPassportFile,
-                                child_document_file: childDocumentFile
+                                child_have_passport: childHavePassport
                             };
                             children.push(childData);
-                            
-                            // Handle file uploads for this child
-                            if (childPassportFileInput && childPassportFileInput.files && childPassportFileInput.files.length > 0) {
-                                formData.append('child_passport_file_' + childIndex, childPassportFileInput.files[0]);
-                            } else if (childPassportFile && childPassportFile !== 'NEW_FILE_' + childIndex) {
-                                formData.append('child_passport_file_' + childIndex + '_existing', childPassportFile);
-                            }
-                            
-                            if (childDocumentFileInput && childDocumentFileInput.files && childDocumentFileInput.files.length > 0) {
-                                formData.append('child_document_file_' + childIndex, childDocumentFileInput.files[0]);
-                            } else if (childDocumentFile && childDocumentFile !== 'NEW_FILE_' + childIndex) {
-                                formData.append('child_document_file_' + childIndex + '_existing', childDocumentFile);
-                            }
                         }
                     });
                     
                     // Add children data as JSON
                     formData.append('children', JSON.stringify(children));
-                    
-                    // Handle other step 5 file fields (father, mother, spouse)
-                    const step5FileFields = [
-                        'father_passport_file',
-                        'mother_passport_file',
-                        'spouse_passport_file',
-                        'spouse_document_file'
-                    ];
-                    
-                    step5FileFields.forEach(function(fileField) {
-                        const fileInput = document.getElementById(fileField);
-                        if (fileInput && fileInput.files && fileInput.files.length > 0) {
-                            const file = fileInput.files[0];
-                            // Explicitly ensure file is in FormData
-                            formData.delete(fileField);
-                            formData.append(fileField, file);
-                            // Remove hidden field since new file is being uploaded
-                            $('#' + fileField + '_hidden').remove();
-                        } else {
-                            // If no new file but existing file exists, ensure hidden field is in FormData
-                            if ($('#' + fileField + '_hidden').length > 0) {
-                                const existingFileName = $('#' + fileField + '_hidden').val();
-                                if (existingFileName) {
-                                    formData.append(fileField + '_existing', existingFileName);
-                                }
-                            }
-                        }
-                    });
                 }
                 
                 // Ensure step 6 file uploads are included if selected
@@ -4309,22 +4038,6 @@
                         const passingYear = getSelectValue('#other_degree_passing_year_' + degreeIndex) || '';
                         const trial = $('#other_degree_trial_' + degreeIndex).val() || '';
                         
-                        // Get other degree result file
-                        const otherDegreeResultFileInput = document.getElementById('other_degree_result_file_' + degreeIndex);
-                        let otherDegreeResultFile = '';
-                        if (otherDegreeResultFileInput && otherDegreeResultFileInput.files && otherDegreeResultFileInput.files.length > 0) {
-                            // File will be handled separately in FormData
-                            otherDegreeResultFile = 'NEW_FILE_' + degreeIndex;
-                        } else {
-                            // Check for existing file
-                            const existingResultLink = $(this).find('.existing-file-link[data-file]').filter(function() {
-                                return $(this).closest('.col-md-3').find('#other_degree_result_file_' + degreeIndex).length > 0;
-                            });
-                            if (existingResultLink.length > 0) {
-                                otherDegreeResultFile = existingResultLink.attr('data-file');
-                            }
-                        }
-                        
                         // Only add other degree if at least one field has a value
                         if (otherDegree || universityName || percentage || passingYear || trial) {
                             const degreeData = {
@@ -4332,51 +4045,14 @@
                                 other_degree_university_name: universityName,
                                 other_degree_percentage: percentage,
                                 other_degree_passing_year: passingYear,
-                                other_degree_trial: trial,
-                                other_degree_result_file: otherDegreeResultFile
+                                other_degree_trial: trial
                             };
                             otherDegrees.push(degreeData);
-                            
-                            // Handle file uploads for this other degree
-                            if (otherDegreeResultFileInput && otherDegreeResultFileInput.files && otherDegreeResultFileInput.files.length > 0) {
-                                formData.append('other_degree_result_file_' + degreeIndex, otherDegreeResultFileInput.files[0]);
-                            } else if (otherDegreeResultFile && otherDegreeResultFile !== 'NEW_FILE_' + degreeIndex) {
-                                formData.append('other_degree_result_file_' + degreeIndex + '_existing', otherDegreeResultFile);
-                            }
                         }
                     });
                     
                     // Add other degrees data as JSON
                     formData.append('other_degrees', JSON.stringify(otherDegrees));
-                    
-                    // Handle other step 6 file fields
-                    const step6FileFields = [
-                        'ielts_result_file',
-                        'tenth_result_file',
-                        'twelfth_result_file',
-                        'graduation_result_file',
-                        'post_graduation_result_file'
-                    ];
-                    
-                    step6FileFields.forEach(function(fileField) {
-                        const fileInput = document.getElementById(fileField);
-                        if (fileInput && fileInput.files && fileInput.files.length > 0) {
-                            const file = fileInput.files[0];
-                            // Explicitly ensure file is in FormData
-                            formData.delete(fileField);
-                            formData.append(fileField, file);
-                            // Remove hidden field since new file is being uploaded
-                            $('#' + fileField + '_hidden').remove();
-                        } else {
-                            // If no new file but existing file exists, ensure hidden field is in FormData
-                            if ($('#' + fileField + '_hidden').length > 0) {
-                                const existingFileName = $('#' + fileField + '_hidden').val();
-                                if (existingFileName) {
-                                    formData.append(fileField + '_existing', existingFileName);
-                                }
-                            }
-                        }
-                    });
                 }
                 
                 // Ensure step 7 file uploads are included if selected
@@ -4392,38 +4068,6 @@
                         const companyName = $('#job_company_name_' + jobIndex).val() || '';
                         const salary = $('#job_salary_' + jobIndex).val() || '';
                         
-                        // Get job offer letter file
-                        const jobOfferLetterFileInput = document.getElementById('job_offer_letter_file_' + jobIndex);
-                        let jobOfferLetterFile = '';
-                        if (jobOfferLetterFileInput && jobOfferLetterFileInput.files && jobOfferLetterFileInput.files.length > 0) {
-                            // File will be handled separately in FormData
-                            jobOfferLetterFile = 'NEW_FILE_' + jobIndex;
-                        } else {
-                            // Check for existing file
-                            const existingOfferLink = $(this).find('.existing-file-link[data-file]').filter(function() {
-                                return $(this).closest('.col-md-3').find('#job_offer_letter_file_' + jobIndex).length > 0;
-                            });
-                            if (existingOfferLink.length > 0) {
-                                jobOfferLetterFile = existingOfferLink.attr('data-file');
-                            }
-                        }
-                        
-                        // Get job experience letter file
-                        const jobExperienceLetterFileInput = document.getElementById('job_experience_letter_file_' + jobIndex);
-                        let jobExperienceLetterFile = '';
-                        if (jobExperienceLetterFileInput && jobExperienceLetterFileInput.files && jobExperienceLetterFileInput.files.length > 0) {
-                            // File will be handled separately in FormData
-                            jobExperienceLetterFile = 'NEW_FILE_' + jobIndex;
-                        } else {
-                            // Check for existing file
-                            const existingExperienceLink = $(this).find('.existing-file-link[data-file]').filter(function() {
-                                return $(this).closest('.col-md-3').find('#job_experience_letter_file_' + jobIndex).length > 0;
-                            });
-                            if (existingExperienceLink.length > 0) {
-                                jobExperienceLetterFile = existingExperienceLink.attr('data-file');
-                            }
-                        }
-                        
                         // Only add job if at least one field has a value
                         if (durationFrom || durationTo || country || designation || companyName || salary) {
                             const jobData = {
@@ -4432,24 +4076,9 @@
                                 job_country: country,
                                 job_designation: designation,
                                 job_company_name: companyName,
-                                job_salary: salary,
-                                job_offer_letter_file: jobOfferLetterFile,
-                                job_experience_letter_file: jobExperienceLetterFile
+                                job_salary: salary
                             };
                             jobs.push(jobData);
-                            
-                            // Handle file uploads for this job
-                            if (jobOfferLetterFileInput && jobOfferLetterFileInput.files && jobOfferLetterFileInput.files.length > 0) {
-                                formData.append('job_offer_letter_file_' + jobIndex, jobOfferLetterFileInput.files[0]);
-                            } else if (jobOfferLetterFile && jobOfferLetterFile !== 'NEW_FILE_' + jobIndex) {
-                                formData.append('job_offer_letter_file_' + jobIndex + '_existing', jobOfferLetterFile);
-                            }
-                            
-                            if (jobExperienceLetterFileInput && jobExperienceLetterFileInput.files && jobExperienceLetterFileInput.files.length > 0) {
-                                formData.append('job_experience_letter_file_' + jobIndex, jobExperienceLetterFileInput.files[0]);
-                            } else if (jobExperienceLetterFile && jobExperienceLetterFile !== 'NEW_FILE_' + jobIndex) {
-                                formData.append('job_experience_letter_file_' + jobIndex + '_existing', jobExperienceLetterFile);
-                            }
                         }
                     });
                     
@@ -4457,56 +4086,6 @@
                     formData.append('jobs', JSON.stringify(jobs));
                 }
                 
-                // Ensure valuation_report_file is included if selected (for step 8)
-                if (currentStep === 8) {
-                    const valuationReportInput = document.getElementById('valuation_report_file');
-                    if (valuationReportInput && valuationReportInput.files && valuationReportInput.files.length > 0) {
-                        const file = valuationReportInput.files[0];
-                        // Explicitly ensure file is in FormData
-                        formData.delete('valuation_report_file');
-                        formData.append('valuation_report_file', file);
-                        // Remove hidden field since new file is being uploaded
-                        $('#valuation_report_file_hidden').remove();
-                    } else {
-                        // If no new file but existing file exists, ensure hidden field is in FormData
-                        if ($('#valuation_report_file_hidden').length > 0) {
-                            const existingFileName = $('#valuation_report_file_hidden').val();
-                            if (existingFileName) {
-                                formData.append('valuation_report_file_existing', existingFileName);
-                            }
-                        }
-                    }
-                }
-                
-                // Ensure step 9 file uploads are included if selected
-                if (currentStep === 9) {
-                    const step9FileFields = [
-                        'father_income_document_file',
-                        'mother_income_document_file',
-                        'candidate_income_document_file',
-                        'spouse_income_document_file'
-                    ];
-                    
-                    step9FileFields.forEach(function(fileField) {
-                        const fileInput = document.getElementById(fileField);
-                        if (fileInput && fileInput.files && fileInput.files.length > 0) {
-                            const file = fileInput.files[0];
-                            // Explicitly ensure file is in FormData
-                            formData.delete(fileField);
-                            formData.append(fileField, file);
-                            // Remove hidden field since new file is being uploaded
-                            $('#' + fileField + '_hidden').remove();
-                        } else {
-                            // If no new file but existing file exists, ensure hidden field is in FormData
-                            if ($('#' + fileField + '_hidden').length > 0) {
-                                const existingFileName = $('#' + fileField + '_hidden').val();
-                                if (existingFileName) {
-                                    formData.append(fileField + '_existing', existingFileName);
-                                }
-                            }
-                        }
-                    });
-                }
                 
                 // Add lead_id if exists
                 if (currentLeadId) {
@@ -4785,14 +4364,7 @@
                 }, 500);
             }
             
-            // Handle file input change - remove hidden field and existing file display when new file is selected
-            $(document).on('change', 'input[type="file"]', function() {
-                const fieldId = $(this).attr('id');
-                if (this.files && this.files.length > 0) {
-                    // New file selected - remove hidden field if exists
-                    $('#' + fieldId + '_hidden').remove();
-                }
-            });
+            // File inputs removed - no handlers needed
             
             updateTabNavigation();
             updateFooterButtons();
