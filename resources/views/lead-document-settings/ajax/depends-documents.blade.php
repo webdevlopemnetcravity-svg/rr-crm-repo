@@ -13,7 +13,7 @@
                         <a href="javascript:;" data-depends-document-id="{{ $dependsDocument->id }}" class="edit-depends-document task_view_more d-flex align-items-center justify-content-center" > <i class="fa fa-edit icons mr-2"></i>  @lang('app.edit')
                         </a>
                     </div>
-                    <div class="task_view mt-1 mt-lg-0 mt-md-0">
+                    <div class="task_view mt-1 mt-lg-0 mt-md-0 d-none">
                         <a href="javascript:;" class="delete-table-row delete-depends-document task_view_more d-flex align-items-center justify-content-center" data-depends-document-id="{{ $dependsDocument->id }}">
                             <i class="fa fa-trash icons mr-2"></i> @lang('app.delete')
                         </a>
