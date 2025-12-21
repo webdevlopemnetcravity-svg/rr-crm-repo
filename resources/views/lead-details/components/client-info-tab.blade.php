@@ -1167,7 +1167,7 @@
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <h5 class="modal-title invoice-view-title">VIEW CLIENT INFO</h5>
                         <div class="d-flex align-items-center">
-                            <button type="button" class="btn invoice-download-btn client-info-download-btn">
+                            <button type="button" class="btn client-info-download-btn">
                                 <i class="fa fa-download mr-1"></i> Download Client Info
                             </button>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">

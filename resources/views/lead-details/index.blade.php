@@ -2556,6 +2556,7 @@
         // Handle Download Client Info button click in modal
         $(document).on('click', '.client-info-download-btn', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             
             // Check if html2pdf is loaded
             if (typeof html2pdf === 'undefined') {
