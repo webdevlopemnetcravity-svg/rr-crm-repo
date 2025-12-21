@@ -120,17 +120,6 @@
                     @endif
                 </div>
 
-                <!-- View Resume Button -->
-                @if(isset($lead) && $lead && !empty($resumeFile))
-                    @if($resumeUrl)
-                        <a href="{{ $resumeUrl }}" target="_blank" class="btn btn-success btn-sm">View Resume</a>
-                    @else
-                        <a href="{{ route('lead-details.download-document', ['leadId' => $lead->id, 'documentKey' => 'upload_resume']) }}" target="_blank" class="btn btn-success btn-sm">View Resume</a>
-                    @endif
-                @else
-                    <button class="btn btn-success btn-sm" disabled>View Resume</button>
-                @endif
-
                 <!-- Service Name and Action Icons -->
                 <div class="lead-header-right-group d-flex align-items-center">
                     <div class="lead-service-actions-group d-flex align-items-center">
@@ -163,7 +152,7 @@
                                     @endphp
                                     {{ $serviceName }}
                                 @else
-                                    PR - Employer Nomination Scheme (ENS)(Subclass 186)
+                                    &nbsp;
                                 @endif
                             </div>
                         </div>
