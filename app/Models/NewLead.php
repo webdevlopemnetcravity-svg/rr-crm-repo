@@ -129,4 +129,12 @@ class NewLead extends BaseModel
     {
         return $this->hasOne(NewLeadTravelDetail::class, 'new_lead_id');
     }
+
+    /**
+     * Get the documents for this lead.
+     */
+    public function documents(): HasOne
+    {
+        return $this->hasOne(NewLeadDocument::class, 'lead_id');
+    }
 }

@@ -11,6 +11,59 @@
         .bootstrap-select .dropdown-menu li.disabled {
             display: none !important;
         }
+        
+        /* Document Section Styles */
+        .document-section {
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+        }
+        
+        .document-section-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .document-section-header:hover {
+            background: #e9ecef;
+        }
+        
+        .document-section-header[aria-expanded="true"] .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        
+        .document-section-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: none !important;
+        }
+        
+        .document-section-title .fa-chevron-down {
+            transition: transform 0.3s;
+            font-size: 14px;
+        }
+        
+        .document-section-body {
+            padding: 20px;
+        }
+        
+        .document-checklist-table {
+            margin-bottom: 0;
+        }
+        
+        .document-checklist-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
     </style>
 @endpush
 
@@ -1795,12 +1848,16 @@
             
             var documentKey = $(this).data('document-key');
             var documentName = $(this).data('document-name');
+            var applicantType = $(this).data('applicant-type') || 'main_applicant';
+            var childIndex = $(this).data('child-index') || '';
             
             if (!documentKey) {
                 return;
             }
             
             $('#document_key_input').val(documentKey);
+            $('#applicant_type_input').val(applicantType);
+            $('#child_index_input').val(childIndex);
             $('#document_name_label').text(documentName || 'Document');
             $('#documentUploadModalLabel').text($(this).hasClass('document-change-link') ? 'Change Document' : 'Upload Document');
             $('#document_file_input').val('');
@@ -1850,6 +1907,11 @@
             
             var formData = new FormData();
             formData.append('document_key', documentKey);
+            formData.append('applicant_type', $('#applicant_type_input').val() || 'main_applicant');
+            var childIndex = $('#child_index_input').val();
+            if (childIndex) {
+                formData.append('child_index', childIndex);
+            }
             formData.append('document_file', fileInput.files[0]);
             formData.append('_token', '{{ csrf_token() }}');
             

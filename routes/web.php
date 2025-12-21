@@ -569,6 +569,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::get('lead-details/{leadId}/view-process-document/{documentField}', [LeadContactController::class, 'viewProcessDocument'])->name('lead-details.view-process-document');
     // Specific routes must come before generic route
     Route::get('lead-details/{leadId}/download-document/{documentKey}', [LeadContactController::class, 'downloadLeadDocument'])->name('lead-details.download-document');
+    Route::get('lead-details/{leadId}/download-document/{documentKey}/{applicantType}', [LeadContactController::class, 'downloadLeadDocument'])->name('lead-details.download-document-with-type');
+    Route::get('lead-details/{leadId}/download-document/{documentKey}/{applicantType}/{childIndex}', [LeadContactController::class, 'downloadLeadDocument'])->name('lead-details.download-document-with-child');
     Route::post('lead-details/{leadId}/send-template-document/{documentId}', [LeadContactController::class, 'sendTemplateDocumentEmail'])->name('lead-details.send-template-document');
     Route::post('lead-details/{leadId}/send-template-document-whatsapp/{documentId}', [LeadContactController::class, 'sendTemplateDocumentWhatsApp'])->name('lead-details.send-template-document-whatsapp');
     Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
