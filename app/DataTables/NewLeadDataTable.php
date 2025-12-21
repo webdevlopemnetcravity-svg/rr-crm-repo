@@ -344,27 +344,13 @@ class NewLeadDataTable extends BaseDataTable
         $datatables->addColumn('action_new', function ($row) {
             $action = '<div class="action-info d-flex align-items-center justify-content-end">';
             
+            // Only show avatar if lead is assigned
             if ($row->leadOwner) {
                 $ownerImage = $row->leadOwner->image_url;
                 $ownerName = $row->leadOwner->name;
                 $action .= '<img src="' . $ownerImage . '" class="rounded-circle mr-2" style="width: 32px; height: 32px; object-fit: cover;" alt="' . $ownerName . '" title="' . $ownerName . '">';
-            } else {
-                // Get 2 letters from client name
-                $clientName = $row->client_name ?? 'NA';
-                $initials = strtoupper(substr($clientName, 0, 2));
-                if (strlen($clientName) > 1) {
-                    // Try to get first letter of first and last word
-                    $nameParts = explode(' ', trim($clientName));
-                    if (count($nameParts) > 1) {
-                        $initials = strtoupper(substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts) - 1], 0, 1));
-                    } else {
-                        $initials = strtoupper(substr($clientName, 0, 2));
-                    }
-                }
-                $action .= '<div class="rounded-circle bg-light-grey d-flex align-items-center justify-content-center mr-2" style="width: 32px; height: 32px;">
-                                <span class="f-12 text-dark-grey f-w-500">' . $initials . '</span>
-                            </div>';
             }
+            // Hide avatar circle when lead is not assigned
             
             // Add edit button - always visible regardless of status
             $editUrl = route('add-lead.index', ['lead_id' => $row->id]);
