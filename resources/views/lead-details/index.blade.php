@@ -80,6 +80,38 @@
             vertical-align: sub;
             margin-left: 10px;
         }
+        
+        /* Profile Avatar Upload Styles */
+        #lead-profile-avatar {
+            background-color: #f0f0f0;
+            border: 2px solid #ddd;
+            transition: all 0.3s ease;
+        }
+        
+        #lead-profile-avatar:hover {
+            border-color: #007bff;
+            transform: scale(1.05);
+        }
+        
+        #lead-profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .profile-upload-overlay {
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .profile-upload-overlay.profile-overlay-hover {
+            display: flex !important;
+        }
+        
+        #lead-profile-avatar {
+            pointer-events: auto;
+            display: inline-block;
+        }
     </style>
 @endpush
 
@@ -98,9 +130,23 @@
                 <!-- Left Section: Avatar + Priority + Lead ID -->
                 <div class="lead-header-left-group d-flex align-items-center">
                     <div class="lead-avatar-section d-flex align-items-center">
-                        <div class="lead-avatar-circle text-white rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
-                            <img src="{{ asset('img/icon/User.svg') }}">
-                        </div>
+                        <label for="profile-image-input" class="lead-avatar-circle text-white rounded-circle d-flex align-items-center justify-content-center mr-3 position-relative mb-0" style="width: 50px; height: 50px; cursor: pointer; overflow: hidden;" id="lead-profile-avatar" title="Click to upload profile image">
+                            @if(isset($lead) && $lead && $lead->profile_image)
+                                <img src="{{ asset_url_local_s3('lead-profile-images/' . $lead->profile_image) }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;" class="profile-image">
+                            @else
+                                <img src="{{ asset('img/icon/User.svg') }}" alt="Profile" id="profile-placeholder-img" class="profile-image">
+                            @endif
+                            @if(isset($lead) && $lead && $lead->profile_image)
+                                <div class="profile-upload-overlay profile-overlay-hover" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; color: white; font-size: 16px; z-index: 10; pointer-events: none;">
+                                    <i class="fa fa-camera"></i>
+                                </div>
+                            @else
+                                <div class="profile-upload-overlay profile-overlay-default" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; z-index: 10; pointer-events: none;">
+                                    <i class="fa fa-camera"></i>
+                                </div>
+                            @endif
+                        </label>
+                        <input type="file" id="profile-image-input" accept="image/*" style="display: none;">
                         <div class="lead-info-group">
                             <div class="lead-priority d-flex align-items-center mb-1">
                                 @if(isset($lead) && $lead)
@@ -314,6 +360,133 @@
         $(document).ready(function() {
             // Initialize select pickers
             $('.select-picker').selectpicker();
+            
+            // Profile Image Upload Functionality
+            var leadId = @json(isset($lead) && $lead ? $lead->id : null);
+            
+            if (leadId) {
+                // Show overlay on hover only if image is set
+                var hasProfileImage = @json(isset($lead) && $lead && $lead->profile_image ? true : false);
+                if (hasProfileImage) {
+                    // Set initial opacity to 0
+                    $('#lead-profile-avatar').find('.profile-overlay-hover').css('opacity', '0');
+                    $('#lead-profile-avatar').on('mouseenter', function() {
+                        $(this).find('.profile-overlay-hover').css('opacity', '1');
+                    }).on('mouseleave', function() {
+                        $(this).find('.profile-overlay-hover').css('opacity', '0');
+                    });
+                }
+                
+                // Handle file selection
+                $('#profile-image-input').on('change', function(e) {
+                    var file = e.target.files[0];
+                    if (!file) {
+                        return;
+                    }
+                    
+                    // Validate file type
+                    if (!file.type.match('image.*')) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Please select a valid image file.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                        return;
+                    }
+                    
+                    // Validate file size (2MB)
+                    if (file.size > 2048 * 1024) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Image size should be less than 2MB.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                        return;
+                    }
+                    
+                    // Show preview
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var img = $('#lead-profile-avatar').find('img');
+                        if (img.attr('id') === 'profile-placeholder-img') {
+                            img.attr('src', e.target.result);
+                            img.removeAttr('id');
+                        } else {
+                            img.attr('src', e.target.result);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Upload file
+                    var formData = new FormData();
+                    formData.append('profile_image', file);
+                    formData.append('_token', '{{ csrf_token() }}');
+                    
+                    $.ajax({
+                        url: '{{ route("lead-details.upload-profile-image", ":leadId") }}'.replace(':leadId', leadId),
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    text: response.message || 'Profile image uploaded successfully.',
+                                    toast: true,
+                                    position: 'top-end',
+                                    timer: 3000,
+                                    showConfirmButton: false
+                                });
+                                // Update image source with the returned URL
+                                $('#lead-profile-avatar').find('img').attr('src', response.image_url);
+                                // Remove placeholder ID if it exists
+                                $('#lead-profile-avatar').find('img').removeAttr('id');
+                                // Update overlay - hide default overlay and show hover overlay
+                                $('.profile-overlay-default').remove();
+                                if ($('.profile-overlay-hover').length === 0) {
+                                    $('#lead-profile-avatar').append('<div class="profile-upload-overlay profile-overlay-hover" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; color: white; font-size: 16px; z-index: 10; pointer-events: none; opacity: 0;"><i class="fa fa-camera"></i></div>');
+                                }
+                                // Add hover handlers for the newly uploaded image
+                                $('#lead-profile-avatar').off('mouseenter mouseleave').on('mouseenter', function() {
+                                    $(this).find('.profile-overlay-hover').css('opacity', '1');
+                                }).on('mouseleave', function() {
+                                    $(this).find('.profile-overlay-hover').css('opacity', '0');
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    text: response.message || 'Failed to upload profile image.',
+                                    toast: true,
+                                    position: 'top-end',
+                                    timer: 3000,
+                                    showConfirmButton: false
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            var errorMsg = 'Failed to upload profile image.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+                            Swal.fire({
+                                icon: 'error',
+                                text: errorMsg,
+                                toast: true,
+                                position: 'top-end',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                        }
+                    });
+                });
+            }
             
             // Check if there's a hash in URL to activate specific tab
             if (window.location.hash) {

@@ -16,6 +16,7 @@ class NewLead extends BaseModel
     protected $fillable = [
         'company_id',
         'client_name',
+        'profile_image',
         'client_email',
         'mobile',
         'lead_source',

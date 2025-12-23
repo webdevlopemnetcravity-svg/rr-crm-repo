@@ -5098,5 +5098,53 @@ class LeadContactController extends AccountBaseController
         return Reply::success(__('messages.recordSaved'));
     }
 
+    /**
+     * Upload profile image for a lead
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $leadId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadProfileImage(Request $request, $leadId)
+    {
+        $lead = NewLead::findOrFail($leadId);
+        
+        // Check permissions
+        $this->editPermission = user()->permission('edit_lead');
+        abort_403(!($this->editPermission == 'all'
+            || ($this->editPermission == 'added' && $lead->added_by == user()->id)
+            || ($this->editPermission == 'owned' && $lead->lead_owner == user()->id)
+            || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
+        ));
+
+        $request->validate([
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        try {
+            // Delete old profile image if exists
+            if ($lead->profile_image) {
+                \App\Helper\Files::deleteFile($lead->profile_image, 'lead-profile-images');
+            }
+
+            // Upload new profile image
+            $imageName = \App\Helper\Files::uploadLocalOrS3($request->file('profile_image'), 'lead-profile-images', 200, 200);
+            
+            // Update lead with new profile image
+            $lead->profile_image = $imageName;
+            $lead->last_updated_by = user()->id;
+            $lead->save();
+
+            $imageUrl = asset_url_local_s3('lead-profile-images/' . $imageName);
+
+            return Reply::successWithData(__('messages.updateSuccess'), [
+                'image_url' => $imageUrl,
+                'image_name' => $imageName
+            ]);
+        } catch (\Exception $e) {
+            return Reply::error(__('messages.errorOccured') . ': ' . $e->getMessage());
+        }
+    }
+
 }
 
