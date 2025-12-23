@@ -31,6 +31,7 @@ class NewLeadAccount extends BaseModel
         'installment_months',
         'invoice_notes',
         'invoice_file',
+        'status',
         'added_by',
         'last_updated_by',
     ];

@@ -4928,6 +4928,7 @@ class LeadContactController extends AccountBaseController
         $account->installment_payment = $request->has('installment_payment') ? true : false;
         $account->installment_months = $request->installment_months;
         $account->invoice_notes = $request->invoice_notes;
+        $account->status = $request->status ?? 'pending';
 
         $account->save();
 
@@ -4956,6 +4957,23 @@ class LeadContactController extends AccountBaseController
         $account->delete();
 
         return Reply::success(__('messages.deleteSuccess'));
+    }
+
+    /**
+     * Update account status
+     */
+    public function updateAccountStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,received',
+        ]);
+
+        $account = \App\Models\NewLeadAccount::findOrFail($id);
+        $account->status = $request->status;
+        $account->last_updated_by = user()->id;
+        $account->save();
+
+        return Reply::success(__('messages.updateSuccess'));
     }
 
     /**

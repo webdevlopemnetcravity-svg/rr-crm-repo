@@ -3068,6 +3068,69 @@
             });
         });
 
+        // Handle Account Status Change
+        $(document).on('change', '.account-status-select', function(e) {
+            e.preventDefault();
+            var accountId = $(this).data('account-id');
+            var newStatus = $(this).val();
+            var $select = $(this);
+            
+            $.easyAjax({
+                url: "{{ route('new-leads.account-update-status', ':id') }}".replace(':id', accountId),
+                type: "POST",
+                data: {
+                    '_token': "{{ csrf_token() }}",
+                    'status': newStatus
+                },
+                blockUI: true,
+                success: function(response) {
+                    if (response.status == "success") {
+                        // Update the badge in the list
+                        var $row = $select.closest('.list-group-item');
+                        var $badge = $row.find('.badge');
+                        $badge.removeClass('badge-success badge-warning');
+                        if (newStatus === 'received') {
+                            $badge.addClass('badge-success').text('Received');
+                        } else {
+                            $badge.addClass('badge-warning').text('Pending');
+                        }
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message || 'Status updated successfully.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    // Revert dropdown to previous value
+                    var previousStatus = $select.data('previous-status') || 'pending';
+                    $select.val(previousStatus);
+                    
+                    var errorMsg = 'Failed to update status.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        text: errorMsg,
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        // Store previous status when dropdown is focused
+        $(document).on('focus', '.account-status-select', function() {
+            $(this).data('previous-status', $(this).val());
+        });
+
         // Handle Delete Account button click
         $(document).on('click', '.delete-account-btn', function(e) {
             e.preventDefault();

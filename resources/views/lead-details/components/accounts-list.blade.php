@@ -10,8 +10,18 @@
                 <div class="list-group-item d-flex justify-content-between align-items-center" style="border: none; border-bottom: 1px solid #E0E0E0; padding: 16px 0;">
                     <div class="invoice-info-simple f-14 text-darkest-grey">
                         Invoice {{ $leadId }} | {{ $clientName }} | {{ $invoiceDate }}
+                        @php
+                            $status = $account->status ?? 'pending';
+                            $statusClass = $status === 'received' ? 'badge-success' : 'badge-warning';
+                            $statusText = ucfirst($status);
+                        @endphp
+                        <span class="badge {{ $statusClass }} ml-2" style="font-size: 11px; padding: 4px 8px;">{{ $statusText }}</span>
                     </div>
                     <div class="d-flex align-items-center">
+                        <select class="form-control form-control-sm account-status-select mr-3" data-account-id="{{ $account->id }}" style="width: 120px; height: 30px; font-size: 12px;">
+                            <option value="pending" {{ $status === 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="received" {{ $status === 'received' ? 'selected' : '' }}>Received</option>
+                        </select>
                         <a href="javascript:;" class="view-account-btn mr-3" data-account-id="{{ $account->id }}" style="color: #000; text-decoration: none;">
                             <i class="fa fa-eye" style="font-size: 18px;"></i>
                         </a>

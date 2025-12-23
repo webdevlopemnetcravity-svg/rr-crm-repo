@@ -557,6 +557,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::get('new-leads/account/{id}/download', [LeadContactController::class, 'downloadAccountInvoice'])->name('new-leads.account-download');
     Route::get('new-leads/account/{id}', [LeadContactController::class, 'getNewLeadAccount'])->name('new-leads.account-get');
     Route::delete('new-leads/account/{id}', [LeadContactController::class, 'deleteNewLeadAccount'])->name('new-leads.account-delete');
+    Route::post('new-leads/account/{id}/update-status', [LeadContactController::class, 'updateAccountStatus'])->name('new-leads.account-update-status');
     Route::get('new-leads/accounts/{id}', [LeadContactController::class, 'getNewLeadAccounts'])->name('new-leads.accounts');
     Route::get('new-leads/documents-tab/{id}', [LeadContactController::class, 'getNewLeadDocumentsTab'])->name('new-leads.documents-tab');
     Route::get('new-leads/{leadId}/master-documents', [LeadContactController::class, 'getMasterDocumentsForSection'])->name('new-leads.master-documents');
