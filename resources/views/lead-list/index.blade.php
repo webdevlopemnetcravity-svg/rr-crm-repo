@@ -204,8 +204,13 @@
             </div>
             <!-- Lead Statistics End -->
 
-            <div class="btn-group mt-2 mt-lg-0 mt-md-0 ml-0 ml-lg-3 ml-md-3" role="group">
+            <div class="mt-2 mt-lg-0 mt-md-0 ml-0 ml-lg-3 ml-md-3">
                 <a href="javascript:;" class="img-lightbox btn btn-secondary f-14" data-image-url="http://127.0.0.1:8000/img/estimate-lc.png" data-toggle="tooltip" data-original-title="The system allows for the addition of further information regarding a lead directly from this view. To access and edit the detailed profile of any specific lead, users may click on the respective entry, which will navigate them to the dedicated Lead Detail Page."><i class="side-icon bi bi-question-circle"></i></a>
+                @if (in_array('admin', user_roles()))
+                    <x-forms.button-primary class="ml-2 mb-2 mb-lg-0" icon="plus" id="import-lead-btn">
+                        Import Lead
+                    </x-forms.button-primary>
+                @endif
             </div>
 
             <!-- Quick Actions Start -->
@@ -363,6 +368,54 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">@lang('app.cancel')</button>
                         <x-forms.button-primary id="save-reassign-lead" icon="check">@lang('app.reassign')</x-forms.button-primary>
+                    </div>
+                </x-form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Lead Modal -->
+    <div class="modal fade" id="importLeadModal" tabindex="-1" role="dialog" aria-labelledby="importLeadModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importLeadModalLabel">Import Lead</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <x-form id="importLeadForm" method="POST" class="ajax-form" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">Choose File <span class="text-danger">*</span></label>
+                            <input type="file" name="import_file" id="import_file" class="form-control height-35 f-14" accept=".xlsx,.xls" required>
+                            <small class="form-text text-muted">Accepted formats: XLSX, XLS (Max: 10MB)</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">Added By <span class="text-danger">*</span></label>
+                            <select name="added_by" id="import_added_by" class="form-control select-picker height-35 f-14" data-live-search="true" required>
+                                <option value="">-- Select User --</option>
+                                @foreach(\App\Models\User::allEmployees(null, 'active', null, company()->id) as $employee)
+                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">Template File</label>
+                            <div>
+                                <a href="{{ route('lead-list.download-import-template') }}" class="btn btn-secondary f-14" download>
+                                    <i class="fa fa-download"></i> Download Template XLSX File
+                                </a>
+                            </div>
+                            <small class="form-text text-muted">Download the template file and fill in the required fields: Surname, Given Name, Primary Phone No, Email</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" id="import-lead-submit-btn" class="btn btn-primary f-14">
+                            <i class="fa fa-upload mr-1"></i> Import
+                        </button>
                     </div>
                 </x-form>
             </div>
@@ -1318,6 +1371,103 @@
             var currentOwner = $(this).data('current-owner');
             
             openReassignDialog(leadId, leadNumber, clientName, currentOwner);
+        });
+
+        // Import Lead Modal
+        $('#import-lead-btn').on('click', function() {
+            $('#importLeadModal').modal('show');
+        });
+
+        // Initialize select picker when modal is shown
+        $('#importLeadModal').on('shown.bs.modal', function() {
+            $('#import_added_by').selectpicker();
+        });
+
+        // Reset form when modal is hidden
+        $('#importLeadModal').on('hidden.bs.modal', function() {
+            $('#importLeadForm')[0].reset();
+            $('#import_added_by').selectpicker('refresh');
+        });
+
+        // Handle Import Lead Button Click
+        $(document).on('click', '#import-lead-submit-btn', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            var fileInput = $('#import_file')[0];
+            var addedBy = $('#import_added_by').val();
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Please select a file to import.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+            
+            if (!addedBy) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Please select a user for "Added By" field.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+            
+            var formData = new FormData($('#importLeadForm')[0]);
+            var url = '{{ route("lead-list.import") }}';
+            
+            $.easyAjax({
+                url: url,
+                type: 'POST',
+                file: true,
+                container: '#importLeadForm',
+                blockUI: true,
+                buttonSelector: '#import-lead-submit-btn',
+                data: formData,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#importLeadModal').modal('hide');
+                        $('#importLeadForm')[0].reset();
+                        $('#import_added_by').selectpicker('refresh');
+                        Swal.fire({
+                            icon: 'success',
+                            text: response.message || 'Leads imported successfully.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                        // Reload the datatable
+                        if (typeof window.LaravelDataTables !== 'undefined' && window.LaravelDataTables['lead-list-table']) {
+                            window.LaravelDataTables['lead-list-table'].draw();
+                        } else {
+                            location.reload();
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    var errorMsg = 'Failed to import leads.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        text: errorMsg,
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                }
+            });
         });
 
         // Open reassign dialog when clicking on unassigned lead row

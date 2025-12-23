@@ -579,6 +579,8 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
     Route::post('lead-details/{leadId}/send-template-document/{documentId}', [LeadContactController::class, 'sendTemplateDocumentEmail'])->name('lead-details.send-template-document');
     Route::get('lead-dashboard', [LeadContactController::class, 'leadDashboard'])->name('lead-dashboard.index');
+    Route::get('lead-list/download-import-template', [LeadContactController::class, 'downloadImportTemplate'])->name('lead-list.download-import-template');
+    Route::post('lead-list/import', [LeadContactController::class, 'importNewLeads'])->name('lead-list.import');
     
     // Step-by-step lead saving routes
     Route::post('add-lead/save-step/{stepNumber}', [LeadContactController::class, 'saveStep'])->name('add-lead.save-step');

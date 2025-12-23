@@ -39,6 +39,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class LeadContactController extends AccountBaseController
 {
@@ -5143,6 +5145,195 @@ class LeadContactController extends AccountBaseController
             ]);
         } catch (\Exception $e) {
             return Reply::error(__('messages.errorOccured') . ': ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Download import template file
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function downloadImportTemplate()
+    {
+        abort_403(!in_array('admin', user_roles()));
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set headers
+        $headers = ['Surname', 'Given Name', 'Primary Phone No', 'Email'];
+        $sheet->fromArray($headers, null, 'A1');
+
+        // Style header row
+        $headerStyle = [
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E0E0E0']
+            ]
+        ];
+        $sheet->getStyle('A1:D1')->applyFromArray($headerStyle);
+
+        // Set column widths
+        $sheet->getColumnDimension('A')->setWidth(20);
+        $sheet->getColumnDimension('B')->setWidth(20);
+        $sheet->getColumnDimension('C')->setWidth(20);
+        $sheet->getColumnDimension('D')->setWidth(30);
+
+        // Add sample data row
+        $sampleData = ['Doe', 'John', '+1234567890', 'john.doe@example.com'];
+        $sheet->fromArray($sampleData, null, 'A2');
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'lead_import_template.xlsx';
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Import new leads from Excel file
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function importNewLeads(Request $request)
+    {
+        abort_403(!in_array('admin', user_roles()));
+
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls|max:10240',
+            'added_by' => 'required|exists:users,id',
+        ]);
+
+        try {
+            $file = $request->file('import_file');
+            $addedBy = $request->added_by;
+
+            $data = \Maatwebsite\Excel\Facades\Excel::toArray([], $file);
+            
+            if (empty($data) || empty($data[0])) {
+                return Reply::error('The file is empty or invalid.');
+            }
+
+            $rows = $data[0];
+            $headerRow = array_shift($rows); // Remove header row
+
+            // Validate headers
+            $expectedHeaders = ['Surname', 'Given Name', 'Primary Phone No', 'Email'];
+            $headerMap = [];
+            foreach ($expectedHeaders as $expected) {
+                $index = array_search($expected, $headerRow);
+                if ($index === false) {
+                    return Reply::error("Missing required column: {$expected}");
+                }
+                $headerMap[$expected] = $index;
+            }
+
+            $imported = 0;
+            $errors = [];
+
+            foreach ($rows as $index => $row) {
+                $rowNum = $index + 2; // +2 because we removed header and arrays are 0-indexed
+
+                // Skip empty rows
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+
+                $surname = trim($row[$headerMap['Surname']] ?? '');
+                $givenName = trim($row[$headerMap['Given Name']] ?? '');
+                $primaryPhone = trim($row[$headerMap['Primary Phone No']] ?? '');
+                $email = trim($row[$headerMap['Email']] ?? '');
+
+                // Validate required fields
+                if (empty($surname)) {
+                    $errors[] = "Row {$rowNum}: Surname is required";
+                    continue;
+                }
+                if (empty($givenName)) {
+                    $errors[] = "Row {$rowNum}: Given Name is required";
+                    continue;
+                }
+                if (empty($primaryPhone)) {
+                    $errors[] = "Row {$rowNum}: Primary Phone No is required";
+                    continue;
+                }
+                if (empty($email)) {
+                    $errors[] = "Row {$rowNum}: Email is required";
+                    continue;
+                }
+
+                // Validate email format
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = "Row {$rowNum}: Invalid email format: {$email}";
+                    continue;
+                }
+
+                // Check for duplicate email
+                $existingLead = NewLead::where('client_email', $email)
+                    ->where('company_id', company()->id)
+                    ->first();
+
+                if ($existingLead) {
+                    $errors[] = "Row {$rowNum}: Lead with email {$email} already exists";
+                    continue;
+                }
+
+                // Create new lead
+                $lead = new NewLead();
+                $lead->company_id = company()->id;
+                $lead->client_name = trim($surname . ' ' . $givenName);
+                $lead->client_email = $email;
+                $lead->mobile = $primaryPhone;
+                $lead->added_by = $addedBy;
+                $lead->last_updated_by = user()->id;
+                $lead->lead_status = 'Untouched';
+                $lead->lead_quality = 'Assigned';
+
+                // Store in step_1_data
+                $lead->step_1_data = [
+                    'surname' => $surname,
+                    'given_name' => $givenName,
+                    'primary_phone' => $primaryPhone,
+                    'email_address' => $email,
+                ];
+
+                $lead->save();
+
+                // Create lead step status entry with all steps set to 0 (false) and final_status as 'draft'
+                LeadStepStatus::create([
+                    'lead_id' => $lead->id,
+                    'step_1_completed' => false,
+                    'step_2_completed' => false,
+                    'step_3_completed' => false,
+                    'step_4_completed' => false,
+                    'step_5_completed' => false,
+                    'step_6_completed' => false,
+                    'step_7_completed' => false,
+                    'step_8_completed' => false,
+                    'step_9_completed' => false,
+                    'final_status' => 'draft',
+                ]);
+
+                $imported++;
+            }
+
+            $message = "Successfully imported {$imported} lead(s).";
+            if (!empty($errors)) {
+                $message .= " " . count($errors) . " error(s) occurred.";
+                \Log::warning('Lead import errors', ['errors' => $errors]);
+            }
+
+            return Reply::successWithData($message, [
+                'imported' => $imported,
+                'errors' => $errors
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Lead import error: ' . $e->getMessage());
+            return Reply::error('Failed to import leads: ' . $e->getMessage());
         }
     }
 
