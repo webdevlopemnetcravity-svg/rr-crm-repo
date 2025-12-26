@@ -6,113 +6,6 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/lead-details.css') }}">
-    <style>
-        /* Hide disabled subclass options completely */
-        .bootstrap-select .dropdown-menu li.disabled {
-            display: none !important;
-        }
-        
-        /* Document Section Styles */
-        .document-section {
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            background: #fff;
-        }
-        
-        .document-section-header {
-            padding: 15px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .document-section-header:hover {
-            background: #e9ecef;
-        }
-        
-        .document-section-header[aria-expanded="true"] .fa-chevron-down {
-            transform: rotate(180deg);
-        }
-        
-        .document-section-title {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-transform: none !important;
-            flex: 1;
-            cursor: pointer;
-        }
-        
-        .add-required-document-btn {
-            margin-left: auto;
-            white-space: nowrap;
-            z-index: 10;
-            position: relative;
-        }
-        
-        .document-section-title .fa-chevron-down {
-            transition: transform 0.3s;
-            font-size: 14px;
-        }
-        
-        .document-section-body {
-            padding: 20px;
-        }
-        
-        .document-checklist-table {
-            margin-bottom: 0;
-        }
-        
-        .document-checklist-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            border-bottom: 2px solid #dee2e6;
-        }
-        .list-group-item .form-check-label {
-            vertical-align: sub;
-            margin-left: 10px;
-        }
-        
-        /* Profile Avatar Upload Styles */
-        #lead-profile-avatar {
-            background-color: #f0f0f0;
-            border: 2px solid #ddd;
-            transition: all 0.3s ease;
-        }
-        
-        #lead-profile-avatar:hover {
-            border-color: #007bff;
-            transform: scale(1.05);
-        }
-        
-        #lead-profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .profile-upload-overlay {
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-        
-        .profile-upload-overlay.profile-overlay-hover {
-            display: flex !important;
-        }
-        
-        #lead-profile-avatar {
-            pointer-events: auto;
-            display: inline-block;
-        }
-    </style>
 @endpush
 
 @push('head-scripts')
@@ -137,11 +30,11 @@
                                 <img src="{{ asset('img/icon/User.svg') }}" alt="Profile" id="profile-placeholder-img" class="profile-image">
                             @endif
                             @if(isset($lead) && $lead && $lead->profile_image)
-                                <div class="profile-upload-overlay profile-overlay-hover" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; color: white; font-size: 16px; z-index: 10; pointer-events: none;">
+                                <div class="profile-upload-overlay profile-overlay-hover" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; color: white; font-size: 16px; z-index: 1; pointer-events: none;">
                                     <i class="fa fa-camera"></i>
                                 </div>
                             @else
-                                <div class="profile-upload-overlay profile-overlay-default" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; z-index: 10; pointer-events: none;">
+                                <div class="profile-upload-overlay profile-overlay-default" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; z-index: 1; pointer-events: none;">
                                     <i class="fa fa-camera"></i>
                                 </div>
                             @endif
