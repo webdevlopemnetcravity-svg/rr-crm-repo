@@ -142,21 +142,14 @@ class LeadContactController extends AccountBaseController
             $allLeadsQuery = NewLead::query();
             $myLeadsQuery = NewLead::query();
             
-            // Apply view permission filters for "All Leads"
-            if ($viewPermission == 'owned') {
-                $allLeadsQuery->where('lead_owner', user()->id);
-            } elseif ($viewPermission == 'added') {
-                $allLeadsQuery->where('added_by', user()->id);
-            } elseif ($viewPermission == 'both') {
-                $allLeadsQuery->where(function ($query) {
-                    $query->where('lead_owner', user()->id)
-                          ->orWhere('added_by', user()->id);
-                });
-            }
-            // If 'all', no filter needed
+            // "All Leads" - count all leads regardless of permissions
+            // No filter needed for all leads count
             
-            // "My Leads" - only leads assigned to current user (lead_owner)
-            $myLeadsQuery->where('lead_owner', user()->id);
+            // "My Leads" - leads owned OR added by current user
+            $myLeadsQuery->where(function ($query) {
+                $query->where('lead_owner', user()->id)
+                      ->orWhere('added_by', user()->id);
+            });
             
             $this->allLeadsCount = $allLeadsQuery->count();
             $this->myLeadsCount = $myLeadsQuery->count();
@@ -171,7 +164,28 @@ class LeadContactController extends AccountBaseController
         $this->addLeadPermission = user()->permission('add_lead');
         abort_403(!in_array($this->addLeadPermission, ['all', 'added']));
 
+        // Check user roles for access control
+        $userRoles = user_roles();
+        $isReceptionist = in_array('receptionist', $userRoles);
+        $isConsultant = in_array('consultant', $userRoles);
+        $isAdmin = in_array('admin', $userRoles);
+
         $this->pageTitle = 'app.addLead';
+
+        // Set custom breadcrumb
+        $this->customBreadcrumb = [
+            [
+                'text' => __('app.menu.home'),
+                'url' => route('dashboard')
+            ],
+            [
+                'text' => __('app.leadList'),
+                'url' => route('lead-list.index')
+            ],
+            [
+                'text' => __('app.addLead')
+            ]
+        ];
 
         $defaultStatus = LeadStatus::where('default', '1')->first();
         $this->columnId = request('column_id') ?: $defaultStatus->id;
@@ -203,8 +217,19 @@ class LeadContactController extends AccountBaseController
         $this->leadStages = PipelineStage::all();
         $this->leadAgentArray = $this->leadAgents->pluck('user_id')->toArray();
         $this->products = Product::all();
-        // Get employees from the same organization
-        $this->employees = User::allEmployees(null, 'active', null, company()->id);
+        // Get employees from the same organization with Consultant role only
+        $this->employees = User::withRole('consultant')
+            ->join('employee_details', 'employee_details.user_id', '=', 'users.id')
+            ->leftJoin('designations', 'employee_details.designation_id', '=', 'designations.id')
+            ->join('role_user', 'role_user.user_id', '=', 'users.id')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->select('users.id', 'users.company_id', 'users.name', 'users.email', 'users.created_at', 'users.image', 'designations.name as designation_name', 'users.email_notifications', 'users.mobile', 'users.country_id', 'users.status')
+            ->where('users.company_id', company()->id)
+            ->where('users.status', 'active')
+            ->where('roles.name', 'consultant')
+            ->orderBy('users.name')
+            ->groupBy('users.id')
+            ->get();
 
         // Load visa types from master datatable
         $this->visaTypes = \App\Models\NewLeadVisaType::where(function($query) {
@@ -232,6 +257,26 @@ class LeadContactController extends AccountBaseController
                 // If there's an error loading the lead, redirect to add-lead without lead_id
                 return redirect()->route('add-lead.index');
             }
+            
+            // Role-based access control for editing existing leads
+            // Check this AFTER loading the lead, but OUTSIDE try-catch to avoid 500 error
+            $userId = user()->id;
+            
+            if ($isReceptionist && !$isAdmin) {
+                // Receptionist: can only access leads they added
+                if ($this->newLead->added_by != $userId) {
+                    abort_403(__('messages.permissionDenied'));
+                }
+            } elseif ($isConsultant && !$isAdmin) {
+                // Consultant: can access leads they own OR added
+                $isOwner = ($this->newLead->lead_owner == $userId);
+                $isAddedBy = ($this->newLead->added_by == $userId);
+                
+                if (!$isOwner && !$isAddedBy) {
+                    abort_403(__('messages.permissionDenied'));
+                }
+            }
+            // Admin has full access, no check needed
         }
 
         return view('add-lead.index', $this->data);
@@ -260,6 +305,15 @@ class LeadContactController extends AccountBaseController
 
     public function leadDetails($id = null)
     {
+        // Restrict access to Consultant and Admin roles only
+        $userRoles = user_roles();
+        $isConsultant = in_array('consultant', $userRoles);
+        $isAdmin = in_array('admin', $userRoles);
+        
+        if (!$isConsultant && !$isAdmin) {
+            abort_403(__('messages.permissionDenied'));
+        }
+        
         $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
         abort_403(!in_array($viewPermission, ['all','added','owned','both']));
 
@@ -314,6 +368,19 @@ class LeadContactController extends AccountBaseController
                 \Log::error('Error loading lead details for ID ' . $id . ': ' . $e->getMessage());
                 \Log::error('Stack trace: ' . $e->getTraceAsString());
                 abort(500, 'Error loading lead details: ' . $e->getMessage());
+            }
+            
+            // For Consultant role: only allow access to leads they own or added
+            // Admin role has full access
+            // Check this AFTER loading the lead, but OUTSIDE try-catch to avoid 500 error
+            if ($isConsultant && !$isAdmin) {
+                $userId = user()->id;
+                $isOwner = ($this->lead->lead_owner == $userId);
+                $isAddedBy = ($this->lead->added_by == $userId);
+                
+                if (!$isOwner && !$isAddedBy) {
+                    abort_403(__('messages.permissionDenied'));
+                }
             }
         } else {
             // Ensure variables are set even when no ID is provided
@@ -4845,6 +4912,9 @@ class LeadContactController extends AccountBaseController
      */
     public function storeNewLeadAccount(Request $request)
     {
+        // Restrict access to Admin role only
+        abort_403(!in_array('admin', user_roles()));
+        
         $lead = NewLead::findOrFail($request->new_lead_id);
         
         $rules = [
@@ -4948,6 +5018,9 @@ class LeadContactController extends AccountBaseController
      */
     public function getNewLeadAccount($id)
     {
+        // Restrict access to Admin role only
+        abort_403(!in_array('admin', user_roles()));
+        
         $account = \App\Models\NewLeadAccount::with(['agentUser', 'newLead'])->findOrFail($id);
         
         return Reply::dataOnly([
@@ -4961,6 +5034,9 @@ class LeadContactController extends AccountBaseController
      */
     public function deleteNewLeadAccount($id)
     {
+        // Restrict access to Admin role only
+        abort_403(!in_array('admin', user_roles()));
+        
         $account = \App\Models\NewLeadAccount::findOrFail($id);
         $account->delete();
 
@@ -4972,6 +5048,9 @@ class LeadContactController extends AccountBaseController
      */
     public function updateAccountStatus(Request $request, $id)
     {
+        // Restrict access to Admin role only
+        abort_403(!in_array('admin', user_roles()));
+        
         $request->validate([
             'status' => 'required|in:pending,received',
         ]);
@@ -4989,6 +5068,9 @@ class LeadContactController extends AccountBaseController
      */
     public function getNewLeadAccounts($id)
     {
+        // Restrict access to Admin role only
+        abort_403(!in_array('admin', user_roles()));
+        
         $lead = NewLead::with(['accounts.agentUser', 'accounts.addedBy'])->findOrFail($id);
         
         $this->lead = $lead;
@@ -5003,6 +5085,9 @@ class LeadContactController extends AccountBaseController
      */
     public function downloadAccountInvoice($id)
     {
+        // Restrict access to Admin role only
+        abort_403(!in_array('admin', user_roles()));
+        
         try {
             $account = \App\Models\NewLeadAccount::with(['agentUser', 'newLead'])->findOrFail($id);
             

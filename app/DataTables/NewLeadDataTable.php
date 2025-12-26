@@ -358,13 +358,30 @@ class NewLeadDataTable extends BaseDataTable
                             <i class="fa fa-edit"></i>
                         </a>';
             
-            // Add view button - only visible if lead status is complete
+            // Add view button - only visible if lead status is complete AND user has Consultant or Admin role
             $isComplete = false;
             if ($row->stepStatus && $row->stepStatus->final_status == 'complete') {
                 $isComplete = true;
             }
             
-            if ($isComplete) {
+            // Check if user has Consultant or Admin role
+            $userRoles = user_roles();
+            $isConsultant = in_array('consultant', $userRoles);
+            $isAdmin = in_array('admin', $userRoles);
+            
+            // For Consultants: only show view icon if they own or added the lead
+            // For Admins: show view icon for all leads
+            $canViewDetails = false;
+            if ($isAdmin) {
+                $canViewDetails = true;
+            } elseif ($isConsultant) {
+                $userId = user()->id;
+                $isOwner = ($row->lead_owner == $userId);
+                $isAddedBy = ($row->added_by == $userId);
+                $canViewDetails = $isOwner || $isAddedBy;
+            }
+            
+            if ($isComplete && $canViewDetails) {
                 // Complete status - show view icon and redirect to lead-details
                 $viewUrl = route('lead-details.index', ['id' => $row->id]);
                 $action .= '<a href="' . $viewUrl . '" class="btn btn-sm btn-secondary ml-2" title="' . __('app.view') . '">

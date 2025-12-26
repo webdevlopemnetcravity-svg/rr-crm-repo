@@ -6,13 +6,12 @@
                             @php
                                 $userRoles = user_roles();
                                 $isAdmin = in_array('admin', $userRoles);
-                                $isEmployee = in_array('employee', $userRoles);
                                 $isDraft = false;
                                 if (isset($lead) && $lead && $lead->stepStatus && $lead->stepStatus->final_status == 'draft') {
                                     $isDraft = true;
                                 }
                             @endphp
-                            @if(($isAdmin || $isEmployee) && !$isDraft)
+                            @if($isAdmin && !$isDraft)
                                 <button type="button" class="tab-section-add-btn" id="addAccountBtn">
                                     <i class="fa fa-plus"></i>
                                 </button>
