@@ -1258,11 +1258,23 @@ class LeadContactController extends AccountBaseController
     }
 
     /**
-     * Get employees for reassign dropdown
+     * Get employees for reassign dropdown - only Consultant role
      */
     public function getEmployeesForReassign()
     {
-        $employees = User::allEmployees(null, 'active');
+        // Get only Consultant role employees
+        $employees = User::withRole('consultant')
+            ->join('employee_details', 'employee_details.user_id', '=', 'users.id')
+            ->leftJoin('designations', 'employee_details.designation_id', '=', 'designations.id')
+            ->join('role_user', 'role_user.user_id', '=', 'users.id')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->select('users.id', 'users.company_id', 'users.name', 'users.email', 'users.created_at', 'users.image', 'designations.name as designation_name', 'users.email_notifications', 'users.mobile', 'users.country_id', 'users.status')
+            ->where('users.company_id', company()->id)
+            ->where('users.status', 'active')
+            ->where('roles.name', 'consultant')
+            ->orderBy('users.name')
+            ->groupBy('users.id')
+            ->get();
         
         $employeeData = [];
         foreach ($employees as $employee) {
