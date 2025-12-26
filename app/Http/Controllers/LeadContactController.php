@@ -1651,12 +1651,14 @@ class LeadContactController extends AccountBaseController
             }
 
             $leadId = $request->lead_id;
+            $isNewLead = false;
 
             // Create or get new lead
             if ($leadId) {
                 $lead = NewLead::findOrFail($leadId);
             } else {
                 // Create new lead
+                $isNewLead = true;
                 $lead = new NewLead();
                 $lead->company_id = company()->id;
                 $lead->client_name = ($request->surname ?? '') . ' ' . ($request->given_name ?? '');
@@ -1674,15 +1676,21 @@ class LeadContactController extends AccountBaseController
             // Save step data using unified method for all steps
             $this->saveStepData($lead, $request, $stepNumber);
 
-            // Mark step as completed
+            // Check if this step was already completed before (to determine if this is first time saving)
             $stepField = 'step_' . $stepNumber . '_completed';
+            $wasStepAlreadyCompleted = $stepStatus->$stepField;
+
+            // Mark step as completed
             $stepStatus->$stepField = true;
             $stepStatus->save();
 
             // Update final status (skip for step 9 as it's managed differently)
             // Use loose comparison to handle both string "9" and integer 9
+            // Only set status to 'draft' if this is the first time saving this step
+            // For step 2, only set to 'draft' on first save, don't overwrite on subsequent saves
             if ($stepNumber != 9 && $stepNumber !== 9 && (string)$stepNumber !== '9') {
-                $stepStatus->updateFinalStatus();
+                $isFirstTimeSavingStep = !$wasStepAlreadyCompleted;
+                $stepStatus->updateFinalStatus($isFirstTimeSavingStep);
             }
 
             // Log step completion

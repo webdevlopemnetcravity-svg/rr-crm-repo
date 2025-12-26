@@ -71,14 +71,20 @@ class LeadStepStatus extends Model
 
     /**
      * Update final status based on step completion.
+     * Only sets status to 'draft' on first save of a step (e.g., first time saving step 2).
+     * Once a step has been saved before, don't overwrite the status to 'draft'.
+     * Status will only change when manually moved (e.g., via "move to lead" action).
+     * Does NOT automatically update to 'complete' when all steps are done.
      */
-    public function updateFinalStatus(): void
+    public function updateFinalStatus($isFirstTimeSavingStep = false): void
     {
-        if ($this->areAllStepsCompleted()) {
-            $this->final_status = 'complete';
-        } else {
+        // Only set to 'draft' if this is the first time saving this step
+        // Don't overwrite existing status for subsequent saves
+        // Status will only change when manually moved (e.g., via "move to lead")
+        if ($isFirstTimeSavingStep || $this->wasRecentlyCreated) {
             $this->final_status = 'draft';
         }
+        // If status already exists and this is not the first time, don't change it
         $this->save();
     }
 
