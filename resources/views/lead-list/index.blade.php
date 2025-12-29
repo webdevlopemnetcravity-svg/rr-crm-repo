@@ -36,6 +36,14 @@
             line-height: 1.4;
             max-height: 2.8em;
         }
+        /* Style for status and quality buttons */
+        .status-change-btn, .quality-change-btn {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .status-change-btn:hover, .quality-change-btn:hover {
+            opacity: 0.9;
+        }
         /* Ensure filter inner elements also have high z-index */
     </style>
 @endpush
@@ -422,6 +430,49 @@
         </div>
     </div>
 
+    <!-- Status/Quality Change Modal -->
+    <div class="modal fade" id="statusQualityChangeModal" tabindex="-1" role="dialog" aria-labelledby="statusQualityChangeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusQualityChangeModalLabel">Change <span id="change-type-label"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <x-form id="statusQualityChangeForm" method="POST" class="ajax-form">
+                    @csrf
+                    <div class="modal-body">
+                        <input type="hidden" name="lead_id" id="change_lead_id">
+                        <input type="hidden" name="change_type" id="change_type">
+                        <input type="hidden" name="old_value" id="old_value">
+                        
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">Current <span id="current-label"></span></label>
+                            <p class="f-14 text-dark-grey" id="current_value_display"></p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">New <span id="new-label"></span> <span class="text-danger">*</span></label>
+                            <select name="new_value" id="new_value" class="form-control select-picker height-35 f-14" data-size="8" required>
+                                <option value="">-- Select --</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="f-14 font-weight-bold mb-2">Remark</label>
+                            <textarea name="remark" id="change_remark" class="form-control f-14" rows="3" placeholder="Enter remark (optional)"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <x-forms.button-primary id="save-status-quality-change" icon="check">Save</x-forms.button-primary>
+                    </div>
+                </x-form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -722,7 +773,7 @@
 
             // Initialize select pickers and tooltips after table draw
             $('#new-leads-table').on('draw.dt', function() {
-                $('.priority-select, .status-select, .quality-select').selectpicker();
+                $('.priority-select').selectpicker();
                 
                 // Add data attributes and classes for unassigned leads
                 $('#new-leads-table tbody tr').each(function() {
@@ -790,18 +841,15 @@
                         updatePriorityDisplay($(this));
                     }
                 });
+                
             }, 500);
         });
 
         // Color mappings for status dropdown
         var statusColors = {
-            "Untouched": "#9E9E9E",
-            "Introduction": "#42A5F5",
-            "Info Collected": "#26C6DA",
-            "Consultation Call 1": "#9575CD",
-            "Consultation Call 2": "#7E57C2",
-            "Consultation Meet 1": "#5C6BC0",
-            "Consultation Meet 2": "#3F51B5",
+            "Open Lead": "#9E9E9E",
+            "Consultation in Progress": "#42A5F5",
+            "Meeting in Progress": "#5C6BC0",
             "Documentation": "#81C784",
             "Final Discussion": "#4CAF50",
             "Estimation": "#C0CA33",
@@ -818,7 +866,7 @@
 
         // Color mappings for Lead Quality dropdown
         var qualityColors = {
-            "Assigned": "#42A5F5",
+            "Open": "#42A5F5",
             "In-Process": "#26C6DA",
             "On Hold": "#FFC107",
             "Plan Dropped": "#FF7043",
@@ -856,14 +904,10 @@
             }
         }
 
-        // Function to apply colors to all dropdowns
+        // Function to apply colors to all dropdowns (for priority only now)
         function applyAllDropdownColors() {
-            $('.status-select').each(function() {
-                applyDropdownColor($(this), statusColors);
-            });
-            $('.quality-select').each(function() {
-                applyDropdownColor($(this), qualityColors);
-            });
+            // Status and quality are now buttons, colors are applied in DataTable
+            // Only priority dropdowns need color application
         }
 
         // Track previous values to prevent duplicate calls
@@ -944,80 +988,207 @@
             });
         });
 
-        // Handle status dropdown change
-        $(document).on('changed.bs.select', '.status-select', function(e, clickedIndex, isSelected, previousValue) {
+        // Handle clicks on status button - open modal
+        $(document).on('click', '.status-change-btn', function(e) {
+            e.preventDefault();
             e.stopImmediatePropagation();
-            var $select = $(this);
-            var leadId = $select.data('lead-id');
-            var status = $select.val();
+            
+            var $btn = $(this);
+            var leadId = $btn.data('lead-id');
+            var currentStatus = $btn.data('current-status');
+            
+            // Open modal
+            openStatusQualityChangeModal('status', leadId, currentStatus);
+        });
+
+        // Handle status button update (when modal is saved)
+        function updateStatusDirectly(leadId, status) {
+            var $btn = $('.status-change-btn[data-lead-id="' + leadId + '"]');
             var key = 'status_' + leadId;
             
-            // Apply color immediately
-            applyDropdownColor($select, statusColors);
+            // Update button text and color
+            var statusColor = statusColors[status] || '#9E9E9E';
+            $btn.find('.status-text').text(status);
+            $btn.data('current-status', status);
+            $btn.css({
+                'background-color': statusColor,
+                'border-color': statusColor
+            });
             
-            // Prevent duplicate calls and validate value
-            if (!status || status === '' || previousValues[key] === status) {
+            previousValues[key] = status;
+        }
+
+        // Handle clicks on quality button - open modal
+        $(document).on('click', '.quality-change-btn', function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            
+            var $btn = $(this);
+            var leadId = $btn.data('lead-id');
+            var currentQuality = $btn.data('current-quality');
+            
+            // Open modal
+            openStatusQualityChangeModal('quality', leadId, currentQuality);
+        });
+
+        // Handle quality button update (when modal is saved)
+        function updateQualityDirectly(leadId, quality) {
+            var $btn = $('.quality-change-btn[data-lead-id="' + leadId + '"]');
+            var key = 'quality_' + leadId;
+            
+            // Update button text and color
+            var qualityColor = qualityColors[quality] || '#42A5F5';
+            $btn.find('.quality-text').text(quality);
+            $btn.data('current-quality', quality);
+            $btn.css({
+                'background-color': qualityColor,
+                'border-color': qualityColor
+            });
+            
+            previousValues[key] = quality;
+        }
+
+        // Function to open status/quality change modal
+        function openStatusQualityChangeModal(changeType, leadId, currentValue, preselectedValue = null) {
+            var isStatus = changeType === 'status';
+            var label = isStatus ? 'Status' : 'Quality';
+            
+            // Set modal title and labels
+            $('#change-type-label').text(label);
+            $('#current-label').text(label);
+            $('#new-label').text(label);
+            $('#current_value_display').text(currentValue || 'Not set');
+            
+            // Set hidden fields
+            $('#change_lead_id').val(leadId);
+            $('#change_type').val(changeType);
+            $('#old_value').val(currentValue);
+            
+            // Populate dropdown options
+            var $select = $('#new_value');
+            $select.empty();
+            $select.append('<option value="">-- Select --</option>');
+            
+            if (isStatus) {
+                var statusOptions = [
+                    'Open Lead', 'Consultation in Progress', 'Meeting in Progress', 
+                    'Documentation', 'Final Discussion', 'Estimation', 'Payment', 'MOU', 
+                    'File in Process', 'File Submission', 'Visa Process', 
+                    'Flying Date Received', 'Join/Move/Admissions', 'Follow Up', 'Lead Close'
+                ];
+                statusOptions.forEach(function(option) {
+                    var selected = (option === preselectedValue || (option === currentValue && !preselectedValue)) ? 'selected' : '';
+                    $select.append('<option value="' + option + '" ' + selected + '>' + option + '</option>');
+                });
+            } else {
+                var qualityOptions = [
+                    'Open', 'In-Process', 'On Hold', 'Plan Dropped', 
+                    'Negotiation', 'Future Prospect', 'Ringing', 
+                    'Dead/Junk Lead', 'Not Interested', 'Rejected'
+                ];
+                qualityOptions.forEach(function(option) {
+                    var selected = (option === preselectedValue || (option === currentValue && !preselectedValue)) ? 'selected' : '';
+                    $select.append('<option value="' + option + '" ' + selected + '>' + option + '</option>');
+                });
+            }
+            
+            // Clear remark
+            $('#change_remark').val('');
+            
+            // Initialize selectpicker
+            $select.selectpicker('refresh');
+            
+            // Show modal
+            $('#statusQualityChangeModal').modal('show');
+        }
+
+        // Handle modal form submission
+        $('#save-status-quality-change').click(function() {
+            var formData = $('#statusQualityChangeForm').serialize();
+            var changeType = $('#change_type').val();
+            var leadId = $('#change_lead_id').val();
+            var newValue = $('#new_value').val();
+            var oldValue = $('#old_value').val();
+            
+            if (!newValue) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Please select a new ' + changeType + '.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
                 return;
             }
             
-            previousValues[key] = status;
+            if (newValue === oldValue) {
+                Swal.fire({
+                    icon: 'info',
+                    text: 'The selected ' + changeType + ' is the same as the current one.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                $('#statusQualityChangeModal').modal('hide');
+                return;
+            }
+            
+            var url = changeType === 'status' 
+                ? "{{ route('new-leads.update_status') }}"
+                : "{{ route('new-leads.update_quality') }}";
             
             $.easyAjax({
-                url: "{{ route('new-leads.update_status') }}",
+                url: url,
                 type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    lead_id: leadId,
-                    status: status
-                },
+                data: formData,
+                blockUI: true,
                 success: function(response) {
                     if (response.status == 'success') {
-                        // Optionally show a success message
+                        $('#statusQualityChangeModal').modal('hide');
+                        
+                        // Update the dropdown display
+                        if (changeType === 'status') {
+                            updateStatusDirectly(leadId, newValue);
+                        } else {
+                            updateQualityDirectly(leadId, newValue);
+                        }
+                        
+                        // Refresh table
+                        showTable();
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            text: changeType.charAt(0).toUpperCase() + changeType.slice(1) + ' updated successfully.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
                     }
                 },
-                error: function() {
-                    // Reset previous value on error
-                    delete previousValues[key];
+                error: function(xhr) {
+                    var errorMsg = 'Failed to update ' + changeType + '.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        text: errorMsg,
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
                 }
             });
         });
 
-        // Handle lead quality dropdown change
-        $(document).on('changed.bs.select', '.quality-select', function(e, clickedIndex, isSelected, previousValue) {
-            e.stopImmediatePropagation();
-            var $select = $(this);
-            var leadId = $select.data('lead-id');
-            var quality = $select.val();
-            var key = 'quality_' + leadId;
-            
-            // Apply color immediately
-            applyDropdownColor($select, qualityColors);
-            
-            // Prevent duplicate calls and validate value
-            if (!quality || quality === '' || previousValues[key] === quality) {
-                return;
-            }
-            
-            previousValues[key] = quality;
-            
-            $.easyAjax({
-                url: "{{ route('new-leads.update_quality') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    lead_id: leadId,
-                    quality: quality
-                },
-                success: function(response) {
-                    if (response.status == 'success') {
-                        // Optionally show a success message
-                    }
-                },
-                error: function() {
-                    // Reset previous value on error
-                    delete previousValues[key];
-                }
-            });
+        // Reset form when modal is hidden
+        $('#statusQualityChangeModal').on('hidden.bs.modal', function() {
+            $('#statusQualityChangeForm')[0].reset();
+            $('#new_value').selectpicker('refresh');
         });
 
         // Handle follow-up button click (Add) - stop propagation to prevent dropdown interference

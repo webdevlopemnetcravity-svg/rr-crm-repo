@@ -180,23 +180,40 @@ class NewLeadDataTable extends BaseDataTable
             }
             
             $statusOptions = [
-                'Untouched', 'Introduction', 'Info Collected', 'Consultation Call 1', 
-                'Consultation Call 2', 'Consultation Meet 1', 'Consultation Meet 2', 
+                'Open Lead', 'Consultation in Progress', 'Meeting in Progress', 
                 'Documentation', 'Final Discussion', 'Estimation', 'Payment', 'MOU', 
                 'File in Process', 'File Submission', 'Visa Process', 
                 'Flying Date Received', 'Join/Move/Admissions', 'Follow Up', 'Lead Close'
             ];
             
-            $currentStatus = $row->lead_status ?? 'Untouched';
+            $currentStatus = $row->lead_status ?? 'Open Lead';
             
-            $statusSelect = '<select class="form-control select-picker status-select f-14" data-lead-id="' . $row->id . '" data-size="8">';
-            foreach ($statusOptions as $option) {
-                $selected = ($currentStatus == $option) ? 'selected' : '';
-                $statusSelect .= '<option value="' . $option . '" ' . $selected . '>' . $option . '</option>';
-            }
-            $statusSelect .= '</select>';
+            // Get color for current status
+            $statusColors = [
+                'Open Lead' => '#9E9E9E',
+                'Consultation in Progress' => '#42A5F5',
+                'Meeting in Progress' => '#5C6BC0',
+                'Documentation' => '#81C784',
+                'Final Discussion' => '#4CAF50',
+                'Estimation' => '#C0CA33',
+                'Payment' => '#FFC107',
+                'MOU' => '#FB8C00',
+                'File in Process' => '#64B5F6',
+                'File Submission' => '#00BCD4',
+                'Visa Process' => '#8BC34A',
+                'Flying Date Received' => '#4DD0E1',
+                'Join/Move/Admissions' => '#43A047',
+                'Follow Up' => '#F06292',
+                'Lead Close' => '#E53935'
+            ];
+            $statusColor = $statusColors[$currentStatus] ?? '#9E9E9E';
             
-            return '<div class="status-dropdown">' . $statusSelect . '</div>';
+            $statusButton = '<button type="button" class="btn btn-sm status-change-btn f-14" data-lead-id="' . $row->id . '" data-current-status="' . htmlspecialchars($currentStatus, ENT_QUOTES) . '" style="background-color: ' . $statusColor . '; border-color: ' . $statusColor . '; color: #ffffff; width: 100%; text-align: left; position: relative; padding-right: 30px;">
+                <span class="status-text">' . htmlspecialchars($currentStatus) . '</span>
+                <i class="fa fa-chevron-down" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);"></i>
+            </button>';
+            
+            return '<div class="status-button-wrapper">' . $statusButton . '</div>';
         });
 
         // LEAD QUALITY Column: Show "-" if draft, otherwise show dropdown
@@ -211,21 +228,34 @@ class NewLeadDataTable extends BaseDataTable
             }
             
             $qualityOptions = [
-                'Assigned', 'In-Process', 'On Hold', 'Plan Dropped', 
+                'Open', 'In-Process', 'On Hold', 'Plan Dropped', 
                 'Negotiation', 'Future Prospect', 'Ringing', 
                 'Dead/Junk Lead', 'Not Interested', 'Rejected'
             ];
             
-            $currentQuality = $row->lead_quality ?? 'Assigned';
+            $currentQuality = $row->lead_quality ?? 'Open';
             
-            $qualitySelect = '<select class="form-control select-picker quality-select f-14" data-lead-id="' . $row->id . '" data-size="8">';
-            foreach ($qualityOptions as $option) {
-                $selected = ($currentQuality == $option) ? 'selected' : '';
-                $qualitySelect .= '<option value="' . $option . '" ' . $selected . '>' . $option . '</option>';
-            }
-            $qualitySelect .= '</select>';
+            // Get color for current quality
+            $qualityColors = [
+                'Open' => '#42A5F5',
+                'In-Process' => '#26C6DA',
+                'On Hold' => '#FFC107',
+                'Plan Dropped' => '#FF7043',
+                'Negotiation' => '#8E24AA',
+                'Future Prospect' => '#7CB342',
+                'Ringing' => '#5C6BC0',
+                'Dead/Junk Lead' => '#E53935',
+                'Not Interested' => '#F06292',
+                'Rejected' => '#9E9E9E'
+            ];
+            $qualityColor = $qualityColors[$currentQuality] ?? '#42A5F5';
             
-            return '<div class="lead-quality-dropdown">' . $qualitySelect . '</div>';
+            $qualityButton = '<button type="button" class="btn btn-sm quality-change-btn f-14" data-lead-id="' . $row->id . '" data-current-quality="' . htmlspecialchars($currentQuality, ENT_QUOTES) . '" style="background-color: ' . $qualityColor . '; border-color: ' . $qualityColor . '; color: #ffffff; width: 100%; text-align: left; position: relative; padding-right: 30px;">
+                <span class="quality-text">' . htmlspecialchars($currentQuality) . '</span>
+                <i class="fa fa-chevron-down" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);"></i>
+            </button>';
+            
+            return '<div class="quality-button-wrapper">' . $qualityButton . '</div>';
         });
 
         // FOLLOW-UP Column: Show last follow-up info and add button

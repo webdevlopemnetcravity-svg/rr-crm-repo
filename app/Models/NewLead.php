@@ -100,6 +100,14 @@ class NewLead extends BaseModel
     }
 
     /**
+     * Get the status change logs for this lead.
+     */
+    public function statusChangeLogs(): HasMany
+    {
+        return $this->hasMany(LeadStatusChangeLog::class, 'lead_id');
+    }
+
+    /**
      * Get the file notes for this lead.
      */
     public function fileNotes(): HasMany

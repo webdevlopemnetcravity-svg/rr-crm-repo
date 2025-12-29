@@ -214,6 +214,9 @@
                         <a class="nav-item-lead nav-link-lead f-14" data-tab="travelDetailsTab" href="#">
                             <div class="tab-item"><img src="{{ asset('img/icon/Travel_Details.svg') }}"></div>Travel Details
                         </a>
+                        <a class="nav-item-lead nav-link-lead f-14" data-tab="statusActivityTab" href="#">
+                            <div class="tab-item"><i class="fa fa-history"></i></div>Lead Status Activity
+                        </a>
                     </div>
                 </nav>
             </div>
@@ -242,6 +245,8 @@
                 @include('lead-details.components.follow-up-tab')
                 <!-- Travel Details Tab Content -->
                 @include('lead-details.components.travel-details-tab')
+                <!-- Lead Status Activity Tab Content -->
+                @include('lead-details.components.status-activity-tab')
             </div>
         </div>
     </div>

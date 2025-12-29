@@ -24,6 +24,7 @@ use App\Models\LeadProduct;
 use App\Models\LeadSource;
 use App\Models\LeadStepLog;
 use App\Models\LeadStepStatus;
+use App\Models\LeadStatusChangeLog;
 use App\Models\NewLead;
 use App\Models\NewLeadProcess;
 use App\Models\PipelineStage;
@@ -103,13 +104,9 @@ class LeadContactController extends AccountBaseController
             
             // Hardcoded lead status values for filter
             $this->leadStatuses = collect([
-                'Untouched',
-                'Introduction',
-                'Info Collected',
-                'Consultation Call 1',
-                'Consultation Call 2',
-                'Consultation Meet 1',
-                'Consultation Meet 2',
+                'Open Lead',
+                'Consultation in Progress',
+                'Meeting in Progress',
                 'Documentation',
                 'Final Discussion',
                 'Estimation',
@@ -1222,8 +1219,25 @@ class LeadContactController extends AccountBaseController
             || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
         ));
 
-        $lead->lead_status = $request->status;
+        $oldStatus = $lead->lead_status;
+        $newStatus = $request->new_value ?? $request->status;
+        $remark = $request->remark ?? null;
+
+        // Update lead status
+        $lead->lead_status = $newStatus;
         $lead->save();
+
+        // Log the status change
+        if ($oldStatus != $newStatus) {
+            \App\Models\LeadStatusChangeLog::create([
+                'lead_id' => $lead->id,
+                'change_type' => 'status',
+                'old_value' => $oldStatus,
+                'new_value' => $newStatus,
+                'remark' => $remark,
+                'changed_by' => user()->id,
+            ]);
+        }
 
         return Reply::success(__('messages.updateSuccess'));
     }
@@ -1245,10 +1259,103 @@ class LeadContactController extends AccountBaseController
             || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
         ));
 
-        $lead->lead_quality = $request->quality;
+        $oldQuality = $lead->lead_quality;
+        $newQuality = $request->new_value ?? $request->quality;
+        $remark = $request->remark ?? null;
+
+        // Update lead quality
+        $lead->lead_quality = $newQuality;
         $lead->save();
 
+        // Log the quality change
+        if ($oldQuality != $newQuality) {
+            \App\Models\LeadStatusChangeLog::create([
+                'lead_id' => $lead->id,
+                'change_type' => 'quality',
+                'old_value' => $oldQuality,
+                'new_value' => $newQuality,
+                'remark' => $remark,
+                'changed_by' => user()->id,
+            ]);
+        }
+
         return Reply::success(__('messages.updateSuccess'));
+    }
+
+    /**
+     * Get status activity for a lead
+     *
+     * @param int $leadId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getStatusActivity($leadId)
+    {
+        $lead = NewLead::findOrFail($leadId);
+        
+        // Check permission
+        $this->viewLeadPermission = user()->permission('view_lead');
+        abort_403(!in_array($this->viewLeadPermission, ['all', 'added', 'owned', 'both']));
+        
+        $statusLogs = LeadStatusChangeLog::where('lead_id', $leadId)
+            ->where('change_type', 'status')
+            ->with('changedBy')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'id' => $log->id,
+                    'old_value' => $log->old_value,
+                    'new_value' => $log->new_value,
+                    'remark' => $log->remark,
+                    'created_at' => $log->created_at->format(company()->date_format . ' ' . company()->time_format),
+                    'created_at_iso' => $log->created_at->toIso8601String(),
+                    'changed_by_user' => $log->changedBy ? [
+                        'id' => $log->changedBy->id,
+                        'name' => $log->changedBy->name,
+                        'image_url' => $log->changedBy->image_url
+                    ] : null
+                ];
+            });
+        
+        return Reply::dataOnly(['status' => 'success', 'data' => $statusLogs]);
+    }
+
+    /**
+     * Get quality activity for a lead
+     *
+     * @param int $leadId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getQualityActivity($leadId)
+    {
+        $lead = NewLead::findOrFail($leadId);
+        
+        // Check permission
+        $this->viewLeadPermission = user()->permission('view_lead');
+        abort_403(!in_array($this->viewLeadPermission, ['all', 'added', 'owned', 'both']));
+        
+        $qualityLogs = LeadStatusChangeLog::where('lead_id', $leadId)
+            ->where('change_type', 'quality')
+            ->with('changedBy')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'id' => $log->id,
+                    'old_value' => $log->old_value,
+                    'new_value' => $log->new_value,
+                    'remark' => $log->remark,
+                    'created_at' => $log->created_at->format(company()->date_format . ' ' . company()->time_format),
+                    'created_at_iso' => $log->created_at->toIso8601String(),
+                    'changed_by_user' => $log->changedBy ? [
+                        'id' => $log->changedBy->id,
+                        'name' => $log->changedBy->name,
+                        'image_url' => $log->changedBy->image_url
+                    ] : null
+                ];
+            });
+        
+        return Reply::dataOnly(['status' => 'success', 'data' => $qualityLogs]);
     }
 
     /**
@@ -1738,6 +1845,8 @@ class LeadContactController extends AccountBaseController
                 $lead->client_email = $request->email_address ?? $request->email ?? null;
                 $lead->mobile = $request->mobile ?? $request->primary_phone ?? null;
                 $lead->added_by = user()->id;
+                $lead->lead_status = 'Open Lead';
+                $lead->lead_quality = 'Open';
                 $lead->hash = md5(microtime());
                 $lead->save();
                 $leadId = $lead->id;
@@ -5407,8 +5516,8 @@ class LeadContactController extends AccountBaseController
                 $lead->mobile = $primaryPhone;
                 $lead->added_by = $addedBy;
                 $lead->last_updated_by = user()->id;
-                $lead->lead_status = 'Untouched';
-                $lead->lead_quality = 'Assigned';
+                $lead->lead_status = 'Open Lead';
+                $lead->lead_quality = 'Open';
 
                 // Store in step_1_data
                 $lead->step_1_data = [
