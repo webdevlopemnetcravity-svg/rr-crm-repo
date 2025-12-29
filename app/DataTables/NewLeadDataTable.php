@@ -58,17 +58,11 @@ class NewLeadDataTable extends BaseDataTable
                             </a>';
             }
 
-            if (
-                $this->deleteLeadPermission == 'all'
-                || ($this->deleteLeadPermission == 'added' && user()->id == $row->added_by)
-                || ($this->deleteLeadPermission == 'owned' && user()->id == $row->lead_owner)
-                || ($this->deleteLeadPermission == 'both' && (user()->id == $row->added_by || user()->id == $row->lead_owner ))
-            ) {
-                $action .= '<a class="dropdown-item delete-table-row" href="javascript:;" data-id="' . $row->id . '">
-                        <i class="fa fa-trash mr-2"></i>
-                        ' . trans('app.delete') . '
-                    </a>';
-            }
+            // Delete action - available for all roles
+            $action .= '<a class="dropdown-item delete-table-row" href="javascript:;" data-id="' . $row->id . '">
+                    <i class="fa fa-trash mr-2"></i>
+                    ' . trans('app.delete') . '
+                </a>';
 
             $action .= '</div>
                     </div>
@@ -408,6 +402,13 @@ class NewLeadDataTable extends BaseDataTable
                                 <i class="fa fa-user-plus"></i>
                             </button>';
             }
+            
+            // Delete button - available for all roles
+            $action .= '<button type="button" class="btn btn-sm btn-danger ml-2 delete-table-row" 
+                            data-id="' . $row->id . '"
+                            title="' . __('app.delete') . '">
+                            <i class="fa fa-trash"></i>
+                        </button>';
             
             $action .= '</div>';
             

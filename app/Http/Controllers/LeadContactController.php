@@ -1162,14 +1162,8 @@ class LeadContactController extends AccountBaseController
     public function destroyNewLead($id)
     {
         $newLead = NewLead::findOrFail($id);
-        $this->deletePermission = user()->permission('delete_lead');
-
-        abort_403(!($this->deletePermission == 'all'
-            || ($this->deletePermission == 'added' && $newLead->added_by == user()->id)
-            || ($this->deletePermission == 'owned' && $newLead->lead_owner == user()->id)
-            || ($this->deletePermission == 'both' && ($newLead->added_by == user()->id || $newLead->lead_owner == user()->id))
-        ));
-
+        
+        // Delete action available for all roles
         NewLead::destroy($id);
 
         return Reply::success(__('messages.deleteSuccess'));
