@@ -5323,7 +5323,8 @@ class LeadContactController extends AccountBaseController
      */
     public function importNewLeads(Request $request)
     {
-        abort_403(!in_array('admin', user_roles()));
+        $userRoles = user_roles();
+        abort_403(!in_array('admin', $userRoles) && !in_array('receptionist', $userRoles));
 
         $request->validate([
             'import_file' => 'required|file|mimes:xlsx,xls|max:10240',

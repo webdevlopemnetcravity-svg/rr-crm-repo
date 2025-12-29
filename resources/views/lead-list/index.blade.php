@@ -206,7 +206,7 @@
 
             <div class="mt-2 mt-lg-0 mt-md-0 ml-0 ml-lg-3 ml-md-3">
                 <a href="javascript:;" class="img-lightbox btn btn-secondary f-14" data-image-url="http://127.0.0.1:8000/img/estimate-lc.png" data-toggle="tooltip" data-original-title="The system allows for the addition of further information regarding a lead directly from this view. To access and edit the detailed profile of any specific lead, users may click on the respective entry, which will navigate them to the dedicated Lead Detail Page."><i class="side-icon bi bi-question-circle"></i></a>
-                @if (in_array('admin', user_roles()))
+                @if (in_array('admin', user_roles()) || in_array('receptionist', user_roles()))
                     <x-forms.button-primary class="ml-2 mb-2 mb-lg-0" icon="plus" id="import-lead-btn">
                         Import Lead
                     </x-forms.button-primary>
@@ -396,7 +396,7 @@
                             <label class="f-14 font-weight-bold mb-2">Added By <span class="text-danger">*</span></label>
                             <select name="added_by" id="import_added_by" class="form-control select-picker height-35 f-14" data-live-search="true" required>
                                 <option value="">-- Select User --</option>
-                                @foreach(\App\Models\User::allEmployees(null, 'active', null, company()->id) as $employee)
+                                @foreach(\App\Models\User::withRole('receptionist')->where('company_id', company()->id)->where('status', 'active')->get() as $employee)
                                     <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                                 @endforeach
                             </select>
