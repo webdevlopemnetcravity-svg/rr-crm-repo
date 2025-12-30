@@ -31,7 +31,7 @@ class LeadConfirmation extends Mailable
     public function build()
     {
         return $this->from(config('mail.from.address'), config('mail.from.name'))
-            ->subject('Lead Confirmation - Your Lead Has Been Successfully Created')
+            ->subject('Registration Confirmation')
             ->view('emails.lead.confirmation');
     }
 }
