@@ -113,18 +113,7 @@
                             </div>
                         @endif
                     @else
-                        <div class="contact-info-item mr-4">
-                            <a href="tel:+91123-456-7890" class="text-dark">
-                                <img src="{{ asset('img/icon/Phone.svg') }}">
-                                <span class="pl-1">+91 123 4567 890</span>
-                            </a>
-                        </div>
-                        <div class="contact-info-item">
-                            <a href="mailto:abc@gmail.com?subject=SUBJECT&body=Demo email" target="_blank" class="text-dark">
-                                <img src="{{ asset('img/icon/Mail.svg') }}">
-                                <span class="pl-1">abc@gmail.com</span>
-                            </a>
-                        </div>
+                        
                     @endif
                 </div>
 
@@ -165,12 +154,19 @@
                             </div>
                         </div>
                         <div class="lead-header-actions d-flex align-items-center">
-                            <a class="Whatsapp mr-2" href="#">
-                                <img src="{{ asset('img/icon/Whatsapp_icon.svg') }}">
-                            </a>
-                            <a class="Email mr-2" href="#">
-                                <img src="{{ asset('img/icon/Mail_1.svg') }}">
-                            </a>
+                            @if($primaryPhone)
+                                @php
+                                    $whatsappNumber = preg_replace('/[^0-9+]/', '', $primaryPhone);
+                                @endphp
+                                <a class="Whatsapp mr-2" href="https://wa.me/{{ $whatsappNumber }}" target="_blank">
+                                    <img src="{{ asset('img/icon/Whatsapp_icon.svg') }}">
+                                </a>
+                            @endif
+                            @if($email)
+                                <a class="Email mr-2" href="mailto:{{ $email }}" target="_blank">
+                                    <img src="{{ asset('img/icon/Mail_1.svg') }}">
+                                </a>
+                            @endif
                             <a class="back-arrow" href="{{ route('lead-list.index') }}">
                                 <img src="{{ asset('img/icon/Back_Arrow.svg') }}">
                             </a>
