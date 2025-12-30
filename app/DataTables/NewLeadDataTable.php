@@ -413,12 +413,18 @@ class NewLeadDataTable extends BaseDataTable
                             </a>';
             }
             
-            // Add Reassign Lead button - visible to admins or if lead is unassigned
+            // Add Reassign Lead button - visible to admins or if lead is unassigned, but NOT if lead is in draft
             $userRoles = user_roles();
             $isAdmin = in_array('admin', $userRoles);
             $isUnassigned = is_null($row->lead_owner);
             
-            if ($isAdmin || $isUnassigned) {
+            // Check if lead is in draft status
+            $isDraft = false;
+            if ($row->stepStatus && $row->stepStatus->final_status == 'draft') {
+                $isDraft = true;
+            }
+            
+            if (($isAdmin || $isUnassigned) && !$isDraft) {
                 $leadNumber = 'LEAD-' . str_pad($row->id, 4, '0', STR_PAD_LEFT);
                 $currentOwnerName = $row->leadOwner ? htmlspecialchars($row->leadOwner->name, ENT_QUOTES) : 'Not Assigned';
                 $clientName = htmlspecialchars($row->client_name ?? 'N/A', ENT_QUOTES);

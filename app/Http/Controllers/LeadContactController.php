@@ -709,13 +709,13 @@ class LeadContactController extends AccountBaseController
                 return Reply::error(__('Lead phone number is not available.'));
             }
 
-            // Remove any non-numeric characters and ensure it has country code
+            // Remove any non-numeric characters
             $leadPhone = preg_replace('/[^0-9]/', '', $leadPhone);
             // Remove leading 0 if present
             $leadPhone = ltrim($leadPhone, '0');
-            // Add 91 (India country code) if not present
-            if (!str_starts_with($leadPhone, '91')) {
-                $leadPhone = '91' . $leadPhone;
+            // Remove country code if present (keep only last 10 digits)
+            if (strlen($leadPhone) > 10) {
+                $leadPhone = substr($leadPhone, -10);
             }
 
             // Get user name
@@ -3425,9 +3425,145 @@ class LeadContactController extends AccountBaseController
             } else {
                 \Log::warning('Assigned user email is invalid or not found');
             }
+            
+            // Send WhatsApp notification to lead
+            $this->sendLeadAssignmentWhatsApp($lead, $assignedUser);
         } catch (\Exception $e) {
             // Log error but don't fail the request
             \Log::error('Failed to send lead emails: ' . $e->getMessage());
+            \Log::error('Exception trace: ' . $e->getTraceAsString());
+        }
+    }
+    
+    /**
+     * Send WhatsApp notification when lead is assigned
+     */
+    private function sendLeadAssignmentWhatsApp(NewLead $lead, $assignedUser = null)
+    {
+        try {
+            // Get lead phone number from step_1_data or mobile
+            $leadPhone = null;
+            if ($lead->step_1_data) {
+                $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : $lead->step_1_data;
+                if (is_array($step1Data)) {
+                    $leadPhone = $step1Data['primary_phone'] ?? $step1Data['mobile'] ?? null;
+                }
+            }
+            
+            // Fallback to mobile
+            if (empty($leadPhone)) {
+                $leadPhone = $lead->mobile;
+            }
+
+            if (empty($leadPhone)) {
+                \Log::warning('Lead phone number is not available for WhatsApp notification. Lead ID: ' . $lead->id);
+                return;
+            }
+
+            // Remove any non-numeric characters
+            $leadPhone = preg_replace('/[^0-9]/', '', $leadPhone);
+            // Remove leading 0 if present
+            $leadPhone = ltrim($leadPhone, '0');
+            // Don't add country code - send as is (10 digits)
+
+            // Get lead name
+            $leadName = $lead->client_name ?? 'Client';
+            if ($lead->step_1_data) {
+                $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : $lead->step_1_data;
+                if (is_array($step1Data)) {
+                    $givenName = $step1Data['given_name'] ?? '';
+                    $surname = $step1Data['surname'] ?? '';
+                    if ($givenName || $surname) {
+                        $leadName = trim($givenName . ' ' . $surname) ?: $leadName;
+                    }
+                }
+            }
+
+            // Get consultant details
+            $consultantName = 'Our Team';
+            $consultantNumber = '';
+            
+            if ($assignedUser) {
+                $consultantName = $assignedUser->name ?? 'Our Team';
+                // Get consultant phone number - check if user has mobile field
+                $consultantNumber = $assignedUser->mobile ?? $assignedUser->phone ?? '';
+                // Format consultant number - keep only 10 digits (no country code)
+                if ($consultantNumber) {
+                    $consultantNumber = preg_replace('/[^0-9]/', '', $consultantNumber);
+                    $consultantNumber = ltrim($consultantNumber, '0');
+                    // Remove country code if present (keep only last 10 digits)
+                    if (strlen($consultantNumber) > 10) {
+                        $consultantNumber = substr($consultantNumber, -10);
+                    }
+                }
+            }
+
+            // API configuration
+            $apiKey = env('AISENSY_API_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzdmM2RjNmZhOGUxMDEzYzdlMDgzZSIsIm5hbWUiOiJSLlIgcGF0ZWwgIG5ldyIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2ODcyMzU5ZGRlNjFiYjMxOTgzMzc2NDMiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTc2MDM1NTc4OX0.6H8mv7r3R0ucc7APyDM1q0xew4-oBUVKqUHA38klVG4');
+            $campaignName = env('AISENSY_REGISTRATION_CAMPAIGN', 'registration_confirmation1');
+            $userName = env('AISENSY_USER_NAME', 'R.R patel  new');
+            $source = env('AISENSY_SOURCE', 'new-landing-page form');
+
+            // Prepare template parameters
+            // Template variables: {{name}}, {{consultant_name}}, {{consultant_number}}
+            $templateParams = [
+                $leadName,
+                $consultantName,
+                $consultantNumber ?: 'N/A'
+            ];
+
+            // Prepare API request payload - matching exact Postman working format
+            $payload = [
+                'apiKey' => $apiKey,
+                'campaignName' => $campaignName,
+                'destination' => $leadPhone,
+                'userName' => $userName,
+                'templateParams' => $templateParams,
+                'source' => $source,
+                'media' => [
+                    'url' => 'https://d3jt6ku4g6z5l8.cloudfront.net/IMAGE/6353da2e153a147b991dd812/4958901_highanglekidcheatingschooltestmin.jpg',
+                    'filename' => 'sample_media'
+                ],
+                'buttons' => [],
+                'carouselCards' => [],
+                'location' => (object)[],
+                'attributes' => (object)[],
+                'paramsFallbackValue' => (object)[]
+            ];
+
+            // Make API call to AISensy
+            $client = new Client();
+            $response = $client->post('https://backend.aisensy.com/campaign/t1/api/v2', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $payload,
+                'timeout' => 30
+            ]);
+
+            $responseBody = json_decode($response->getBody()->getContents(), true);
+
+            if ($response->getStatusCode() === 200) {
+                \Log::info('WhatsApp notification sent successfully to lead. Lead ID: ' . $lead->id . ', Phone: ' . $leadPhone);
+            } else {
+                \Log::error('AISensy API error for lead assignment WhatsApp: ' . json_encode($responseBody));
+            }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $errorMessage = $e->getMessage();
+            try {
+                $errorResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
+                if (is_array($errorResponse) && isset($errorResponse['message'])) {
+                    $errorMessage = $errorResponse['message'];
+                }
+            } catch (\Exception $ex) {
+                // If we can't parse the error response, use the original message
+            }
+            \Log::error('AISensy API client error for lead assignment WhatsApp: ' . $e->getMessage());
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            \Log::error('AISensy API request error for lead assignment WhatsApp: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            \Log::error('Failed to send lead assignment WhatsApp notification: ' . $e->getMessage());
             \Log::error('Exception trace: ' . $e->getTraceAsString());
         }
     }
@@ -3549,6 +3685,8 @@ class LeadContactController extends AccountBaseController
                         \Log::error('Failed to send consultant notification email: ' . $e->getMessage());
                     }
                 }
+                // Send WhatsApp notification when consultant is assigned
+                $this->sendLeadAssignmentWhatsApp($lead, $assignedUser);
             }
 
             // Redirect to lead list or lead details
