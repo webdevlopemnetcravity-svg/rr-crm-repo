@@ -3516,19 +3516,40 @@ class LeadContactController extends AccountBaseController
                 || ($this->editPermission == 'both' && ($lead->added_by == user()->id || $lead->lead_owner == user()->id))
             ));
 
+            // Get or create step status before updating
+            $stepStatus = LeadStepStatus::getOrCreateForLead($leadId);
+            
+            // Check if status was already complete (to avoid sending duplicate lead emails)
+            $wasAlreadyComplete = $stepStatus->final_status === 'complete';
+            
+            // Check if lead owner is being changed
+            $oldLeadOwner = $lead->lead_owner;
+            $isNewAssignment = ($oldLeadOwner != $leadAssignTo);
+
             // Update lead owner
             $lead->lead_owner = $leadAssignTo;
             $lead->save();
-
-            // Get or create step status
-            $stepStatus = LeadStepStatus::getOrCreateForLead($leadId);
 
             // Set final status to complete
             $stepStatus->final_status = 'complete';
             $stepStatus->save();
 
-            // Send emails to lead and assigned consultant
-            $this->sendLeadEmails($lead);
+            // Send emails only if status was not already complete (to avoid duplicate lead emails)
+            // If status was already complete but consultant is being assigned/changed, only send consultant email
+            if (!$wasAlreadyComplete) {
+                // First time completing - send both emails
+                $this->sendLeadEmails($lead);
+            } elseif ($isNewAssignment) {
+                // Status already complete, but consultant is being assigned/changed - only send consultant email
+                $assignedUser = User::find($leadAssignTo);
+                if ($assignedUser && $assignedUser->email) {
+                    try {
+                        Mail::to($assignedUser->email)->send(new LeadCreatedNotification($lead));
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send consultant notification email: ' . $e->getMessage());
+                    }
+                }
+            }
 
             // Redirect to lead list or lead details
             $redirectUrl = route('lead-list.index');
