@@ -302,6 +302,11 @@ class LeadContactController extends AccountBaseController
 
     public function leadDetails($id = null)
     {
+        // Redirect to lead list if ID is not provided
+        if (!$id) {
+            return redirect()->route('lead-list.index');
+        }
+        
         // Restrict access to Consultant and Admin roles only
         $userRoles = user_roles();
         $isConsultant = in_array('consultant', $userRoles);
@@ -352,36 +357,36 @@ class LeadContactController extends AccountBaseController
         $this->data['visaTypes'] = $this->visaTypes;
         $this->data['subclasses'] = $this->subclasses;
         
-        if ($id) {
-            try {
-                $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process', 'accounts.agentUser', 'accounts.addedBy', 'travelDetails'])->find($id);
-                if (!$this->lead) {
-                    abort(404, 'Lead not found');
-                }
-                
-                // Explicitly add lead to data array
-                $this->data['lead'] = $this->lead;
-            } catch (\Exception $e) {
-                \Log::error('Error loading lead details for ID ' . $id . ': ' . $e->getMessage());
-                \Log::error('Stack trace: ' . $e->getTraceAsString());
-                abort(500, 'Error loading lead details: ' . $e->getMessage());
+        try {
+            $this->lead = NewLead::with(['addedBy', 'leadOwner', 'followUps.addedBy', 'followUps.lastUpdatedBy', 'fileNotes.addedBy', 'process', 'accounts.agentUser', 'accounts.addedBy', 'travelDetails', 'stepStatus'])->find($id);
+            if (!$this->lead) {
+                return redirect()->route('lead-list.index');
             }
             
-            // For Consultant role: only allow access to leads they own or added
-            // Admin role has full access
-            // Check this AFTER loading the lead, but OUTSIDE try-catch to avoid 500 error
-            if ($isConsultant && !$isAdmin) {
-                $userId = user()->id;
-                $isOwner = ($this->lead->lead_owner == $userId);
-                $isAddedBy = ($this->lead->added_by == $userId);
-                
-                if (!$isOwner && !$isAddedBy) {
-                    abort_403(__('messages.permissionDenied'));
-                }
+            // Check if lead is in draft status - redirect to lead list if it is
+            if ($this->lead->stepStatus && $this->lead->stepStatus->final_status == 'draft') {
+                return redirect()->route('lead-list.index');
             }
-        } else {
-            // Ensure variables are set even when no ID is provided
-            $this->data['lead'] = null;
+            
+            // Explicitly add lead to data array
+            $this->data['lead'] = $this->lead;
+        } catch (\Exception $e) {
+            \Log::error('Error loading lead details for ID ' . $id . ': ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect()->route('lead-list.index');
+        }
+        
+        // For Consultant role: only allow access to leads they own or added
+        // Admin role has full access
+        // Check this AFTER loading the lead, but OUTSIDE try-catch to avoid 500 error
+        if ($isConsultant && !$isAdmin) {
+            $userId = user()->id;
+            $isOwner = ($this->lead->lead_owner == $userId);
+            $isAddedBy = ($this->lead->added_by == $userId);
+            
+            if (!$isOwner && !$isAddedBy) {
+                abort_403(__('messages.permissionDenied'));
+            }
         }
 
         if (!request()->ajax()) {
