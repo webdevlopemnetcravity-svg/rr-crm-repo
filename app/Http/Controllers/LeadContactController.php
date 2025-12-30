@@ -3527,6 +3527,9 @@ class LeadContactController extends AccountBaseController
             $stepStatus->final_status = 'complete';
             $stepStatus->save();
 
+            // Send emails to lead and assigned consultant
+            $this->sendLeadEmails($lead);
+
             // Redirect to lead list or lead details
             $redirectUrl = route('lead-list.index');
 
