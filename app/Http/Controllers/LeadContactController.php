@@ -26,12 +26,17 @@ use App\Models\LeadStepLog;
 use App\Models\LeadStepStatus;
 use App\Models\LeadStatusChangeLog;
 use App\Models\NewLead;
+use App\Models\NewLeadAccount;
+use App\Models\NewLeadFollowUp;
 use App\Models\NewLeadProcess;
+use App\Models\NewLeadVisaType;
 use App\Models\PipelineStage;
 use App\Models\LeadStatus;
 use App\Models\Product;
 use App\Models\User;
 use App\Traits\ImportExcel;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use App\Mail\LeadConfirmation;
 use App\Mail\LeadCreatedNotification;
@@ -794,6 +799,333 @@ class LeadContactController extends AccountBaseController
         abort_403(!in_array($viewPermission, ['all','added','owned','both']));
 
         $this->pageTitle = 'app.leadDashboard';
+
+        $now = now($this->company->timezone);
+        $today = $now->copy()->startOfDay();
+        $todayEnd = $now->copy()->endOfDay();
+        $thisWeekStart = $now->copy()->startOfWeek();
+        $thisWeekEnd = $now->copy()->endOfWeek();
+        
+        // Convert to date strings for database queries
+        $todayDate = $today->format('Y-m-d');
+        $thisWeekStartDate = $thisWeekStart->format('Y-m-d');
+        $thisWeekEndDate = $thisWeekEnd->format('Y-m-d');
+
+        // Base query for leads based on permissions
+        $baseQuery = NewLead::query();
+        
+        if ($viewPermission == 'owned') {
+            $baseQuery->where('lead_owner', user()->id);
+        } elseif ($viewPermission == 'added') {
+            $baseQuery->where('added_by', user()->id);
+        } elseif ($viewPermission == 'both') {
+            $baseQuery->where(function($q) {
+                $q->where('lead_owner', user()->id)
+                  ->orWhere('added_by', user()->id);
+            });
+        }
+
+        // TOP SUMMARY CARDS
+        $this->totalLeads = (clone $baseQuery)->count();
+        $this->newLeadsToday = (clone $baseQuery)->whereBetween('created_at', [$today, $todayEnd])->count();
+        $this->newLeadsThisWeek = (clone $baseQuery)->whereBetween('created_at', [$thisWeekStart, $thisWeekEnd])->count();
+        $this->closedLeads = (clone $baseQuery)->where('lead_status', 'Lead Close')->count();
+
+        // Follow-ups Today (for Consultant role)
+        $userRoles = user_roles();
+        $this->isConsultant = in_array('consultant', $userRoles);
+        $this->isAdmin = in_array('admin', $userRoles);
+        
+        if ($this->isConsultant) {
+            $followUpQuery = NewLeadFollowUp::where('status', 'pending')
+                ->whereDate('next_follow_up_date', $todayDate);
+            
+            if ($viewPermission == 'owned') {
+                $followUpQuery->whereHas('newLead', function($q) {
+                    $q->where('lead_owner', user()->id);
+                });
+            } elseif ($viewPermission == 'added') {
+                $followUpQuery->whereHas('newLead', function($q) {
+                    $q->where('added_by', user()->id);
+                });
+            } elseif ($viewPermission == 'both') {
+                $followUpQuery->whereHas('newLead', function($q) {
+                    $q->where(function($q2) {
+                        $q2->where('lead_owner', user()->id)
+                           ->orWhere('added_by', user()->id);
+                    });
+                });
+            }
+            
+            $this->followUpsToday = $followUpQuery->count();
+        } else {
+            $this->followUpsToday = 0;
+        }
+
+        // Revenue Generated (for Admin role)
+        if ($this->isAdmin) {
+            $revenueGenerated = NewLeadAccount::where('status', 'received')
+                ->sum('total_amount');
+            $this->revenueGenerated = $revenueGenerated ?? 0;
+        } else {
+            $this->revenueGenerated = 0;
+        }
+
+        // LEAD STATUS FUNNEL
+        $funnelStages = [
+            'Consultation in Progress',
+            'Meeting in Progress',
+            'Documentation',
+            'Estimation',
+            'Payment',
+            'MOU',
+            'File in Process',
+            'File Submission',
+            'Visa Process',
+            'Flying Date Received',
+            'Join / Move / Admissions',
+            'Follow up',
+            'Lead Close'
+        ];
+
+        $funnelData = [];
+        $openLeadsQuery = (clone $baseQuery)->where('lead_status', 'Open Lead');
+        $this->openLeadsCount = $openLeadsQuery->count();
+        
+        foreach ($funnelStages as $stage) {
+            $count = (clone $baseQuery)->where('lead_status', $stage)->count();
+            $funnelData[$stage] = $count;
+        }
+        
+        // Ensure all stages are present even if count is 0
+        foreach ($funnelStages as $stage) {
+            if (!isset($funnelData[$stage])) {
+                $funnelData[$stage] = 0;
+            }
+        }
+        
+        $this->funnelData = $funnelData;
+
+        // COUNTRY / VISA TYPE ANALYTICS
+        $allLeads = (clone $baseQuery)->whereNotNull('step_2_data')->get();
+        
+        $visaTypes = [
+            'PR' => 0,
+            'Student Visa' => 0,
+            'Visit Visa' => 0,
+            'Work Permit' => 0
+        ];
+        
+        $countries = [
+            'Australia' => 0,
+            'New Zealand' => 0
+        ];
+
+        foreach ($allLeads as $lead) {
+            // Handle both array (from cast) and JSON string (backward compatibility)
+            $step2Data = is_array($lead->step_2_data) ? $lead->step_2_data : (json_decode($lead->step_2_data, true) ?? []);
+            
+            // Extract visa type - handle both numeric ID (new format) and string (old format)
+            $visaTypeName = null;
+            if (isset($step2Data['visa_type'])) {
+                $visaTypeValue = $step2Data['visa_type'];
+                
+                if (is_numeric($visaTypeValue)) {
+                    // New format: Look up visa type by ID
+                    $visaTypeModel = NewLeadVisaType::find($visaTypeValue);
+                    if ($visaTypeModel) {
+                        $visaTypeName = $visaTypeModel->name;
+                    }
+                } else {
+                    // Old format: string values - map to proper names
+                    $visaTypeLower = strtolower($visaTypeValue);
+                    $visaTypeMap = [
+                        'pr' => 'PR',
+                        'permanent residence' => 'PR',
+                        'student' => 'Student Visa',
+                        'student visa' => 'Student Visa',
+                        'visit' => 'Visit Visa',
+                        'visit visa' => 'Visit Visa',
+                        'work' => 'Work Permit',
+                        'work permit' => 'Work Permit',
+                    ];
+                    $visaTypeName = $visaTypeMap[$visaTypeLower] ?? null;
+                }
+                
+                // Count visa type
+                if ($visaTypeName && isset($visaTypes[$visaTypeName])) {
+                    $visaTypes[$visaTypeName]++;
+                }
+            }
+            
+            // Extract country based on visa type
+            $country = null;
+            if (isset($step2Data['visa_type'])) {
+                $visaTypeValue = $step2Data['visa_type'];
+                $sectionId = null;
+                
+                // Determine section ID
+                if (is_numeric($visaTypeValue)) {
+                    $visaTypeModel = NewLeadVisaType::find($visaTypeValue);
+                    if ($visaTypeModel) {
+                        $visaTypeNameForSection = $visaTypeModel->name;
+                        $sectionMap = [
+                            'PR' => 'pr',
+                            'Permanent Residence' => 'pr',
+                            'Visit Visa' => 'visit',
+                            'Work Permit' => 'work',
+                            'Student Visa' => 'student',
+                        ];
+                        foreach($sectionMap as $key => $value) {
+                            if(stripos($visaTypeNameForSection, $key) !== false) {
+                                $sectionId = $value;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    $sectionId = strtolower($visaTypeValue);
+                }
+                
+                // Get country based on section
+                if ($sectionId == 'pr' && isset($step2Data['pr_preferred_country'])) {
+                    $country = $step2Data['pr_preferred_country'];
+                } elseif ($sectionId == 'visit' && isset($step2Data['visit_preferred_country'])) {
+                    $country = $step2Data['visit_preferred_country'];
+                } elseif ($sectionId == 'work' && isset($step2Data['work_preferred_country'])) {
+                    $country = $step2Data['work_preferred_country'];
+                } elseif ($sectionId == 'student' && isset($step2Data['student_country'])) {
+                    $country = $step2Data['student_country'];
+                }
+            }
+            
+            // Count country (case-insensitive matching)
+            if ($country) {
+                $countryNormalized = ucwords(strtolower(trim($country)));
+                // Check for Australia variations
+                if (stripos($country, 'australia') !== false || $countryNormalized === 'Australia') {
+                    $countries['Australia']++;
+                }
+                // Check for New Zealand variations
+                elseif (stripos($country, 'new zealand') !== false || $countryNormalized === 'New Zealand') {
+                    $countries['New Zealand']++;
+                }
+            }
+        }
+        
+        $this->visaTypes = $visaTypes;
+        $this->countries = $countries;
+
+        // SOURCE-WISE LEADS
+        $leadSources = [
+            'Facebook' => 0,
+            'Google Ads' => 0,
+            'Walk-in' => 0,
+            'WhatsApp Inquiry' => 0,
+            'Reference' => 0,
+            'Website' => 0,
+            'Email Marketing' => 0
+        ];
+
+        $sourceLeads = (clone $baseQuery)->select('lead_source', DB::raw('count(*) as count'))
+            ->whereNotNull('lead_source')
+            ->groupBy('lead_source')
+            ->get();
+
+        foreach ($sourceLeads as $sourceLead) {
+            $source = $sourceLead->lead_source;
+            if (isset($leadSources[$source])) {
+                $leadSources[$source] = $sourceLead->count;
+            }
+        }
+        
+        $this->leadSources = $leadSources;
+
+        // FOLLOW-UP & TASK TRACKER
+        $followUpBaseQuery = NewLeadFollowUp::where('status', 'pending');
+        
+        if ($viewPermission == 'owned') {
+            $followUpBaseQuery->whereHas('newLead', function($q) {
+                $q->where('lead_owner', user()->id);
+            });
+        } elseif ($viewPermission == 'added') {
+            $followUpBaseQuery->whereHas('newLead', function($q) {
+                $q->where('added_by', user()->id);
+            });
+        } elseif ($viewPermission == 'both') {
+            $followUpBaseQuery->whereHas('newLead', function($q) {
+                $q->where(function($q2) {
+                    $q2->where('lead_owner', user()->id)
+                       ->orWhere('added_by', user()->id);
+                });
+            });
+        }
+
+        $this->todayFollowups = (clone $followUpBaseQuery)->whereDate('next_follow_up_date', $todayDate)->count();
+        $this->overdueFollowups = (clone $followUpBaseQuery)->where('next_follow_up_date', '<', $now)->count();
+        
+        // Upcoming Meetings (next 7 days)
+        $upcomingEnd = $now->copy()->addDays(7);
+        $this->upcomingMeetings = (clone $followUpBaseQuery)
+            ->where('follow_up_type', 'meeting')
+            ->whereBetween('next_follow_up_date', [$now, $upcomingEnd])
+            ->count();
+        
+        // Pending Calls
+        $this->pendingCalls = (clone $followUpBaseQuery)
+            ->where('follow_up_type', 'call')
+            ->where('next_follow_up_date', '>=', $now)
+            ->count();
+
+        // REVENUE & PAYMENT ANALYTICS (Admin only)
+        if ($this->isAdmin) {
+            $this->totalExpectedRevenue = NewLeadAccount::sum('total_amount') ?? 0;
+            $this->collectedPayments = NewLeadAccount::where('status', 'received')->sum('total_amount') ?? 0;
+            $this->pendingPayments = NewLeadAccount::where('status', 'pending')->sum('total_amount') ?? 0;
+            
+            // Month-wise Revenue Trend (last 12 months)
+            $monthlyRevenue = [];
+            for ($i = 11; $i >= 0; $i--) {
+                $monthStart = $now->copy()->subMonths($i)->startOfMonth();
+                $monthEnd = $now->copy()->subMonths($i)->endOfMonth();
+                $monthName = $monthStart->format('M Y');
+                
+                $monthRevenueAmount = NewLeadAccount::where('status', 'received')
+                    ->whereBetween('invoice_date', [$monthStart->toDateString(), $monthEnd->toDateString()])
+                    ->sum('total_amount');
+                
+                $monthlyRevenue[$monthName] = round($monthRevenueAmount ?? 0, 2);
+            }
+            $this->monthlyRevenue = $monthlyRevenue;
+        } else {
+            $this->totalExpectedRevenue = 0;
+            $this->collectedPayments = 0;
+            $this->pendingPayments = 0;
+            $this->monthlyRevenue = [];
+        }
+
+        // Ensure all variables are set for the view
+        $this->data['totalLeads'] = $this->totalLeads;
+        $this->data['newLeadsToday'] = $this->newLeadsToday;
+        $this->data['newLeadsThisWeek'] = $this->newLeadsThisWeek;
+        $this->data['closedLeads'] = $this->closedLeads;
+        $this->data['followUpsToday'] = $this->followUpsToday;
+        $this->data['revenueGenerated'] = $this->revenueGenerated;
+        $this->data['funnelData'] = $this->funnelData;
+        $this->data['openLeadsCount'] = $this->openLeadsCount;
+        $this->data['visaTypes'] = $this->visaTypes;
+        $this->data['countries'] = $this->countries;
+        $this->data['leadSources'] = $this->leadSources;
+        $this->data['todayFollowups'] = $this->todayFollowups;
+        $this->data['overdueFollowups'] = $this->overdueFollowups;
+        $this->data['upcomingMeetings'] = $this->upcomingMeetings;
+        $this->data['pendingCalls'] = $this->pendingCalls;
+        $this->data['isAdmin'] = $this->isAdmin;
+        $this->data['isConsultant'] = $this->isConsultant;
+        $this->data['totalExpectedRevenue'] = $this->totalExpectedRevenue ?? 0;
+        $this->data['collectedPayments'] = $this->collectedPayments ?? 0;
+        $this->data['pendingPayments'] = $this->pendingPayments ?? 0;
+        $this->data['monthlyRevenue'] = $this->monthlyRevenue ?? [];
 
         return view('lead-dashboard.index', $this->data);
     }

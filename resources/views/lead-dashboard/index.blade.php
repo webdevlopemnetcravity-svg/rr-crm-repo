@@ -183,6 +183,99 @@
             .dashboard-row:last-child {
                 margin-bottom: 0;
             }
+            .dashboard-section-card {
+                background: #FFFFFF;
+                border-radius: 12px;
+                box-shadow: 0px 6px 18px 0px rgb(0 0 0 / 3%);
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            .dashboard-section-title {
+                font-family: 'Inter', sans-serif;
+                font-weight: 600;
+                font-size: 16px;
+                line-height: 1.21em;
+                color: #000000;
+                margin-bottom: 20px;
+            }
+            .funnel-container {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .funnel-stage {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 12px 15px;
+                background: #F8F9FA;
+                border-radius: 8px;
+                border-left: 4px solid #713ED9;
+            }
+            .funnel-stage-label {
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                font-size: 14px;
+                color: #000000;
+                min-width: 200px;
+            }
+            .funnel-stage-count {
+                font-family: 'Inter', sans-serif;
+                font-weight: 600;
+                font-size: 16px;
+                color: #713ED9;
+                min-width: 60px;
+            }
+            .funnel-stage-percentage {
+                font-family: 'Inter', sans-serif;
+                font-weight: 400;
+                font-size: 14px;
+                color: #6C6C6C;
+                min-width: 80px;
+            }
+            .funnel-bar {
+                flex: 1;
+                height: 24px;
+                background: #E9ECEF;
+                border-radius: 4px;
+                overflow: hidden;
+                position: relative;
+            }
+            .funnel-bar-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #713ED9 0%, #9D6FE8 100%);
+                transition: width 0.3s ease;
+            }
+            .task-tracker-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 15px;
+                background: #FFFFFF;
+                border-radius: 8px;
+                border: 1px solid #E9ECEF;
+                margin-bottom: 12px;
+            }
+            .task-tracker-item.overdue {
+                background: #FFF5F5;
+                border-color: #DF3046;
+                border-left: 4px solid #DF3046;
+            }
+            .task-tracker-label {
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                font-size: 14px;
+                color: #000000;
+            }
+            .task-tracker-value {
+                font-family: 'Inter', sans-serif;
+                font-weight: 600;
+                font-size: 16px;
+                color: #DF3046;
+            }
+            .task-tracker-value.normal {
+                color: #713ED9;
+            }
             @media (max-width: 992px) {
                 .dashboard-time-badges {
                     gap: 15px;
@@ -203,240 +296,376 @@
                 .dashboard-time-badge-item {
                     flex: 0 0 auto;
                 }
+                .funnel-stage {
+                    flex-wrap: wrap;
+                }
+                .funnel-stage-label {
+                    min-width: 100%;
+                }
             }
         </style>
         
-        <div class="row dashboard-row">
+        @php
+            // Data is passed from controller
+            $totalLeads = $totalLeads ?? 0;
+            $newLeadsToday = $newLeadsToday ?? 0;
+            $newLeadsThisWeek = $newLeadsThisWeek ?? 0;
+            $closedLeads = $closedLeads ?? 0;
+            $followUpsToday = $followUpsToday ?? 0;
+            $revenueGenerated = $revenueGenerated ?? 0;
+            
+            // Lead Status Funnel Data
+            $funnelStages = $funnelData ?? [];
+            $openLeadsCount = $openLeadsCount ?? 0;
+            
+            // Country/Visa Type Data
+            $visaTypes = $visaTypes ?? [
+                'PR' => 0,
+                'Student Visa' => 0,
+                'Visit Visa' => 0,
+                'Work Permit' => 0
+            ];
+            $countries = $countries ?? [
+                'Australia' => 0,
+                'New Zealand' => 0
+            ];
+            
+            // Source-wise Leads
+            $leadSources = $leadSources ?? [
+                'Facebook' => 0,
+                'Google Ads' => 0,
+                'Walk-in' => 0,
+                'WhatsApp Inquiry' => 0,
+                'Reference' => 0,
+                'Website' => 0,
+                'Email Marketing' => 0
+            ];
+            
+            // Follow-up & Task Tracker
+            $todayFollowups = $todayFollowups ?? 0;
+            $overdueFollowups = $overdueFollowups ?? 0;
+            $upcomingMeetings = $upcomingMeetings ?? 0;
+            $pendingCalls = $pendingCalls ?? 0;
+            
+            // Revenue & Payment Analytics (Admin only)
+            $totalExpectedRevenue = $totalExpectedRevenue ?? 0;
+            $collectedPayments = $collectedPayments ?? 0;
+            $pendingPayments = $pendingPayments ?? 0;
+            $monthlyRevenue = $monthlyRevenue ?? [];
+        @endphp
+        
+        <!-- TOP SUMMARY CARDS (KPIs) -->
+        <div class="row">
             <!-- Total Leads Card -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-title">
-                        <div class="dashboard-card-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 17L12 22L22 17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 12L12 17L22 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <span>Total Leads</span>
-                    </div>
-                    <div class="dashboard-card-number">12</div>
-                    <div class="dashboard-card-separator"></div>
-                    <div class="dashboard-current-month">
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-cyan">0</div>
-                            <span class="dashboard-current-month-label">Current Month</span>
-                        </div>
-                        <div class="dashboard-total-group">
-                            <span class="dashboard-total-label">Total</span>
-                            <span class="dashboard-total-value">12</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                <x-cards.widget title="Total Leads" :value="$totalLeads" icon="users">
+                </x-cards.widget>
             </div>
 
-            <!-- Reg. Leads Card -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-title">
-                        <span>Reg. Leads</span>
-                    </div>
-                    <div class="dashboard-card-separator"></div>
-                    <div class="dashboard-current-month">
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-dark-green">0</div>
-                            <span class="dashboard-current-month-label">Current Month</span>
-                        </div>
-                        <div class="dashboard-total-group">
-                            <span class="dashboard-total-label">Total</span>
-                            <span class="dashboard-total-value">5</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- New Leads Card -->
+            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                <x-cards.widget title="New Leads this week" :value="$newLeadsThisWeek" icon="users">
+                </x-cards.widget>
             </div>
 
-            <!-- Open Leads Card -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-title">
-                        <div class="dashboard-card-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 17L12 22L22 17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 12L12 17L22 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <span>Open Leads</span>
-                    </div>
-                    <div class="dashboard-card-separator"></div>
-                    <div class="dashboard-current-month">
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-yellow">0</div>
-                            <span class="dashboard-current-month-label">Current Month</span>
-                        </div>
-                        <div class="dashboard-total-group">
-                            <span class="dashboard-total-label">Total</span>
-                            <span class="dashboard-total-value">7</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- Closed Leads Card -->
+            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                <x-cards.widget title="Closed Leads" :value="$closedLeads" icon="check-circle">
+                </x-cards.widget>
             </div>
 
-            <!-- Open Invoices Card -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-title">
-                        <div class="dashboard-card-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M14 2V8H20" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+            <!-- Follow-ups Today Card (CONSULTANT only) -->
+            @if($isConsultant)
+            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                <x-cards.widget title="Follow-ups Today" :value="$followUpsToday" icon="clock">
+                </x-cards.widget>
+            </div>
+            @endif
+
+            <!-- Revenue Generated Card (ADMIN only) -->
+            @if($isAdmin)
+            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+                <x-cards.widget title="Revenue Generated (₹)" :value="'₹' . number_format($revenueGenerated ?? 0, 0)" icon="dollar-sign">
+                </x-cards.widget>
+            </div>
+            @endif
+        </div>
+
+        <!-- LEAD STATUS FUNNEL -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <x-cards.data title="Lead Status Funnel">
+                    <div class="row">
+                        <!-- Left Column - 7 Statuses -->
+                        <div class="col-lg-6 col-md-12 pr-lg-3">
+                            <div class="funnel-container">
+                                @php
+                                    $leftStages = array_slice($funnelStages, 0, 7, true);
+                                @endphp
+                                @foreach($leftStages as $stageName => $stageCount)
+                                    @php
+                                        $percentage = $openLeadsCount > 0 ? round(($stageCount / $openLeadsCount) * 100, 1) : 0;
+                                        $barWidth = $openLeadsCount > 0 ? ($stageCount / $openLeadsCount) * 100 : 0;
+                                    @endphp
+                                    <div class="funnel-stage">
+                                        <div class="funnel-stage-label">{{ $stageName }}</div>
+                                        <div class="funnel-stage-count">{{ $stageCount }}</div>
+                                        <div class="funnel-bar">
+                                            <div class="funnel-bar-fill" style="width: {{ $barWidth }}%"></div>
+                                        </div>
+                                        <div class="funnel-stage-percentage">{{ $percentage }}%</div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                        <span>Open Invoices</span>
+                        <!-- Right Column - 6 Statuses -->
+                        <div class="col-lg-6 col-md-12 pl-lg-3">
+                            <div class="funnel-container">
+                                @php
+                                    $rightStages = array_slice($funnelStages, 7, 6, true);
+                                @endphp
+                                @foreach($rightStages as $stageName => $stageCount)
+                                    @php
+                                        $percentage = $openLeadsCount > 0 ? round(($stageCount / $openLeadsCount) * 100, 1) : 0;
+                                        $barWidth = $openLeadsCount > 0 ? ($stageCount / $openLeadsCount) * 100 : 0;
+                                    @endphp
+                                    <div class="funnel-stage">
+                                        <div class="funnel-stage-label">{{ $stageName }}</div>
+                                        <div class="funnel-stage-count">{{ $stageCount }}</div>
+                                        <div class="funnel-bar">
+                                            <div class="funnel-bar-fill" style="width: {{ $barWidth }}%"></div>
+                                        </div>
+                                        <div class="funnel-stage-percentage">{{ $percentage }}%</div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
-                    <div class="dashboard-card-separator"></div>
-                    <div class="dashboard-current-month">
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-yellow">1</div>
-                            <span class="dashboard-current-month-label">Open Invoices</span>
-                        </div>
-                        <div class="dashboard-total-group">
-                            <span class="dashboard-total-label">Total</span>
-                            <span class="dashboard-total-value">12</span>
-                        </div>
-                    </div>
-                </div>
+                </x-cards.data>
             </div>
         </div>
 
-        <div class="row dashboard-row">
-            <!-- Total Actioned Lead Card -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-title">
-                        <div class="dashboard-card-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 17L12 22L22 17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 12L12 17L22 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <span>Total Actioned Lead</span>
+        <!-- COUNTRY / VISA TYPE ANALYTICS -->
+        <div class="row mt-3">
+            <div class="col-sm-12 col-lg-6">
+                <x-cards.data title="Visa Types">
+                    <div id="visa-types-chart" style="height: 300px;"></div>
+                </x-cards.data>
+            </div>
+            <div class="col-sm-12 col-lg-6">
+                <x-cards.data title="Top Countries">
+                    <div id="countries-chart" style="height: 300px;"></div>
+                </x-cards.data>
+            </div>
+        </div>
+
+        <!-- SOURCE-WISE LEADS -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <x-cards.data title="Source-wise Leads">
+                    <div id="source-leads-chart" style="height: 350px;"></div>
+                </x-cards.data>
+            </div>
+        </div>
+
+        <!-- FOLLOW-UP & TASK TRACKER AND REVENUE OVERVIEW -->
+        <div class="row mt-3">
+            <!-- FOLLOW-UP & TASK TRACKER -->
+            <div class="col-sm-12 col-lg-6">
+                <x-cards.data title="Follow-up & Task Tracker">
+                    <div class="task-tracker-item {{ $overdueFollowups > 0 ? 'overdue' : '' }}">
+                        <span class="task-tracker-label">Overdue Follow-ups</span>
+                        <span class="task-tracker-value">{{ $overdueFollowups }}</span>
                     </div>
-                    <div class="dashboard-card-number">1</div>
-                    <div class="dashboard-card-separator"></div>
-                    <div class="dashboard-time-badges">
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-yellow">0</div>
-                            <span class="dashboard-time-label">W</span>
-                        </div>
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-red">0</div>
-                            <span class="dashboard-time-label">M</span>
-                        </div>
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-green">1</div>
-                            <span class="dashboard-time-label">Y</span>
-                        </div>
+                    <div class="task-tracker-item">
+                        <span class="task-tracker-label">Today Follow-ups</span>
+                        <span class="task-tracker-value normal">{{ $todayFollowups }}</span>
                     </div>
-                </div>
+                    <div class="task-tracker-item">
+                        <span class="task-tracker-label">Upcoming Meetings</span>
+                        <span class="task-tracker-value normal">{{ $upcomingMeetings }}</span>
+                    </div>
+                    <div class="task-tracker-item">
+                        <span class="task-tracker-label">Pending Calls</span>
+                        <span class="task-tracker-value normal">{{ $pendingCalls }}</span>
+                    </div>
+                </x-cards.data>
             </div>
 
-            <!-- Total Actioned Awaited Leads Card -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-title">
-                        <div class="dashboard-card-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 17L12 22L22 17" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M2 12L12 17L22 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
+            <!-- REVENUE OVERVIEW (ADMIN ONLY) -->
+            @if($isAdmin)
+            <div class="col-sm-12 col-lg-6">
+                <x-cards.data title="Revenue Overview">
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #F8F9FA; border-radius: 8px;">
+                            <span style="font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; color: #000000;">Total Expected Revenue</span>
+                            <span style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; color: #713ED9;">₹{{ number_format($totalExpectedRevenue, 0) }}</span>
                         </div>
-                        <span>Total Actioned Awaited Leads</span>
-                    </div>
-                    <div class="dashboard-card-number">6</div>
-                    <div class="dashboard-card-separator"></div>
-                    <div class="dashboard-time-badges">
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-yellow">0</div>
-                            <span class="dashboard-time-label">W</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #F8F9FA; border-radius: 8px;">
+                            <span style="font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; color: #000000;">Collected Payments</span>
+                            <span style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; color: #1A8761;">₹{{ number_format($collectedPayments, 0) }}</span>
                         </div>
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-red">0</div>
-                            <span class="dashboard-time-label">M</span>
-                        </div>
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-green">6</div>
-                            <span class="dashboard-time-label">Y</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #F8F9FA; border-radius: 8px;">
+                            <span style="font-family: 'Inter', sans-serif; font-weight: 500; font-size: 14px; color: #000000;">Pending Payments</span>
+                            <span style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 16px; color: #DF3046;">₹{{ number_format($pendingPayments, 0) }}</span>
                         </div>
                     </div>
-                </div>
+                </x-cards.data>
             </div>
-
-            <!-- Total Followup Overdue Card -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-title dashboard-card-title-alt-1">
-                        <div class="dashboard-card-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="10" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 6V12L16 14" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <span>Total Followup Overdue</span>
-                    </div>
-                    <div class="dashboard-card-number dashboard-card-number-alt-1">1</div>
-                    <div class="dashboard-card-separator dashboard-card-separator-alt"></div>
-                    <div class="dashboard-time-badges dashboard-time-badges-alt">
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-yellow">0</div>
-                            <span class="dashboard-time-label">W</span>
-                        </div>
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-red">0</div>
-                            <span class="dashboard-time-label">M</span>
-                        </div>
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-green">1</div>
-                            <span class="dashboard-time-label">Y</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Application Done Card -->
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="dashboard-card">
-                    <div class="dashboard-card-title dashboard-card-title-alt-2">
-                        <div class="dashboard-card-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 6L9 17L4 12" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <span>Total Application Done</span>
-                    </div>
-                    <div class="dashboard-card-number dashboard-card-number-alt-1">0</div>
-                    <div class="dashboard-card-separator dashboard-card-separator-alt"></div>
-                    <div class="dashboard-time-badges dashboard-time-badges-alt">
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-yellow">0</div>
-                            <span class="dashboard-time-label">W</span>
-                        </div>
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-red">0</div>
-                            <span class="dashboard-time-label">M</span>
-                        </div>
-                        <div class="dashboard-time-badge-item">
-                            <div class="dashboard-badge dashboard-badge-green">0</div>
-                            <span class="dashboard-time-label">Y</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endif
         </div>
     </div>
     <!-- CONTENT WRAPPER END -->
+
+    <script src="{{ asset('vendor/jquery/frappe-charts.min.iife.js') }}"></script>
+    <script src="{{ asset('vendor/jquery/Chart.min.js') }}"></script>
+    <script>
+        // Visa Types Chart
+        @php
+            $visaTypesData = [
+                'labels' => array_keys($visaTypes),
+                'values' => array_values($visaTypes),
+                'colors' => ['#713ED9', '#0CC8F1', '#1A8761', '#FFBF09']
+            ];
+        @endphp
+        @if(array_sum($visaTypesData['values']) > 0)
+        var visaTypesData = {
+            labels: [
+                @foreach($visaTypesData['labels'] as $label)
+                    "{{ $label }}",
+                @endforeach
+            ],
+            datasets: [{
+                name: "Visa Types",
+                values: [
+                    @foreach($visaTypesData['values'] as $value)
+                        {{ $value }},
+                    @endforeach
+                ],
+                chartType: 'bar'
+            }]
+        };
+        var visaTypesChart = new frappe.Chart("#visa-types-chart", {
+            data: visaTypesData,
+            type: 'bar',
+            height: 300,
+            barOptions: {
+                stacked: false,
+                spaceRatio: 0.3
+            },
+            valuesOverPoints: 1,
+            axisOptions: {
+                yAxisMode: 'tick',
+                xAxisMode: 'tick',
+                xIsSeries: 0
+            },
+            colors: [
+                @foreach($visaTypesData['colors'] as $color)
+                    "{{ $color }}",
+                @endforeach
+            ]
+        });
+        @else
+        document.getElementById('visa-types-chart').innerHTML = '<div class="align-items-center d-flex flex-column text-lightest p-20" style="height: 300px;"><i class="side-icon bi bi-bar-chart"></i><div class="f-15 mt-4">- Not Enough Data -</div></div>';
+        @endif
+
+        // Countries Chart
+        @php
+            $countriesData = [
+                'labels' => array_keys($countries),
+                'values' => array_values($countries),
+                'colors' => ['#713ED9', '#0CC8F1']
+            ];
+        @endphp
+        @if(array_sum($countriesData['values']) > 0)
+        var countriesData = {
+            labels: [
+                @foreach($countriesData['labels'] as $label)
+                    "{{ $label }}",
+                @endforeach
+            ],
+            datasets: [{
+                name: "Countries",
+                values: [
+                    @foreach($countriesData['values'] as $value)
+                        {{ $value }},
+                    @endforeach
+                ],
+                chartType: 'bar'
+            }]
+        };
+        var countriesChart = new frappe.Chart("#countries-chart", {
+            data: countriesData,
+            type: 'bar',
+            height: 300,
+            barOptions: {
+                stacked: false,
+                spaceRatio: 0.3
+            },
+            valuesOverPoints: 1,
+            axisOptions: {
+                yAxisMode: 'tick',
+                xAxisMode: 'tick',
+                xIsSeries: 0
+            },
+            colors: [
+                @foreach($countriesData['colors'] as $color)
+                    "{{ $color }}",
+                @endforeach
+            ]
+        });
+        @else
+        document.getElementById('countries-chart').innerHTML = '<div class="align-items-center d-flex flex-column text-lightest p-20" style="height: 300px;"><i class="side-icon bi bi-bar-chart"></i><div class="f-15 mt-4">- Not Enough Data -</div></div>';
+        @endif
+
+        // Source-wise Leads Chart
+        @php
+            $sourceLeadsData = [
+                'labels' => array_keys($leadSources),
+                'values' => array_values($leadSources),
+                'colors' => ['#713ED9', '#0CC8F1', '#1A8761', '#FFBF09', '#DF3046', '#1B855B', '#9D6FE8']
+            ];
+        @endphp
+        @if(array_sum($sourceLeadsData['values']) > 0)
+        var sourceLeadsData = {
+            labels: [
+                @foreach($sourceLeadsData['labels'] as $label)
+                    "{{ $label }}",
+                @endforeach
+            ],
+            datasets: [{
+                name: "Source-wise Leads",
+                values: [
+                    @foreach($sourceLeadsData['values'] as $value)
+                        {{ $value }},
+                    @endforeach
+                ],
+                chartType: 'bar'
+            }]
+        };
+        var sourceLeadsChart = new frappe.Chart("#source-leads-chart", {
+            data: sourceLeadsData,
+            type: 'bar',
+            height: 350,
+            barOptions: {
+                stacked: false,
+                spaceRatio: 0.3
+            },
+            valuesOverPoints: 1,
+            axisOptions: {
+                yAxisMode: 'tick',
+                xAxisMode: 'tick',
+                xIsSeries: 0
+            },
+            colors: [
+                @foreach($sourceLeadsData['colors'] as $color)
+                    "{{ $color }}",
+                @endforeach
+            ]
+        });
+        @else
+        document.getElementById('source-leads-chart').innerHTML = '<div class="align-items-center d-flex flex-column text-lightest p-20" style="height: 350px;"><i class="side-icon bi bi-bar-chart"></i><div class="f-15 mt-4">- Not Enough Data -</div></div>';
+        @endif
+
+    </script>
 @endsection
-
-
