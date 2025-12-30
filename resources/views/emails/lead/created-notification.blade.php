@@ -25,10 +25,6 @@
             <li style="margin-bottom: 10px;"><strong>Created Date:</strong> {{ $lead->created_at->format('F d, Y h:i A') }}</li>
         </ul>
         
-        <div style="background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px; padding: 15px; margin: 20px 0;">
-            <p style="margin: 0; color: #155724;"><strong>Status:</strong> All 9 steps have been completed.</p>
-        </div>
-        
         <p>This lead has been assigned to you. Please review the lead details in the system and take appropriate action.</p>
         
         @php
