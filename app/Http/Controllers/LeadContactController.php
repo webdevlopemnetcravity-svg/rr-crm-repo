@@ -3773,6 +3773,11 @@ class LeadContactController extends AccountBaseController
     private function sendLeadAssignmentWhatsApp(NewLead $lead, $assignedUser = null)
     {
         try {
+            // Ensure company relationship is loaded
+            if (!$lead->relationLoaded('company')) {
+                $lead->load('company');
+            }
+            
             // Get lead phone number from step_1_data or mobile
             $leadPhone = null;
             if ($lead->step_1_data) {
@@ -3844,6 +3849,14 @@ class LeadContactController extends AccountBaseController
                 $consultantNumber ?: 'N/A'
             ];
 
+            // Get logo URL from company or use default
+            $logoUrl = 'https://lh3.googleusercontent.com/d/1o50KgJxSNFJCYEUOTEx33wBYK5LLD2Wc'; // Default logo
+            if ($lead->company) {
+                $logoUrl = $lead->company->light_logo_url ?? $logoUrl;
+            } elseif (company()) {
+                $logoUrl = company()->light_logo_url ?? $logoUrl;
+            }
+
             // Prepare API request payload - matching exact Postman working format
             $payload = [
                 'apiKey' => $apiKey,
@@ -3853,7 +3866,7 @@ class LeadContactController extends AccountBaseController
                 'templateParams' => $templateParams,
                 'source' => $source,
                 'media' => [
-                    'url' => 'https://d3jt6ku4g6z5l8.cloudfront.net/IMAGE/6353da2e153a147b991dd812/4958901_highanglekidcheatingschooltestmin.jpg',
+                    'url' => $logoUrl,
                     'filename' => 'sample_media'
                 ],
                 'buttons' => [],
