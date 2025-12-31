@@ -25,7 +25,12 @@
     var canvas;
     // logo id input file and set to image
     var input = document.getElementById(elementId);
-    var files = input.files;
+    
+    if (!input) {
+        console.error('Input element not found:', elementId);
+        $(MODAL_LG).modal('hide');
+    } else {
+        var files = input.files;
 
     function dataURLtoFile(dataurl) {
 
@@ -45,7 +50,7 @@
         });
     }
 
-    if (files.length > 0) {
+    if (files && files.length > 0) {
         var file = files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -53,16 +58,52 @@
 
             // delay to load image
             setTimeout(function () {
-                cropper = new Cropper(img, {
-                    viewMode: 1,
-                });
+                if (img && img.complete) {
+                    try {
+                        cropper = new Cropper(img, {
+                            viewMode: 1,
+                        });
+                    } catch (error) {
+                        console.error('Error initializing cropper:', error);
+                        $(MODAL_LG).modal('hide');
+                    }
+                } else {
+                    img.onload = function() {
+                        try {
+                            cropper = new Cropper(img, {
+                                viewMode: 1,
+                            });
+                        } catch (error) {
+                            console.error('Error initializing cropper:', error);
+                            $(MODAL_LG).modal('hide');
+                        }
+                    };
+                    img.onerror = function() {
+                        console.error('Error loading image');
+                        $(MODAL_LG).modal('hide');
+                    };
+                }
             }, 200);
 
-        }
+        };
+        reader.onerror = function() {
+            console.error('Error reading file');
+            $(MODAL_LG).modal('hide');
+        };
         reader.readAsDataURL(file);
+    } else {
+        // No file selected, show error or close modal
+        console.error('No file selected for cropping');
+        $(MODAL_LG).modal('hide');
+    }
     }
 
     $('#cropImage').click(function () {
+        if (!cropper) {
+            console.error('Cropper not initialized');
+            return;
+        }
+        
         $('#cropImage').attr('disabled', true);
         canvas = cropper.getCroppedCanvas();
 
@@ -82,7 +123,10 @@
     function onModelClose() {
         if(elementId != undefined && elementId != '') {
             $('#' + elementId).parent().find('.dropify-clear').click();
-            cropper.destroy();
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
             elementId = '';
         }
     }

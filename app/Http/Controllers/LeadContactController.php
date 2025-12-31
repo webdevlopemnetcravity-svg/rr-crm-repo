@@ -3892,13 +3892,8 @@ class LeadContactController extends AccountBaseController
                 $consultantNumber ?: 'N/A'
             ];
 
-            // Get logo URL from company or use default
-            $logoUrl = 'https://lh3.googleusercontent.com/d/1o50KgJxSNFJCYEUOTEx33wBYK5LLD2Wc'; // Default logo
-            if ($lead->company) {
-                $logoUrl = $lead->company->light_logo_url ?? $logoUrl;
-            } elseif (company()) {
-                $logoUrl = company()->light_logo_url ?? $logoUrl;
-            }
+            // Use default logo URL
+            $logoUrl = 'https://crm.rrpateloverseas.com/user-uploads/app-logo/a8ca4aa7cc63d81a6763972296948880.png';
 
             // Prepare API request payload - matching exact Postman working format
             $payload = [
@@ -3910,7 +3905,7 @@ class LeadContactController extends AccountBaseController
                 'source' => $source,
                 'media' => [
                     'url' => $logoUrl,
-                    'filename' => 'sample_media'
+                    'filename' => 'RR Patels'
                 ],
                 'buttons' => [],
                 'carouselCards' => [],
@@ -3931,13 +3926,24 @@ class LeadContactController extends AccountBaseController
 
             $responseBody = json_decode($response->getBody()->getContents(), true);
 
+            // Check both status code and response body for success
             if ($response->getStatusCode() === 200) {
-                \Log::info('WhatsApp notification sent successfully to lead. Lead ID: ' . $lead->id . ', Phone: ' . $leadPhone);
+                // Check if response indicates success (some APIs return 200 with error in body)
+                if (isset($responseBody['status']) && $responseBody['status'] === 'success') {
+                    \Log::info('WhatsApp notification sent successfully to lead. Lead ID: ' . $lead->id . ', Phone: ' . $leadPhone);
+                } elseif (isset($responseBody['message']) && strpos(strtolower($responseBody['message']), 'error') !== false) {
+                    \Log::error('AISensy API error in response body for lead assignment WhatsApp: ' . json_encode($responseBody));
+                } else {
+                    // Log full response for debugging
+                    \Log::info('WhatsApp notification response for lead assignment: ' . json_encode($responseBody));
+                    \Log::info('WhatsApp notification sent successfully to lead. Lead ID: ' . $lead->id . ', Phone: ' . $leadPhone);
+                }
             } else {
-                \Log::error('AISensy API error for lead assignment WhatsApp: ' . json_encode($responseBody));
+                \Log::error('AISensy API error for lead assignment WhatsApp: Status ' . $response->getStatusCode() . ', Response: ' . json_encode($responseBody));
             }
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $errorMessage = $e->getMessage();
+            $errorResponse = null;
             try {
                 $errorResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
                 if (is_array($errorResponse) && isset($errorResponse['message'])) {
@@ -3947,6 +3953,9 @@ class LeadContactController extends AccountBaseController
                 // If we can't parse the error response, use the original message
             }
             \Log::error('AISensy API client error for lead assignment WhatsApp: ' . $e->getMessage());
+            if ($errorResponse) {
+                \Log::error('AISensy API error response body: ' . json_encode($errorResponse));
+            }
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             \Log::error('AISensy API request error for lead assignment WhatsApp: ' . $e->getMessage());
         } catch (\Exception $e) {
@@ -6104,26 +6113,83 @@ class LeadContactController extends AccountBaseController
             }
             
             // Upload PDF content to storage (cloud storage if configured)
+            $documentUrl = '';
             try {
                 \Storage::disk(config('filesystems.default'))->put($folderPath . '/' . $pdfFilename, $pdfContent, $fileVisibility);
                 $documentUrl = asset_url_local_s3($folderPath . '/' . $pdfFilename);
+                
+                // Ensure URL is absolute and publicly accessible
+                if (!empty($documentUrl) && !\Str::startsWith($documentUrl, 'http')) {
+                    $documentUrl = url($documentUrl);
+                }
+                
+                \Log::info('Travel details PDF URL generated: ' . $documentUrl);
             } catch (\Exception $e) {
                 \Log::error('Failed to upload travel details PDF to storage: ' . $e->getMessage());
-                // Fallback to public URL
-                $documentUrl = asset($publicFolderPath . '/' . $pdfFilename);
+                // Fallback to public URL - ensure it's absolute
+                $documentUrl = url($publicFolderPath . '/' . $pdfFilename);
+                \Log::info('Using fallback PDF URL: ' . $documentUrl);
+            }
+            
+            // Final check - ensure we have a valid URL
+            if (empty($documentUrl)) {
+                \Log::error('Travel details PDF URL is empty. File path: ' . $folderPath . '/' . $pdfFilename);
+                $documentUrl = url($publicFolderPath . '/' . $pdfFilename);
+            }
+            
+            // Log the final URL being sent to WhatsApp API
+            \Log::info('Sending travel details PDF to WhatsApp. URL: ' . $documentUrl . ', Filename: ' . $pdfFilename);
+            
+            // Verify PDF file exists and is accessible
+            if (\File::exists($publicFileFullPath)) {
+                $fileSize = \File::size($publicFileFullPath);
+                \Log::info('PDF file verified. Size: ' . $fileSize . ' bytes');
+            } else {
+                \Log::warning('PDF file not found at: ' . $publicFileFullPath);
             }
 
-            // API configuration - use same campaign as template documents since they have same template variables
+            // API configuration - use journey_details campaign for travel details
             $apiKey = env('AISENSY_API_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzdmM2RjNmZhOGUxMDEzYzdlMDgzZSIsIm5hbWUiOiJSLlIgcGF0ZWwgIG5ldyIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2ODcyMzU5ZGRlNjFiYjMxOTgzMzc2NDMiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTc2MDM1NTc4OX0.6H8mv7r3R0ucc7APyDM1q0xew4-oBUVKqUHA38klVG4');
-            $campaignName = env('AISENSY_TRAVEL_DETAILS_CAMPAIGN', env('AISENSY_TEMPLATE_DOCUMENT_CAMPAIGN', 'additional_details_requested1'));
+            $campaignName = env('AISENSY_TRAVEL_DETAILS_CAMPAIGN', 'journey_details');
             $userName = env('AISENSY_USER_NAME', 'R.R patel  new');
             $source = env('AISENSY_SOURCE', 'new-landing-page form');
 
-            // Prepare template parameters
+            // Prepare template parameters - journey_details template requires 15 parameters
+            // Map travel details to template parameters
+            $formatDate = function($date) {
+                if (empty($date)) return 'N/A';
+                try {
+                    if (is_string($date)) {
+                        $dateObj = \Carbon\Carbon::parse($date);
+                        return $dateObj->format('d-M-Y');
+                    }
+                    return $date->format('d-M-Y');
+                } catch (\Exception $e) {
+                    return $date;
+                }
+            };
+            
+            $getValue = function($value, $default = 'N/A') {
+                return !empty($value) ? $value : $default;
+            };
+            
+            // Prepare 15 template parameters based on travel details
             $templateParams = [
-                $leadName,
-                $consultantName,
-                $consultantNumber ?: 'N/A'
+                $leadName, // 1. Lead name
+                $getValue($travelDetails->purpose_of_trip), // 2. Purpose of trip
+                $getValue($travelDetails->place_to_visit), // 3. Place to visit
+                $formatDate($travelDetails->date_of_arrival), // 4. Arrival date
+                $getValue($travelDetails->arrival_flight), // 5. Arrival flight
+                $getValue($travelDetails->arrival_city), // 6. Arrival city
+                $formatDate($travelDetails->date_of_departure), // 7. Departure date
+                $getValue($travelDetails->departure_flight), // 8. Departure flight
+                $getValue($travelDetails->departure_city), // 9. Departure city
+                $getValue($travelDetails->address_stay), // 10. Address
+                $getValue($travelDetails->city), // 11. City
+                $getValue($travelDetails->state), // 12. State
+                $getValue($travelDetails->postal_code), // 13. Postal code
+                $consultantName, // 14. Consultant name
+                $consultantNumber ?: 'N/A' // 15. Consultant number
             ];
 
             // Prepare API request payload
@@ -6146,6 +6212,15 @@ class LeadContactController extends AccountBaseController
                     'FirstName' => $leadName
                 ]
             ];
+            
+            // Log payload for debugging (without sensitive data)
+            \Log::info('Travel details WhatsApp payload: ' . json_encode([
+                'campaignName' => $campaignName,
+                'destination' => $leadPhone,
+                'media_url' => $documentUrl,
+                'media_filename' => $pdfFilename,
+                'templateParams_count' => count($templateParams)
+            ]));
 
             // Make API call to AISensy
             $client = new Client();
@@ -6159,13 +6234,24 @@ class LeadContactController extends AccountBaseController
 
             $responseBody = json_decode($response->getBody()->getContents(), true);
 
+            // Check both status code and response body for success
             if ($response->getStatusCode() === 200) {
-                \Log::info('Travel details WhatsApp notification sent successfully. Lead ID: ' . $lead->id . ', Phone: ' . $leadPhone);
+                // Check if response indicates success (some APIs return 200 with error in body)
+                if (isset($responseBody['status']) && $responseBody['status'] === 'success') {
+                    \Log::info('Travel details WhatsApp notification sent successfully. Lead ID: ' . $lead->id . ', Phone: ' . $leadPhone);
+                } elseif (isset($responseBody['message']) && strpos(strtolower($responseBody['message']), 'error') !== false) {
+                    \Log::error('AISensy API error in response body for travel details WhatsApp: ' . json_encode($responseBody));
+                } else {
+                    // Log full response for debugging
+                    \Log::info('Travel details WhatsApp notification response: ' . json_encode($responseBody));
+                    \Log::info('Travel details WhatsApp notification sent successfully. Lead ID: ' . $lead->id . ', Phone: ' . $leadPhone);
+                }
             } else {
-                \Log::error('AISensy API error for travel details WhatsApp: ' . json_encode($responseBody));
+                \Log::error('AISensy API error for travel details WhatsApp: Status ' . $response->getStatusCode() . ', Response: ' . json_encode($responseBody));
             }
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $errorMessage = $e->getMessage();
+            $errorResponse = null;
             try {
                 $errorResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
                 if (is_array($errorResponse) && isset($errorResponse['message'])) {
@@ -6175,6 +6261,9 @@ class LeadContactController extends AccountBaseController
                 // If we can't parse the error response, use the original message
             }
             \Log::error('AISensy API client error for travel details WhatsApp: ' . $e->getMessage());
+            if ($errorResponse) {
+                \Log::error('AISensy API error response body for travel details: ' . json_encode($errorResponse));
+            }
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             \Log::error('AISensy API request error for travel details WhatsApp: ' . $e->getMessage());
         } catch (\Exception $e) {
