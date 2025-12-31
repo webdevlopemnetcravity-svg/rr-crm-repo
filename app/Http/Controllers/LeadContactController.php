@@ -5882,6 +5882,308 @@ class LeadContactController extends AccountBaseController
     }
 
     /**
+     * Notify client with travel details via email and WhatsApp
+     */
+    public function notifyTravelDetails(Request $request, $leadId)
+    {
+        // Increase execution time limit for PDF generation
+        set_time_limit(120);
+        
+        try {
+            $lead = NewLead::with(['travelDetails', 'leadOwner', 'company', 'addedBy'])->findOrFail($leadId);
+            
+            if (!$lead->travelDetails) {
+                return Reply::error('Travel details not found for this lead.');
+            }
+
+            $travelDetails = $lead->travelDetails;
+
+            // Get lead email from step_1_data or client_email
+            $leadEmail = null;
+            if ($lead->step_1_data) {
+                $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : $lead->step_1_data;
+                if (is_array($step1Data)) {
+                    $leadEmail = $step1Data['email_address'] ?? null;
+                }
+            }
+            
+            if (empty($leadEmail)) {
+                $leadEmail = $lead->client_email;
+            }
+
+            // Get lead name
+            $leadName = $lead->client_name ?? 'Client';
+            if ($lead->step_1_data) {
+                $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : $lead->step_1_data;
+                if (is_array($step1Data)) {
+                    $givenName = $step1Data['given_name'] ?? '';
+                    $surname = $step1Data['surname'] ?? '';
+                    if ($givenName || $surname) {
+                        $leadName = trim($givenName . ' ' . $surname) ?: $leadName;
+                    }
+                }
+            }
+
+            // Get consultant details
+            $consultantName = 'Our Team';
+            $consultantNumber = '';
+            
+            if ($lead->lead_owner) {
+                $assignedUser = User::find($lead->lead_owner);
+                if ($assignedUser) {
+                    $consultantName = $assignedUser->name ?? 'Our Team';
+                    $consultantNumber = $assignedUser->mobile ?? $assignedUser->phone ?? '';
+                    // Format consultant number - keep only 10 digits (no country code)
+                    if ($consultantNumber) {
+                        $consultantNumber = preg_replace('/[^0-9]/', '', $consultantNumber);
+                        $consultantNumber = ltrim($consultantNumber, '0');
+                        if (strlen($consultantNumber) > 10) {
+                            $consultantNumber = substr($consultantNumber, -10);
+                        }
+                    }
+                }
+            }
+
+            // Generate PDF with travel details
+            $pdf = $this->generateTravelDetailsPDF($lead, $travelDetails);
+            $pdfContent = $pdf->output();
+            $pdfFilename = 'Travel_Details_' . $lead->id . '_' . date('Y-m-d_His') . '.pdf';
+
+            // Send email with PDF attachment
+            if ($leadEmail && filter_var($leadEmail, FILTER_VALIDATE_EMAIL)) {
+                try {
+                    Mail::to($leadEmail)->send(new \App\Mail\TravelDetailsNotification($lead, $travelDetails, $pdfContent, $pdfFilename, $leadName, $consultantName, $consultantNumber));
+                    \Log::info('Travel details email sent successfully to: ' . $leadEmail);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send travel details email: ' . $e->getMessage());
+                }
+            }
+
+            // Send WhatsApp notification
+            $this->sendTravelDetailsWhatsApp($lead, $travelDetails, $leadName, $consultantName, $consultantNumber, $pdfContent, $pdfFilename);
+
+            return Reply::success('Travel details notification sent successfully via email and WhatsApp.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to notify travel details: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return Reply::error('Failed to send notification: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Generate PDF for travel details
+     */
+    private function generateTravelDetailsPDF(NewLead $lead, $travelDetails)
+    {
+        // Use same logo URL as emails (hardcoded Google Drive URL)
+        $logoUrl = 'https://lh3.googleusercontent.com/d/1o50KgJxSNFJCYEUOTEx33wBYK5LLD2Wc';
+
+        // Convert logo to base64 to avoid remote loading timeout
+        $logoBase64 = '';
+        try {
+            $ch = curl_init($logoUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $logoContent = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            
+            if ($logoContent !== false && $httpCode == 200) {
+                $imageInfo = @getimagesizefromstring($logoContent);
+                if ($imageInfo !== false) {
+                    $mimeType = $imageInfo['mime'];
+                    $logoBase64 = 'data:' . $mimeType . ';base64,' . base64_encode($logoContent);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Failed to load logo for PDF: ' . $e->getMessage());
+        }
+        
+        // Fallback to URL if base64 conversion failed
+        if (empty($logoBase64)) {
+            $logoBase64 = $logoUrl;
+        }
+
+        // Format dates
+        $formatDate = function($date) {
+            if (empty($date)) return 'N/A';
+            try {
+                if (is_string($date)) {
+                    $dateObj = \Carbon\Carbon::parse($date);
+                    return $dateObj->format('d-M-Y');
+                }
+                return $date->format('d-M-Y');
+            } catch (\Exception $e) {
+                return $date;
+            }
+        };
+
+        $data = [
+            'lead' => $lead,
+            'travelDetails' => $travelDetails,
+            'logoUrl' => $logoBase64,
+            'formatDate' => $formatDate,
+            'getValue' => function($value, $default = 'N/A') {
+                return !empty($value) ? $value : $default;
+            }
+        ];
+
+        $pdf = app('dompdf.wrapper');
+        $pdf->setOption('enable_php', true);
+        // Disable remote loading to avoid timeout, use base64 logo instead
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true, 
+            'isRemoteEnabled' => false,
+            'defaultFont' => 'DejaVu Sans'
+        ]);
+        $pdf->loadView('lead-details.pdf.travel-details', $data);
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf;
+    }
+
+    /**
+     * Send WhatsApp notification for travel details
+     */
+    private function sendTravelDetailsWhatsApp(NewLead $lead, $travelDetails, $leadName, $consultantName, $consultantNumber, $pdfContent, $pdfFilename)
+    {
+        try {
+            // Get lead phone number
+            $leadPhone = null;
+            if ($lead->step_1_data) {
+                $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : $lead->step_1_data;
+                if (is_array($step1Data)) {
+                    $leadPhone = $step1Data['primary_phone'] ?? $step1Data['mobile'] ?? null;
+                }
+            }
+            
+            if (empty($leadPhone)) {
+                $leadPhone = $lead->mobile;
+            }
+
+            if (empty($leadPhone)) {
+                \Log::warning('Lead phone number is not available for WhatsApp notification. Lead ID: ' . $lead->id);
+                return;
+            }
+
+            // Format phone number (10 digits)
+            $leadPhone = preg_replace('/[^0-9]/', '', $leadPhone);
+            $leadPhone = ltrim($leadPhone, '0');
+            if (strlen($leadPhone) > 10) {
+                $leadPhone = substr($leadPhone, -10);
+            }
+
+            // Upload PDF to get URL for WhatsApp
+            $folderPath = 'travel-details-pdfs';
+            $fileVisibility = [];
+            if (config('filesystems.default') == 'local') {
+                $fileVisibility = ['directory_visibility' => 'public', 'visibility' => 'public'];
+            }
+            
+            // Save PDF to public folder first (required for saveFileInfo)
+            $publicFolderPath = \App\Helper\Files::UPLOAD_FOLDER . '/' . $folderPath;
+            $publicFilePath = public_path($publicFolderPath);
+            
+            // Create directory if it doesn't exist
+            if (!\File::exists($publicFilePath)) {
+                \File::makeDirectory($publicFilePath, 0755, true);
+            }
+            
+            // Save to public folder
+            $publicFileFullPath = $publicFilePath . '/' . $pdfFilename;
+            \File::put($publicFileFullPath, $pdfContent);
+            
+            // Store file information in database (requires file to exist in public folder)
+            try {
+                \App\Helper\Files::saveFileInfo($pdfFilename, $folderPath, $lead->company_id ?? company()->id ?? null);
+            } catch (\Exception $e) {
+                \Log::warning('Failed to save file info: ' . $e->getMessage());
+            }
+            
+            // Upload PDF content to storage (cloud storage if configured)
+            try {
+                \Storage::disk(config('filesystems.default'))->put($folderPath . '/' . $pdfFilename, $pdfContent, $fileVisibility);
+                $documentUrl = asset_url_local_s3($folderPath . '/' . $pdfFilename);
+            } catch (\Exception $e) {
+                \Log::error('Failed to upload travel details PDF to storage: ' . $e->getMessage());
+                // Fallback to public URL
+                $documentUrl = asset($publicFolderPath . '/' . $pdfFilename);
+            }
+
+            // API configuration - use same campaign as template documents since they have same template variables
+            $apiKey = env('AISENSY_API_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzdmM2RjNmZhOGUxMDEzYzdlMDgzZSIsIm5hbWUiOiJSLlIgcGF0ZWwgIG5ldyIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2ODcyMzU5ZGRlNjFiYjMxOTgzMzc2NDMiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTc2MDM1NTc4OX0.6H8mv7r3R0ucc7APyDM1q0xew4-oBUVKqUHA38klVG4');
+            $campaignName = env('AISENSY_TRAVEL_DETAILS_CAMPAIGN', env('AISENSY_TEMPLATE_DOCUMENT_CAMPAIGN', 'additional_details_requested1'));
+            $userName = env('AISENSY_USER_NAME', 'R.R patel  new');
+            $source = env('AISENSY_SOURCE', 'new-landing-page form');
+
+            // Prepare template parameters
+            $templateParams = [
+                $leadName,
+                $consultantName,
+                $consultantNumber ?: 'N/A'
+            ];
+
+            // Prepare API request payload
+            $payload = [
+                'apiKey' => $apiKey,
+                'campaignName' => $campaignName,
+                'destination' => $leadPhone,
+                'userName' => $userName,
+                'templateParams' => $templateParams,
+                'source' => $source,
+                'media' => [
+                    'url' => $documentUrl ?: '',
+                    'filename' => $pdfFilename
+                ],
+                'buttons' => [],
+                'carouselCards' => [],
+                'location' => (object)[],
+                'attributes' => (object)[],
+                'paramsFallbackValue' => [
+                    'FirstName' => $leadName
+                ]
+            ];
+
+            // Make API call to AISensy
+            $client = new Client();
+            $response = $client->post('https://backend.aisensy.com/campaign/t1/api/v2', [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => $payload,
+                'timeout' => 30
+            ]);
+
+            $responseBody = json_decode($response->getBody()->getContents(), true);
+
+            if ($response->getStatusCode() === 200) {
+                \Log::info('Travel details WhatsApp notification sent successfully. Lead ID: ' . $lead->id . ', Phone: ' . $leadPhone);
+            } else {
+                \Log::error('AISensy API error for travel details WhatsApp: ' . json_encode($responseBody));
+            }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $errorMessage = $e->getMessage();
+            try {
+                $errorResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
+                if (is_array($errorResponse) && isset($errorResponse['message'])) {
+                    $errorMessage = $errorResponse['message'];
+                }
+            } catch (\Exception $ex) {
+                // If we can't parse the error response, use the original message
+            }
+            \Log::error('AISensy API client error for travel details WhatsApp: ' . $e->getMessage());
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            \Log::error('AISensy API request error for travel details WhatsApp: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            \Log::error('Failed to send travel details WhatsApp notification: ' . $e->getMessage());
+            \Log::error('Exception trace: ' . $e->getTraceAsString());
+        }
+    }
+
+    /**
      * Upload profile image for a lead
      *
      * @param \Illuminate\Http\Request $request

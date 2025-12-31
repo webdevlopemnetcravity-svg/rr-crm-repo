@@ -307,3 +307,89 @@
         </div>
     </div>
 </div>
+
+<!-- Notify Client Modal -->
+<div class="modal fade" id="notifyClientTravelDetailsModal" tabindex="-1" role="dialog" aria-labelledby="notifyClientTravelDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #d4edda; border-bottom: 1px solid #c3e6cb;">
+                <h5 class="modal-title" id="notifyClientTravelDetailsModalLabel" style="color: #155724;">Notify Client?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: #721c24;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <p class="mb-3">Only "Congratulations! Find your travel details" notification by:</p>
+                <hr>
+                <p class="mb-3">For further details please connect with your consultant.</p>
+                <hr>
+                
+                <div class="row">
+                    <!-- Left Column: Travel Details -->
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold mb-3">Travel Details</h6>
+                        <div class="mb-2">
+                            <strong>Purpose of Trip:</strong><br>
+                            <span id="modal_purpose_of_trip">{{ $getValue($travelData ? $travelData->purpose_of_trip : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Place To Visit:</strong><br>
+                            <span id="modal_place_to_visit">{{ $getValue($travelData ? $travelData->place_to_visit : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Date of Arrival:</strong><br>
+                            <span id="modal_date_of_arrival">{{ $formatDate($travelData ? $travelData->date_of_arrival : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Arrival Flight:</strong><br>
+                            <span id="modal_arrival_flight">{{ $getValue($travelData ? $travelData->arrival_flight : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Arrival City:</strong><br>
+                            <span id="modal_arrival_city">{{ $getValue($travelData ? $travelData->arrival_city : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Date of Departure From:</strong><br>
+                            <span id="modal_date_of_departure">{{ $formatDate($travelData ? $travelData->date_of_departure : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Departure Flight:</strong><br>
+                            <span id="modal_departure_flight">{{ $getValue($travelData ? $travelData->departure_flight : null) }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Contact/Address Details -->
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold mb-3">Contact/Address Details</h6>
+                        <div class="mb-2">
+                            <strong>Phone Number (of other country):</strong><br>
+                            <span id="modal_phone_number_other_country">{{ $getValue($travelData ? $travelData->phone_number_other_country : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Address Where You Will Stay:</strong><br>
+                            <span id="modal_address_stay">{{ $getValue($travelData ? $travelData->address_stay : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>City:</strong><br>
+                            <span id="modal_city">{{ $getValue($travelData ? $travelData->city : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>State:</strong><br>
+                            <span id="modal_state">{{ $getValue($travelData ? $travelData->state : null) }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Postal/Zip Code:</strong><br>
+                            <span id="modal_postal_code">{{ $getValue($travelData ? $travelData->postal_code : null) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmNotifyClientTravelDetailsBtn" data-lead-id="{{ isset($lead) && $lead ? $lead->id : '' }}">
+                    Notify Client
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -566,6 +566,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('new-leads/{leadId}/upload-document', [LeadContactController::class, 'uploadLeadDocument'])->name('new-leads.upload-document');
     Route::post('new-leads/process-store', [LeadContactController::class, 'storeNewLeadProcess'])->name('new-leads.process-store');
     Route::post('new-leads/travel-details-store', [LeadContactController::class, 'storeNewLeadTravelDetails'])->name('new-leads.travel-details-store');
+    Route::post('lead-details/{leadId}/notify-travel-details', [LeadContactController::class, 'notifyTravelDetails'])->name('lead-details.notify-travel-details');
     Route::get('new-leads/get-employees', [LeadContactController::class, 'getEmployeesForReassign'])->name('new-leads.get-employees');
     Route::post('new-leads/reassign', [LeadContactController::class, 'reassignLead'])->name('new-leads.reassign');
     Route::get('add-lead/download-assessment-letter/{leadId}/{fileName}', [LeadContactController::class, 'downloadAssessmentLetter'])->name('add-lead.download-assessment-letter');

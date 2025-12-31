@@ -2611,6 +2611,76 @@
             return false;
         });
 
+        // Notify Client Travel Details Button Click
+        $(document).on('click', '#notifyClientTravelDetailsBtn', function(e) {
+            e.preventDefault();
+            $('#notifyClientTravelDetailsModal').modal('show');
+        });
+
+        // Confirm Notify Client Travel Details Button Click
+        $(document).on('click', '#confirmNotifyClientTravelDetailsBtn', function(e) {
+            e.preventDefault();
+            var leadId = $(this).data('lead-id');
+            
+            if (!leadId) {
+                try {
+                    if (typeof $.showToastr === 'function') {
+                        $.showToastr('Lead ID is missing.', 'error');
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error('Lead ID is missing.');
+                    }
+                } catch (e) {}
+                return;
+            }
+
+            var $btn = $(this);
+            var originalText = $btn.html();
+            $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Sending...');
+
+            $.easyAjax({
+                url: "{{ route('lead-details.notify-travel-details', ':leadId') }}".replace(':leadId', leadId),
+                type: "POST",
+                data: {
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.status == "success") {
+                        $('#notifyClientTravelDetailsModal').modal('hide');
+                        try {
+                            if (typeof $.showToastr === 'function') {
+                                $.showToastr(response.message || 'Travel details notification sent successfully!', 'success');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.success(response.message || 'Travel details notification sent successfully!');
+                            }
+                        } catch (e) {}
+                    } else {
+                        try {
+                            if (typeof $.showToastr === 'function') {
+                                $.showToastr(response.message || 'Failed to send notification.', 'error');
+                            } else if (typeof toastr !== 'undefined') {
+                                toastr.error(response.message || 'Failed to send notification.');
+                            }
+                        } catch (e) {}
+                    }
+                    $btn.prop('disabled', false).html(originalText);
+                },
+                error: function(xhr) {
+                    var errorMessage = 'Failed to send notification. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    try {
+                        if (typeof $.showToastr === 'function') {
+                            $.showToastr(errorMessage, 'error');
+                        } else if (typeof toastr !== 'undefined') {
+                            toastr.error(errorMessage);
+                        }
+                    } catch (e) {}
+                    $btn.prop('disabled', false).html(originalText);
+                }
+            });
+        });
+
         // ========== ACCOUNTS FUNCTIONALITY ==========
         
         // Handle Add Account button click
