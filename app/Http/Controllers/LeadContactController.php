@@ -723,25 +723,66 @@ class LeadContactController extends AccountBaseController
                 $leadPhone = substr($leadPhone, -10);
             }
 
-            // Get user name
-            $userName = $lead->client_name ?? 'Client';
+            // Get lead name
+            $leadName = $lead->client_name ?? 'Client';
+            if ($lead->step_1_data) {
+                $step1Data = is_string($lead->step_1_data) ? json_decode($lead->step_1_data, true) : $lead->step_1_data;
+                if (is_array($step1Data)) {
+                    $givenName = $step1Data['given_name'] ?? '';
+                    $surname = $step1Data['surname'] ?? '';
+                    if ($givenName || $surname) {
+                        $leadName = trim($givenName . ' ' . $surname) ?: $leadName;
+                    }
+                }
+            }
+
+            // Get consultant details
+            $consultantName = 'Our Team';
+            $consultantNumber = '';
+            
+            if ($lead->lead_owner) {
+                $assignedUser = User::find($lead->lead_owner);
+                if ($assignedUser) {
+                    $consultantName = $assignedUser->name ?? 'Our Team';
+                    // Get consultant phone number
+                    $consultantNumber = $assignedUser->mobile ?? $assignedUser->phone ?? '';
+                    // Format consultant number - keep only 10 digits (no country code)
+                    if ($consultantNumber) {
+                        $consultantNumber = preg_replace('/[^0-9]/', '', $consultantNumber);
+                        $consultantNumber = ltrim($consultantNumber, '0');
+                        // Remove country code if present (keep only last 10 digits)
+                        if (strlen($consultantNumber) > 10) {
+                            $consultantNumber = substr($consultantNumber, -10);
+                        }
+                    }
+                }
+            }
 
             // Get document URL and filename
             $documentUrl = $document->file_url;
-            $documentFilename = $document->file_name ?? $document->name ?? 'Document';
+            $documentFilename = $document->file_name ?? $document->name ?? 'sample_media';
 
             // Fixed values as per API requirements - read from environment variables
             $apiKey = env('AISENSY_API_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzdmM2RjNmZhOGUxMDEzYzdlMDgzZSIsIm5hbWUiOiJSLlIgcGF0ZWwgIG5ldyIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2ODcyMzU5ZGRlNjFiYjMxOTgzMzc2NDMiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTc2MDM1NTc4OX0.6H8mv7r3R0ucc7APyDM1q0xew4-oBUVKqUHA38klVG4');
-            $campaignName = env('AISENSY_CAMPAIGN_NAME', 'testing102');
+            $campaignName = env('AISENSY_TEMPLATE_DOCUMENT_CAMPAIGN', 'additional_details_requested1');
+            $userName = env('AISENSY_USER_NAME', 'R.R patel  new');
             $source = env('AISENSY_SOURCE', 'new-landing-page form');
 
-            // Prepare API request payload
+            // Prepare template parameters
+            // Template variables: {{name}}, {{consultant_name}}, {{consultant_number}}
+            $templateParams = [
+                $leadName,
+                $consultantName,
+                $consultantNumber ?: 'N/A'
+            ];
+
+            // Prepare API request payload - matching exact Postman working format
             $payload = [
                 'apiKey' => $apiKey,
                 'campaignName' => $campaignName,
                 'destination' => $leadPhone,
                 'userName' => $userName,
-                'templateParams' => [],
+                'templateParams' => $templateParams,
                 'source' => $source,
                 'media' => [
                     'url' => $documentUrl,
@@ -751,7 +792,9 @@ class LeadContactController extends AccountBaseController
                 'carouselCards' => [],
                 'location' => (object)[],
                 'attributes' => (object)[],
-                'paramsFallbackValue' => (object)[]
+                'paramsFallbackValue' => [
+                    'FirstName' => $leadName
+                ]
             ];
 
             // Make API call to AISensy

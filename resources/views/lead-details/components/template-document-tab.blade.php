@@ -53,7 +53,7 @@
                                             data-lead-id="{{ $lead->id ?? '' }}" 
                                             data-document-id="{{ $document->id }}" 
                                             title="Send via WhatsApp">
-                                        <i class="fa fa-whatsapp mr-1"></i> WhatsApp
+                                        <img src="{{ asset('img/icon/Whatsapp_icon.svg') }}" class="mr-1" style="width: 16px; height: 16px;"> WhatsApp
                                     </button>
                                 @endif
                             </div>
