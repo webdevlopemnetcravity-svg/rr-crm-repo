@@ -163,10 +163,10 @@
                                      :text="__('app.menu.languageSettings')"/>
             @endif --}}
 
-            {{-- @if (user()->permission('manage_social_login_setting') == 'all')
+            @if (user()->permission('manage_social_login_setting') == 'all')
                 <x-setting-menu-item :active="$activeMenu" menu="social_auth_settings"
                                      :href="route('social-auth-settings.index')" :text="__('app.menu.socialLogin')"/>
-            @endif --}}
+            @endif
 
             {{-- @if (user()->permission('manage_google_calendar_setting') == 'all')
                 <x-setting-menu-item :active="$activeMenu" menu="google_calendar_settings"
