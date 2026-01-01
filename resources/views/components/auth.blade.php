@@ -67,7 +67,7 @@
                 </div>
 
                 {{ $outsideLoginBox ?? '' }}
-                @if($languages->count() > 1)
+                {{-- @if($languages->count() > 1)
                     <div class="my-3 d-flex flex-column flex-grow-1">
                         <div class="d-flex flex-wrap align-items-center justify-content-center">
                             @foreach($languages->take(4) as $index => $language)
@@ -101,7 +101,7 @@
                             @endif
                         </div>
                     </div>
-                @endif
+                @endif --}}
 
                 {{--                @if($languages->count() >1)--}}
                 {{--                    <div class="my-3 d-flex flex-column flex-grow-1">--}}
