@@ -22,7 +22,8 @@
                                    <i class="fa fa-circle f-12 ml-1 {{ $credentials->google_status == 'enable' ? 'text-light-green' : 'text-red' }}"></i>
                                 </a>
                             </li>
-                            <li>
+                            {{-- Hidden: Facebook, LinkedIn, and Twitter settings --}}
+                            {{-- <li>
                                 <a class="nav-item nav-link f-15 facebook" data-toggle="tab"
                                    href="{{ route('social-auth-settings.index') }}?tab=facebook" role="tab"
                                    aria-controls="nav-facebook" aria-selected="false"><img style="height: 15px;"
@@ -45,7 +46,7 @@
                                                                                           src="{{ asset('img/twitter-icon.svg') }}"> @lang('app.socialAuthSettings.twitter')
                                    <i class="fa fa-circle f-12 ml-1 {{ $credentials->twitter_status == 'enable' ? 'text-light-green' : 'text-red' }}"></i>
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </nav>
                 </div>
