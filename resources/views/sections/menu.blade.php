@@ -1,6 +1,8 @@
 <ul>
     <!-- NAV ITEM - DASHBOARD COLLAPSE MENU-->
     @if (in_array('admin', user_roles())
+    || in_array('receptionist', user_roles())
+    || in_array('consultant', user_roles())
     || $sidebarUserPermissions['view_overview_dashboard'] == 4
     || $sidebarUserPermissions['view_project_dashboard'] == 4
     || $sidebarUserPermissions['view_client_dashboard'] == 4
@@ -18,9 +20,11 @@
             <div class="accordionItemContent">
                 <x-sub-menu-item :link="route('dashboard')"
                                  :text="__('app.menu.privateDashboard')" />
-                <x-sub-menu-item :link="route('dashboard.advanced')"
-                                 :text="__('app.menu.advanceDashboard')" />
-                @if (in_array('leads', user_modules()) && $sidebarUserPermissions['view_lead'] != 5 && $sidebarUserPermissions['view_lead'] != 'none')
+                @if (in_array('admin', user_roles()))
+                    <x-sub-menu-item :link="route('dashboard.advanced')"
+                                     :text="__('app.menu.advanceDashboard')" />
+                @endif
+                @if (in_array('leads', user_modules()) && (in_array('admin', user_roles()) || in_array('receptionist', user_roles()) || in_array('consultant', user_roles()) || ($sidebarUserPermissions['view_lead'] != 5 && $sidebarUserPermissions['view_lead'] != 'none')))
                     <x-sub-menu-item :link="route('lead-dashboard.index')" :text="__('app.leadDashboard')" />
                 @endif
             </div>
