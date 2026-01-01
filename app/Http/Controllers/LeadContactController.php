@@ -3880,7 +3880,7 @@ class LeadContactController extends AccountBaseController
 
             // API configuration
             $apiKey = env('AISENSY_API_KEY', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YzdmM2RjNmZhOGUxMDEzYzdlMDgzZSIsIm5hbWUiOiJSLlIgcGF0ZWwgIG5ldyIsImFwcE5hbWUiOiJBaVNlbnN5IiwiY2xpZW50SWQiOiI2ODcyMzU5ZGRlNjFiYjMxOTgzMzc2NDMiLCJhY3RpdmVQbGFuIjoiQkFTSUNfTU9OVEhMWSIsImlhdCI6MTc2MDM1NTc4OX0.6H8mv7r3R0ucc7APyDM1q0xew4-oBUVKqUHA38klVG4');
-            $campaignName = env('AISENSY_REGISTRATION_CAMPAIGN', 'registration_confirmation1');
+            $campaignName = env('AISENSY_REGISTRATION_CAMPAIGN', 'order_confirm101');
             $userName = env('AISENSY_USER_NAME', 'R.R patel  new');
             $source = env('AISENSY_SOURCE', 'new-landing-page form');
 
@@ -3892,8 +3892,6 @@ class LeadContactController extends AccountBaseController
                 $consultantNumber ?: 'N/A'
             ];
 
-            // Use default logo URL
-            $logoUrl = 'https://crm.rrpateloverseas.com/user-uploads/app-logo/a8ca4aa7cc63d81a6763972296948880.png';
 
             // Prepare API request payload - matching exact Postman working format
             $payload = [
@@ -3903,10 +3901,7 @@ class LeadContactController extends AccountBaseController
                 'userName' => $userName,
                 'templateParams' => $templateParams,
                 'source' => $source,
-                'media' => [
-                    'url' => $logoUrl,
-                    'filename' => 'RR Patels'
-                ],
+                'media' => [],
                 'buttons' => [],
                 'carouselCards' => [],
                 'location' => (object)[],
