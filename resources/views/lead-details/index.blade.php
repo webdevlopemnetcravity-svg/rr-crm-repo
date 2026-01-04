@@ -170,6 +170,9 @@
                             <a class="back-arrow" href="{{ route('lead-list.index') }}">
                                 <img src="{{ asset('img/icon/Back_Arrow.svg') }}">
                             </a>
+                            <a href="javascript:;" class="btn btn-primary ml-3 f-14 d-flex align-items-center" id="openBookAppointmentModal">
+                                <i class="fa fa-calendar mr-2"></i> Book Appointment
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -247,6 +250,52 @@
         </div>
     </div>
     <!-- CONTENT WRAPPER END -->
+
+    <!-- Book Appointment Modal -->
+    <div class="modal fade" id="bookAppointmentModal" tabindex="-1" role="dialog" aria-labelledby="bookAppointmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold text-dark" id="bookAppointmentModalLabel">Book Appointment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="bookAppointmentForm">
+                        @csrf
+                        <div class="form-group">
+                            <label for="appointment_date" class="font-weight-bold text-dark">Date <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control height-35 f-14" id="appointment_date" name="appointment_date" placeholder="Select Date" autocomplete="off">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="start_time" class="font-weight-bold text-dark">Start Time <span class="text-danger">*</span></label>
+                            <div class="bootstrap-timepicker timepicker">
+                                <input type="text" class="form-control height-35 f-14" id="start_time" name="start_time" placeholder="Select Start Time" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="end_time" class="font-weight-bold text-dark">End Time <span class="text-danger">*</span></label>
+                            <div class="bootstrap-timepicker timepicker">
+                                <input type="text" class="form-control height-35 f-14" id="end_time" name="end_time" placeholder="Select End Time" autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description" class="font-weight-bold text-dark">Description</label>
+                            <textarea class="form-control f-14" id="description" name="description" rows="3" placeholder="Optional: Add appointment description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveBookAppointmentBtn">Book Appointment</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -3345,6 +3394,33 @@
             if (dateInput && dateInput._datepicker) {
                 dateInput._datepicker.destroy();
             }
+        });
+        // Book Appointment Modal Functionality
+        $('body').on('click', '#openBookAppointmentModal', function() {
+            $('#bookAppointmentModal').modal('show');
+        });
+
+        $('#bookAppointmentModal').on('shown.bs.modal', function () {
+            // Initialize Datepicker
+            const appointmentDate = document.getElementById('appointment_date');
+            if (appointmentDate && !appointmentDate._datepicker) {
+                datepicker('#appointment_date', {
+                    position: 'bl',
+                    ...datepickerConfig
+                });
+            }
+            
+            // Initialize Timepickers
+            $('#start_time').timepicker({
+                @if (company()->time_format == 'H:i')
+                showMeridian: false,
+                @endif
+            });
+            $('#end_time').timepicker({
+                @if (company()->time_format == 'H:i')
+                showMeridian: false,
+                @endif
+            });
         });
     </script>
 @endpush
