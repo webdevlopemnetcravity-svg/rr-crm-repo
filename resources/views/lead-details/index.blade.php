@@ -178,6 +178,33 @@
                 </div>
             </div>
 
+            @if(isset($lastFutureAppointment) && $lastFutureAppointment)
+                @php
+                    $appointmentDate = $lastFutureAppointment->appointment_date;
+                    $startTime = $lastFutureAppointment->start_time;
+                    $endTime = $lastFutureAppointment->end_time;
+                    $dateFormat = company()->date_format ?? 'Y-m-d';
+                    $timeFormat = company()->time_format ?? 'H:i';
+                    $formattedDate = $appointmentDate ? $appointmentDate->format($dateFormat) : '';
+                    $formattedStartTime = $startTime ? $startTime->format($timeFormat) : '';
+                    $formattedEndTime = $endTime ? $endTime->format($timeFormat) : '';
+                @endphp
+                <div class="lead-header-bar bg-white p-3 border-bottom-grey" style="background-color: #f1f3ff !important;">
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-calendar mr-2 text-primary"></i>
+                        <span class="font-weight-bold mr-2">Upcoming Appointment:</span>
+                        <span class="font-weight-bold mr-2">{{ $lastFutureAppointment->meeting_title ?? 'Appointment' }} -</span>
+                        <span class="text-dark">{{ $formattedDate }}</span>
+                        @if($formattedStartTime)
+                            <span class="text-dark ml-2">{{ $formattedStartTime }}</span>
+                            @if($formattedEndTime)
+                                <span class="text-dark">&nbsp; - &nbsp;{{ $formattedEndTime }}</span>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+            @endif
+
             <!-- Navigation Tabs Bar -->
                         <!-- Tabs Navigation -->
             <div class="s-b-n-header bg-white" id="tabs">
