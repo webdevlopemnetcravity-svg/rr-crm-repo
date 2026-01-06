@@ -27,9 +27,12 @@ use App\Models\LeadStepStatus;
 use App\Models\LeadStatusChangeLog;
 use App\Models\NewLead;
 use App\Models\NewLeadAccount;
+use App\Models\NewLeadAppointment;
 use App\Models\NewLeadFollowUp;
 use App\Models\NewLeadProcess;
 use App\Models\NewLeadVisaType;
+use App\Models\NewGoogleToken;
+use App\Services\Google;
 use App\Models\PipelineStage;
 use App\Models\LeadStatus;
 use App\Models\Product;
@@ -6502,6 +6505,201 @@ class LeadContactController extends AccountBaseController
         } catch (\Exception $e) {
             \Log::error('Lead import error: ' . $e->getMessage());
             return Reply::error('Failed to import leads: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Book appointment for a lead
+     *
+     * @param Request $request
+     * @param int $leadId
+     * @return \Illuminate\Http\Response
+     */
+    public function bookAppointment(Request $request, $leadId)
+    {
+        try {
+            $lead = NewLead::findOrFail($leadId);
+            
+            // Validate required fields
+            $request->validate([
+                'meeting_title' => 'required|string|max:255',
+                'appointment_date' => 'required|date',
+                'start_time' => 'required',
+                'end_time' => 'required',
+            ]);
+
+            // Get company timezone and date/time format
+            $company = company();
+            $timezone = $company->timezone ?? 'UTC';
+            $dateFormat = $company->date_format ?? 'Y-m-d';
+            $timeFormat = $company->time_format ?? 'H:i';
+
+            // Parse date and time
+            $appointmentDate = Carbon::createFromFormat($dateFormat, $request->appointment_date, $timezone);
+            $startTime = Carbon::createFromFormat($timeFormat, $request->start_time, $timezone);
+            $endTime = Carbon::createFromFormat($timeFormat, $request->end_time, $timezone);
+
+            // Combine date and time
+            $startDateTime = $appointmentDate->copy()->setTime($startTime->hour, $startTime->minute, 0);
+            $endDateTime = $appointmentDate->copy()->setTime($endTime->hour, $endTime->minute, 0);
+
+            // Validate that appointment is in the future
+            $now = Carbon::now($timezone);
+            if ($startDateTime->lte($now)) {
+                return Reply::error('Appointment date and time must be in the future.');
+            }
+
+            // Validate that end time is after start time
+            if ($endDateTime->lte($startDateTime)) {
+                return Reply::error('End time must be after start time.');
+            }
+
+            // Get user's Google token
+            $currentUser = user();
+            $googleToken = NewGoogleToken::where('user_id', $currentUser->id)
+                ->where('company_id', $company->id)
+                ->where('verification_status', 'verified')
+                ->first();
+
+            if (!$googleToken || empty($googleToken->access_token)) {
+                return Reply::error('Google Calendar is not authenticated. Please login with Google to book appointments with Meet links.');
+            }
+
+            // Create Google Meet link first - MUST succeed before saving appointment
+            $googleMeetLink = null;
+            $googleEventId = null;
+
+            try {
+                // Get token array from model first
+                $tokenArray = $googleToken->getTokenArray();
+                if (!$tokenArray) {
+                    throw new \Exception('Invalid token format in database');
+                }
+
+                // Create Google service instance
+                $google = new Google();
+                
+                // Set access token directly - the client will handle refresh automatically if needed
+                // We avoid calling getAccessToken() to prevent MAC errors
+                $google->connectUsing($tokenArray);
+
+                // Get lead email
+                $leadEmail = null;
+                if ($lead->step_1_data && is_array($lead->step_1_data)) {
+                    $leadEmail = $lead->step_1_data['email_address'] ?? null;
+                }
+                if (empty($leadEmail)) {
+                    $leadEmail = $lead->client_email;
+                }
+
+                // Get owner/creator email
+                $ownerEmail = $currentUser->email;
+
+                // Prepare attendees
+                $attendees = [];
+                if (!empty($leadEmail)) {
+                    $attendees[] = ['email' => $leadEmail];
+                }
+                if (!empty($ownerEmail)) {
+                    $attendees[] = ['email' => $ownerEmail];
+                }
+
+                // Create conference data for Google Meet
+                $conferenceData = new \Google_Service_Calendar_ConferenceData();
+                $conferenceRequest = new \Google_Service_Calendar_CreateConferenceRequest();
+                $conferenceRequest->setRequestId(uniqid());
+                $conferenceData->setCreateRequest($conferenceRequest);
+
+                // Create Google Calendar event with Meet
+                $eventData = new \Google_Service_Calendar_Event([
+                    'summary' => $request->meeting_title,
+                    'description' => $request->description ?? '',
+                    'location' => 'Google Meet',
+                    'start' => [
+                        'dateTime' => $startDateTime->format('Y-m-d\TH:i:s'),
+                        'timeZone' => $timezone,
+                    ],
+                    'end' => [
+                        'dateTime' => $endDateTime->format('Y-m-d\TH:i:s'),
+                        'timeZone' => $timezone,
+                    ],
+                    'attendees' => $attendees,
+                    'conferenceData' => $conferenceData,
+                    'reminders' => [
+                        'useDefault' => false,
+                        'overrides' => [
+                            ['method' => 'email', 'minutes' => 24 * 60],
+                            ['method' => 'popup', 'minutes' => 10],
+                        ],
+                    ],
+                ]);
+
+                // Insert event with conference data
+                $calendarId = $googleToken->calendar_id ?? 'primary';
+                $results = $google->service('Calendar')->events->insert($calendarId, $eventData, [
+                    'conferenceDataVersion' => 1
+                ]);
+
+                $googleEventId = $results->id;
+
+                // Extract Google Meet link from conference data
+                if ($results->getConferenceData() && $results->getConferenceData()->getEntryPoints()) {
+                    foreach ($results->getConferenceData()->getEntryPoints() as $entryPoint) {
+                        if ($entryPoint->getEntryPointType() == 'video') {
+                            $googleMeetLink = $entryPoint->getUri();
+                            break;
+                        }
+                    }
+                }
+
+                if (empty($googleMeetLink)) {
+                    throw new \Exception('Google Meet link was not created. Conference data may be missing.');
+                }
+
+                // Note: We skip token refresh check to avoid MAC errors
+                // The Google Client will automatically refresh tokens when needed
+
+            } catch (\Exception $e) {
+                \Log::error('Google Calendar API error: ' . $e->getMessage());
+                \Log::error('Google Calendar API error class: ' . get_class($e));
+                \Log::error('Google Calendar API error trace: ' . $e->getTraceAsString());
+                
+                // Check if this is a MAC error (session encryption issue)
+                if (strpos($e->getMessage(), 'MAC is invalid') !== false || 
+                    strpos($e->getMessage(), 'The MAC is invalid') !== false) {
+                    return Reply::error('Google Calendar authentication error. Please logout and login again with Google to refresh your tokens.');
+                }
+                
+                return Reply::error('Failed to create Google Meet link: ' . $e->getMessage());
+            }
+
+            // Convert to UTC for storage
+            $startDateTimeUTC = $startDateTime->setTimezone('UTC');
+            $endDateTimeUTC = $endDateTime->setTimezone('UTC');
+
+            // Create appointment entry in database ONLY if Google Meet link was successfully created
+            $appointment = new NewLeadAppointment();
+            $appointment->company_id = $company->id;
+            $appointment->lead_id = $lead->id;
+            $appointment->meeting_title = $request->meeting_title;
+            $appointment->description = $request->description ?? null;
+            $appointment->appointment_date = $startDateTimeUTC;
+            $appointment->start_time = $startDateTimeUTC;
+            $appointment->end_time = $endDateTimeUTC;
+            $appointment->google_meet_link = $googleMeetLink;
+            $appointment->google_event_id = $googleEventId;
+            $appointment->created_by = $currentUser->id;
+            $appointment->updated_by = $currentUser->id;
+            $appointment->save();
+
+            return Reply::success(__('messages.recordSaved'), [
+                'message' => 'Appointment booked successfully!',
+                'meet_link' => $googleMeetLink
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Book appointment error: ' . $e->getMessage());
+            return Reply::error('Failed to book appointment: ' . $e->getMessage());
         }
     }
 

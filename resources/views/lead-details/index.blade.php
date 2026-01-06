@@ -264,9 +264,14 @@
                 <div class="modal-body">
                     <form id="bookAppointmentForm">
                         @csrf
+                        <input type="hidden" id="lead_id" name="lead_id" value="{{ isset($lead) && $lead ? $lead->id : '' }}">
+                        <div class="form-group">
+                            <label for="meeting_title" class="font-weight-bold text-dark">Meeting Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control height-35 f-14" id="meeting_title" name="meeting_title" placeholder="Enter meeting title" required>
+                        </div>
                         <div class="form-group">
                             <label for="appointment_date" class="font-weight-bold text-dark">Date <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control height-35 f-14" id="appointment_date" name="appointment_date" placeholder="Select Date" autocomplete="off">
+                            <input type="text" class="form-control height-35 f-14" id="appointment_date" name="appointment_date" placeholder="Select Date" autocomplete="off" required>
                         </div>
                         
                         <div class="form-group">
@@ -3400,26 +3405,219 @@
             $('#bookAppointmentModal').modal('show');
         });
 
-        $('#bookAppointmentModal').on('shown.bs.modal', function () {
-            // Initialize Datepicker
+        // Unbind any existing handlers to prevent duplicates
+        $('#bookAppointmentModal').off('shown.bs.modal').on('shown.bs.modal', function () {
+            // Destroy existing datepicker if it exists - try multiple methods
             const appointmentDate = document.getElementById('appointment_date');
-            if (appointmentDate && !appointmentDate._datepicker) {
-                datepicker('#appointment_date', {
-                    position: 'bl',
-                    ...datepickerConfig
-                });
+            if (appointmentDate) {
+                try {
+                    if (appointmentDate._datepicker) {
+                        appointmentDate._datepicker.destroy();
+                    }
+                } catch (e) {
+                    // Ignore errors
+                }
+                // Also try removing any jQuery data
+                try {
+                    $(appointmentDate).removeData('datepicker');
+                } catch (e) {
+                    // Ignore errors
+                }
+            }
+            
+            // Small delay to ensure cleanup is complete
+            setTimeout(function() {
+                // Initialize Datepicker - only allow future dates
+                try {
+                    datepicker('#appointment_date', {
+                        position: 'bl',
+                        minDate: new Date(), // Only allow future dates
+                        ...datepickerConfig
+                    });
+                } catch (e) {
+                    console.error('Datepicker initialization error:', e);
+                }
+            }, 100);
+            
+            // Remove existing timepickers if they exist
+            try {
+                if ($('#start_time').data('timepicker')) {
+                    $('#start_time').timepicker('remove');
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+            try {
+                if ($('#end_time').data('timepicker')) {
+                    $('#end_time').timepicker('remove');
+                }
+            } catch (e) {
+                // Ignore errors
             }
             
             // Initialize Timepickers
-            $('#start_time').timepicker({
-                @if (company()->time_format == 'H:i')
-                showMeridian: false,
-                @endif
-            });
-            $('#end_time').timepicker({
-                @if (company()->time_format == 'H:i')
-                showMeridian: false,
-                @endif
+            setTimeout(function() {
+                try {
+                    $('#start_time').timepicker({
+                        @if (company()->time_format == 'H:i')
+                        showMeridian: false,
+                        @endif
+                    });
+                } catch (e) {
+                    console.error('Start timepicker initialization error:', e);
+                }
+                try {
+                    $('#end_time').timepicker({
+                        @if (company()->time_format == 'H:i')
+                        showMeridian: false,
+                        @endif
+                    });
+                } catch (e) {
+                    console.error('End timepicker initialization error:', e);
+                }
+            }, 150);
+        });
+
+        // Cleanup when modal is hidden
+        $('#bookAppointmentModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            const appointmentDate = document.getElementById('appointment_date');
+            if (appointmentDate) {
+                try {
+                    if (appointmentDate._datepicker) {
+                        appointmentDate._datepicker.destroy();
+                    }
+                } catch (e) {
+                    // Ignore errors
+                }
+                try {
+                    $(appointmentDate).removeData('datepicker');
+                } catch (e) {
+                    // Ignore errors
+                }
+            }
+            try {
+                if ($('#start_time').data('timepicker')) {
+                    $('#start_time').timepicker('remove');
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+            try {
+                if ($('#end_time').data('timepicker')) {
+                    $('#end_time').timepicker('remove');
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+            $('#bookAppointmentForm')[0].reset();
+        });
+
+        // Handle form submission
+        $(document).on('click', '#saveBookAppointmentBtn', function(e) {
+            e.preventDefault();
+            var form = $('#bookAppointmentForm');
+            var formData = form.serialize();
+            var leadId = @json(isset($lead) && $lead ? $lead->id : null);
+
+            // Validation
+            if (!leadId) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Lead ID is missing.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            if (!$('#meeting_title').val()) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Please enter a meeting title.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            if (!$('#appointment_date').val()) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Please select a date.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            if (!$('#start_time').val()) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Please select a start time.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            if (!$('#end_time').val()) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Please select an end time.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            // Submit form via AJAX
+            $.easyAjax({
+                url: "{{ route('lead-details.book-appointment', ':id') }}".replace(':id', leadId),
+                type: "POST",
+                container: '#bookAppointmentForm',
+                blockUI: true,
+                data: formData,
+                success: function(response) {
+                    if (response.status == "success") {
+                        $('#bookAppointmentModal').modal('hide');
+                        $('#bookAppointmentForm')[0].reset();
+                        var message = response.message || 'Appointment booked successfully!';
+                        if (response.data && response.data.meet_link) {
+                            message += '\n\nGoogle Meet Link:\n' + response.data.meet_link;
+                        }
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            html: message.replace(/\n/g, '<br>') + (response.data && response.data.meet_link ? '<br><br><a href="' + response.data.meet_link + '" target="_blank" class="btn btn-primary">Open Google Meet</a>' : ''),
+                            showConfirmButton: true,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    var errorMsg = 'Failed to book appointment.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        text: errorMsg,
+                        toast: true,
+                        position: 'top-end',
+                        timer: 5000,
+                        showConfirmButton: false
+                    });
+                }
             });
         });
     </script>

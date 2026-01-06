@@ -49,6 +49,16 @@ class Google
         return new $classname($this->client);
     }
 
+    /**
+     * Get the underlying Google_Client instance
+     *
+     * @return Google_Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
     public function __call($method, $args)
     {
         if (!method_exists($this->client, $method)) {
