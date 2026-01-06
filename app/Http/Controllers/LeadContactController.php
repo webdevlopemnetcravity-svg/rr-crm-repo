@@ -6578,9 +6578,53 @@ class LeadContactController extends AccountBaseController
 
                 // Create Google service instance
                 $google = new Google();
+                $client = $google->getClient();
                 
-                // Set access token directly - the client will handle refresh automatically if needed
-                // We avoid calling getAccessToken() to prevent MAC errors
+                // Check if token needs refresh (Google access tokens expire in ~1 hour)
+                $tokenCreated = $tokenArray['created'] ?? ($googleToken->created_at ? $googleToken->created_at->timestamp : time());
+                $tokenAge = time() - $tokenCreated;
+                
+                // If token is older than 50 minutes (3000 seconds), refresh it before using
+                if ($tokenAge > 3000 && !empty($googleToken->refresh_token)) {
+                    \Log::info('Google Calendar: Token is expired/expiring, refreshing before API call');
+                    try {
+                        // Refresh the token using refresh_token
+                        $client->refreshToken($googleToken->refresh_token);
+                        
+                        // Get the new token from the client
+                        // Note: After refreshToken(), the client has the new token internally
+                        // We try to get it, but if it fails (MAC error), we continue anyway
+                        try {
+                            $newToken = $client->getAccessToken();
+                            if ($newToken) {
+                                $newTokenArray = is_string($newToken) ? json_decode($newToken, true) : $newToken;
+                                if (is_array($newTokenArray) && isset($newTokenArray['access_token'])) {
+                                    // Update token array for current use
+                                    $tokenArray = $newTokenArray;
+                                    $tokenArray['created'] = time();
+                                    
+                                    // Update stored token in database
+                                    $googleToken->access_token = $newTokenArray['access_token'];
+                                    // Keep refresh_token if provided, otherwise keep existing
+                                    if (isset($newTokenArray['refresh_token']) && !empty($newTokenArray['refresh_token'])) {
+                                        $googleToken->refresh_token = $newTokenArray['refresh_token'];
+                                    }
+                                    $googleToken->save();
+                                    \Log::info('Google Calendar: Token refreshed and saved to database');
+                                }
+                            }
+                        } catch (\Exception $tokenError) {
+                            // If getAccessToken() fails (e.g., MAC error), log but continue
+                            // The refresh already happened, the client has the new token internally
+                            \Log::warning('Google Calendar: Token refreshed but could not retrieve/save: ' . $tokenError->getMessage());
+                        }
+                    } catch (\Exception $refreshError) {
+                        // If refresh fails, log but continue - might still work with existing token
+                        \Log::warning('Google Calendar: Token refresh failed, will try with existing token: ' . $refreshError->getMessage());
+                    }
+                }
+                
+                // Set access token on client (either original or newly refreshed)
                 $google->connectUsing($tokenArray);
 
                 // Get lead email
@@ -6655,9 +6699,6 @@ class LeadContactController extends AccountBaseController
                 if (empty($googleMeetLink)) {
                     throw new \Exception('Google Meet link was not created. Conference data may be missing.');
                 }
-
-                // Note: We skip token refresh check to avoid MAC errors
-                // The Google Client will automatically refresh tokens when needed
 
             } catch (\Exception $e) {
                 \Log::error('Google Calendar API error: ' . $e->getMessage());
