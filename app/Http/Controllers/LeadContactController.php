@@ -425,14 +425,25 @@ class LeadContactController extends AccountBaseController
             try {
                 $this->data['documentChecklists'] = $this->getDocumentChecklists($this->lead);
                 $this->data['familyDetails'] = $this->getFamilyDetails($this->lead);
+                
+                // Get the last future appointment for this lead
+                $lastFutureAppointment = NewLeadAppointment::where('lead_id', $this->lead->id)
+                    ->where('appointment_date', '>=', now())
+                    ->orderBy('appointment_date', 'asc')
+                    ->orderBy('start_time', 'asc')
+                    ->first();
+                
+                $this->data['lastFutureAppointment'] = $lastFutureAppointment;
             } catch (\Exception $e) {
                 \Log::error('Error loading document checklists: ' . $e->getMessage());
                 $this->data['documentChecklists'] = [];
                 $this->data['familyDetails'] = [];
+                $this->data['lastFutureAppointment'] = null;
             }
         } else {
             $this->data['documentChecklists'] = [];
             $this->data['familyDetails'] = [];
+            $this->data['lastFutureAppointment'] = null;
         }
 
         return view('lead-details.index', $this->data);
@@ -6556,6 +6567,11 @@ class LeadContactController extends AccountBaseController
 
             // Get user's Google token
             $currentUser = user();
+            \Log::info('Book Appointment: Current user', [
+                'user_id' => $currentUser->id,
+                'user_name' => $currentUser->name,
+                'auth_user_id' => auth()->id()
+            ]);
             $googleToken = NewGoogleToken::where('user_id', $currentUser->id)
                 ->where('company_id', $company->id)
                 ->where('verification_status', 'verified')
@@ -6732,6 +6748,12 @@ class LeadContactController extends AccountBaseController
             $appointment->created_by = $currentUser->id;
             $appointment->updated_by = $currentUser->id;
             $appointment->save();
+            
+            \Log::info('Book Appointment: Appointment saved', [
+                'appointment_id' => $appointment->id,
+                'created_by' => $appointment->created_by,
+                'current_user_id' => $currentUser->id
+            ]);
 
             return Reply::success(__('messages.recordSaved'), [
                 'message' => 'Appointment booked successfully!',
@@ -6741,6 +6763,240 @@ class LeadContactController extends AccountBaseController
         } catch (\Exception $e) {
             \Log::error('Book appointment error: ' . $e->getMessage());
             return Reply::error('Failed to book appointment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show appointment details
+     */
+    public function showAppointment($id)
+    {
+        $appointment = NewLeadAppointment::with(['lead', 'creator', 'updater'])->findOrFail($id);
+        
+        $this->appointment = $appointment;
+        $this->pageTitle = 'Appointment Details';
+        $this->view = 'lead-details.appointment-show';
+        
+        // Add to data array
+        $this->data['appointment'] = $appointment;
+
+        if (request()->ajax()) {
+            return $this->returnAjax($this->view);
+        }
+
+        return view('lead-details.appointment-show', $this->data);
+    }
+
+    /**
+     * Update appointment
+     */
+    public function updateAppointment(Request $request, $id)
+    {
+        $appointment = NewLeadAppointment::findOrFail($id);
+        
+        $request->validate([
+            'meeting_title' => 'required|string|max:255',
+            'appointment_date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ]);
+
+        try {
+            $company = company();
+            $timezone = $company->timezone ?? 'UTC';
+            $dateFormat = $company->date_format ?? 'Y-m-d';
+            $timeFormat = $company->time_format ?? 'H:i';
+
+            // Parse date and time
+            $appointmentDate = Carbon::createFromFormat($dateFormat, $request->appointment_date, $timezone);
+            $startTime = Carbon::createFromFormat($timeFormat, $request->start_time, $timezone);
+            $endTime = Carbon::createFromFormat($timeFormat, $request->end_time, $timezone);
+
+            // Combine date and time
+            $startDateTime = $appointmentDate->copy()->setTime($startTime->hour, $startTime->minute, 0);
+            $endDateTime = $appointmentDate->copy()->setTime($endTime->hour, $endTime->minute, 0);
+
+            // Validate that appointment is in the future
+            $now = Carbon::now($timezone);
+            if ($startDateTime->lte($now)) {
+                return Reply::error('Appointment date and time must be in the future.');
+            }
+
+            // Validate that end time is after start time
+            if ($endDateTime->lte($startDateTime)) {
+                return Reply::error('End time must be after start time.');
+            }
+
+            // Convert to UTC for storage
+            $startDateTimeUTC = $startDateTime->setTimezone('UTC');
+            $endDateTimeUTC = $endDateTime->setTimezone('UTC');
+
+            // Get user's Google token for updating calendar event
+            $currentUser = user();
+            $googleToken = NewGoogleToken::where('user_id', $currentUser->id)
+                ->where('company_id', $company->id)
+                ->where('verification_status', 'verified')
+                ->first();
+
+            // Update Google Calendar event if it exists and user has token
+            if ($appointment->google_event_id && $googleToken && !empty($googleToken->access_token)) {
+                try {
+                    // Get token array from model
+                    $tokenArray = $googleToken->getTokenArray();
+                    if (!$tokenArray) {
+                        throw new \Exception('Invalid token format in database');
+                    }
+
+                    // Create Google service instance
+                    $google = new Google();
+                    $client = $google->getClient();
+                    
+                    // Check if token needs refresh (Google access tokens expire in ~1 hour)
+                    $tokenCreated = $tokenArray['created'] ?? ($googleToken->created_at ? $googleToken->created_at->timestamp : time());
+                    $tokenAge = time() - $tokenCreated;
+                    
+                    // If token is older than 50 minutes (3000 seconds), refresh it before using
+                    if ($tokenAge > 3000 && !empty($googleToken->refresh_token)) {
+                        \Log::info('Update Appointment: Token is expired/expiring, refreshing before API call');
+                        try {
+                            // Refresh the token using refresh_token
+                            $client->refreshToken($googleToken->refresh_token);
+                            
+                            // Get the new token from the client
+                            try {
+                                $newToken = $client->getAccessToken();
+                                if ($newToken) {
+                                    $newTokenArray = is_string($newToken) ? json_decode($newToken, true) : $newToken;
+                                    if (is_array($newTokenArray) && isset($newTokenArray['access_token'])) {
+                                        // Update token array for current use
+                                        $tokenArray = $newTokenArray;
+                                        $tokenArray['created'] = time();
+                                        
+                                        // Update stored token in database
+                                        $googleToken->access_token = $newTokenArray['access_token'];
+                                        if (isset($newTokenArray['refresh_token']) && !empty($newTokenArray['refresh_token'])) {
+                                            $googleToken->refresh_token = $newTokenArray['refresh_token'];
+                                        }
+                                        $googleToken->save();
+                                        \Log::info('Update Appointment: Token refreshed and saved to database');
+                                    }
+                                }
+                            } catch (\Exception $tokenError) {
+                                \Log::warning('Update Appointment: Token refreshed but could not retrieve/save: ' . $tokenError->getMessage());
+                            }
+                        } catch (\Exception $refreshError) {
+                            \Log::warning('Update Appointment: Token refresh failed, will try with existing token: ' . $refreshError->getMessage());
+                        }
+                    }
+                    
+                    // Set access token on client (either original or newly refreshed)
+                    $google->connectUsing($tokenArray);
+
+                    // Get calendar service
+                    $calendarId = $googleToken->calendar_id ?? 'primary';
+
+                    // Get the existing event
+                    $event = $google->service('Calendar')->events->get($calendarId, $appointment->google_event_id);
+
+                    // Update event details
+                    $event->setSummary($request->meeting_title);
+                    $event->setDescription($request->description ?? '');
+
+                    // Update start time
+                    $startDateTimeGoogle = new \Google_Service_Calendar_EventDateTime();
+                    $startDateTimeGoogle->setDateTime($startDateTime->format('Y-m-d\TH:i:s'));
+                    $startDateTimeGoogle->setTimeZone($timezone);
+                    $event->setStart($startDateTimeGoogle);
+
+                    // Update end time
+                    $endDateTimeGoogle = new \Google_Service_Calendar_EventDateTime();
+                    $endDateTimeGoogle->setDateTime($endDateTime->format('Y-m-d\TH:i:s'));
+                    $endDateTimeGoogle->setTimeZone($timezone);
+                    $event->setEnd($endDateTimeGoogle);
+
+                    // Update attendees (lead and creator)
+                    $attendees = [];
+                    if ($appointment->lead) {
+                        // Get lead email from step_1_data or client_email
+                        $leadEmail = null;
+                        if ($appointment->lead->step_1_data && is_array($appointment->lead->step_1_data)) {
+                            $leadEmail = $appointment->lead->step_1_data['email_address'] ?? null;
+                        }
+                        if (empty($leadEmail)) {
+                            $leadEmail = $appointment->lead->client_email;
+                        }
+                        if (!empty($leadEmail)) {
+                            $attendee = new \Google_Service_Calendar_EventAttendee();
+                            $attendee->setEmail($leadEmail);
+                            $attendees[] = $attendee;
+                        }
+                    }
+                    if ($currentUser->email) {
+                        $attendee = new \Google_Service_Calendar_EventAttendee();
+                        $attendee->setEmail($currentUser->email);
+                        $attendees[] = $attendee;
+                    }
+                    if (!empty($attendees)) {
+                        $event->setAttendees($attendees);
+                    }
+
+                    // Update the event in Google Calendar
+                    $updatedEvent = $google->service('Calendar')->events->update($calendarId, $appointment->google_event_id, $event);
+
+                    \Log::info('Update Appointment: Google Calendar event updated', [
+                        'event_id' => $appointment->google_event_id,
+                        'calendar_id' => $calendarId
+                    ]);
+
+                } catch (\Exception $e) {
+                    \Log::error('Update Appointment: Google Calendar update error', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    // Continue with database update even if Google update fails
+                    // But log the error for debugging
+                }
+            }
+
+            // Update appointment in database
+            $appointment->meeting_title = $request->meeting_title;
+            $appointment->description = $request->description ?? null;
+            $appointment->appointment_date = $startDateTimeUTC;
+            $appointment->start_time = $startDateTimeUTC;
+            $appointment->end_time = $endDateTimeUTC;
+            $appointment->updated_by = $currentUser->id;
+            $appointment->save();
+
+            return Reply::success(__('messages.updateSuccess'), [
+                'redirectUrl' => route('events.index')
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Update appointment error: ' . $e->getMessage());
+            return Reply::error('Failed to update appointment: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Cancel appointment
+     */
+    public function cancelAppointment(Request $request, $id)
+    {
+        $appointment = NewLeadAppointment::findOrFail($id);
+        
+        try {
+            // TODO: Cancel Google Calendar event if needed
+            
+            // Delete appointment
+            $appointment->delete();
+
+            return Reply::success(__('messages.deleteSuccess'), [
+                'redirectUrl' => route('events.index')
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Cancel appointment error: ' . $e->getMessage());
+            return Reply::error('Failed to cancel appointment: ' . $e->getMessage());
         }
     }
 

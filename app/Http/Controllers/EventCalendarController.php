@@ -16,6 +16,7 @@ use App\Http\Requests\Events\StoreEvent;
 use App\Http\Requests\Events\StoreEventNote;
 use App\Http\Requests\Events\UpdateEvent;
 use App\Models\MentionUser;
+use App\Models\NewLeadAppointment;
 use Illuminate\Http\Request;
 
 class EventCalendarController extends AccountBaseController
@@ -102,6 +103,86 @@ class EventCalendarController extends AccountBaseController
                     'start' => $event->start_date_time,
                     'end' => $event->end_date_time,
                     'color' => $event->label_color
+                ];
+            }
+
+            // Add appointments from new_lead_appointments table (only current user's appointments)
+            $start = request('start');
+            $end = request('end');
+            $currentUserId = user()->id;
+            $companyId = company()->id;
+            
+            // Debug: Check all appointments in the table first
+            $allAppointments = NewLeadAppointment::all();
+            \Log::info('EventCalendar: All appointments in database', [
+                'total_count' => $allAppointments->count(),
+                'sample_data' => $allAppointments->take(5)->map(function($apt) {
+                    return [
+                        'id' => $apt->id,
+                        'company_id' => $apt->company_id,
+                        'created_by' => $apt->created_by,
+                        'created_by_type' => gettype($apt->created_by),
+                        'start_time' => $apt->start_time ? $apt->start_time->toDateTimeString() : null
+                    ];
+                })->toArray()
+            ]);
+            
+            // Debug: Check appointments with just company_id filter
+            $companyAppointments = NewLeadAppointment::where('company_id', $companyId)->get();
+            \Log::info('EventCalendar: Appointments for company', [
+                'company_id' => $companyId,
+                'count' => $companyAppointments->count(),
+                'created_by_values' => $companyAppointments->pluck('created_by')->unique()->toArray()
+            ]);
+            
+            // Debug: Check appointments with just created_by filter
+            $userAppointments = NewLeadAppointment::where('created_by', $currentUserId)->get();
+            \Log::info('EventCalendar: Appointments for user', [
+                'user_id' => $currentUserId,
+                'user_id_type' => gettype($currentUserId),
+                'count' => $userAppointments->count(),
+                'company_ids' => $userAppointments->pluck('company_id')->unique()->toArray()
+            ]);
+            
+            // Query appointments created by current user only
+            // Try with explicit type casting to ensure match
+            $appointmentsQuery = NewLeadAppointment::where('company_id', (int)$companyId)
+                ->where('created_by', (int)$currentUserId);
+            
+            // Only add date filters if start and end are provided
+            if ($start && $end) {
+                // Standard interval overlap check: two intervals overlap if
+                // start_time <= end AND end_time >= start
+                $appointmentsQuery->where('start_time', '<=', $end)
+                                  ->where('end_time', '>=', $start);
+            }
+            
+            $appointments = $appointmentsQuery->get();
+            
+            // Debug logging
+            \Log::info('EventCalendar: Final appointments query result', [
+                'user_id' => $currentUserId,
+                'company_id' => $companyId,
+                'start' => $start,
+                'end' => $end,
+                'appointment_count' => $appointments->count(),
+                'appointment_ids' => $appointments->pluck('id')->toArray(),
+                'sql_query' => $appointmentsQuery->toSql(),
+                'sql_bindings' => $appointmentsQuery->getBindings()
+            ]);
+
+            foreach ($appointments as $appointment) {
+                $eventData[] = [
+                    'id' => 'appointment_' . $appointment->id,
+                    'title' => $appointment->meeting_title ?? 'Appointment',
+                    'start' => $appointment->start_time->format('Y-m-d H:i:s'),
+                    'end' => $appointment->end_time->format('Y-m-d H:i:s'),
+                    'color' => '#28a745', // Green color
+                    'extendedProps' => [
+                        'type' => 'appointment',
+                        'lead_id' => $appointment->lead_id,
+                        'google_meet_link' => $appointment->google_meet_link
+                    ]
                 ];
             }
 

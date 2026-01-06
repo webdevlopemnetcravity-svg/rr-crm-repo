@@ -579,6 +579,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('lead-details/{leadId}/send-template-document-whatsapp/{documentId}', [LeadContactController::class, 'sendTemplateDocumentWhatsApp'])->name('lead-details.send-template-document-whatsapp');
     Route::post('lead-details/{leadId}/upload-profile-image', [LeadContactController::class, 'uploadProfileImage'])->name('lead-details.upload-profile-image');
     Route::post('lead-details/{leadId}/book-appointment', [LeadContactController::class, 'bookAppointment'])->name('lead-details.book-appointment');
+    Route::get('appointments/{id}', [LeadContactController::class, 'showAppointment'])->name('appointments.show');
+    Route::post('appointments/{id}/update', [LeadContactController::class, 'updateAppointment'])->name('appointments.update');
+    Route::post('appointments/{id}/cancel', [LeadContactController::class, 'cancelAppointment'])->name('appointments.cancel');
     Route::get('lead-details/{id?}', [LeadContactController::class, 'leadDetails'])->name('lead-details.index');
     Route::get('lead-details/{leadId}/status-activity', [LeadContactController::class, 'getStatusActivity'])->name('lead-details.status-activity');
     Route::get('lead-details/{leadId}/quality-activity', [LeadContactController::class, 'getQualityActivity'])->name('lead-details.quality-activity');

@@ -146,7 +146,13 @@ $addEventsPermission = user()->permission('add_events');
                 calendar.unselect()
             },
             eventClick: function(arg) {
-                getEventDetail(arg.event.id);
+                // Check if it's an appointment (starts with 'appointment_')
+                if (arg.event.id && arg.event.id.toString().startsWith('appointment_')) {
+                    var appointmentId = arg.event.id.toString().replace('appointment_', '');
+                    getAppointmentDetail(appointmentId);
+                } else {
+                    getEventDetail(arg.event.id);
+                }
             },
             editable: false,
             dayMaxEvents: true, // allow "more" link when too many events
@@ -195,6 +201,41 @@ $addEventsPermission = user()->permission('add_events');
                 blockUI: true,
                 container: RIGHT_MODAL,
                 historyPush: true,
+                success: function(response) {
+                    if (response.status == "success") {
+                        $(RIGHT_MODAL_CONTENT).html(response.html);
+                        $(RIGHT_MODAL_TITLE).html(response.title);
+                    }
+                },
+                error: function(request, status, error) {
+                    if (request.status == 403) {
+                        $(RIGHT_MODAL_CONTENT).html(
+                            '<div class="align-content-between d-flex justify-content-center mt-105 f-21">403 | Permission Denied</div>'
+                        );
+                    } else if (request.status == 404) {
+                        $(RIGHT_MODAL_CONTENT).html(
+                            '<div class="align-content-between d-flex justify-content-center mt-105 f-21">404 | Not Found</div>'
+                        );
+                    } else if (request.status == 500) {
+                        $(RIGHT_MODAL_CONTENT).html(
+                            '<div class="align-content-between d-flex justify-content-center mt-105 f-21">500 | Something Went Wrong</div>'
+                        );
+                    }
+                }
+            });
+        }
+
+        // show appointment detail in sidebar
+        var getAppointmentDetail = function(id) {
+            openTaskDetail();
+            var url = "{{ route('appointments.show', ':id') }}";
+            url = url.replace(':id', id);
+
+            $.easyAjax({
+                url: url,
+                blockUI: true,
+                container: RIGHT_MODAL,
+                historyPush: false,
                 success: function(response) {
                     if (response.status == "success") {
                         $(RIGHT_MODAL_CONTENT).html(response.html);
