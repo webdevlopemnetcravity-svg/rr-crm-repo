@@ -22,8 +22,7 @@
                                    <i class="fa fa-circle f-12 ml-1 {{ $credentials->google_status == 'enable' ? 'text-light-green' : 'text-red' }}"></i>
                                 </a>
                             </li>
-                            {{-- Hidden: Facebook, LinkedIn, and Twitter settings --}}
-                            {{-- <li>
+                            <li>
                                 <a class="nav-item nav-link f-15 facebook" data-toggle="tab"
                                    href="{{ route('social-auth-settings.index') }}?tab=facebook" role="tab"
                                    aria-controls="nav-facebook" aria-selected="false"><img style="height: 15px;"
@@ -31,6 +30,8 @@
                                    <i class="fa fa-circle f-12 ml-1 {{ $credentials->facebook_status == 'enable' ? 'text-light-green' : 'text-red' }}"></i>
                                 </a>
                             </li>
+                            {{-- Hidden: Facebook, LinkedIn, and Twitter settings --}}
+                            {{--
                             <li>
                                 <a class="nav-item nav-link f-15 linkedin" data-toggle="tab"
                                    href="{{ route('social-auth-settings.index') }}?tab=linkedin" role="tab"

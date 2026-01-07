@@ -15,7 +15,7 @@
                 <span><img src="{{ asset('img/google.png') }}" alt="Google"/></span>
                 @lang('auth.signInGoogle')</a>
         @endif
-        @if ($socialAuthSettings->facebook_status == 'enable')
+        <!-- @if ($socialAuthSettings->facebook_status == 'enable')
             <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = facebook;">
                 <span><img src="{{ asset('img/fb.png') }}" alt="Google"/></span>
                 @lang('auth.signInFacebook')
@@ -32,7 +32,7 @@
                 <span><img src="{{ asset('img/linkedin.png') }}" alt="Google"/></span>
                 @lang('auth.signInLinkedin')
             </a>
-        @endif
+        @endif -->
 
         @if ($socialAuthSettings->social_auth_enable)
             <p class="position-relative my-4">@lang('auth.useEmail')</p>

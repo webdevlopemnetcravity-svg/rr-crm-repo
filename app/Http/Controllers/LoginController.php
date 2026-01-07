@@ -6,7 +6,6 @@ use Exception;
 use App\Models\User;
 use App\Helper\Reply;
 use App\Models\Social;
-use App\Models\NewGoogleToken;
 use Illuminate\Http\Request;
 use Laravel\Fortify\Fortify;
 use App\Events\TwoFactorCodeEvent;
@@ -83,18 +82,6 @@ class LoginController extends Controller
     {
         $this->setSocailAuthConfigs();
 
-        // For Google, request calendar scopes and offline access for refresh token
-        if ($provider === 'google') {
-            return Socialite::driver($provider)
-                ->scopes([
-                    'https://www.googleapis.com/auth/userinfo.email',
-                    'https://www.googleapis.com/auth/userinfo.profile',
-                    'https://www.googleapis.com/auth/calendar',
-                ])
-                ->with(['access_type' => 'offline', 'prompt' => 'consent'])
-                ->redirect();
-        }
-
         return Socialite::driver($provider)->redirect();
     }
 
@@ -149,16 +136,6 @@ class LoginController extends Controller
                 'social_service' => $provider,
             ]);
 
-            // If Google login, store Google tokens for all users
-            if ($provider === 'google') {
-                try {
-                    $this->storeGoogleTokens($user, $data);
-                } catch (Exception $e) {
-                    Log::error('Google Calendar: Failed to store tokens: ' . $e->getMessage());
-                    // Don't fail login if token storage fails
-                }
-            }
-
             DB::commit();
 
             Auth::login($user, true);
@@ -185,44 +162,5 @@ class LoginController extends Controller
         return 'email';
     }
 
-    /**
-     * Store Google tokens for admin users
-     */
-    private function storeGoogleTokens(User $user, $socialiteUser)
-    {
-        // Get company from user
-        $company = $user->company;
-        if (!$company) {
-            Log::warning('Google Calendar: No company found for user ' . $user->id);
-            return;
-        }
-
-        // Get tokens from Socialite user
-        $accessToken = $socialiteUser->token ?? null;
-        $refreshToken = $socialiteUser->refreshToken ?? null;
-
-        if (empty($accessToken)) {
-            Log::warning('Google Calendar: No access token received for user ' . $user->id);
-            return;
-        }
-
-        // Store tokens in database
-        NewGoogleToken::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'company_id' => $company->id,
-            ],
-            [
-                'access_token' => $accessToken,
-                'refresh_token' => $refreshToken,
-                'google_id' => $socialiteUser->id ?? null,
-                'name' => $socialiteUser->name ?? null,
-                'email' => $socialiteUser->email ?? $user->email,
-                'verification_status' => 'verified',
-            ]
-        );
-
-        Log::info('Google Calendar: Tokens stored for user ' . $user->id);
-    }
 
 }
