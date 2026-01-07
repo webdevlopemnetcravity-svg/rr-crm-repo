@@ -130,6 +130,13 @@
         <input type="hidden" id="current-longitude" name="current_longitude">
     </form>
 
+    <!-- Footer Links -->
+    <div class="text-center mt-4 mb-1 d-flex justify-content-center">
+        <a href="{{ url('/privacy-policy.html') }}" target="_blank" class="border-none p-0 w-auto" style="border: none; font-size: 12px;">Privacy Policy</a>
+        <span class="mx-2">|</span>
+        <a href="{{ url('/terms-of-service.html') }}" target="_blank" class="border-none p-0 w-auto" style="border: none; font-size: 12px;">Terms of Service</a>
+    </div>
+
     <x-slot name="scripts">
 
 {{--        Will not work in SAAS--}}
