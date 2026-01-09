@@ -107,11 +107,33 @@
                     <div class="select-others">
                         <select class="form-control select-picker" id="filter_lead_status" data-live-search="true" data-container="body" data-size="8">
                             <option value="all">@lang('app.all')</option>
+                            <option value="draft">Draft</option>
                             @if(isset($leadStatuses))
                                 @foreach ($leadStatuses as $status)
                                     <option value="{{ $status->type }}">{{ $status->type }}</option>
                                 @endforeach
                             @endif
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('modules.lead.leadQuality')</label>
+                <div class="select-filter mb-4">
+                    <div class="select-others">
+                        <select class="form-control select-picker" id="filter_lead_quality" data-live-search="true" data-container="body" data-size="8">
+                            <option value="all">@lang('app.all')</option>
+                            <option value="Open">Open</option>
+                            <option value="In-Process">In-Process</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Plan Dropped">Plan Dropped</option>
+                            <option value="Negotiation">Negotiation</option>
+                            <option value="Future Prospect">Future Prospect</option>
+                            <option value="Ringing">Ringing</option>
+                            <option value="Dead/Junk Lead">Dead/Junk Lead</option>
+                            <option value="Not Interested">Not Interested</option>
+                            <option value="Rejected">Rejected</option>
                         </select>
                     </div>
                 </div>
@@ -197,26 +219,6 @@
                 </div>
             </div>
 
-            <div class="more-filter-items">
-                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('modules.lead.leadQuality')</label>
-                <div class="select-filter mb-4">
-                    <div class="select-others">
-                        <select class="form-control select-picker" id="filter_lead_quality" data-live-search="true" data-container="body" data-size="8">
-                            <option value="all">@lang('app.all')</option>
-                            <option value="Open">Open</option>
-                            <option value="In-Process">In-Process</option>
-                            <option value="On Hold">On Hold</option>
-                            <option value="Plan Dropped">Plan Dropped</option>
-                            <option value="Negotiation">Negotiation</option>
-                            <option value="Future Prospect">Future Prospect</option>
-                            <option value="Ringing">Ringing</option>
-                            <option value="Dead/Junk Lead">Dead/Junk Lead</option>
-                            <option value="Not Interested">Not Interested</option>
-                            <option value="Rejected">Rejected</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
         </x-filters.more-filter-box>
         <!-- MORE FILTERS END -->
     </x-filters.filter-box>
@@ -254,9 +256,14 @@
 
             <div class="mt-2 mt-lg-0 mt-md-0 ml-0 ml-lg-3 ml-md-3">
                 <a href="javascript:;" class="img-lightbox btn btn-secondary f-14" data-image-url="http://127.0.0.1:8000/img/estimate-lc.png" data-toggle="tooltip" data-original-title="The system allows for the addition of further information regarding a lead directly from this view. To access and edit the detailed profile of any specific lead, users may click on the respective entry, which will navigate them to the dedicated Lead Detail Page."><i class="side-icon bi bi-question-circle"></i></a>
-                @if (in_array('admin', user_roles()) || in_array('receptionist', user_roles()))
+                @if (in_array('admin', user_roles()) || in_array('receptionist', user_roles()) || in_array('consultant', user_roles()))
                     <x-forms.button-primary class="ml-2 mb-2 mb-lg-0" icon="plus" id="import-lead-btn">
                         Import Lead
+                    </x-forms.button-primary>
+                @endif
+                @if (in_array('admin', user_roles()))
+                    <x-forms.button-primary class="ml-2 mb-2 mb-lg-0" icon="file-excel" id="export-lead-btn">
+                        Export XLSX
                     </x-forms.button-primary>
                 @endif
             </div>
@@ -1709,6 +1716,53 @@
                 
                 openReassignDialog(leadId, leadNumber, clientName, currentOwner);
             }
+        });
+
+        // Handle Export Lead List button click
+        $('#export-lead-btn').click(function() {
+            // Collect all current filter values
+            var dateRangePicker = $('#datatableRange').data('daterangepicker');
+            var startDate = $('#datatableRange').val();
+            var endDate = null;
+            
+            if (startDate == '') {
+                startDate = null;
+                endDate = null;
+            } else {
+                startDate = dateRangePicker.startDate.format('{{ company()->moment_date_format }}');
+                endDate = dateRangePicker.endDate.format('{{ company()->moment_date_format }}');
+            }
+            
+            var searchText = $('#search-text-field').val();
+            var source_id = $('#filter_source_id').val();
+            var date_filter_on = $('#date_filter_on').val();
+            var filter_added_by = $('#filter_addedBy').val();
+            var filter_assigned_to = $('#filter_assignedTo').val();
+            var filter_lead_status = $('#filter_lead_status').val();
+            var filter_lead_quality = $('#filter_lead_quality').val();
+            var filter_subclass = $('#filter_subclass').val();
+            var filter_priority = $('#filter_priority').val();
+            
+            // Build export URL with all filter parameters
+            var exportUrl = '{{ route("lead-list.export") }}?';
+            var params = [];
+            
+            if (startDate) params.push('startDate=' + encodeURIComponent(startDate));
+            if (endDate) params.push('endDate=' + encodeURIComponent(endDate));
+            if (date_filter_on) params.push('date_filter_on=' + encodeURIComponent(date_filter_on));
+            if (searchText) params.push('searchText=' + encodeURIComponent(searchText));
+            if (source_id && source_id != 'all') params.push('source_id=' + encodeURIComponent(source_id));
+            if (filter_added_by && filter_added_by != 'all') params.push('filter_addedBy=' + encodeURIComponent(filter_added_by));
+            if (filter_assigned_to && filter_assigned_to != 'all') params.push('filter_assignedTo=' + encodeURIComponent(filter_assigned_to));
+            if (filter_lead_status && filter_lead_status != 'all') params.push('filter_lead_status=' + encodeURIComponent(filter_lead_status));
+            if (filter_lead_quality && filter_lead_quality != 'all') params.push('filter_lead_quality=' + encodeURIComponent(filter_lead_quality));
+            if (filter_subclass && filter_subclass != 'all') params.push('filter_subclass=' + encodeURIComponent(filter_subclass));
+            if (filter_priority && filter_priority != 'all') params.push('filter_priority=' + encodeURIComponent(filter_priority));
+            
+            exportUrl += params.join('&');
+            
+            // Open export URL in new window to trigger download
+            window.location.href = exportUrl;
         });
 
         // Handle reassign form submission

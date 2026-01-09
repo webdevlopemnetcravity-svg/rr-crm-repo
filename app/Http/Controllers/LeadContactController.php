@@ -50,6 +50,8 @@ use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Exports\LeadListExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class LeadContactController extends AccountBaseController
 {
@@ -6499,6 +6501,22 @@ class LeadContactController extends AccountBaseController
             \Log::error('Lead import error: ' . $e->getMessage());
             return Reply::error('Failed to import leads: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Export lead list to Excel
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function exportLeadList(Request $request)
+    {
+        // Only admin can export
+        abort_403(!in_array('admin', user_roles()));
+
+        $filename = 'lead_list_' . date('Y-m-d_His') . '.xlsx';
+        
+        return Excel::download(new LeadListExport($request), $filename);
     }
 
     /**

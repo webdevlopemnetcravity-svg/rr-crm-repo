@@ -579,7 +579,15 @@ class NewLeadDataTable extends BaseDataTable
         
         // Filter by Lead Status
         if ($this->request()->filter_lead_status != 'all' && $this->request()->filter_lead_status != '') {
-            $newLead = $newLead->where('new_leads.lead_status', $this->request()->filter_lead_status);
+            if ($this->request()->filter_lead_status == 'draft') {
+                // Filter by draft status (check stepStatus final_status)
+                $newLead = $newLead->whereHas('stepStatus', function ($query) {
+                    $query->where('final_status', 'draft');
+                });
+            } else {
+                // Filter by regular lead status
+                $newLead = $newLead->where('new_leads.lead_status', $this->request()->filter_lead_status);
+            }
         }
         
         // Filter by Lead Quality
