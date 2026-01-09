@@ -175,7 +175,15 @@ class LeadContactController extends AccountBaseController
         $isConsultant = in_array('consultant', $userRoles);
         $isAdmin = in_array('admin', $userRoles);
 
-        $this->pageTitle = 'app.addLead';
+        // Check if editing existing new lead
+        $leadId = request('lead_id');
+        
+        // Set page title based on whether we're adding or editing
+        if ($leadId) {
+            $this->pageTitle = 'app.editLead';
+        } else {
+            $this->pageTitle = 'app.addLead';
+        }
 
         // Set custom breadcrumb
         $this->customBreadcrumb = [
@@ -188,7 +196,7 @@ class LeadContactController extends AccountBaseController
                 'url' => route('lead-list.index')
             ],
             [
-                'text' => __('app.addLead')
+                'text' => $leadId ? __('app.editLead') : __('app.addLead')
             ]
         ];
 
@@ -242,8 +250,7 @@ class LeadContactController extends AccountBaseController
                   ->orWhereNull('company_id');
         })->orderBy('name')->get();
 
-        // Check if editing existing new lead
-        $leadId = request('lead_id');
+        // Load lead data if editing
         $this->newLead = null;
         $this->newLeadStepStatus = null;
         
@@ -263,25 +270,7 @@ class LeadContactController extends AccountBaseController
                 return redirect()->route('add-lead.index');
             }
             
-            // Role-based access control for editing existing leads
-            // Check this AFTER loading the lead, but OUTSIDE try-catch to avoid 500 error
-            $userId = user()->id;
-            
-            if ($isReceptionist && !$isAdmin) {
-                // Receptionist: can only access leads they added
-                if ($this->newLead->added_by != $userId) {
-                    abort_403(__('messages.permissionDenied'));
-                }
-            } elseif ($isConsultant && !$isAdmin) {
-                // Consultant: can access leads they own OR added
-                $isOwner = ($this->newLead->lead_owner == $userId);
-                $isAddedBy = ($this->newLead->added_by == $userId);
-                
-                if (!$isOwner && !$isAddedBy) {
-                    abort_403(__('messages.permissionDenied'));
-                }
-            }
-            // Admin has full access, no check needed
+            // Removed role-based restrictions - all users can now edit all leads
         }
 
         return view('add-lead.index', $this->data);
@@ -315,17 +304,7 @@ class LeadContactController extends AccountBaseController
             return redirect()->route('lead-list.index');
         }
         
-        // Restrict access to Consultant and Admin roles only
-        $userRoles = user_roles();
-        $isConsultant = in_array('consultant', $userRoles);
-        $isAdmin = in_array('admin', $userRoles);
-        
-        if (!$isConsultant && !$isAdmin) {
-            abort_403(__('messages.permissionDenied'));
-        }
-        
-        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
-        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+        // Removed role and permission restrictions - all users can now view lead details
 
         $this->pageTitle = 'app.leadDetails';
 
@@ -384,18 +363,7 @@ class LeadContactController extends AccountBaseController
             return redirect()->route('lead-list.index');
         }
         
-        // For Consultant role: only allow access to leads they own or added
-        // Admin role has full access
-        // Check this AFTER loading the lead, but OUTSIDE try-catch to avoid 500 error
-        if ($isConsultant && !$isAdmin) {
-            $userId = user()->id;
-            $isOwner = ($this->lead->lead_owner == $userId);
-            $isAddedBy = ($this->lead->added_by == $userId);
-            
-            if (!$isOwner && !$isAddedBy) {
-                abort_403(__('messages.permissionDenied'));
-            }
-        }
+        // Removed role-based restrictions - all users can now view all lead details
 
         if (!request()->ajax()) {
             try {
