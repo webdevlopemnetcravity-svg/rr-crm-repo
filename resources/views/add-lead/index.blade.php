@@ -1889,7 +1889,7 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_zip_code_${contactNum}" fieldLabel="Zip Code">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_zip_code_${contactNum}" id="relative_zip_code_${contactNum}" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits" value="${zipCode}">
+                                <input type="text" class="form-control height-35 f-14" name="relative_zip_code_${contactNum}" id="relative_zip_code_${contactNum}" maxlength="6" pattern="[0-9]{6}" title="Please enter exactly 6 digits" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" value="${zipCode}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_email_address_${contactNum}" fieldLabel="Email Address">
@@ -2875,7 +2875,7 @@
             }
             
             // Zip Code / Pin Code validation - only allow 6 digits
-            $(document).on('input', 'input[name="home_pin_code"], input[name="mailing_pin_code"], input[name="relative_zip_code"], input[name="relative_zip_code[]"], input[name="spouse_postal_code"]', function() {
+            $(document).on('input', 'input[name="home_pin_code"], input[name="mailing_pin_code"], input[name^="relative_zip_code"], input[name="relative_zip_code[]"], input[name="spouse_postal_code"]', function() {
                 let value = $(this).val();
                 // Remove any non-digit characters
                 value = value.replace(/\D/g, '');
