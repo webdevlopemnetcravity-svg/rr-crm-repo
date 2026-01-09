@@ -46,17 +46,11 @@ class NewLeadDataTable extends BaseDataTable
 
             $action .= '<a href="' . route('add-lead.index', ['lead_id' => $row->id]) . '" class="dropdown-item"><i class="fa fa-eye mr-2"></i>' . __('app.view') . '</a>';
 
-            if (
-                $this->editLeadPermission == 'all'
-                || $this->editLeadPermission == 'both' && (user()->id == $row->added_by || user()->id == $row->lead_owner)
-                || ($this->editLeadPermission == 'owned' && user()->id == $row->lead_owner )
-                || ($this->editLeadPermission == 'added' && user()->id == $row->added_by) )
-            {
-                $action .= '<a class="dropdown-item" href="' . route('add-lead.index', ['lead_id' => $row->id]) . '">
-                                <i class="fa fa-edit mr-2"></i>
-                                ' . trans('app.edit') . '
-                            </a>';
-            }
+            // Removed permission restrictions - all users can now edit all leads
+            $action .= '<a class="dropdown-item" href="' . route('add-lead.index', ['lead_id' => $row->id]) . '">
+                            <i class="fa fa-edit mr-2"></i>
+                            ' . trans('app.edit') . '
+                        </a>';
 
             // Delete action - available for all roles
             $action .= '<a class="dropdown-item delete-table-row" href="javascript:;" data-id="' . $row->id . '">
@@ -84,8 +78,50 @@ class NewLeadDataTable extends BaseDataTable
                     </div>';
         });
 
-        // CLIENT Column: Priority dropdown, mobile number, and email
+        // CLIENT Column: Person name (Surname + Given Name), mobile number, and email
         $datatables->addColumn('client', function ($row) {
+            // Get person name from step_1_data (surname + given_name)
+            $personName = '--';
+            if ($row->step_1_data) {
+                $step1Data = is_array($row->step_1_data) ? $row->step_1_data : json_decode($row->step_1_data, true);
+                if ($step1Data) {
+                    $surname = $step1Data['surname'] ?? '';
+                    $givenName = $step1Data['given_name'] ?? '';
+                    $fullName = trim($surname . ' ' . $givenName);
+                    $personName = $fullName ?: '--';
+                }
+            }
+            
+            // Fallback to client_name if step_1_data doesn't have name
+            if ($personName == '--' && $row->client_name) {
+                $personName = $row->client_name;
+            }
+            
+            $mobile = $row->mobile ?? '--';
+            $email = $row->client_email ?? '--';
+            
+            // Get email from step_1_data if not in main field
+            if ($email == '--' && $row->step_1_data) {
+                $step1Data = is_array($row->step_1_data) ? $row->step_1_data : json_decode($row->step_1_data, true);
+                $email = $step1Data['email_address'] ?? '--';
+            }
+            
+            // Get mobile from step_1_data if not in main field
+            if ($mobile == '--' && $row->step_1_data) {
+                $step1Data = is_array($row->step_1_data) ? $row->step_1_data : json_decode($row->step_1_data, true);
+                $mobile = $step1Data['primary_phone'] ?? '--';
+            }
+            
+            return '<div class="client-info">
+                        <div class="client-name f-14 f-w-500 text-darkest-grey mb-1">' . htmlspecialchars($personName) . '</div>
+                        <div class="client-mobile f-12 text-dark-grey mb-1">' . htmlspecialchars($mobile) . '</div>
+                        <div class="client-email f-12 text-dark-grey">' . htmlspecialchars($email) . '</div>
+                    </div>';
+        });
+
+        // SERVICES Column: Priority dropdown and Subclass from step 2 data
+        $datatables->addColumn('services', function ($row) {
+            // Priority dropdown
             $priorityOptions = ['Select Priority', '1st Priority', '2nd Priority', '3rd Priority', '4th Priority', '5th Priority'];
             $currentPriority = $row->priority ?? 'Select Priority';
             
@@ -115,30 +151,7 @@ class NewLeadDataTable extends BaseDataTable
             }
             $prioritySelect .= '</select>';
             
-            $mobile = $row->mobile ?? '--';
-            $email = $row->client_email ?? '--';
-            
-            // Get email from step_1_data if not in main field
-            if ($email == '--' && $row->step_1_data) {
-                $step1Data = is_array($row->step_1_data) ? $row->step_1_data : json_decode($row->step_1_data, true);
-                $email = $step1Data['email_address'] ?? '--';
-            }
-            
-            // Get mobile from step_1_data if not in main field
-            if ($mobile == '--' && $row->step_1_data) {
-                $step1Data = is_array($row->step_1_data) ? $row->step_1_data : json_decode($row->step_1_data, true);
-                $mobile = $step1Data['primary_phone'] ?? '--';
-            }
-            
-            return '<div class="client-info">
-                        <div class="priority-dropdown mb-2">' . $prioritySelect . '</div>
-                        <div class="client-mobile f-12 text-dark-grey mb-1">' . $mobile . '</div>
-                        <div class="client-email f-12 text-dark-grey">' . $email . '</div>
-                    </div>';
-        });
-
-        // SERVICES Column: Subclass from step 2 data
-        $datatables->addColumn('services', function ($row) {
+            // Subclass from step 2 data
             $subclass = '--';
             if ($row->step_2_data) {
                 $step2Data = is_array($row->step_2_data) ? $row->step_2_data : json_decode($row->step_2_data, true);
@@ -165,7 +178,11 @@ class NewLeadDataTable extends BaseDataTable
                     }
                 }
             }
-            return '<div class="services-info f-14 text-darkest-grey">' . $subclass . '</div>';
+            
+            return '<div class="services-info">
+                        <div class="priority-dropdown mb-2">' . $prioritySelect . '</div>
+                        <div class="subclass-info f-14 text-darkest-grey">' . htmlspecialchars($subclass) . '</div>
+                    </div>';
         });
 
         // STATUS Column: Show "draft" if final_status is draft, otherwise show dropdown
@@ -382,30 +399,14 @@ class NewLeadDataTable extends BaseDataTable
                             <i class="fa fa-edit"></i>
                         </a>';
             
-            // Add view button - only visible if lead status is complete AND user has Consultant or Admin role
+            // Add view button - visible if lead status is complete (all users can view)
             $isComplete = false;
             if ($row->stepStatus && $row->stepStatus->final_status == 'complete') {
                 $isComplete = true;
             }
             
-            // Check if user has Consultant or Admin role
-            $userRoles = user_roles();
-            $isConsultant = in_array('consultant', $userRoles);
-            $isAdmin = in_array('admin', $userRoles);
-            
-            // For Consultants: only show view icon if they own or added the lead
-            // For Admins: show view icon for all leads
-            $canViewDetails = false;
-            if ($isAdmin) {
-                $canViewDetails = true;
-            } elseif ($isConsultant) {
-                $userId = user()->id;
-                $isOwner = ($row->lead_owner == $userId);
-                $isAddedBy = ($row->added_by == $userId);
-                $canViewDetails = $isOwner || $isAddedBy;
-            }
-            
-            if ($isComplete && $canViewDetails) {
+            // Removed role and permission restrictions - all users can view lead details
+            if ($isComplete) {
                 // Complete status - show view icon and redirect to lead-details
                 $viewUrl = route('lead-details.index', ['id' => $row->id]);
                 $action .= '<a href="' . $viewUrl . '" class="btn btn-sm btn-secondary ml-2" title="' . __('app.view') . '">
@@ -518,24 +519,27 @@ class NewLeadDataTable extends BaseDataTable
             $newLead = $newLead->where('new_leads.lead_source', $this->request()->source_id);
         }
 
-        if ($this->viewLeadPermission == 'all' && $this->request()->filter_addedBy != 'all' && $this->request()->filter_addedBy != '') {
+        // Removed permission-based restrictions - all users can now see all leads
+        // Filter by "Added By" is still available as a manual filter option
+        if ($this->request()->filter_addedBy != 'all' && $this->request()->filter_addedBy != '') {
             $newLead = $newLead->where('new_leads.added_by', $this->request()->filter_addedBy);
         }
 
-        if ($this->viewLeadPermission == 'owned') {
-            $newLead = $newLead->where('new_leads.lead_owner', user()->id);
-        }
+        // Commented out permission restrictions to show all leads to all users
+        // if ($this->viewLeadPermission == 'owned') {
+        //     $newLead = $newLead->where('new_leads.lead_owner', user()->id);
+        // }
 
-        if ($this->viewLeadPermission == 'added') {
-            $newLead = $newLead->where('new_leads.added_by', user()->id);
-        }
+        // if ($this->viewLeadPermission == 'added') {
+        //     $newLead = $newLead->where('new_leads.added_by', user()->id);
+        // }
 
-        if ($this->viewLeadPermission == 'both') {
-            $newLead = $newLead->where(function ($query) {
-                $query->where('new_leads.lead_owner', user()->id)
-                      ->orWhere('new_leads.added_by', user()->id);
-            });
-        }
+        // if ($this->viewLeadPermission == 'both') {
+        //     $newLead = $newLead->where(function ($query) {
+        //         $query->where('new_leads.lead_owner', user()->id)
+        //               ->orWhere('new_leads.added_by', user()->id);
+        //     });
+        // }
 
         if ($this->request()->searchText != '') {
             $searchText = request('searchText');

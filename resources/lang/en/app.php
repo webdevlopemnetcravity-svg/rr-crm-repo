@@ -1030,6 +1030,7 @@ return array(
     'addTask' => 'Add Task',
     'addClient' => 'Add Client',
     'addLead' => 'Add Lead',
+    'editLead' => 'Edit Lead',
     'addPassport' => 'Add Passport',
     'addVisa' => 'Add Visa',
     'addInvoiceRecurring' => 'Add Recurring Invoice',
