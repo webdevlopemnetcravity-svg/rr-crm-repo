@@ -1280,6 +1280,7 @@ return array(
     'reassignLead' => 'Reassign Lead',
     'reassign' => 'Reassign',
     'currentLeadAssignedTo' => 'Current Lead Assigned To',
+    'assignedTo' => 'Assigned To',
     'changeLeadTo' => 'Change Lead To',
     'addPassport' => 'Add Passport',
     'surname' => 'Surname',

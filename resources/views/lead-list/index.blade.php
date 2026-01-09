@@ -177,6 +177,44 @@
                     </div>
                 </div>
             </div>
+
+            <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('app.assignedTo')</label>
+                <div class="select-filter mb-4">
+                    <div class="select-others">
+                        <select class="form-control select-picker" id="filter_assignedTo" data-live-search="true" data-container="body" data-size="8">
+                            <option value="all">@lang('app.all')</option>
+                            <option value="unassigned">Unassigned</option>
+                            @if(isset($consultants))
+                                @foreach ($consultants as $item)
+                                    <x-user-option :user="$item" />
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="more-filter-items">
+                <label class="f-14 text-dark-grey mb-12 " for="usr">@lang('modules.lead.leadQuality')</label>
+                <div class="select-filter mb-4">
+                    <div class="select-others">
+                        <select class="form-control select-picker" id="filter_lead_quality" data-live-search="true" data-container="body" data-size="8">
+                            <option value="all">@lang('app.all')</option>
+                            <option value="Open">Open</option>
+                            <option value="In-Process">In-Process</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Plan Dropped">Plan Dropped</option>
+                            <option value="Negotiation">Negotiation</option>
+                            <option value="Future Prospect">Future Prospect</option>
+                            <option value="Ringing">Ringing</option>
+                            <option value="Dead/Junk Lead">Dead/Junk Lead</option>
+                            <option value="Not Interested">Not Interested</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </x-filters.more-filter-box>
         <!-- MORE FILTERS END -->
     </x-filters.filter-box>
@@ -496,17 +534,21 @@
             var source_id = $('#filter_source_id').val();
             var date_filter_on = $('#date_filter_on').val();
             var filter_added_by = $('#filter_addedBy').val();
+            var filter_assigned_to = $('#filter_assignedTo').val();
             var filter_lead_status = $('#filter_lead_status').val();
+            var filter_lead_quality = $('#filter_lead_quality').val();
             var filter_subclass = $('#filter_subclass').val();
             var filter_priority = $('#filter_priority').val();
 
             data['startDate'] = startDate;
             data['filter_addedBy'] = filter_added_by;
+            data['filter_assignedTo'] = filter_assigned_to;
             data['endDate'] = endDate;
             data['searchText'] = searchText;
             data['source_id'] = source_id;
             data['date_filter_on'] = date_filter_on;
             data['filter_lead_status'] = filter_lead_status;
+            data['filter_lead_quality'] = filter_lead_quality;
             data['filter_subclass'] = filter_subclass;
             data['filter_priority'] = filter_priority;
         });
@@ -515,7 +557,7 @@
             window.LaravelDataTables["new-leads-table"].draw(true);
         }
 
-        $('#filter_source_id, #date_filter_on, #filter_addedBy, #filter_lead_status, #filter_subclass, #filter_priority').on('change keyup',
+        $('#filter_source_id, #date_filter_on, #filter_addedBy, #filter_assignedTo, #filter_lead_status, #filter_lead_quality, #filter_subclass, #filter_priority').on('change keyup',
             function () {
                 if ($('#filter_source_id').val() != "all") {
                     $('#reset-filters').removeClass('d-none');
@@ -523,7 +565,11 @@
                     $('#reset-filters').removeClass('d-none');
                 } else if ($('#filter_addedBy').val() != "all") {
                     $('#reset-filters').removeClass('d-none');
+                } else if ($('#filter_assignedTo').val() != "all") {
+                    $('#reset-filters').removeClass('d-none');
                 } else if ($('#filter_lead_status').val() != "all") {
+                    $('#reset-filters').removeClass('d-none');
+                } else if ($('#filter_lead_quality').val() != "all") {
                     $('#reset-filters').removeClass('d-none');
                 } else if ($('#filter_subclass').val() != "all") {
                     $('#reset-filters').removeClass('d-none');

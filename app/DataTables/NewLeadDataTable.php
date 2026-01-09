@@ -525,6 +525,15 @@ class NewLeadDataTable extends BaseDataTable
             $newLead = $newLead->where('new_leads.added_by', $this->request()->filter_addedBy);
         }
 
+        // Filter by "Assigned To" (lead owner)
+        if ($this->request()->filter_assignedTo != 'all' && $this->request()->filter_assignedTo != '') {
+            if ($this->request()->filter_assignedTo == 'unassigned') {
+                $newLead = $newLead->whereNull('new_leads.lead_owner');
+            } else {
+                $newLead = $newLead->where('new_leads.lead_owner', $this->request()->filter_assignedTo);
+            }
+        }
+
         // Commented out permission restrictions to show all leads to all users
         // if ($this->viewLeadPermission == 'owned') {
         //     $newLead = $newLead->where('new_leads.lead_owner', user()->id);
@@ -571,6 +580,11 @@ class NewLeadDataTable extends BaseDataTable
         // Filter by Lead Status
         if ($this->request()->filter_lead_status != 'all' && $this->request()->filter_lead_status != '') {
             $newLead = $newLead->where('new_leads.lead_status', $this->request()->filter_lead_status);
+        }
+        
+        // Filter by Lead Quality
+        if ($this->request()->filter_lead_quality != 'all' && $this->request()->filter_lead_quality != '') {
+            $newLead = $newLead->where('new_leads.lead_quality', $this->request()->filter_lead_quality);
         }
         
         // Filter by Subclass
