@@ -15,6 +15,7 @@ return array(
     'requestSentOffline' => 'In offline pay method request will be sent for approval',
     'recordSaved' => 'Record saved successfully',
     'deleteSuccess' => 'Deleted successfully.',
+    'duplicateLead' => 'A lead with the same information already exists.',
     'checkDayHoliday' => 'Choose at-least 1.',
     'addItem' => 'Add at-least 1 item.',
     'quantityNumber' => 'Quantity should be a number',

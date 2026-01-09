@@ -4298,12 +4298,104 @@
                                 }
                             }
                         } else {
+                            // Check if this is a duplicate lead error
+                            const duplicateData = response.data || {};
+                            if (duplicateData.duplicate && duplicateData.duplicate_lead_number) {
+                                // Show duplicate lead popup
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Duplicate Lead',
+                                    html: '<div class="text-center">' +
+                                          '<p class="mb-3">A lead with the same <strong>' + (duplicateData.duplicate_reason || 'information') + '</strong> already exists.</p>' +
+                                          '<p class="mb-3"><strong>Duplicate Lead Number:</strong> ' + duplicateData.duplicate_lead_number + '</p>' +
+                                          '</div>',
+                                    showCancelButton: true,
+                                    confirmButtonText: 'View Lead',
+                                    cancelButtonText: 'Cancel',
+                                    customClass: {
+                                        confirmButton: 'btn btn-primary mr-2',
+                                        cancelButton: 'btn btn-secondary'
+                                    },
+                                    buttonsStyling: false
+                                }).then((result) => {
+                                    if (result.isConfirmed && duplicateData.view_lead_url) {
+                                        // Open duplicate lead in new tab
+                                        window.open(duplicateData.view_lead_url, '_blank');
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    text: response.message || '@lang('messages.errorOccurred')',
+                                    toast: true,
+                                    position: "top-end",
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false,
+                                    customClass: {
+                                        confirmButton: "btn btn-primary",
+                                    },
+                                    showClass: {
+                                        popup: "swal2-noanimation",
+                                        backdrop: "swal2-noanimation",
+                                    },
+                                });
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = '@lang('messages.errorOccurred')';
+                        let response = xhr.responseJSON || {};
+                        const duplicateData = response.data || {};
+                        
+                        // Check if this is a duplicate lead error
+                        if (duplicateData.duplicate && duplicateData.duplicate_lead_number) {
+                            // Show duplicate lead popup
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Duplicate Lead',
+                                html: '<div class="text-center">' +
+                                      '<p class="mb-3">A lead with the same <strong>' + (duplicateData.duplicate_reason || 'information') + '</strong> already exists.</p>' +
+                                      '<p class="mb-3"><strong>Duplicate Lead Number:</strong> ' + duplicateData.duplicate_lead_number + '</p>' +
+                                      '</div>',
+                                showCancelButton: true,
+                                confirmButtonText: 'View Lead',
+                                cancelButtonText: 'Cancel',
+                                customClass: {
+                                    confirmButton: 'btn btn-primary mr-2',
+                                    cancelButton: 'btn btn-secondary'
+                                },
+                                buttonsStyling: false
+                            }).then((result) => {
+                                if (result.isConfirmed && duplicateData.view_lead_url) {
+                                    // Open duplicate lead in new tab
+                                    window.open(duplicateData.view_lead_url, '_blank');
+                                }
+                            });
+                        } else {
+                            // Handle validation errors from backend
+                            if (response.message) {
+                                errorMessage = response.message;
+                            } else if (response.errors) {
+                                // Laravel validation errors - collect all errors
+                                const errors = response.errors;
+                                const errorList = [];
+                                for (let field in errors) {
+                                    if (errors.hasOwnProperty(field)) {
+                                        errorList.push(errors[field][0]);
+                                    }
+                                }
+                                errorMessage = errorList.length === 1 
+                                    ? errorList[0] 
+                                    : errorList.slice(0, 3).join('<br>') + (errorList.length > 3 ? '<br>... and ' + (errorList.length - 3) + ' more' : '');
+                            }
+                            
                             Swal.fire({
                                 icon: 'error',
-                                text: response.message || '@lang('messages.errorOccurred')',
+                                html: errorMessage,
                                 toast: true,
                                 position: "top-end",
-                                timer: 3000,
+                                timer: errorMessage.includes('<br>') ? 5000 : 3000,
                                 timerProgressBar: true,
                                 showConfirmButton: false,
                                 customClass: {
@@ -4315,45 +4407,6 @@
                                 },
                             });
                         }
-                    },
-                    error: function(xhr) {
-                        let errorMessage = '@lang('messages.errorOccurred')';
-                        
-                        // Handle validation errors from backend
-                        if (xhr.responseJSON) {
-                            if (xhr.responseJSON.message) {
-                                errorMessage = xhr.responseJSON.message;
-                            } else if (xhr.responseJSON.errors) {
-                                // Laravel validation errors - collect all errors
-                                const errors = xhr.responseJSON.errors;
-                                const errorList = [];
-                                for (let field in errors) {
-                                    if (errors.hasOwnProperty(field)) {
-                                        errorList.push(errors[field][0]);
-                                    }
-                                }
-                                errorMessage = errorList.length === 1 
-                                    ? errorList[0] 
-                                    : errorList.slice(0, 3).join('<br>') + (errorList.length > 3 ? '<br>... and ' + (errorList.length - 3) + ' more' : '');
-                            }
-                        }
-                        
-                        Swal.fire({
-                            icon: 'error',
-                            html: errorMessage,
-                            toast: true,
-                            position: "top-end",
-                            timer: errorMessage.includes('<br>') ? 5000 : 3000,
-                            timerProgressBar: true,
-                            showConfirmButton: false,
-                            customClass: {
-                                confirmButton: "btn btn-primary",
-                            },
-                            showClass: {
-                                popup: "swal2-noanimation",
-                                backdrop: "swal2-noanimation",
-                            },
-                        });
                     },
                     complete: function() {
                         $saveBtn.prop('disabled', false).html(originalHtml);

@@ -2254,6 +2254,59 @@ class LeadContactController extends AccountBaseController
             $leadId = $request->lead_id;
             $isNewLead = false;
 
+            // Check for duplicate leads (only for step 1 and new leads)
+            if ($stepNumber == 1 && !$leadId) {
+                $primaryPhone = $request->primary_phone ?? $request->mobile ?? null;
+                $emailAddress = $request->email_address ?? $request->email ?? null;
+                
+                $duplicateLead = null;
+                $duplicateReason = '';
+                
+                // Check for duplicate by primary phone
+                if ($primaryPhone) {
+                    $duplicateByPhone = NewLead::where('company_id', company()->id)
+                        ->where(function($query) use ($primaryPhone) {
+                            $query->where('mobile', $primaryPhone)
+                                  ->orWhere('step_1_data->primary_phone', $primaryPhone);
+                        })
+                        ->first();
+                    
+                    if ($duplicateByPhone) {
+                        $duplicateLead = $duplicateByPhone;
+                        $duplicateReason = 'Primary Phone No';
+                    }
+                }
+                
+                // Check for duplicate by email (if not already found by phone)
+                if (!$duplicateLead && $emailAddress) {
+                    $duplicateByEmail = NewLead::where('company_id', company()->id)
+                        ->where(function($query) use ($emailAddress) {
+                            $query->where('client_email', $emailAddress)
+                                  ->orWhere('step_1_data->email_address', $emailAddress);
+                        })
+                        ->first();
+                    
+                    if ($duplicateByEmail) {
+                        $duplicateLead = $duplicateByEmail;
+                        $duplicateReason = 'Email';
+                    }
+                }
+                
+                // If duplicate found, return error with duplicate lead information
+                if ($duplicateLead) {
+                    $leadNumber = 'LEAD-' . str_pad($duplicateLead->id, 4, '0', STR_PAD_LEFT);
+                    $viewLeadUrl = route('lead-details.index', $duplicateLead->id);
+                    
+                    return Reply::error(__('messages.duplicateLead'), null, [
+                        'duplicate' => true,
+                        'duplicate_reason' => $duplicateReason,
+                        'duplicate_lead_id' => $duplicateLead->id,
+                        'duplicate_lead_number' => $leadNumber,
+                        'view_lead_url' => $viewLeadUrl,
+                    ]);
+                }
+            }
+
             // Create or get new lead
             if ($leadId) {
                 $lead = NewLead::findOrFail($leadId);
