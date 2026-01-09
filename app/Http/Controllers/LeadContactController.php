@@ -97,16 +97,15 @@ class LeadContactController extends AccountBaseController
             $this->categories = LeadCategory::get();
             $this->employees = User::allEmployees(null, 'active');
             
-            // Get consultants for "Assigned To" filter
-            $this->consultants = User::withRole('consultant')
-                ->join('employee_details', 'employee_details.user_id', '=', 'users.id')
+            // Get users with admin, consultant, and receptionist roles for filters
+            $this->filterUsers = User::join('employee_details', 'employee_details.user_id', '=', 'users.id')
                 ->leftJoin('designations', 'employee_details.designation_id', '=', 'designations.id')
                 ->join('role_user', 'role_user.user_id', '=', 'users.id')
                 ->join('roles', 'roles.id', '=', 'role_user.role_id')
                 ->select('users.id', 'users.company_id', 'users.name', 'users.email', 'users.created_at', 'users.image', 'designations.name as designation_name', 'users.email_notifications', 'users.mobile', 'users.country_id', 'users.status')
                 ->where('users.company_id', company()->id)
                 ->where('users.status', 'active')
-                ->where('roles.name', 'consultant')
+                ->whereIn('roles.name', ['admin', 'consultant', 'receptionist'])
                 ->orderBy('users.name')
                 ->groupBy('users.id')
                 ->get();

@@ -170,9 +170,11 @@
                     <div class="select-others">
                         <select class="form-control select-picker" id="filter_addedBy" data-live-search="true" data-container="body" data-size="8">
                             <option value="all">@lang('app.all')</option>
-                            @foreach ($employees as $item)
-                                <x-user-option :user="$item" />
-                            @endforeach
+                            @if(isset($filterUsers))
+                                @foreach ($filterUsers as $item)
+                                    <x-user-option :user="$item" />
+                                @endforeach
+                            @endif
                         </select>
                     </div>
                 </div>
@@ -185,8 +187,8 @@
                         <select class="form-control select-picker" id="filter_assignedTo" data-live-search="true" data-container="body" data-size="8">
                             <option value="all">@lang('app.all')</option>
                             <option value="unassigned">Unassigned</option>
-                            @if(isset($consultants))
-                                @foreach ($consultants as $item)
+                            @if(isset($filterUsers))
+                                @foreach ($filterUsers as $item)
                                     <x-user-option :user="$item" />
                                 @endforeach
                             @endif
