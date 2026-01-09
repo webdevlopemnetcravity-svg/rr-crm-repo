@@ -146,6 +146,20 @@ class LeadContactController extends AccountBaseController
                 return (object)['id' => $status, 'type' => $status];
             });
             
+            // Hardcoded lead quality values for filter (must match DataTable options)
+            $this->leadQualityOptions = [
+                'Open',
+                'In-Process',
+                'On Hold',
+                'Plan Dropped',
+                'Negotiation',
+                'Future Prospect',
+                'Ringing',
+                'Dead/Junk Lead',
+                'Not Interested',
+                'Rejected'
+            ];
+            
             // Hardcoded service/subclass values for filter
             $this->subclasses = collect([
                 'Visitor Visa (Subclass 600)',

@@ -124,16 +124,11 @@
                     <div class="select-others">
                         <select class="form-control select-picker" id="filter_lead_quality" data-live-search="true" data-container="body" data-size="8">
                             <option value="all">@lang('app.all')</option>
-                            <option value="Open">Open</option>
-                            <option value="In-Process">In-Process</option>
-                            <option value="On Hold">On Hold</option>
-                            <option value="Plan Dropped">Plan Dropped</option>
-                            <option value="Negotiation">Negotiation</option>
-                            <option value="Future Prospect">Future Prospect</option>
-                            <option value="Ringing">Ringing</option>
-                            <option value="Dead/Junk Lead">Dead/Junk Lead</option>
-                            <option value="Not Interested">Not Interested</option>
-                            <option value="Rejected">Rejected</option>
+                            @if(isset($leadQualityOptions))
+                                @foreach ($leadQualityOptions as $quality)
+                                    <option value="{{ $quality }}">{{ $quality }}</option>
+                                @endforeach
+                            @endif
                         </select>
                     </div>
                 </div>
