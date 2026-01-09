@@ -2273,11 +2273,12 @@ class LeadContactController extends AccountBaseController
             $this->logStepCompletion($leadId, $stepNumber);
 
             // Send emails when step 9 is completed
+            // DISABLED: Email notification on step 9 completion
             // Use loose comparison to handle both string "9" and integer 9
-            if ($stepNumber == 9 || $stepNumber === 9 || (string)$stepNumber === '9') {
-                \Log::info('Step 9 completed, triggering email sending for lead ID: ' . $lead->id);
-                $this->sendLeadEmails($lead);
-            }
+            // if ($stepNumber == 9 || $stepNumber === 9 || (string)$stepNumber === '9') {
+            //     \Log::info('Step 9 completed, triggering email sending for lead ID: ' . $lead->id);
+            //     $this->sendLeadEmails($lead);
+            // }
 
             return Reply::successWithData(__('messages.recordSaved'), [
                 'lead_id' => $leadId,
