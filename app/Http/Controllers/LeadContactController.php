@@ -1571,6 +1571,36 @@ class LeadContactController extends AccountBaseController
     }
 
     /**
+     * Get updated lead counts for statistics
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getLeadCounts()
+    {
+        // Calculate lead counts for statistics
+        $allLeadsQuery = NewLead::query();
+        $myLeadsQuery = NewLead::query();
+        
+        // "All Leads" - count all leads regardless of permissions
+        // No filter needed for all leads count
+        
+        // "My Leads" - leads owned OR added by current user
+        $myLeadsQuery->where(function ($query) {
+            $query->where('lead_owner', user()->id)
+                  ->orWhere('added_by', user()->id);
+        });
+        
+        $allLeadsCount = $allLeadsQuery->count();
+        $myLeadsCount = $myLeadsQuery->count();
+
+        return Reply::dataOnly([
+            'status' => 'success',
+            'allLeadsCount' => $allLeadsCount,
+            'myLeadsCount' => $myLeadsCount
+        ]);
+    }
+
+    /**
      * Update lead priority
      *
      * @param Request $request

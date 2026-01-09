@@ -544,6 +544,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::post('new-leads/update-priority', [LeadContactController::class, 'updateLeadPriority'])->name('new-leads.update_priority');
     Route::post('new-leads/update-status', [LeadContactController::class, 'updateLeadStatus'])->name('new-leads.update_status');
     Route::post('new-leads/update-quality', [LeadContactController::class, 'updateLeadQuality'])->name('new-leads.update_quality');
+    Route::get('new-leads/get-counts', [LeadContactController::class, 'getLeadCounts'])->name('new-leads.get_counts');
     Route::post('new-leads/follow-up-store', [LeadContactController::class, 'storeNewLeadFollowUp'])->name('new-leads.follow-up-store');
     Route::get('new-leads/follow-ups/{leadId}', [LeadContactController::class, 'getNewLeadFollowUps'])->name('new-leads.follow-ups');
     Route::get('new-leads/follow-up-list/{id}', [LeadContactController::class, 'getNewLeadFollowUpList'])->name('new-leads.follow-up-list');

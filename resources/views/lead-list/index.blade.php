@@ -239,12 +239,12 @@
             <!-- Lead Statistics Start -->
             <!-- All Leads Statistic -->
             <div class="mb-0 f-18 font-weight-bold text-dark-grey d-grid align-items-center mr-3">
-                <span id="dashboard-clock">{{ $allLeadsCount ?? 0 }}</span>
+                <span id="all-leads-count">{{ $allLeadsCount ?? 0 }}</span>
                 <span class="f-13 font-weight-normal">All Leads</span>
             </div>
             <!-- My Leads Statistic -->
             <div class="mb-0 f-18 font-weight-bold text-dark-grey d-grid align-items-center mr-3">
-                <span id="dashboard-clock">{{ $myLeadsCount ?? 0 }}</span>
+                <span id="my-leads-count">{{ $myLeadsCount ?? 0 }}</span>
                 <span class="f-13 font-weight-normal">My Leads</span>
             </div>
             <!-- Lead Statistics End -->
@@ -561,6 +561,24 @@
             window.LaravelDataTables["new-leads-table"].draw(true);
         }
 
+        // Function to update lead counts
+        const updateLeadCounts = () => {
+            $.easyAjax({
+                url: "{{ route('new-leads.get_counts') }}",
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    if (response.status == "success") {
+                        $('#all-leads-count').text(response.allLeadsCount || 0);
+                        $('#my-leads-count').text(response.myLeadsCount || 0);
+                    }
+                },
+                error: function () {
+                    // Silently fail - counts will update on next page load
+                }
+            });
+        }
+
         $('#filter_source_id, #date_filter_on, #filter_addedBy, #filter_assignedTo, #filter_lead_status, #filter_lead_quality, #filter_subclass, #filter_priority').on('change keyup',
             function () {
                 if ($('#filter_source_id').val() != "all") {
@@ -675,6 +693,7 @@
                         success: function (response) {
                             if (response.status == "success") {
                                 showTable();
+                                updateLeadCounts();
                             }
                         }
                     });
@@ -700,6 +719,7 @@
                 success: function (response) {
                     if (response.status == 'success') {
                         showTable();
+                        updateLeadCounts();
                         resetActionButtons();
                         deSelectAll();
                         $('#quick-action-form').hide();

@@ -3589,6 +3589,12 @@
                         });
                     }
                 }
+                
+                // Update tab navigation after form fields are populated
+                // Use a delay to ensure all selectpickers are refreshed
+                setTimeout(function() {
+                    updateTabNavigation();
+                }, 300);
             }
 
             // Map tab IDs to step numbers (mapped to original database step numbers)
@@ -3693,18 +3699,94 @@
                 }
             }
 
-            // Update tab navigation - all tabs are always enabled
+            // Check if first step (Personal Details) is completed
+            function isFirstStepCompleted() {
+                const surname = ($('#surname').val() || '').trim();
+                const givenName = ($('#given_name').val() || '').trim();
+                const primaryPhone = ($('#primary_phone').val() || '').trim();
+                const emailAddress = ($('#email_address').val() || '').trim();
+                
+                // Check if all required fields are filled
+                const hasSurname = surname.length > 0;
+                const hasGivenName = givenName.length > 0;
+                const hasPrimaryPhone = primaryPhone.length === 10 && /^[0-9]{10}$/.test(primaryPhone);
+                const hasValidEmail = emailAddress.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailAddress);
+                
+                return hasSurname && hasGivenName && hasPrimaryPhone && hasValidEmail;
+            }
+
+            // Update tab navigation - disable all tabs except first until first step is completed
             function updateTabNavigation() {
+                const firstStepCompleted = isFirstStepCompleted();
+                
                 $('.nav-link-lead').each(function() {
-                    // Remove disabled class and enable all tabs
-                    $(this).removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
+                    const $tab = $(this);
+                    const tabId = $tab.attr('id');
+                    
+                    // Always enable the first tab (Personal Details)
+                    if (tabId === 'nav-personal-tab') {
+                        $tab.removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
+                    } else {
+                        // Enable/disable other tabs based on first step completion
+                        if (firstStepCompleted) {
+                            $tab.removeClass('disabled').css('pointer-events', 'auto').css('opacity', '1');
+                        } else {
+                            $tab.addClass('disabled').css('pointer-events', 'none').css('opacity', '0.5');
+                        }
+                    }
                 });
             }
 
-            // Handle tab navigation - all tabs are accessible
+            // Handle tab navigation - prevent navigation to disabled tabs
             $('.nav-link-lead').on('click', function(e) {
-                // All tabs are now accessible, no need to check for disabled state
+                const $tab = $(this);
+                
+                // Prevent navigation if tab is disabled
+                if ($tab.hasClass('disabled') || $tab.css('pointer-events') === 'none') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Show message to user
+                    Swal.fire({
+                        icon: 'info',
+                        text: 'Please complete the Personal Details step first before accessing other steps.',
+                        toast: true,
+                        position: "top-end",
+                        timer: 3000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                    });
+                    
+                    return false;
+                }
+                
                 currentStep = getCurrentStep();
+            });
+
+            // Add event listeners to required fields for real-time validation
+            function setupFirstStepValidation() {
+                const requiredFields = ['#surname', '#given_name', '#primary_phone', '#email_address'];
+                
+                requiredFields.forEach(function(fieldId) {
+                    $(fieldId).on('input blur', function() {
+                        // Update tab navigation when any required field changes
+                        updateTabNavigation();
+                    });
+                });
+            }
+
+            // Initialize tab navigation on page load
+            $(document).ready(function() {
+                // Disable all tabs except first on initial load
+                updateTabNavigation();
+                
+                // Setup real-time validation for first step
+                setupFirstStepValidation();
+                
+                // Also check after a short delay to handle any pre-filled data
+                setTimeout(function() {
+                    updateTabNavigation();
+                }, 500);
             });
 
             // Update footer buttons based on current step
@@ -4347,11 +4429,6 @@
                 });
             }
             
-            // Handle tab click - all tabs are accessible
-            $('.nav-link-lead').on('click', function(e) {
-                // All tabs are now accessible, no restrictions
-            });
-
             // Initialize on page load - always default to step 1
             currentStep = 1;
             // Ensure step 1 (nav-personal-tab) is always active on page load/refresh
@@ -4366,6 +4443,7 @@
             
             // File inputs removed - no handlers needed
             
+            // Initialize tab navigation on page load (will be updated after data loads if lead exists)
             updateTabNavigation();
             updateFooterButtons();
 
