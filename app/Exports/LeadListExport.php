@@ -194,6 +194,10 @@ class LeadListExport implements FromCollection, WithHeadings, WithMapping
         }
         
         $priority = $row->priority ?? 'Select Priority';
+        // If priority is "Select Priority", show "--" in export
+        if ($priority == 'Select Priority') {
+            $priority = '--';
+        }
         
         // Services (Subclass)
         $subclass = '--';
@@ -220,8 +224,20 @@ class LeadListExport implements FromCollection, WithHeadings, WithMapping
             }
         }
         
-        $status = $row->lead_status ?? 'Open Lead';
-        $quality = $row->lead_quality ?? 'Open';
+        // Check if lead is in draft status
+        $isDraft = false;
+        if ($row->stepStatus && $row->stepStatus->final_status == 'draft') {
+            $isDraft = true;
+        }
+        
+        // Set status and quality based on draft status
+        if ($isDraft) {
+            $status = 'Draft';
+            $quality = '--';
+        } else {
+            $status = $row->lead_status ?? 'Open Lead';
+            $quality = $row->lead_quality ?? 'Open';
+        }
         
         return [
             $leadId,
