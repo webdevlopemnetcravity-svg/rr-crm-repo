@@ -36,10 +36,10 @@
         <x-setting-menu-item :active="$activeMenu" menu="profile_settings" :href="route('profile-settings.index')"
                              :text="__('app.menu.profileSettings')"/>
 
-        {{-- @if (user()->permission('manage_notification_setting') == 'all')
+        @if (user()->permission('manage_notification_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="notification_settings" :href="route('notifications.index')"
                                  :text="__('app.menu.notificationSettings')"/>
-        @endif --}}
+        @endif 
 
         {{-- @if (user()->permission('manage_currency_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="currency_settings" :href="route('currency-settings.index')"
