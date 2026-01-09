@@ -108,8 +108,14 @@ class LeadListExport implements FromCollection, WithHeadings, WithMapping
                     $query->where('final_status', 'draft');
                 });
             } else {
-                // Filter by regular lead status
-                $newLead = $newLead->where('new_leads.lead_status', $this->request->filter_lead_status);
+                // Filter by regular lead status, but exclude draft leads
+                $newLead = $newLead->where('new_leads.lead_status', $this->request->filter_lead_status)
+                    ->where(function ($query) {
+                        $query->whereDoesntHave('stepStatus')
+                              ->orWhereHas('stepStatus', function ($q) {
+                                  $q->where('final_status', '!=', 'draft');
+                              });
+                    });
             }
         }
         
