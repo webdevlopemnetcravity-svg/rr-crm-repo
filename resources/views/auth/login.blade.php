@@ -1,6 +1,10 @@
 <x-auth>
     <form id="login-form" action="{{ route('login') }}" class="ajax-form" method="POST">
         {{ csrf_field() }}
+        
+        <div class="text-center mb-4">
+            <img src="{{ $globalSetting->logo_url }}" alt="Logo" class="rounded" style="max-height: 60px;">
+        </div>
         <h3 class=" mb-4 f-w-500">@lang('app.login')</h3>
 
         <script>

@@ -6541,21 +6541,37 @@ class LeadContactController extends AccountBaseController
 
             // Get company timezone and date/time format
             $company = company();
-            $timezone = $company->timezone ?? 'UTC';
+            $companyTimezone = $company->timezone ?? 'Asia/Kolkata';
             $dateFormat = $company->date_format ?? 'Y-m-d';
             $timeFormat = $company->time_format ?? 'H:i';
 
-            // Parse date and time
-            $appointmentDate = Carbon::createFromFormat($dateFormat, $request->appointment_date, $timezone);
-            $startTime = Carbon::createFromFormat($timeFormat, $request->start_time, $timezone);
-            $endTime = Carbon::createFromFormat($timeFormat, $request->end_time, $timezone);
+            // Try to get lead's timezone from step_1_data (country_of_origin)
+            // If not available, use company timezone
+            $leadTimezone = $companyTimezone;
+            if ($lead->step_1_data && is_array($lead->step_1_data)) {
+                $countryOfOrigin = $lead->step_1_data['country_of_origin'] ?? null;
+                if (!empty($countryOfOrigin)) {
+                    // Try to get timezone from country
+                    $leadTimezone = $this->getTimezoneFromCountry($countryOfOrigin, $companyTimezone);
+                    \Log::info('Book Appointment: Lead timezone detected', [
+                        'country_of_origin' => $countryOfOrigin,
+                        'lead_timezone' => $leadTimezone,
+                        'company_timezone' => $companyTimezone
+                    ]);
+                }
+            }
+
+            // Parse date and time using lead's timezone (or company timezone as fallback)
+            $appointmentDate = Carbon::createFromFormat($dateFormat, $request->appointment_date, $leadTimezone);
+            $startTime = Carbon::createFromFormat($timeFormat, $request->start_time, $leadTimezone);
+            $endTime = Carbon::createFromFormat($timeFormat, $request->end_time, $leadTimezone);
 
             // Combine date and time
             $startDateTime = $appointmentDate->copy()->setTime($startTime->hour, $startTime->minute, 0);
             $endDateTime = $appointmentDate->copy()->setTime($endTime->hour, $endTime->minute, 0);
 
             // Validate that appointment is in the future
-            $now = Carbon::now($timezone);
+            $now = Carbon::now($leadTimezone);
             if ($startDateTime->lte($now)) {
                 return Reply::error('Appointment date and time must be in the future.');
             }
@@ -6565,21 +6581,65 @@ class LeadContactController extends AccountBaseController
                 return Reply::error('End time must be after start time.');
             }
 
-            // Get user's Google token
-            $currentUser = user();
+            // Try to use logged-in user's Google token first (so they can join directly)
+            // If not available, fall back to admin's token
+            $currentUser = user(); // Keep for logging who created the appointment
+            
             \Log::info('Book Appointment: Current user', [
                 'user_id' => $currentUser->id,
                 'user_name' => $currentUser->name,
                 'auth_user_id' => auth()->id()
             ]);
+            
+            // First, try to get logged-in user's Google token
             $googleToken = NewGoogleToken::where('user_id', $currentUser->id)
                 ->where('company_id', $company->id)
                 ->where('verification_status', 'verified')
                 ->first();
-
+            
+            $tokenOwner = $currentUser;
+            $usingAdminToken = false;
+            
+            // If logged-in user doesn't have a token, fall back to admin's token
             if (!$googleToken || empty($googleToken->access_token)) {
-                return Reply::error('Google Calendar is not authenticated. Please login with Google to book appointments with Meet links.');
+                \Log::info('Book Appointment: Logged-in user has no token, trying admin token');
+                $adminUsers = User::allAdmins($company->id);
+                
+                if ($adminUsers->isEmpty()) {
+                    \Log::error('Book Appointment: No admin user found', [
+                        'company_id' => $company->id
+                    ]);
+                    return Reply::error('No admin user found. Please ensure an admin user has connected their Google Calendar.');
+                }
+                
+                // Get the first admin user's Google token
+                $adminUser = $adminUsers->first();
+                $googleToken = NewGoogleToken::where('user_id', $adminUser->id)
+                    ->where('company_id', $company->id)
+                    ->where('verification_status', 'verified')
+                    ->first();
+                
+                if (!$googleToken || empty($googleToken->access_token)) {
+                    \Log::error('Book Appointment: Admin Google token not found', [
+                        'admin_user_id' => $adminUser->id,
+                        'admin_user_email' => $adminUser->email,
+                        'company_id' => $company->id
+                    ]);
+                    return Reply::error('Google Calendar is not authenticated. Please connect your Google Calendar or ensure an admin has connected theirs.');
+                }
+                
+                $tokenOwner = $adminUser;
+                $usingAdminToken = true;
             }
+            
+            \Log::info('Book Appointment: Using Google token', [
+                'token_owner_id' => $tokenOwner->id,
+                'token_owner_name' => $tokenOwner->name,
+                'token_owner_email' => $tokenOwner->email,
+                'using_admin_token' => $usingAdminToken,
+                'created_by_user_id' => $currentUser->id,
+                'created_by_user_name' => $currentUser->name
+            ]);
 
             // Create Google Meet link first - MUST succeed before saving appointment
             $googleMeetLink = null;
@@ -6655,13 +6715,25 @@ class LeadContactController extends AccountBaseController
                 // Get owner/creator email
                 $ownerEmail = $currentUser->email;
 
-                // Prepare attendees
-                $attendees = [];
+                // Prepare attendees with proper Google Calendar attendee objects
+                // This ensures proper permissions and response status
+                $attendeesList = [];
+                
+                // Add lead as attendee
                 if (!empty($leadEmail)) {
-                    $attendees[] = ['email' => $leadEmail];
+                    $leadAttendee = new \Google_Service_Calendar_EventAttendee();
+                    $leadAttendee->setEmail($leadEmail);
+                    $attendeesList[] = $leadAttendee;
                 }
+                
+                // Add logged-in user as attendee with accepted status
+                // Note: When using admin's token, Google Meet will still see admin as host
+                // The only way to avoid "waiting" is to use logged-in user's own token
                 if (!empty($ownerEmail)) {
-                    $attendees[] = ['email' => $ownerEmail];
+                    $userAttendee = new \Google_Service_Calendar_EventAttendee();
+                    $userAttendee->setEmail($ownerEmail);
+                    $userAttendee->setResponseStatus('accepted');
+                    $attendeesList[] = $userAttendee;
                 }
 
                 // Create conference data for Google Meet
@@ -6671,19 +6743,20 @@ class LeadContactController extends AccountBaseController
                 $conferenceData->setCreateRequest($conferenceRequest);
 
                 // Create Google Calendar event with Meet
+                // Use lead's timezone so it displays correctly in Google Calendar
                 $eventData = new \Google_Service_Calendar_Event([
                     'summary' => $request->meeting_title,
                     'description' => $request->description ?? '',
                     'location' => 'Google Meet',
                     'start' => [
                         'dateTime' => $startDateTime->format('Y-m-d\TH:i:s'),
-                        'timeZone' => $timezone,
+                        'timeZone' => $leadTimezone,
                     ],
                     'end' => [
                         'dateTime' => $endDateTime->format('Y-m-d\TH:i:s'),
-                        'timeZone' => $timezone,
+                        'timeZone' => $leadTimezone,
                     ],
-                    'attendees' => $attendees,
+                    'attendees' => $attendeesList,
                     'conferenceData' => $conferenceData,
                     'reminders' => [
                         'useDefault' => false,
@@ -6693,6 +6766,26 @@ class LeadContactController extends AccountBaseController
                         ],
                     ],
                 ]);
+
+                // Set logged-in user as the organizer/owner of the meeting
+                if (!empty($ownerEmail)) {
+                    $organizer = new \Google_Service_Calendar_EventOrganizer();
+                    $organizer->setEmail($ownerEmail);
+                    $organizer->setDisplayName($currentUser->name ?? $ownerEmail);
+                    $eventData->setOrganizer($organizer);
+                    
+                    \Log::info('Book Appointment: Set organizer', [
+                        'organizer_email' => $ownerEmail,
+                        'organizer_name' => $currentUser->name,
+                        'user_id' => $currentUser->id,
+                        'using_admin_token' => $usingAdminToken,
+                        'token_owner_email' => $tokenOwner->email ?? 'unknown'
+                    ]);
+                    
+                    if ($usingAdminToken) {
+                        \Log::warning('Book Appointment: Using admin token - logged-in user may see "Please wait" message. To avoid this, user should connect their own Google Calendar.');
+                    }
+                }
 
                 // Insert event with conference data
                 $calendarId = $googleToken->calendar_id ?? 'primary';
@@ -6730,9 +6823,9 @@ class LeadContactController extends AccountBaseController
                 return Reply::error('Failed to create Google Meet link: ' . $e->getMessage());
             }
 
-            // Convert to UTC for storage
-            $startDateTimeUTC = $startDateTime->setTimezone('UTC');
-            $endDateTimeUTC = $endDateTime->setTimezone('UTC');
+            // Convert to IST for storage
+            $startDateTimeIST = $startDateTime->setTimezone('Asia/Kolkata');
+            $endDateTimeIST = $endDateTime->setTimezone('Asia/Kolkata');
 
             // Create appointment entry in database ONLY if Google Meet link was successfully created
             $appointment = new NewLeadAppointment();
@@ -6740,9 +6833,9 @@ class LeadContactController extends AccountBaseController
             $appointment->lead_id = $lead->id;
             $appointment->meeting_title = $request->meeting_title;
             $appointment->description = $request->description ?? null;
-            $appointment->appointment_date = $startDateTimeUTC;
-            $appointment->start_time = $startDateTimeUTC;
-            $appointment->end_time = $endDateTimeUTC;
+            $appointment->appointment_date = $startDateTimeIST;
+            $appointment->start_time = $startDateTimeIST;
+            $appointment->end_time = $endDateTimeIST;
             $appointment->google_meet_link = $googleMeetLink;
             $appointment->google_event_id = $googleEventId;
             $appointment->created_by = $currentUser->id;
@@ -6803,7 +6896,7 @@ class LeadContactController extends AccountBaseController
 
         try {
             $company = company();
-            $timezone = $company->timezone ?? 'UTC';
+            $timezone = $company->timezone ?? 'Asia/Kolkata';
             $dateFormat = $company->date_format ?? 'Y-m-d';
             $timeFormat = $company->time_format ?? 'H:i';
 
@@ -6827,9 +6920,9 @@ class LeadContactController extends AccountBaseController
                 return Reply::error('End time must be after start time.');
             }
 
-            // Convert to UTC for storage
-            $startDateTimeUTC = $startDateTime->setTimezone('UTC');
-            $endDateTimeUTC = $endDateTime->setTimezone('UTC');
+            // Convert to IST for storage
+            $startDateTimeIST = $startDateTime->setTimezone('Asia/Kolkata');
+            $endDateTimeIST = $endDateTime->setTimezone('Asia/Kolkata');
 
             // Get user's Google token for updating calendar event
             $currentUser = user();
@@ -6961,9 +7054,9 @@ class LeadContactController extends AccountBaseController
             // Update appointment in database
             $appointment->meeting_title = $request->meeting_title;
             $appointment->description = $request->description ?? null;
-            $appointment->appointment_date = $startDateTimeUTC;
-            $appointment->start_time = $startDateTimeUTC;
-            $appointment->end_time = $endDateTimeUTC;
+            $appointment->appointment_date = $startDateTimeIST;
+            $appointment->start_time = $startDateTimeIST;
+            $appointment->end_time = $endDateTimeIST;
             $appointment->updated_by = $currentUser->id;
             $appointment->save();
 
@@ -6998,6 +7091,101 @@ class LeadContactController extends AccountBaseController
             \Log::error('Cancel appointment error: ' . $e->getMessage());
             return Reply::error('Failed to cancel appointment: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get timezone from country name
+     * Maps common country names to their primary timezone
+     */
+    private function getTimezoneFromCountry($countryName, $defaultTimezone = 'Asia/Kolkata')
+    {
+        if (empty($countryName)) {
+            return $defaultTimezone;
+        }
+
+        // Common country to timezone mapping
+        $countryTimezoneMap = [
+            'India' => 'Asia/Kolkata',
+            'United States' => 'America/New_York',
+            'USA' => 'America/New_York',
+            'United Kingdom' => 'Europe/London',
+            'UK' => 'Europe/London',
+            'Canada' => 'America/Toronto',
+            'Australia' => 'Australia/Sydney',
+            'Germany' => 'Europe/Berlin',
+            'France' => 'Europe/Paris',
+            'Japan' => 'Asia/Tokyo',
+            'China' => 'Asia/Shanghai',
+            'Brazil' => 'America/Sao_Paulo',
+            'Mexico' => 'America/Mexico_City',
+            'Russia' => 'Europe/Moscow',
+            'South Korea' => 'Asia/Seoul',
+            'Italy' => 'Europe/Rome',
+            'Spain' => 'Europe/Madrid',
+            'Netherlands' => 'Europe/Amsterdam',
+            'Belgium' => 'Europe/Brussels',
+            'Switzerland' => 'Europe/Zurich',
+            'Sweden' => 'Europe/Stockholm',
+            'Norway' => 'Europe/Oslo',
+            'Denmark' => 'Europe/Copenhagen',
+            'Poland' => 'Europe/Warsaw',
+            'Portugal' => 'Europe/Lisbon',
+            'Greece' => 'Europe/Athens',
+            'Turkey' => 'Europe/Istanbul',
+            'Saudi Arabia' => 'Asia/Riyadh',
+            'UAE' => 'Asia/Dubai',
+            'United Arab Emirates' => 'Asia/Dubai',
+            'Singapore' => 'Asia/Singapore',
+            'Malaysia' => 'Asia/Kuala_Lumpur',
+            'Thailand' => 'Asia/Bangkok',
+            'Indonesia' => 'Asia/Jakarta',
+            'Philippines' => 'Asia/Manila',
+            'Vietnam' => 'Asia/Ho_Chi_Minh',
+            'Hong Kong' => 'Asia/Hong_Kong',
+            'Taiwan' => 'Asia/Taipei',
+            'New Zealand' => 'Pacific/Auckland',
+            'South Africa' => 'Africa/Johannesburg',
+            'Egypt' => 'Africa/Cairo',
+            'Nigeria' => 'Africa/Lagos',
+            'Kenya' => 'Africa/Nairobi',
+            'Argentina' => 'America/Argentina/Buenos_Aires',
+            'Chile' => 'America/Santiago',
+            'Colombia' => 'America/Bogota',
+            'Peru' => 'America/Lima',
+            'Venezuela' => 'America/Caracas',
+        ];
+
+        // Try exact match first (case-insensitive)
+        $countryNameLower = strtolower(trim($countryName));
+        foreach ($countryTimezoneMap as $country => $timezone) {
+            if (strtolower($country) === $countryNameLower) {
+                \Log::info('Book Appointment: Timezone mapped from country', [
+                    'country' => $countryName,
+                    'timezone' => $timezone
+                ]);
+                return $timezone;
+            }
+        }
+
+        // Try partial match (in case country name has extra text)
+        foreach ($countryTimezoneMap as $country => $timezone) {
+            if (stripos($countryNameLower, strtolower($country)) !== false || 
+                stripos(strtolower($country), $countryNameLower) !== false) {
+                \Log::info('Book Appointment: Timezone mapped from country (partial match)', [
+                    'country' => $countryName,
+                    'matched_country' => $country,
+                    'timezone' => $timezone
+                ]);
+                return $timezone;
+            }
+        }
+
+        // If no match found, return default
+        \Log::info('Book Appointment: Timezone not found for country, using default', [
+            'country' => $countryName,
+            'default_timezone' => $defaultTimezone
+        ]);
+        return $defaultTimezone;
     }
 
 }
