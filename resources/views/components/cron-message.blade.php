@@ -8,11 +8,11 @@
 
     @if (now()->diffInHours($globalSetting->last_cron_run) > 48)
         @if(in_array('admin', user_roles()))
-            <div class="col-md-12 cursor-pointer">
+            <!-- <div class="col-md-12 cursor-pointer">
                 <x-alert type="danger" icon="exclamation-circle" data-toggle="modal" data-target="#cronJobModal">
                     @lang('messages.cronIsNotRunning').
                 </x-alert>
-            </div>
+            </div> -->
             <div id="cronJobModal" class="modal fade overflow-auto" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog d-flex justify-content-center align-items-center modal-xl">
                     <div class="modal-content">
