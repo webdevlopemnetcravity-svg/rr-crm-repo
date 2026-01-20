@@ -125,6 +125,11 @@
         @endif
 
         @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_country_master" :href="route('new-country-master.index')"
+                                 :text="__('app.menu.newCountryMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
             <x-setting-menu-item :active="$activeMenu" menu="visa_type_settings" :href="route('visa-type-settings.index')"
                                  :text="__('app.menu.visaTypeSettings')"/>
         @endif

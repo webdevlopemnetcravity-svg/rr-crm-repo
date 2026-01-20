@@ -12,6 +12,10 @@ use App\Http\Controllers\LeadSettingController;
 use App\Http\Controllers\NewLeadTemplateDocumentController;
 use App\Http\Controllers\NewLanguageMasterController;
 use App\Http\Controllers\NewVisaCategoryMasterController;
+use App\Http\Controllers\NewCountryMasterController;
+use App\Http\Controllers\CountryController;
+use App\Http\Controllers\StateMasterController;
+use App\Http\Controllers\CityMasterController;
 use App\Http\Controllers\VisaTypeSettingController;
 use App\Http\Controllers\VisaTypeController;
 use App\Http\Controllers\SubclassController;
@@ -223,6 +227,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
 
     /* Visa Category Master */
     Route::resource('new-visa-category-master', NewVisaCategoryMasterController::class);
+
+    /* Country Master */
+    Route::get('new-country-master', [NewCountryMasterController::class, 'index'])->name('new-country-master.index');
+    Route::resource('countries', CountryController::class);
+    Route::resource('states', StateMasterController::class);
+    Route::resource('cities', CityMasterController::class);
 
     /* Visa Type Settings */
     Route::get('visa-type-settings', [VisaTypeSettingController::class, 'index'])->name('visa-type-settings.index');
