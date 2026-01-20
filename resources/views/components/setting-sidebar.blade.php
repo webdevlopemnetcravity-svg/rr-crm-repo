@@ -115,6 +115,16 @@
         @endif
 
         @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_language_master" :href="route('new-language-master.index')"
+                                 :text="__('app.menu.newLanguageMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_visa_category_master" :href="route('new-visa-category-master.index')"
+                                 :text="__('app.menu.newVisaCategoryMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
             <x-setting-menu-item :active="$activeMenu" menu="visa_type_settings" :href="route('visa-type-settings.index')"
                                  :text="__('app.menu.visaTypeSettings')"/>
         @endif

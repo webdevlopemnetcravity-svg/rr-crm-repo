@@ -10,6 +10,8 @@ use App\Http\Controllers\TicketTypeController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\LeadSettingController;
 use App\Http\Controllers\NewLeadTemplateDocumentController;
+use App\Http\Controllers\NewLanguageMasterController;
+use App\Http\Controllers\NewVisaCategoryMasterController;
 use App\Http\Controllers\VisaTypeSettingController;
 use App\Http\Controllers\VisaTypeController;
 use App\Http\Controllers\SubclassController;
@@ -215,6 +217,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
 
     /* New Lead Template Documents */
     Route::resource('new-lead-template-documents', NewLeadTemplateDocumentController::class);
+
+    /* Language Master */
+    Route::resource('new-language-master', NewLanguageMasterController::class);
+
+    /* Visa Category Master */
+    Route::resource('new-visa-category-master', NewVisaCategoryMasterController::class);
 
     /* Visa Type Settings */
     Route::get('visa-type-settings', [VisaTypeSettingController::class, 'index'])->name('visa-type-settings.index');

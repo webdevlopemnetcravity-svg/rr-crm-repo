@@ -247,6 +247,8 @@ return array(
         'financeSettings' => 'Finance Settings',
         'taxSettings' => 'Tax Settings',
         'newLeadTemplateDocuments' => 'Lead Template Documents',
+        'newLanguageMaster' => 'Language Master',
+        'newVisaCategoryMaster' => 'Visa Category Master',
         'visaTypeSettings' => 'Visa Type Master',
         'visaType' => 'Visa Type',
         'subclass' => 'Subclass',
