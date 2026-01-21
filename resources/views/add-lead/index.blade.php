@@ -279,10 +279,26 @@
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_expire_date" id="visa_expire_date">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="visa_category" :fieldLabel="__('app.visaCategory')">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="visa_category" id="visa_category">
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 visa-category-select" name="visa_category" id="visa_category">
+                                        <option value="">@lang('app.select')</option>
+                                        @foreach($visaCategories ?? [] as $vc)
+                                            <option value="{{ $vc->id }}">{{ $vc->name }}</option>
+                                        @endforeach
+                                        <option value="other">@lang('app.other')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 visa-category-clear-btn" id="visa_category_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-3" id="visa_category_other_wrapper" style="display: none;">
+                                <x-forms.label class="mt-3" fieldId="visa_category_other" :fieldLabel="__('placeholders.otherInfo')">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="visa_category_other" id="visa_category_other" placeholder="@lang('placeholders.otherInfo')">
                             </div>
                         </div>
                         
@@ -1349,6 +1365,9 @@
 
 @push('scripts')
     <script>
+        // Make visa categories available in JavaScript
+        const visaCategories = @json($visaCategories ?? []);
+        
         // Hide Move to Lead button immediately if no lead_id in URL
         (function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1417,6 +1436,43 @@
                 });
             }
 
+            // Initialize searchable Select2 for Visa Category (Visa Granted)
+            if ($('#visa_category').length && !$('#visa_category').hasClass('select2-hidden-accessible')) {
+                $('#visa_category').select2({
+                    placeholder: '@lang("app.select") @lang("app.visaCategory")',
+                    allowClear: false,
+                    width: '100%'
+                });
+            }
+            
+            // Function to toggle custom clear button visibility
+            function toggleVisaCategoryClearButton() {
+                var val = $('#visa_category').val();
+                if (val && val !== '') {
+                    $('#visa_category_clear').show();
+                } else {
+                    $('#visa_category_clear').hide();
+                }
+            }
+            
+            // Custom clear button click handler
+            $('#visa_category_clear').on('click', function(e) {
+                e.preventDefault();
+                $('#visa_category').val(null).trigger('change');
+                toggleVisaCategoryClearButton();
+            });
+            
+            $('#visa_category').on('change', function() {
+                var v = $(this).val();
+                toggleVisaCategoryClearButton();
+                if (v === 'other') {
+                    $('#visa_category_other_wrapper').show();
+                } else {
+                    $('#visa_category_other_wrapper').hide();
+                    $('#visa_category_other').val('');
+                }
+            });
+
             // Handle mailing address same as home address checkbox
             $('#mailing_same_as_home').on('change', function() {
                 if ($(this).is(':checked')) {
@@ -1466,7 +1522,9 @@
                     // Clear all Visa Granted fields
                     $('#visa_issue_date').val('');
                     $('#visa_expire_date').val('');
-                    $('#visa_category').val('');
+                    $('#visa_category').val(null).trigger('change');
+                    $('#visa_category_other').val('');
+                    $('#visa_category_other_wrapper').hide();
                     
                     // Initialize with one blank visa refusal if none exist
                     if ($('#visa-refusal-rows-container .visa-refusal-row').length === 0) {
@@ -1480,7 +1538,9 @@
                     // Clear all fields
                     $('#visa_issue_date').val('');
                     $('#visa_expire_date').val('');
-                    $('#visa_category').val('');
+                    $('#visa_category').val(null).trigger('change');
+                    $('#visa_category_other').val('');
+                    $('#visa_category_other_wrapper').hide();
                     $('#visa-refusal-rows-container').empty();
                     $('#visa_rejection_date').val('');
                     $('#visa_refusal_category').val('');
@@ -1543,6 +1603,13 @@
                 const category = refusalData && refusalData.category ? refusalData.category : '';
                 const reason = refusalData && refusalData.reason ? refusalData.reason : '';
                 
+                // Build visa category options
+                let categoryOptions = '<option value="">@lang("app.select")</option>';
+                visaCategories.forEach(function(vc) {
+                    categoryOptions += `<option value="${vc.id}">${vc.name}</option>`;
+                });
+                categoryOptions += '<option value="other">@lang("app.other")</option>';
+                
                 return `
                     <div class="visa-refusal-row mb-3" id="visa-refusal-row-${refusalNum}" data-refusal-index="${refusalNum}">
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -1557,12 +1624,24 @@
                                 </x-forms.label>
                                 <input type="month" class="form-control height-35 f-14" name="visa_rejection_date_${refusalNum}" id="visa_rejection_date_${refusalNum}" max="{{ date('Y-m') }}" value="${date}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="visa_refusal_category_${refusalNum}" :fieldLabel="__('app.visaCategory')">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="visa_refusal_category_${refusalNum}" id="visa_refusal_category_${refusalNum}" value="${category}">
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 visa-refusal-category-select" name="visa_refusal_category_${refusalNum}" id="visa_refusal_category_${refusalNum}">
+                                        ${categoryOptions}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 visa-refusal-category-clear-btn" id="visa_refusal_category_clear_${refusalNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-3" id="visa_refusal_category_other_wrapper_${refusalNum}" style="display: none;">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_category_other_${refusalNum}" :fieldLabel="__('placeholders.otherInfo')">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="visa_refusal_category_other_${refusalNum}" id="visa_refusal_category_other_${refusalNum}" placeholder="@lang('placeholders.otherInfo')">
+                            </div>
+                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${refusalNum}" :fieldLabel="__('app.reason')">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="2" name="visa_refusal_reason_${refusalNum}" id="visa_refusal_reason_${refusalNum}">${reason}</textarea>
@@ -1579,6 +1658,63 @@
                 
                 // Append to the visa-refusal-rows-container
                 $('#visa-refusal-rows-container').append(newRow);
+                
+                // Initialize Select2 for visa refusal category
+                const categorySelectId = '#visa_refusal_category_' + refusalNum;
+                if ($(categorySelectId).length && !$(categorySelectId).hasClass('select2-hidden-accessible')) {
+                    $(categorySelectId).select2({
+                        placeholder: '@lang("app.select") @lang("app.visaCategory")',
+                        allowClear: false,
+                        width: '100%'
+                    });
+                }
+                
+                // Function to toggle clear button visibility for visa refusal category
+                function toggleVisaRefusalCategoryClearButton() {
+                    const val = $(categorySelectId).val();
+                    if (val && val !== '') {
+                        $('#visa_refusal_category_clear_' + refusalNum).show();
+                    } else {
+                        $('#visa_refusal_category_clear_' + refusalNum).hide();
+                    }
+                }
+                
+                // Custom clear button click handler for visa refusal category
+                $('#visa_refusal_category_clear_' + refusalNum).on('click', function(e) {
+                    e.preventDefault();
+                    $(categorySelectId).val(null).trigger('change');
+                    toggleVisaRefusalCategoryClearButton();
+                });
+                
+                // Change handler for visa refusal category
+                $(categorySelectId).on('change', function() {
+                    const v = $(this).val();
+                    toggleVisaRefusalCategoryClearButton();
+                    if (v === 'other') {
+                        $('#visa_refusal_category_other_wrapper_' + refusalNum).show();
+                    } else {
+                        $('#visa_refusal_category_other_wrapper_' + refusalNum).hide();
+                        $('#visa_refusal_category_other_' + refusalNum).val('');
+                    }
+                });
+                
+                // Set initial value if category data exists
+                if (refusalData && refusalData.category) {
+                    const vc = refusalData.category;
+                    const $sel = $(categorySelectId);
+                    let found = false;
+                    $sel.find('option').each(function() {
+                        if ($(this).val() == vc || $(this).text().trim() === String(vc)) {
+                            $sel.val($(this).val()).trigger('change');
+                            found = true;
+                            return false; // break
+                        }
+                    });
+                    if (!found) {
+                        $sel.val('other').trigger('change');
+                        $('#visa_refusal_category_other_' + refusalNum).val(vc);
+                    }
+                }
                 
                 // Update remove buttons visibility and refusal row numbers
                 setTimeout(function() {
@@ -3170,7 +3306,24 @@
                         if (data.visa_status === 'granted') {
                             $('#visa_issue_date').val(data.visa_issue_date || '');
                             $('#visa_expire_date').val(data.visa_expire_date || '');
-                            $('#visa_category').val(data.visa_category || '');
+                            var vc = data.visa_category || '';
+                            var $sel = $('#visa_category');
+                            if (!vc) {
+                                $sel.val(null).trigger('change');
+                            } else {
+                                var found = false;
+                                $sel.find('option').each(function() {
+                                    if ($(this).val() == vc || $(this).text().trim() === String(vc)) {
+                                        $sel.val($(this).val()).trigger('change');
+                                        found = true;
+                                        return false; // break
+                                    }
+                                });
+                                if (!found) {
+                                    $sel.val('other').trigger('change');
+                                    $('#visa_category_other').val(vc);
+                                }
+                            }
                         }
                     }
                     
@@ -4182,8 +4335,21 @@
                     $('.visa-refusal-row').each(function() {
                         const refusalIndex = $(this).data('refusal-index');
                         const date = $('#visa_rejection_date_' + refusalIndex).val() || '';
-                        const category = $('#visa_refusal_category_' + refusalIndex).val() || '';
+                        let category = $('#visa_refusal_category_' + refusalIndex).val() || '';
                         const reason = $('#visa_refusal_reason_' + refusalIndex).val() || '';
+                        
+                        // Handle category: resolve ID to name, or use "Other" text
+                        if (category === 'other' || category === 'Other') {
+                            category = $('#visa_refusal_category_other_' + refusalIndex).val() || '';
+                        } else if (category && !isNaN(category)) {
+                            // It's a numeric ID, find the category name
+                            const categoryObj = visaCategories.find(function(vc) {
+                                return vc.id == category;
+                            });
+                            if (categoryObj) {
+                                category = categoryObj.name;
+                            }
+                        }
                         
                         // Only add if at least one field has a value
                         if (date || category || reason) {

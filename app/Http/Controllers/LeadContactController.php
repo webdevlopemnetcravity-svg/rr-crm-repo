@@ -31,6 +31,7 @@ use App\Models\NewLeadAppointment;
 use App\Models\NewLeadFollowUp;
 use App\Models\NewLeadProcess;
 use App\Models\NewLeadVisaType;
+use App\Models\NewVisaCategoryMaster;
 use App\Models\NewGoogleToken;
 use App\Services\Google;
 use App\Models\PipelineStage;
@@ -275,6 +276,12 @@ class LeadContactController extends AccountBaseController
 
         // Load visa types from master datatable
         $this->visaTypes = \App\Models\NewLeadVisaType::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load visa categories from master (for Last Five Years Visa Status - Visa Granted)
+        $this->visaCategories = \App\Models\NewVisaCategoryMaster::where(function($query) {
             $query->where('company_id', company()->id)
                   ->orWhereNull('company_id');
         })->orderBy('name')->get();
@@ -2704,7 +2711,17 @@ class LeadContactController extends AccountBaseController
             // Handle email field
             $emailValue = $this->getRequestValue($request, 'email_address');
             $stepData['email_address'] = $emailValue;
-            
+
+            // Handle visa_category: resolve id to name, or use visa_category_other when "Other" is selected
+            $visaCat = $this->getRequestValue($request, 'visa_category');
+            if ($visaCat === 'other' || $visaCat === 'Other') {
+                $stepData['visa_category'] = $this->getRequestValue($request, 'visa_category_other');
+            } elseif (is_numeric($visaCat)) {
+                $cat = NewVisaCategoryMaster::find($visaCat);
+                $stepData['visa_category'] = $cat ? $cat->name : $visaCat;
+            }
+            // else: stepData['visa_category'] stays as from the loop (e.g. empty string)
+
             // Parse visa_refusals if it's a JSON string
             $visaRefusals = [];
             if ($request->has('visa_refusals')) {
