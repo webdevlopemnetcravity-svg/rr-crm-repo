@@ -32,6 +32,7 @@ use App\Models\NewLeadFollowUp;
 use App\Models\NewLeadProcess;
 use App\Models\NewLeadVisaType;
 use App\Models\NewVisaCategoryMaster;
+use App\Models\NewLanguageMaster;
 use App\Models\NewGoogleToken;
 use App\Services\Google;
 use App\Models\PipelineStage;
@@ -282,6 +283,12 @@ class LeadContactController extends AccountBaseController
 
         // Load visa categories from master (for Last Five Years Visa Status - Visa Granted)
         $this->visaCategories = \App\Models\NewVisaCategoryMaster::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load languages from master (for Languages Spoken)
+        $this->languages = NewLanguageMaster::where(function($query) {
             $query->where('company_id', company()->id)
                   ->orWhereNull('company_id');
         })->orderBy('name')->get();
@@ -2721,6 +2728,27 @@ class LeadContactController extends AccountBaseController
                 $stepData['visa_category'] = $cat ? $cat->name : $visaCat;
             }
             // else: stepData['visa_category'] stays as from the loop (e.g. empty string)
+
+            // Handle languages_spoken: convert array of IDs to comma-separated names
+            $languagesSpoken = $request->input('languages_spoken', []);
+            if (is_array($languagesSpoken) && count($languagesSpoken) > 0) {
+                $languageNames = [];
+                foreach ($languagesSpoken as $langId) {
+                    if (is_numeric($langId)) {
+                        $lang = NewLanguageMaster::find($langId);
+                        if ($lang) {
+                            $languageNames[] = $lang->name;
+                        }
+                    } else {
+                        // Backward compatibility: if it's already a string, use it
+                        $languageNames[] = $langId;
+                    }
+                }
+                $stepData['languages_spoken'] = implode(', ', $languageNames);
+            } else {
+                // If empty or not array, keep the value from the loop (which might be empty string)
+                $stepData['languages_spoken'] = $this->getRequestValue($request, 'languages_spoken', '');
+            }
 
             // Parse visa_refusals if it's a JSON string
             $visaRefusals = [];

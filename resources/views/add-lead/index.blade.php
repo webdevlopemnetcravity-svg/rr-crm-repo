@@ -324,7 +324,11 @@
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3" fieldId="languages_spoken" :fieldLabel="__('app.languagesSpoken')">
                                 </x-forms.label>
-                                <textarea class="form-control f-14" rows="2" name="languages_spoken" id="languages_spoken"></textarea>
+                                <select class="form-control height-35 f-14 languages-spoken-select" name="languages_spoken[]" id="languages_spoken" multiple>
+                                    @foreach($languages ?? [] as $lang)
+                                        <option value="{{ $lang->id }}">{{ $lang->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -1368,6 +1372,9 @@
         // Make visa categories available in JavaScript
         const visaCategories = @json($visaCategories ?? []);
         
+        // Make languages available in JavaScript
+        const languages = @json($languages ?? []);
+        
         // Hide Move to Lead button immediately if no lead_id in URL
         (function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1472,6 +1479,17 @@
                     $('#visa_category_other').val('');
                 }
             });
+
+            // Initialize searchable Select2 for Languages Spoken (multiple selection)
+            if ($('#languages_spoken').length && !$('#languages_spoken').hasClass('select2-hidden-accessible')) {
+                $('#languages_spoken').select2({
+                    placeholder: '@lang("app.select") @lang("app.languagesSpoken")',
+                    allowClear: false,
+                    width: '100%',
+                    multiple: true,
+                    closeOnSelect: false
+                });
+            }
 
             // Handle mailing address same as home address checkbox
             $('#mailing_same_as_home').on('change', function() {
@@ -3362,8 +3380,37 @@
                         addVisaRefusalRow();
                     }
                     
-                    // Languages Spoken
-                    $('#languages_spoken').val(data.languages_spoken || '');
+                    // Languages Spoken - handle comma-separated string and convert to array of IDs
+                    if (data.languages_spoken) {
+                        const languagesSpokenStr = data.languages_spoken;
+                        let selectedLanguageIds = [];
+                        
+                        if (typeof languagesSpokenStr === 'string' && languagesSpokenStr.trim() !== '') {
+                            // Split by comma and trim each language name
+                            const languageNames = languagesSpokenStr.split(',').map(function(name) {
+                                return name.trim();
+                            });
+                            
+                            // Find matching language IDs
+                            languageNames.forEach(function(langName) {
+                                const lang = languages.find(function(l) {
+                                    return l.name === langName || l.name.trim() === langName;
+                                });
+                                if (lang) {
+                                    selectedLanguageIds.push(lang.id.toString());
+                                }
+                            });
+                        } else if (Array.isArray(languagesSpokenStr)) {
+                            // If it's already an array (backward compatibility)
+                            selectedLanguageIds = languagesSpokenStr.map(function(id) {
+                                return id.toString();
+                            });
+                        }
+                        
+                        if (selectedLanguageIds.length > 0) {
+                            $('#languages_spoken').val(selectedLanguageIds).trigger('change');
+                        }
+                    }
                     
                     // Social Media Profile URLs
                     $('#facebook_profile_url').val(data.facebook_profile_url || '');
