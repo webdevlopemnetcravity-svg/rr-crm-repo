@@ -67,6 +67,12 @@ return [
         'include_granted_scopes' => true,
     ],
 
+    'microsoft' => [
+        'client_id' => env('MS_CLIENT_ID'),
+        'client_secret' => env('MS_CLIENT_SECRET'),
+        'redirect' => env('MS_REDIRECT_URI', env('APP_URL') . '/auth/microsoft/callback'),
+    ],
+
     'sentry' => [
         'enabled' => env('SENTRY_ENABLED', false)
     ],

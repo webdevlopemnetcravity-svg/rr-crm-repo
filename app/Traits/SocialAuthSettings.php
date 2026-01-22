@@ -34,6 +34,11 @@ trait SocialAuthSettings
         Config::set('services.linkedin-openid.client_id', ($settings->linkedin_client_id) ?: env('LINKEDIN_CLIENT_ID'));
         Config::set('services.linkedin-openid.client_secret', ($settings->linkedin_secret_id) ?: env('LINKEDIN_CLIENT_SECRET'));
         Config::set('services.linkedin-openid.redirect', $this->updateMainAppUrl(route('social_login_callback', 'linkedin')));
+
+        // Use MS_ prefixed environment variables (preferred) or fallback to database/old env vars
+        Config::set('services.microsoft.client_id', env('MS_CLIENT_ID') ?: ((isset($settings->microsoft_client_id) && $settings->microsoft_client_id) ?: env('MICROSOFT_CLIENT_ID')));
+        Config::set('services.microsoft.client_secret', env('MS_CLIENT_SECRET') ?: ((isset($settings->microsoft_secret_id) && $settings->microsoft_secret_id) ?: env('MICROSOFT_CLIENT_SECRET')));
+        Config::set('services.microsoft.redirect', env('MS_REDIRECT_URI') ?: $this->updateMainAppUrl(url('/auth/microsoft/callback')));
     }
 
     private function updateMainAppUrl($url)

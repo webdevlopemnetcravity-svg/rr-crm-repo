@@ -213,6 +213,7 @@ return array(
     'noNotification' => 'No new notifications',
     'addGoogleCallback' => 'Add this callback url on your google app settings.',
     'addFacebookCallback' => 'Add this callback url on your facebook app settings.',
+    'addMicrosoftCallback' => 'Add this callback url on your Microsoft app settings.',
     'addLinkedinCallback' => 'Add this callback url on your linkedin app settings.',
     'addTwitterCallback' => 'Add this callback url on your twitter app settings.',
     'clockOutTimeError' => 'Clock-out time cannot be less than clock in time',
