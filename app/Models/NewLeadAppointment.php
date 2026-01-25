@@ -21,6 +21,9 @@ class NewLeadAppointment extends BaseModel
         'end_time',
         'google_meet_link',
         'google_event_id',
+        'zoom_link',
+        'zoom_meeting_id',
+        'zoom_meeting_password',
         'created_by',
         'updated_by',
     ];

@@ -34,7 +34,11 @@ use App\Models\NewLeadVisaType;
 use App\Models\NewVisaCategoryMaster;
 use App\Models\NewLanguageMaster;
 use App\Models\NewGoogleToken;
+use App\Models\SocialAuthSetting;
 use App\Services\Google;
+use App\Mail\LeadAppointmentBookedToLead;
+use App\Mail\LeadAppointmentBookedToUser;
+use MacsiDigital\Zoom\Facades\Zoom;
 use App\Models\PipelineStage;
 use App\Models\LeadStatus;
 use App\Models\Product;
@@ -46,6 +50,7 @@ use Illuminate\Support\Facades\Schema;
 use App\Mail\LeadConfirmation;
 use App\Mail\LeadCreatedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -6734,6 +6739,7 @@ class LeadContactController extends AccountBaseController
             ]);
             
             // First, try to get logged-in user's Google token
+            /* 
             $googleToken = NewGoogleToken::where('user_id', $currentUser->id)
                 ->where('company_id', $company->id)
                 ->where('verification_status', 'verified')
@@ -6963,13 +6969,73 @@ class LeadContactController extends AccountBaseController
                 }
                 
                 return Reply::error('Failed to create Google Meet link: ' . $e->getMessage());
+            } */
+
+            // Create Zoom Meeting
+            $zoomLink = null;
+            $zoomMeetingId = null;
+            $zoomMeetingPassword = null;
+
+            $zoomSettings = SocialAuthSetting::first();
+            
+            if ($zoomSettings && $zoomSettings->zoom_status == 'enable' && !empty($zoomSettings->zoom_client_id)) {
+                try {
+                    // Get Zoom access token using account_credentials grant type as suggested by user
+                    $response = Http::withBasicAuth(
+                        $zoomSettings->zoom_client_id,
+                        $zoomSettings->zoom_client_secret
+                    )->asForm()->post('https://zoom.us/oauth/token', [
+                        'grant_type' => 'account_credentials',
+                        'account_id' => $zoomSettings->zoom_account_id,
+                    ]);
+
+                    if ($response->failed()) {
+                        throw new \Exception('Failed to get Zoom access token: ' . $response->body());
+                    }
+
+                    $accessToken = $response->json()['access_token'];
+                    $duration = $startDateTime->diffInMinutes($endDateTime);
+
+                    // Create Zoom meeting using the API directly
+                    $meetingResponse = Http::withToken($accessToken)
+                        ->post("https://api.zoom.us/v2/users/me/meetings", [
+                            'topic' => $request->meeting_title,
+                            'type' => 2, // Scheduled meeting
+                            'start_time' => $startDateTime->format('Y-m-d\TH:i:s'),
+                            'duration' => $duration,
+                            'timezone' => $leadTimezone,
+                            'agenda' => $request->description ?? null,
+                            'settings' => [
+                                'host_video' => true,
+                                'participant_video' => true,
+                                'join_before_host' => true,
+                                'mute_upon_entry' => true,
+                                'waiting_room' => false,
+                            ],
+                        ]);
+
+                    if ($meetingResponse->failed()) {
+                        throw new \Exception('Zoom meeting creation failed: ' . $meetingResponse->body());
+                    }
+
+                    $responseData = $meetingResponse->json();
+                    $zoomLink = $responseData['join_url'];
+                    $zoomMeetingId = $responseData['id'];
+                    $zoomMeetingPassword = $responseData['password'] ?? null;
+
+                } catch (\Exception $e) {
+                    \Log::error('Zoom API error: ' . $e->getMessage());
+                    return Reply::error('Failed to create Zoom link: ' . $e->getMessage());
+                }
+            } else {
+                return Reply::error('Zoom integration is not enabled or configured.');
             }
 
             // Convert to IST for storage
             $startDateTimeIST = $startDateTime->setTimezone('Asia/Kolkata');
             $endDateTimeIST = $endDateTime->setTimezone('Asia/Kolkata');
 
-            // Create appointment entry in database ONLY if Google Meet link was successfully created
+            // Create appointment entry in database ONLY if Zoom link was successfully created
             $appointment = new NewLeadAppointment();
             $appointment->company_id = $company->id;
             $appointment->lead_id = $lead->id;
@@ -6978,8 +7044,9 @@ class LeadContactController extends AccountBaseController
             $appointment->appointment_date = $startDateTimeIST;
             $appointment->start_time = $startDateTimeIST;
             $appointment->end_time = $endDateTimeIST;
-            $appointment->google_meet_link = $googleMeetLink;
-            $appointment->google_event_id = $googleEventId;
+            $appointment->zoom_link = $zoomLink;
+            $appointment->zoom_meeting_id = $zoomMeetingId;
+            $appointment->zoom_meeting_password = $zoomMeetingPassword;
             $appointment->created_by = $currentUser->id;
             $appointment->updated_by = $currentUser->id;
             $appointment->save();
@@ -6990,9 +7057,40 @@ class LeadContactController extends AccountBaseController
                 'current_user_id' => $currentUser->id
             ]);
 
+            // Send email to lead
+            try {
+                $leadEmail = $lead->routeNotificationForMail();
+                \Log::info('Sending appointment email to lead', [
+                    'lead_id' => $lead->id,
+                    'lead_email' => $leadEmail
+                ]);
+                
+                if ($leadEmail) {
+                    \Mail::to($leadEmail)->send(new LeadAppointmentBookedToLead($appointment));
+                    \Log::info('Appointment email sent to lead');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send appointment email to lead: ' . $e->getMessage());
+            }
+
+            // Send email to login user
+            try {
+                \Log::info('Sending appointment email to user', [
+                    'user_id' => $currentUser->id,
+                    'user_email' => $currentUser->email
+                ]);
+                
+                if ($currentUser->email) {
+                    \Mail::to($currentUser->email)->send(new LeadAppointmentBookedToUser($appointment, $currentUser));
+                    \Log::info('Appointment email sent to user');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send appointment email to user: ' . $e->getMessage());
+            }
+
             return Reply::success(__('messages.recordSaved'), [
                 'message' => 'Appointment booked successfully!',
-                'meet_link' => $googleMeetLink
+                'meet_link' => $zoomLink
             ]);
 
         } catch (\Exception $e) {
@@ -7074,6 +7172,7 @@ class LeadContactController extends AccountBaseController
                 ->first();
 
             // Update Google Calendar event if it exists and user has token
+            /* 
             if ($appointment->google_event_id && $googleToken && !empty($googleToken->access_token)) {
                 try {
                     // Get token array from model
@@ -7191,6 +7290,41 @@ class LeadContactController extends AccountBaseController
                     // Continue with database update even if Google update fails
                     // But log the error for debugging
                 }
+            } */
+
+            // Update Zoom Meeting if exists
+            if ($appointment->zoom_meeting_id) {
+                $zoomSettings = SocialAuthSetting::first();
+                if ($zoomSettings && $zoomSettings->zoom_status == 'enable' && !empty($zoomSettings->zoom_client_id)) {
+                    try {
+                        // Get Zoom access token
+                        $response = Http::withBasicAuth(
+                            $zoomSettings->zoom_client_id,
+                            $zoomSettings->zoom_client_secret
+                        )->asForm()->post('https://zoom.us/oauth/token', [
+                            'grant_type' => 'account_credentials',
+                            'account_id' => $zoomSettings->zoom_account_id,
+                        ]);
+
+                        if ($response->successful()) {
+                            $accessToken = $response->json()['access_token'];
+                            $duration = $startDateTime->diffInMinutes($endDateTime);
+
+                            // Update Zoom meeting using the API directly
+                            Http::withToken($accessToken)
+                                ->patch("https://api.zoom.us/v2/meetings/{$appointment->zoom_meeting_id}", [
+                                    'topic' => $request->meeting_title,
+                                    'type' => 2,
+                                    'start_time' => $startDateTime->format('Y-m-d\TH:i:s'),
+                                    'duration' => $duration,
+                                    'timezone' => $timezone,
+                                    'agenda' => $request->description ?? null,
+                                ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to update Zoom meeting: ' . $e->getMessage());
+                    }
+                }
             }
 
             // Update appointment in database
@@ -7220,7 +7354,32 @@ class LeadContactController extends AccountBaseController
         $appointment = NewLeadAppointment::findOrFail($id);
         
         try {
-            // TODO: Cancel Google Calendar event if needed
+            // Cancel Zoom meeting if it exists
+            if ($appointment->zoom_meeting_id) {
+                $zoomSettings = SocialAuthSetting::first();
+                if ($zoomSettings && $zoomSettings->zoom_status == 'enable' && !empty($zoomSettings->zoom_client_id)) {
+                    try {
+                        // Get Zoom access token
+                        $response = Http::withBasicAuth(
+                            $zoomSettings->zoom_client_id,
+                            $zoomSettings->zoom_client_secret
+                        )->asForm()->post('https://zoom.us/oauth/token', [
+                            'grant_type' => 'account_credentials',
+                            'account_id' => $zoomSettings->zoom_account_id,
+                        ]);
+
+                        if ($response->successful()) {
+                            $accessToken = $response->json()['access_token'];
+
+                            // Delete Zoom meeting using the API directly
+                            Http::withToken($accessToken)
+                                ->delete("https://api.zoom.us/v2/meetings/{$appointment->zoom_meeting_id}");
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to delete Zoom meeting: ' . $e->getMessage());
+                    }
+                }
+            }
             
             // Delete appointment
             $appointment->delete();

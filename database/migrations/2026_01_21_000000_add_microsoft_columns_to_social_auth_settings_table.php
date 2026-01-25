@@ -19,7 +19,7 @@ return new class extends Migration
         
         if (!Schema::hasColumn('social_auth_settings', 'microsoft_secret_id')) {
             Schema::table('social_auth_settings', function (Blueprint $table) {
-                $table->string('microsoft_secret_id')->nullable()->after('microsoft_client_id');
+                $table->text('microsoft_secret_id')->nullable()->after('microsoft_client_id');
             });
         }
         

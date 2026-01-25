@@ -23,6 +23,11 @@ class UpdateRequest extends CoreRequest
             'twitter_secret_id' => 'required_if:twitter_status,enable|max:100',
             'linkedin_client_id' => 'required_if:linkedin_status,enable|max:100',
             'linkedin_secret_id' => 'required_if:linkedin_status,enable|max:100',
+            'microsoft_client_id' => 'required_if:microsoft_status,enable',
+            'microsoft_secret_id' => 'required_if:microsoft_status,enable',
+            'zoom_account_id' => 'required_if:zoom_status,enable',
+            'zoom_client_id' => 'required_if:zoom_status,enable',
+            'zoom_client_secret' => 'required_if:zoom_status,enable',
         ];
     }
 

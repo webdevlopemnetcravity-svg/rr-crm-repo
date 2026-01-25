@@ -31,6 +31,7 @@ class SocialAuthSettingController extends AccountBaseController
             'twitter' => 'social-login-settings.ajax.twitter',
             'linkedin' => 'social-login-settings.ajax.linkedin',
             'microsoft' => 'social-login-settings.ajax.microsoft',
+            'zoom' => 'social-login-settings.ajax.zoom',
             default => 'social-login-settings.ajax.google',
         };
 
@@ -76,6 +77,13 @@ class SocialAuthSettingController extends AccountBaseController
             $socialAuth->microsoft_client_id = $request->microsoft_client_id;
             $socialAuth->microsoft_secret_id  = $request->microsoft_secret_id;
             $socialAuth->microsoft_status = $request->microsoft_status ? 'enable' : 'disable';
+        }
+
+        if($request->tab == 'zoom') {
+            $socialAuth->zoom_account_id = $request->zoom_account_id;
+            $socialAuth->zoom_client_id = $request->zoom_client_id;
+            $socialAuth->zoom_client_secret = $request->zoom_client_secret;
+            $socialAuth->zoom_status = $request->zoom_status ? 'enable' : 'disable';
         }
 
         $socialAuth->save();

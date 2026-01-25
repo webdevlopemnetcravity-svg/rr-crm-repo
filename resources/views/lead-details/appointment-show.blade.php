@@ -50,7 +50,22 @@ $appointment = $appointment ?? null;
                         :value="$appointment->end_time->translatedFormat(company()->date_format . ' - ' . company()->time_format)"
                         html="true" />
 
-                    @if($appointment->google_meet_link)
+                    @if($appointment->zoom_link)
+                        @php
+                            $url = str_starts_with($appointment->zoom_link, 'http') ? $appointment->zoom_link : 'http://' . $appointment->zoom_link;
+                            $link = "<a href='" . $url . "' style='color:black; cursor: pointer;' target='_blank'>" . $appointment->zoom_link . "</a>";
+                        @endphp
+                        <x-cards.data-row label="Zoom Meeting Link"
+                            html="true" :value="$link"/>
+                        
+                        @if($appointment->zoom_meeting_id)
+                            <x-cards.data-row label="Zoom Meeting ID" :value="$appointment->zoom_meeting_id" />
+                        @endif
+                        
+                        @if($appointment->zoom_meeting_password)
+                            <x-cards.data-row label="Zoom Meeting Password" :value="$appointment->zoom_meeting_password" />
+                        @endif
+                    @elseif($appointment->google_meet_link)
                         @php
                             $url = str_starts_with($appointment->google_meet_link, 'http') ? $appointment->google_meet_link : 'http://' . $appointment->google_meet_link;
                             $link = "<a href='" . $url . "' style='color:black; cursor: pointer;' target='_blank'>" . $appointment->google_meet_link . "</a>";
@@ -58,7 +73,7 @@ $appointment = $appointment ?? null;
                         <x-cards.data-row label="Google Meet Link"
                             html="true" :value="$link"/>
                     @else
-                        <x-cards.data-row label="Google Meet Link" value="Not Set" html="true" />
+                        <x-cards.data-row label="Meeting Link" value="Not Set" html="true" />
                     @endif
 
                     @if($appointment->creator)

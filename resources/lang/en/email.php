@@ -477,5 +477,10 @@ return array(
         'holidayText' => 'Total Holiday',
         'leavesText' => 'Total Leaves',
         'interviewText' => 'Total Interview'
+     ],
+     'appointmentBooked' => [
+        'subject' => 'New Appointment Booked',
+        'text' => 'A new appointment has been booked. Following are the details:',
+        'action' => 'View Appointment Details',
      ]
 );
