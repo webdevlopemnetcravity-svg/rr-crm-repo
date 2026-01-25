@@ -12,15 +12,19 @@
     </div>
     
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
-        <h1 style="color: #2c3e50; margin-top: 0;">Appointment Confirmed</h1>
+        <h1 style="color: #2c3e50; margin-top: 0;">{{ isset($isUpdate) && $isUpdate ? 'Appointment Updated' : 'Appointment Confirmed' }}</h1>
     </div>
     
     <div style="background-color: #ffffff; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px;">
         <p>Hi {{ $notifiableName }},</p>
         
+        @if(isset($isUpdate) && $isUpdate)
+        <p>Your appointment with RR Patel Overseas & Education has been updated. Please find the updated appointment details below:</p>
+        @else
         <p>We're delighted to confirm your appointment with RR Patel Overseas & Education. Your registration has been successfully completed, and we're excited to welcome you onboard! 🎉</p>
         
         <p>Please find your appointment details below:</p>
+        @endif
         
         <div style="margin: 20px 0; padding: 15px; background-color: #f9f9f9; border-left: 4px solid #1f75cb;">
             {!! $content !!}

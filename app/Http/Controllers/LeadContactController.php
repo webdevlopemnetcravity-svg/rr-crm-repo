@@ -7336,6 +7336,44 @@ class LeadContactController extends AccountBaseController
             $appointment->updated_by = $currentUser->id;
             $appointment->save();
 
+            // Refresh appointment with relationships
+            $appointment->refresh();
+            $appointment->load(['lead', 'creator', 'updater', 'company']);
+
+            // Send email to lead
+            try {
+                $lead = $appointment->lead;
+                if ($lead) {
+                    $leadEmail = $lead->routeNotificationForMail();
+                    \Log::info('Sending appointment update email to lead', [
+                        'lead_id' => $lead->id,
+                        'lead_email' => $leadEmail
+                    ]);
+                    
+                    if ($leadEmail) {
+                        \Mail::to($leadEmail)->send(new \App\Mail\LeadAppointmentUpdatedToLead($appointment));
+                        \Log::info('Appointment update email sent to lead');
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send appointment update email to lead: ' . $e->getMessage());
+            }
+
+            // Send email to current user
+            try {
+                \Log::info('Sending appointment update email to user', [
+                    'user_id' => $currentUser->id,
+                    'user_email' => $currentUser->email
+                ]);
+                
+                if ($currentUser->email) {
+                    \Mail::to($currentUser->email)->send(new \App\Mail\LeadAppointmentUpdatedToUser($appointment, $currentUser));
+                    \Log::info('Appointment update email sent to user');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send appointment update email to user: ' . $e->getMessage());
+            }
+
             return Reply::success(__('messages.updateSuccess'), [
                 'redirectUrl' => route('events.index')
             ]);
@@ -7381,6 +7419,44 @@ class LeadContactController extends AccountBaseController
                 }
             }
             
+            // Load relationships before deleting
+            $appointment->load(['lead', 'creator', 'updater', 'company']);
+            $lead = $appointment->lead;
+            $currentUser = user();
+
+            // Send email to lead before deleting
+            try {
+                if ($lead) {
+                    $leadEmail = $lead->routeNotificationForMail();
+                    \Log::info('Sending appointment cancellation email to lead', [
+                        'lead_id' => $lead->id,
+                        'lead_email' => $leadEmail
+                    ]);
+                    
+                    if ($leadEmail) {
+                        \Mail::to($leadEmail)->send(new \App\Mail\LeadAppointmentCancelledToLead($appointment));
+                        \Log::info('Appointment cancellation email sent to lead');
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send appointment cancellation email to lead: ' . $e->getMessage());
+            }
+
+            // Send email to current user before deleting
+            try {
+                \Log::info('Sending appointment cancellation email to user', [
+                    'user_id' => $currentUser->id,
+                    'user_email' => $currentUser->email
+                ]);
+                
+                if ($currentUser->email) {
+                    \Mail::to($currentUser->email)->send(new \App\Mail\LeadAppointmentCancelledToUser($appointment, $currentUser));
+                    \Log::info('Appointment cancellation email sent to user');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Failed to send appointment cancellation email to user: ' . $e->getMessage());
+            }
+
             // Delete appointment
             $appointment->delete();
 

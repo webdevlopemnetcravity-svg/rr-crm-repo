@@ -12,13 +12,17 @@
     </div>
     
     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
-        <h1 style="color: #2c3e50; margin-top: 0;">Appointment Scheduled</h1>
+        <h1 style="color: #2c3e50; margin-top: 0;">{{ isset($isUpdate) && $isUpdate ? 'Appointment Updated' : 'Appointment Scheduled' }}</h1>
     </div>
     
     <div style="background-color: #ffffff; padding: 20px; border: 1px solid #dee2e6; border-radius: 5px;">
         <p>Hi {{ $notifiableName }},</p>
         
+        @if(isset($isUpdate) && $isUpdate)
+        <p>The appointment with {{ $leadPersonName }} has been updated.</p>
+        @else
         <p>Your appointment has been successfully scheduled with {{ $leadPersonName }}.</p>
+        @endif
         
         <p>Please find the appointment details below:</p>
         
