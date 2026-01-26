@@ -263,7 +263,8 @@ class LeadContactController extends AccountBaseController
 
         $this->sources = LeadSource::all();
         $this->categories = LeadCategory::all();
-        $this->countries = countries();
+        // Some installs don't have the legacy `countries` table; avoid 500 on Add Lead.
+        $this->countries = Schema::hasTable('countries') ? countries() : collect();
         $this->salutations = Salutation::cases();
         $this->leadPipelines = LeadPipeline::orderBy('default', 'DESC')->get();
         $this->leadStages = PipelineStage::all();
