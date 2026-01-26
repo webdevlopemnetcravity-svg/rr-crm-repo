@@ -54,16 +54,39 @@ class SocialAuthSetting extends BaseModel
         'google_secret_id' => 'encrypted',
         'linkedin_secret_id' => 'encrypted',
         'twitter_secret_id' => 'encrypted',
+        'microsoft_secret_id' => 'encrypted',
+        'zoom_client_secret' => 'encrypted',
     ];
+
+    protected function castAttribute($key, $value)
+    {
+        try {
+            return parent::castAttribute($key, $value);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            return null;
+        }
+    }
 
     public function getSocialAuthEnableAttribute()
     {
-        return in_array('enable', [
+        $statuses = [
             $this->linkedin_status,
             $this->google_status,
             $this->twitter_status,
             $this->facebook_status
-        ]);
+        ];
+        
+        // Add Microsoft status if column exists
+        if (isset($this->attributes['microsoft_status'])) {
+            $statuses[] = $this->microsoft_status;
+        }
+
+        // Add Zoom status if column exists
+        if (isset($this->attributes['zoom_status'])) {
+            $statuses[] = $this->zoom_status;
+        }
+        
+        return in_array('enable', $statuses);
     }
 
     public function getSocialAuthEnableCountAttribute()
@@ -74,6 +97,16 @@ class SocialAuthSetting extends BaseModel
             $this->twitter_status,
             $this->facebook_status
         ];
+        
+        // Add Microsoft status if column exists
+        if (isset($this->attributes['microsoft_status'])) {
+            $statuses[] = $this->microsoft_status;
+        }
+
+        // Add Zoom status if column exists
+        if (isset($this->attributes['zoom_status'])) {
+            $statuses[] = $this->zoom_status;
+        }
 
         return count(array_filter($statuses, function ($status) {
             return $status == 'enable';

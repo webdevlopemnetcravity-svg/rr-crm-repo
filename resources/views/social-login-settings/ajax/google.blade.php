@@ -46,7 +46,7 @@
                         <p class="text-primary">(@lang('messages.addGoogleCallback'))</p>
                     </div>
                 </div>
-                <div class="col-md-12">
+                <!-- <div class="col-md-12">
                     <div class="alert alert-warning">
                         <div class="form-group mb-0">
                             <a href="{{ route('googleAuth') }}" class="btn btn-primary">
@@ -55,7 +55,7 @@
                             <p class="text-muted mt-2 mb-0">Click to authenticate with Google and store your calendar tokens for appointment booking.</p>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
         <!-- Buttons Start -->

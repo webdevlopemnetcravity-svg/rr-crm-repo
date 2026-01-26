@@ -6,6 +6,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\AppSettingController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\FacebookAuthController;
+use App\Http\Controllers\MicrosoftAuthController;
 use App\Http\Controllers\TicketTypeController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\LeadSettingController;
@@ -255,6 +257,14 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     Route::resource('google-calendar-settings', GoogleCalendarSettingController::class);
     Route::get('google-auth', [GoogleAuthController::class, 'index'])->name('googleAuth');
     Route::delete('google-auth', [GoogleAuthController::class, 'destroy'])->name('googleAuth.destroy');
+
+    // Facebook Auth Settings
+    Route::get('facebook-auth', [FacebookAuthController::class, 'index'])->name('facebookAuth');
+    Route::delete('facebook-auth', [FacebookAuthController::class, 'destroy'])->name('facebookAuth.destroy');
+
+    // Microsoft Calendar Settings
+    Route::get('microsoft-auth', [MicrosoftAuthController::class, 'index'])->name('microsoftAuth');
+    Route::delete('microsoft-auth', [MicrosoftAuthController::class, 'destroy'])->name('microsoftAuth.destroy');
 
 
     // Database Backup Settings

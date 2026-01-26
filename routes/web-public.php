@@ -4,7 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\LoginController;
-
+use App\Http\Controllers\MicrosoftAuthController;
 use App\Http\Controllers\RegisterController;
 
 use App\Http\Controllers\PublicUrlController;
@@ -78,6 +78,9 @@ Route::post('/consent/l/update/{lead}', [PublicLeadGdprController::class, 'updat
 // Socialite routes
 Route::get('/redirect/{provider}', [LoginController::class, 'redirect'])->name('social_login');
 Route::get('/callback/{provider}', [LoginController::class, 'callback'])->name('social_login_callback');
+
+// Microsoft OAuth callback route
+Route::get('/auth/microsoft/callback', [MicrosoftAuthController::class, 'callback'])->name('microsoft.callback');
 Route::post('check-email', [LoginController::class, 'checkEmail'])->name('check_email');
 Route::post('check-code', [LoginController::class, 'checkCode'])->name('check_code');
 Route::get('resend-code', [LoginController::class, 'resendCode'])->name('resend_code');

@@ -225,37 +225,71 @@ $addEventsPermission = user()->permission('add_events');
             });
         }
 
-        // show appointment detail in sidebar
+        // show appointment detail in modal
         var getAppointmentDetail = function(id) {
-            openTaskDetail();
             var url = "{{ route('appointments.show', ':id') }}";
             url = url.replace(':id', id);
 
+            // Create or get modal element
+            var modalId = 'appointmentDetailModal';
+            var $modal = $('#' + modalId);
+            
+            // Create modal if it doesn't exist
+            if ($modal.length === 0) {
+                $modal = $('<div class="modal fade" id="' + modalId + '" tabindex="-1" role="dialog" aria-labelledby="' + modalId + 'Label" aria-hidden="true">' +
+                    '<div class="modal-dialog modal-lg modal-dialog-centered" role="document">' +
+                    '<div class="modal-content">' +
+                    '<div class="modal-header">' +
+                    '<h5 class="modal-title" id="' + modalId + 'Label">Appointment Details</h5>' +
+                    '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+                    '<span aria-hidden="true">&times;</span>' +
+                    '</button>' +
+                    '</div>' +
+                    '<div class="modal-body" id="appointmentModalBody" style="max-height: 70vh; overflow-y: auto;">' +
+                    '<div class="text-center p-4"><i class="fa fa-spinner fa-spin"></i> Loading...</div>' +
+                    '</div>' +
+                    '<div class="modal-footer">' +
+                    '<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>');
+                $('body').append($modal);
+                
+                // Clean up modal content when closed
+                $modal.on('hidden.bs.modal', function() {
+                    $('#appointmentModalBody').html('<div class="text-center p-4"><i class="fa fa-spinner fa-spin"></i> Loading...</div>');
+                });
+            }
+
+            // Show modal
+            $modal.modal('show');
+            
+            // Load content
             $.easyAjax({
                 url: url,
                 blockUI: true,
-                container: RIGHT_MODAL,
+                container: '#appointmentModalBody',
                 historyPush: false,
                 success: function(response) {
                     if (response.status == "success") {
-                        $(RIGHT_MODAL_CONTENT).html(response.html);
-                        $(RIGHT_MODAL_TITLE).html(response.title);
+                        $('#appointmentModalBody').html(response.html);
+                        $('#' + modalId + 'Label').html(response.title || 'Appointment Details');
                     }
                 },
                 error: function(request, status, error) {
+                    var errorHtml = '<div class="text-center p-4">';
                     if (request.status == 403) {
-                        $(RIGHT_MODAL_CONTENT).html(
-                            '<div class="align-content-between d-flex justify-content-center mt-105 f-21">403 | Permission Denied</div>'
-                        );
+                        errorHtml += '<div class="f-21 text-danger">403 | Permission Denied</div>';
                     } else if (request.status == 404) {
-                        $(RIGHT_MODAL_CONTENT).html(
-                            '<div class="align-content-between d-flex justify-content-center mt-105 f-21">404 | Not Found</div>'
-                        );
+                        errorHtml += '<div class="f-21 text-danger">404 | Not Found</div>';
                     } else if (request.status == 500) {
-                        $(RIGHT_MODAL_CONTENT).html(
-                            '<div class="align-content-between d-flex justify-content-center mt-105 f-21">500 | Something Went Wrong</div>'
-                        );
+                        errorHtml += '<div class="f-21 text-danger">500 | Something Went Wrong</div>';
+                    } else {
+                        errorHtml += '<div class="f-21 text-danger">Error loading appointment details</div>';
                     }
+                    errorHtml += '</div>';
+                    $('#appointmentModalBody').html(errorHtml);
                 }
             });
         }

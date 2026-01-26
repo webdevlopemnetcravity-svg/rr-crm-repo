@@ -50,7 +50,22 @@ $appointment = $appointment ?? null;
                         :value="$appointment->end_time->translatedFormat(company()->date_format . ' - ' . company()->time_format)"
                         html="true" />
 
-                    @if($appointment->google_meet_link)
+                    @if($appointment->zoom_link)
+                        @php
+                            $url = str_starts_with($appointment->zoom_link, 'http') ? $appointment->zoom_link : 'http://' . $appointment->zoom_link;
+                            $link = "<a href='" . $url . "' style='color:black; cursor: pointer;' target='_blank'>" . $appointment->zoom_link . "</a>";
+                        @endphp
+                        <x-cards.data-row label="Zoom Meeting Link"
+                            html="true" :value="$link"/>
+                        
+                        @if($appointment->zoom_meeting_id)
+                            <x-cards.data-row label="Zoom Meeting ID" :value="$appointment->zoom_meeting_id" />
+                        @endif
+                        
+                        @if($appointment->zoom_meeting_password)
+                            <x-cards.data-row label="Zoom Meeting Password" :value="$appointment->zoom_meeting_password" />
+                        @endif
+                    @elseif($appointment->google_meet_link)
                         @php
                             $url = str_starts_with($appointment->google_meet_link, 'http') ? $appointment->google_meet_link : 'http://' . $appointment->google_meet_link;
                             $link = "<a href='" . $url . "' style='color:black; cursor: pointer;' target='_blank'>" . $appointment->google_meet_link . "</a>";
@@ -58,7 +73,7 @@ $appointment = $appointment ?? null;
                         <x-cards.data-row label="Google Meet Link"
                             html="true" :value="$link"/>
                     @else
-                        <x-cards.data-row label="Google Meet Link" value="Not Set" html="true" />
+                        <x-cards.data-row label="Meeting Link" value="Not Set" html="true" />
                     @endif
 
                     @if($appointment->creator)
@@ -78,12 +93,12 @@ $appointment = $appointment ?? null;
 </div>
 
 <!-- Update Appointment Modal -->
-<div class="modal fade" id="updateAppointmentModal" tabindex="-1" role="dialog" aria-labelledby="updateAppointmentModalLabel" aria-hidden="true" data-backdrop="false">
+<div class="modal fade" id="updateAppointmentModal" tabindex="-1" role="dialog" aria-labelledby="updateAppointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="updateAppointmentModalLabel">Update Meeting</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" id="closeUpdateModalXBtn" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -116,7 +131,7 @@ $appointment = $appointment ?? null;
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" id="closeUpdateModalBtn">Cancel</button>
                     <button type="submit" class="btn btn-primary" id="saveUpdateAppointmentBtn">Update</button>
                 </div>
             </form>
@@ -286,14 +301,19 @@ $appointment = $appointment ?? null;
     }, 150);
 
     // Update Appointment
-    $('#update-appointment-btn').click(function() {
-        // Remove any existing backdrop before opening modal
-        $('.modal-backdrop').not('#close-task-detail-overlay').remove();
+    $('#update-appointment-btn').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         
-        // Open modal without backdrop to prevent stacking
+        // Check if we're in a modal context (appointment detail modal)
+        var isInModal = $('#appointmentDetailModal').hasClass('show') || $('#appointmentDetailModal').is(':visible');
+        
+        // Open modal with proper backdrop handling for nested modals
+        // Use 'static' backdrop when inside another modal to prevent closing parent
         $('#updateAppointmentModal').modal({
-            backdrop: false,
-            show: true
+            backdrop: isInModal ? 'static' : true,
+            show: true,
+            keyboard: true
         });
         
         // Initialize datepicker and timepicker
@@ -330,7 +350,23 @@ $appointment = $appointment ?? null;
         }, 100);
     });
 
-    $('#updateAppointmentModal').on('hidden.bs.modal', function () {
+    // Handle close button clicks to prevent affecting parent modal
+    $('#closeUpdateModalBtn, #closeUpdateModalXBtn').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('#updateAppointmentModal').modal('hide');
+    });
+
+    // Prevent update modal from closing parent modal
+    $('#updateAppointmentModal').on('hide.bs.modal', function (e) {
+        // Stop propagation to prevent affecting parent modal
+        e.stopPropagation();
+    });
+
+    $('#updateAppointmentModal').on('hidden.bs.modal', function (e) {
+        // Stop event propagation to prevent affecting parent modal
+        e.stopPropagation();
+        
         const updateDate = document.getElementById('update_appointment_date');
         if (updateDate && updateDate._datepicker) {
             updateDate._datepicker.destroy();
@@ -341,8 +377,34 @@ $appointment = $appointment ?? null;
         if ($('#update_end_time').data('timepicker')) {
             $('#update_end_time').timepicker('remove');
         }
-        // Clean up any backdrop that might have been created
-        $('.modal-backdrop').not('#close-task-detail-overlay').remove();
+        
+        // Only remove the backdrop that was created for this modal
+        // Find the highest z-index backdrop (which should be the update modal's)
+        var backdrops = $('.modal-backdrop');
+        if (backdrops.length > 1) {
+            // Multiple backdrops exist (parent + update modal)
+            // Remove only the one with highest z-index
+            var highestZIndex = 0;
+            var highestBackdrop = null;
+            backdrops.each(function() {
+                var zIndex = parseInt($(this).css('z-index')) || 1040;
+                if (zIndex > highestZIndex) {
+                    highestZIndex = zIndex;
+                    highestBackdrop = $(this);
+                }
+            });
+            if (highestBackdrop && !highestBackdrop.is('#close-task-detail-overlay')) {
+                highestBackdrop.remove();
+            }
+        } else if (backdrops.length === 1 && !backdrops.is('#close-task-detail-overlay')) {
+            // Only one backdrop, but check if parent modal is still open
+            var parentModal = $('#appointmentDetailModal');
+            if (!parentModal.length || !parentModal.hasClass('show')) {
+                // Parent modal is not open, safe to remove
+                backdrops.remove();
+            }
+            // If parent modal is open, keep the backdrop
+        }
     });
 
     $(document).on('submit', '#updateAppointmentForm', function(e) {

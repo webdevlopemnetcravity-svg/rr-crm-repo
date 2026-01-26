@@ -30,6 +30,20 @@
                                    <i class="fa fa-circle f-12 ml-1 {{ $credentials->facebook_status == 'enable' ? 'text-light-green' : 'text-red' }}"></i>
                                 </a>
                             </li>
+                            <li class="d-none">
+                                <a class="nav-item nav-link f-15 microsoft" data-toggle="tab"
+                                   href="{{ route('social-auth-settings.index') }}?tab=microsoft" role="tab"
+                                   aria-controls="nav-microsoft" aria-selected="false"><i class="fab fa-microsoft" style="font-size: 15px;"></i> @lang('app.socialAuthSettings.microsoft')
+                                   <i class="fa fa-circle f-12 ml-1 {{ isset($credentials->microsoft_status) && $credentials->microsoft_status == 'enable' ? 'text-light-green' : 'text-red' }}"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-item nav-link f-15 zoom" data-toggle="tab"
+                                   href="{{ route('social-auth-settings.index') }}?tab=zoom" role="tab"
+                                   aria-controls="nav-zoom" aria-selected="false"><i class="fa fa-video" style="font-size: 15px;"></i> @lang('app.socialAuthSettings.zoom')
+                                   <i class="fa fa-circle f-12 ml-1 {{ isset($credentials->zoom_status) && $credentials->zoom_status == 'enable' ? 'text-light-green' : 'text-red' }}"></i>
+                                </a>
+                            </li>
                             {{-- Hidden: Facebook, LinkedIn, and Twitter settings --}}
                             {{--
                             <li>
@@ -95,7 +109,7 @@
             });
         });
 
-        $('body').on('click', '#save_google_data, #save_facebook_data, #save_linkedin_data, #save_twitter_data', function(event) {
+        $('body').on('click', '#save_google_data, #save_facebook_data, #save_linkedin_data, #save_twitter_data, #save_microsoft_data, #save_zoom_data', function(event) {
             var url = "{{ route('social-auth-settings.update', $credentials->id) }}";
             $.easyAjax({
                 url: url,

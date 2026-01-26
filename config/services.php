@@ -67,6 +67,20 @@ return [
         'include_granted_scopes' => true,
     ],
 
+    'microsoft' => [
+        'client_id' => env('MS_CLIENT_ID'),
+        'client_secret' => env('MS_CLIENT_SECRET'),
+        'redirect' => env('MS_REDIRECT_URI', env('APP_URL') . '/auth/microsoft/callback'),
+    ],
+
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'redirect' => env('FACEBOOK_REDIRECT'),
+        // No default scopes - scopes are set explicitly in FacebookAuthController
+        // Using Graph API v18.0 for Marketing API / Lead Ads integration
+    ],
+
     'sentry' => [
         'enabled' => env('SENTRY_ENABLED', false)
     ],

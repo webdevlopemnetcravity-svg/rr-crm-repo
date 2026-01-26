@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Notifiable;
 
 class NewLead extends BaseModel
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $table = 'new_leads';
 
@@ -145,5 +146,19 @@ class NewLead extends BaseModel
     public function documents(): HasOne
     {
         return $this->hasOne(NewLeadDocument::class, 'lead_id');
+    }
+
+    public function routeNotificationForMail()
+    {
+        $leadEmail = null;
+        if ($this->step_1_data && is_array($this->step_1_data)) {
+            $leadEmail = $this->step_1_data['email_address'] ?? null;
+        }
+        return $leadEmail ?? $this->client_email;
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->client_name;
     }
 }

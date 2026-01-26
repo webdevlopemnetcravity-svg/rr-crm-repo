@@ -1842,6 +1842,10 @@ return array(
     ),
 
 
+    'zoom' => array(
+        'meetingId' => 'Meeting ID',
+        'meetingPassword' => 'Meeting Password',
+    ),
     'projectSettings' => array(
         'sendNotificationsTo' => 'Send Reminder To',
     ),
@@ -1995,6 +1999,8 @@ return array(
         'state' => 'State',
         'country' => 'Country',
         'postal_code' => 'Postal Code',
+        'meetingTitle' => 'Meeting Title',
+        'leadId' => 'Lead ID',
     ),
 
     'emailNotification' => array(

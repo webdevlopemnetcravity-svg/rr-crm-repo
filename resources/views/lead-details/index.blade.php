@@ -3434,33 +3434,36 @@
 
         // Unbind any existing handlers to prevent duplicates
         $('#bookAppointmentModal').off('shown.bs.modal').on('shown.bs.modal', function () {
-            // Destroy existing datepicker if it exists - try multiple methods
             const appointmentDate = document.getElementById('appointment_date');
-            if (appointmentDate) {
+            
+            // Destroy existing datepicker if it exists
+            if (appointmentDate && appointmentDate._datepicker) {
                 try {
-                    if (appointmentDate._datepicker) {
-                        appointmentDate._datepicker.destroy();
-                    }
-                } catch (e) {
-                    // Ignore errors
-                }
-                // Also try removing any jQuery data
-                try {
-                    $(appointmentDate).removeData('datepicker');
+                    appointmentDate._datepicker.destroy();
                 } catch (e) {
                     // Ignore errors
                 }
             }
-            
+
+            // Also try removing any jQuery data just in case
+            try {
+                $(appointmentDate).removeData('datepicker');
+            } catch (e) {
+                // Ignore errors
+            }
+
             // Small delay to ensure cleanup is complete
             setTimeout(function() {
                 // Initialize Datepicker - only allow future dates
                 try {
-                    datepicker('#appointment_date', {
-                        position: 'bl',
-                        minDate: new Date(), // Only allow future dates
-                        ...datepickerConfig
-                    });
+                    // Check again to be absolutely sure no other script initialized it in the meantime
+                    if (appointmentDate && !appointmentDate._datepicker) {
+                        datepicker('#appointment_date', {
+                            position: 'bl',
+                            minDate: new Date(), // Only allow future dates
+                            ...datepickerConfig
+                        });
+                    }
                 } catch (e) {
                     console.error('Datepicker initialization error:', e);
                 }
@@ -3620,12 +3623,12 @@
                         $('#bookAppointmentForm')[0].reset();
                         var message = response.message || 'Appointment booked successfully!';
                         if (response.data && response.data.meet_link) {
-                            message += '\n\nGoogle Meet Link:\n' + response.data.meet_link;
+                            message += '\n\nZoom Meeting Link:\n' + response.data.meet_link;
                         }
                         Swal.fire({
                             icon: 'success',
                             title: 'Success!',
-                            html: message.replace(/\n/g, '<br>') + (response.data && response.data.meet_link ? '<br><br><a href="' + response.data.meet_link + '" target="_blank" class="btn btn-primary">Open Google Meet</a>' : ''),
+                            html: message.replace(/\n/g, '<br>') + (response.data && response.data.meet_link ? '<br><br><a href="' + response.data.meet_link + '" target="_blank" class="btn btn-primary">Open Zoom Meeting</a>' : ''),
                             showConfirmButton: true,
                             confirmButtonText: 'OK'
                         });
