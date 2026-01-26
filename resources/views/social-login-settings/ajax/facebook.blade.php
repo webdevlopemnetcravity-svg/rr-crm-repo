@@ -46,6 +46,16 @@
                         <p class="text-primary">(@lang('messages.addFacebookCallback'))</p>
                     </div>
                 </div>
+                <div class="col-md-12">
+                    <div class="alert alert-warning">
+                        <div class="form-group mb-0">
+                            <a href="{{ route('facebookAuth') }}" class="btn btn-primary">
+                                <i class="fa fa-facebook mr-2"></i>Get Facebook Token
+                            </a>
+                            <p class="text-muted mt-2 mb-0">Click to authenticate with Facebook and store your tokens.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- Buttons Start -->
