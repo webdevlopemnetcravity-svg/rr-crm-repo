@@ -33,6 +33,9 @@ use App\Models\NewLeadProcess;
 use App\Models\NewLeadVisaType;
 use App\Models\NewVisaCategoryMaster;
 use App\Models\NewLanguageMaster;
+use App\Models\NewCountryMaster;
+use App\Models\NewStateMaster;
+use App\Models\NewCityMaster;
 use App\Models\NewGoogleToken;
 use App\Services\Google;
 use App\Models\PipelineStage;
@@ -293,6 +296,23 @@ class LeadContactController extends AccountBaseController
                   ->orWhereNull('company_id');
         })->orderBy('name')->get();
 
+        // Load countries from master (for Country of Origin / address state/city)
+        $this->countryMasters = NewCountryMaster::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load states/cities masters (for other tabs dropdowns)
+        $this->stateMasters = NewStateMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        $this->cityMasters = NewCityMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
         // Load lead data if editing
         $this->newLead = null;
         $this->newLeadStepStatus = null;
@@ -338,6 +358,48 @@ class LeadContactController extends AccountBaseController
         }
 
         return Reply::dataOnly(['status' => 'success', 'options' => $options, 'subclasses' => $subclasses]);
+    }
+
+    /**
+     * Get states by country (for address dropdowns)
+     */
+    public function getStatesByCountry($countryId)
+    {
+        $states = NewStateMaster::where('country_id', $countryId)
+            ->where(function ($query) {
+                $query->where('company_id', company()->id)
+                    ->orWhereNull('company_id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $options = '<option value="">' . __('app.select') . '</option>';
+        foreach ($states as $state) {
+            $options .= '<option value="' . $state->id . '">' . htmlspecialchars($state->name, ENT_QUOTES, 'UTF-8') . '</option>';
+        }
+
+        return Reply::dataOnly(['status' => 'success', 'options' => $options, 'states' => $states]);
+    }
+
+    /**
+     * Get cities by state (for address dropdowns)
+     */
+    public function getCitiesByState($stateId)
+    {
+        $cities = NewCityMaster::where('state_id', $stateId)
+            ->where(function ($query) {
+                $query->where('company_id', company()->id)
+                    ->orWhereNull('company_id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $options = '<option value="">' . __('app.select') . '</option>';
+        foreach ($cities as $city) {
+            $options .= '<option value="' . $city->id . '">' . htmlspecialchars($city->name, ENT_QUOTES, 'UTF-8') . '</option>';
+        }
+
+        return Reply::dataOnly(['status' => 'success', 'options' => $options, 'cities' => $cities]);
     }
 
     public function leadDetails($id = null)
@@ -2750,6 +2812,37 @@ class LeadContactController extends AccountBaseController
                 $stepData['languages_spoken'] = $this->getRequestValue($request, 'languages_spoken', '');
             }
 
+            // Bind Country/State/City masters (store names in step data)
+            $countryOfOrigin = $this->getRequestValue($request, 'country_of_origin');
+            if (is_numeric($countryOfOrigin)) {
+                $country = NewCountryMaster::find($countryOfOrigin);
+                $stepData['country_of_origin'] = $country ? $country->name : $countryOfOrigin;
+            }
+
+            $homeState = $this->getRequestValue($request, 'home_state');
+            if (is_numeric($homeState)) {
+                $state = NewStateMaster::find($homeState);
+                $stepData['home_state'] = $state ? $state->name : $homeState;
+            }
+
+            $homeCity = $this->getRequestValue($request, 'home_city');
+            if (is_numeric($homeCity)) {
+                $city = NewCityMaster::find($homeCity);
+                $stepData['home_city'] = $city ? $city->name : $homeCity;
+            }
+
+            $mailingState = $stepData['mailing_state'] ?? $this->getRequestValue($request, 'mailing_state');
+            if (is_numeric($mailingState)) {
+                $state = NewStateMaster::find($mailingState);
+                $stepData['mailing_state'] = $state ? $state->name : $mailingState;
+            }
+
+            $mailingCity = $stepData['mailing_city'] ?? $this->getRequestValue($request, 'mailing_city');
+            if (is_numeric($mailingCity)) {
+                $city = NewCityMaster::find($mailingCity);
+                $stepData['mailing_city'] = $city ? $city->name : $mailingCity;
+            }
+
             // Parse visa_refusals if it's a JSON string
             $visaRefusals = [];
             if ($request->has('visa_refusals')) {
@@ -2921,6 +3014,19 @@ class LeadContactController extends AccountBaseController
                 }
                 $stepData['passport_file_upload'] = null;
             }
+
+            // Bind issuing country / city masters (store names)
+            $issuingCountry = $this->getRequestValue($request, 'issuing_country');
+            if (is_numeric($issuingCountry)) {
+                $country = NewCountryMaster::find($issuingCountry);
+                $stepData['issuing_country'] = $country ? $country->name : $issuingCountry;
+            }
+
+            $cityWhereIssued = $this->getRequestValue($request, 'city_where_issued');
+            if (is_numeric($cityWhereIssued)) {
+                $city = NewCityMaster::find($cityWhereIssued);
+                $stepData['city_where_issued'] = $city ? $city->name : $cityWhereIssued;
+            }
         }
         
         if ($stepNumber == 4) {
@@ -3001,6 +3107,25 @@ class LeadContactController extends AccountBaseController
         }
         
         if ($stepNumber == 5) {
+            // Bind spouse city/state masters (store names)
+            $spouseCountry = $this->getRequestValue($request, 'spouse_country');
+            if (is_numeric($spouseCountry)) {
+                $country = NewCountryMaster::find($spouseCountry);
+                $stepData['spouse_country'] = $country ? $country->name : $spouseCountry;
+            }
+
+            $spouseState = $this->getRequestValue($request, 'spouse_state');
+            if (is_numeric($spouseState)) {
+                $state = NewStateMaster::find($spouseState);
+                $stepData['spouse_state'] = $state ? $state->name : $spouseState;
+            }
+
+            $spouseCity = $this->getRequestValue($request, 'spouse_city');
+            if (is_numeric($spouseCity)) {
+                $city = NewCityMaster::find($spouseCity);
+                $stepData['spouse_city'] = $city ? $city->name : $spouseCity;
+            }
+
             // Handle children data - check if sent as JSON string
             $childData = [];
             

@@ -119,7 +119,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="country_of_origin" :fieldLabel="__('app.countryOfOrigin')">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="country_of_origin" id="country_of_origin">
+                                <select class="form-control height-35 f-14 country-origin-select" name="country_of_origin" id="country_of_origin">
+                                    <option value="">@lang('app.select')</option>
+                                    @foreach($countryMasters ?? [] as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
@@ -134,14 +139,18 @@
                                 <input type="text" class="form-control height-35 f-14" name="home_address" id="home_address">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="home_city" :fieldLabel="__('app.city')">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="home_city" id="home_city">
-                            </div>
-                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="home_state" :fieldLabel="__('app.state')">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="home_state" id="home_state">
+                                <select class="form-control height-35 f-14 address-state-select" name="home_state" id="home_state">
+                                    <option value="">@lang('app.select')</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="home_city" :fieldLabel="__('app.city')">
+                                </x-forms.label>
+                                <select class="form-control height-35 f-14 address-city-select" name="home_city" id="home_city">
+                                    <option value="">@lang('app.select')</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="home_pin_code" :fieldLabel="__('app.pinCode')">
@@ -169,14 +178,18 @@
                                 <input type="text" class="form-control height-35 f-14" name="mailing_address" id="mailing_address">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="mailing_city" :fieldLabel="__('app.city')">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="mailing_city" id="mailing_city">
-                            </div>
-                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mailing_state" :fieldLabel="__('app.state')">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="mailing_state" id="mailing_state">
+                                <select class="form-control height-35 f-14 address-state-select" name="mailing_state" id="mailing_state">
+                                    <option value="">@lang('app.select')</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="mailing_city" :fieldLabel="__('app.city')">
+                                </x-forms.label>
+                                <select class="form-control height-35 f-14 address-city-select" name="mailing_city" id="mailing_city">
+                                    <option value="">@lang('app.select')</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mailing_pin_code" :fieldLabel="__('app.pinCode')">
@@ -661,12 +674,22 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="issuing_country" fieldLabel="Issuing Country">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="issuing_country" id="issuing_country">
+                                <select class="form-control height-35 f-14 country-master-select" name="issuing_country" id="issuing_country">
+                                    <option value="">@lang('app.select')</option>
+                                    @foreach($countryMasters ?? [] as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="city_where_issued" fieldLabel="City Where Issued">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="city_where_issued" id="city_where_issued">
+                                <select class="form-control height-35 f-14 city-master-select" name="city_where_issued" id="city_where_issued">
+                                    <option value="">@lang('app.select')</option>
+                                    @foreach($cityMasters ?? [] as $city)
+                                        <option value="{{ $city->id }}">{{ $city->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="issuance_date" fieldLabel="Issue Date">
@@ -811,7 +834,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_country" fieldLabel="Spouse's Country">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="spouse_country" id="spouse_country">
+                                <select class="form-control height-35 f-14 country-master-select" name="spouse_country" id="spouse_country">
+                                    <option value="">@lang('app.select')</option>
+                                    @foreach($countryMasters ?? [] as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_city_of_birth" fieldLabel="Spouse's City of Birth">
@@ -835,14 +863,18 @@
                                 <input type="text" class="form-control height-35 f-14" name="spouse_address" id="spouse_address">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="spouse_city" fieldLabel="City">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="spouse_city" id="spouse_city">
-                            </div>
-                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_state" fieldLabel="State">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="spouse_state" id="spouse_state">
+                                <select class="form-control height-35 f-14 state-master-select" name="spouse_state" id="spouse_state">
+                                    <option value="">@lang('app.select')</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="spouse_city" fieldLabel="City">
+                                </x-forms.label>
+                                <select class="form-control height-35 f-14 city-master-select" name="spouse_city" id="spouse_city">
+                                    <option value="">@lang('app.select')</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_postal_code" fieldLabel="Postal Code">
@@ -1369,11 +1401,16 @@
 
 @push('scripts')
     <script>
-        // Make visa categories available in JavaScript
-        const visaCategories = @json($visaCategories ?? []);
-        
-        // Make languages available in JavaScript
-        const languages = @json($languages ?? []);
+            // Make visa categories available in JavaScript
+            const visaCategories = @json($visaCategories ?? []);
+            
+            // Make languages available in JavaScript
+            const languages = @json($languages ?? []);
+
+            // Make country/state/city masters available in JavaScript
+            const countryMasters = @json($countryMasters ?? []);
+            const stateMasters = @json($stateMasters ?? []);
+            const cityMasters = @json($cityMasters ?? []);
         
         // Hide Move to Lead button immediately if no lead_id in URL
         (function() {
@@ -1491,13 +1528,168 @@
                 });
             }
 
+            // Initialize searchable Select2 for Country/State/City masters (Tab 1)
+            const stateUrlTemplate = "{{ route('add-lead.get-states', ':countryId') }}";
+            const cityUrlTemplate = "{{ route('add-lead.get-cities', ':stateId') }}";
+
+            function initSelect2IfNeeded(selector, placeholderText) {
+                if ($(selector).length && !$(selector).hasClass('select2-hidden-accessible')) {
+                    $(selector).select2({
+                        placeholder: placeholderText,
+                        allowClear: false,
+                        width: '100%'
+                    });
+                }
+            }
+
+            initSelect2IfNeeded('#country_of_origin', '@lang("app.select") @lang("app.countryOfOrigin")');
+            initSelect2IfNeeded('#home_state', '@lang("app.select") @lang("app.state")');
+            initSelect2IfNeeded('#home_city', '@lang("app.select") @lang("app.city")');
+            initSelect2IfNeeded('#mailing_state', '@lang("app.select") @lang("app.state")');
+            initSelect2IfNeeded('#mailing_city', '@lang("app.select") @lang("app.city")');
+            initSelect2IfNeeded('#issuing_country', '@lang("app.select") Issuing Country');
+            initSelect2IfNeeded('#city_where_issued', '@lang("app.select") City Where Issued');
+            initSelect2IfNeeded('#spouse_country', '@lang("app.select") Spouse\'s Country');
+            initSelect2IfNeeded('#spouse_state', '@lang("app.select") @lang("app.state")');
+            initSelect2IfNeeded('#spouse_city', '@lang("app.select") @lang("app.city")');
+
+            function resetCitySelect($citySelect) {
+                $citySelect.html('<option value="">@lang("app.select")</option>');
+                $citySelect.val(null).trigger('change');
+                $citySelect.prop('disabled', true);
+            }
+
+            function resetStateSelect($stateSelect) {
+                $stateSelect.html('<option value="">@lang("app.select")</option>');
+                $stateSelect.val(null).trigger('change');
+                $stateSelect.prop('disabled', true);
+            }
+
+            function loadStates(countryId) {
+                if (!countryId) {
+                    resetStateSelect($('#home_state'));
+                    resetStateSelect($('#mailing_state'));
+                    resetCitySelect($('#home_city'));
+                    resetCitySelect($('#mailing_city'));
+                    return $.Deferred().resolve().promise();
+                }
+
+                const url = stateUrlTemplate.replace(':countryId', countryId);
+                return $.get(url).then(function (res) {
+                    if (res && res.options) {
+                        $('#home_state').html(res.options).prop('disabled', false).val(null).trigger('change');
+                        $('#mailing_state').html(res.options).prop('disabled', false).val(null).trigger('change');
+                        resetCitySelect($('#home_city'));
+                        resetCitySelect($('#mailing_city'));
+                    }
+                });
+            }
+
+            function loadSpouseStates(countryId) {
+                if (!countryId) {
+                    resetStateSelect($('#spouse_state'));
+                    resetCitySelect($('#spouse_city'));
+                    return $.Deferred().resolve().promise();
+                }
+
+                const url = stateUrlTemplate.replace(':countryId', countryId);
+                return $.get(url).then(function (res) {
+                    if (res && res.options) {
+                        $('#spouse_state').html(res.options).prop('disabled', false).val(null).trigger('change');
+                        resetCitySelect($('#spouse_city'));
+                    }
+                });
+            }
+
+            function loadCities(stateId, $citySelect) {
+                if (!stateId) {
+                    resetCitySelect($citySelect);
+                    return $.Deferred().resolve().promise();
+                }
+
+                const url = cityUrlTemplate.replace(':stateId', stateId);
+                return $.get(url).then(function (res) {
+                    if (res && res.options) {
+                        $citySelect.html(res.options).prop('disabled', false).val(null).trigger('change');
+                    }
+                });
+            }
+
+            function setSelectBySavedText($select, savedText) {
+                if (!savedText) return;
+
+                // If savedText is numeric string, try direct set (backward compatibility)
+                if (!isNaN(savedText)) {
+                    $select.val(savedText).trigger('change');
+                    return;
+                }
+
+                let found = false;
+                $select.find('option').each(function () {
+                    if ($(this).text().trim() === String(savedText).trim()) {
+                        $select.val($(this).val()).trigger('change');
+                        found = true;
+                        return false;
+                    }
+                });
+
+                if (!found) {
+                    $select.val(null).trigger('change');
+                }
+            }
+
+            // Country of origin change -> reload states/cities
+            $('#country_of_origin').on('change', function () {
+                const countryId = $(this).val();
+                loadStates(countryId);
+            });
+
+            // Spouse country change -> reload spouse states/cities
+            $('#spouse_country').on('change', function () {
+                loadSpouseStates($(this).val());
+            });
+
+            // Home state change -> reload home cities
+            $('#home_state').on('change', function () {
+                loadCities($(this).val(), $('#home_city'));
+            });
+
+            // Mailing state change -> reload mailing cities
+            $('#mailing_state').on('change', function () {
+                loadCities($(this).val(), $('#mailing_city'));
+            });
+
+            // Spouse state change -> reload spouse cities
+            $('#spouse_state').on('change', function () {
+                loadCities($(this).val(), $('#spouse_city'));
+            });
+
+            // Disable state/city until country is selected
+            resetStateSelect($('#home_state'));
+            resetStateSelect($('#mailing_state'));
+            resetCitySelect($('#home_city'));
+            resetCitySelect($('#mailing_city'));
+            // Spouse state/city depend on spouse_country/state
+            resetStateSelect($('#spouse_state'));
+            resetCitySelect($('#spouse_city'));
+
             // Handle mailing address same as home address checkbox
             $('#mailing_same_as_home').on('change', function() {
                 if ($(this).is(':checked')) {
                     $('#mailing_address').val($('#home_address').val());
-                    $('#mailing_city').val($('#home_city').val());
-                    $('#mailing_state').val($('#home_state').val());
                     $('#mailing_pin_code').val($('#home_pin_code').val());
+
+                    // Copy state/city selections (after city options are available)
+                    const homeStateVal = $('#home_state').val();
+                    const homeCityVal = $('#home_city').val();
+                    $('#mailing_state').val(homeStateVal).trigger('change');
+                    if (homeStateVal) {
+                        loadCities(homeStateVal, $('#mailing_city')).then(function () {
+                            $('#mailing_city').val(homeCityVal).trigger('change');
+                        });
+                    } else {
+                        $('#mailing_city').val(null).trigger('change');
+                    }
                     
                     // Disable mailing address fields
                     $('#mailing_address, #mailing_city, #mailing_state, #mailing_pin_code').prop('disabled', true);
@@ -1508,12 +1700,26 @@
             });
 
             // Auto-fill mailing address when home address changes (if checkbox is checked)
-            $('#home_address, #home_city, #home_state, #home_pin_code').on('input', function() {
+            $('#home_address, #home_pin_code').on('input', function() {
                 if ($('#mailing_same_as_home').is(':checked')) {
                     $('#mailing_address').val($('#home_address').val());
-                    $('#mailing_city').val($('#home_city').val());
-                    $('#mailing_state').val($('#home_state').val());
                     $('#mailing_pin_code').val($('#home_pin_code').val());
+                }
+            });
+
+            // Auto-fill mailing state/city when home state/city changes (if checkbox is checked)
+            $('#home_state, #home_city').on('change', function () {
+                if ($('#mailing_same_as_home').is(':checked')) {
+                    const homeStateVal = $('#home_state').val();
+                    const homeCityVal = $('#home_city').val();
+                    $('#mailing_state').val(homeStateVal).trigger('change');
+                    if (homeStateVal) {
+                        loadCities(homeStateVal, $('#mailing_city')).then(function () {
+                            $('#mailing_city').val(homeCityVal).trigger('change');
+                        });
+                    } else {
+                        $('#mailing_city').val(null).trigger('change');
+                    }
                 }
             });
 
@@ -1994,6 +2200,12 @@
                 const email = contactData && contactData.relative_email_address ? contactData.relative_email_address : '';
                 const phone = contactData && contactData.relative_phone_number ? contactData.relative_phone_number : '';
                 
+                // Build state options from master
+                let stateOptions = '<option value="">@lang("app.select")</option>';
+                stateMasters.forEach(function (st) {
+                    stateOptions += `<option value="${st.id}">${st.name}</option>`;
+                });
+
                 return `
                     <div class="relative-contact-row mb-4" id="relative-contact-row-${contactNum}" data-contact-index="${contactNum}">
                         <div class="relative-contact-row-header mb-3">
@@ -2031,14 +2243,18 @@
                                 <input type="text" class="form-control height-35 f-14" name="relative_contact_address_${contactNum}" id="relative_contact_address_${contactNum}" value="${address}">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_city_${contactNum}" fieldLabel="City">
-                                </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_city_${contactNum}" id="relative_city_${contactNum}" value="${city}">
-                            </div>
-                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_state_${contactNum}" fieldLabel="State">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_state_${contactNum}" id="relative_state_${contactNum}" value="${state}">
+                                <select class="form-control height-35 f-14 relative-state-select" name="relative_state_${contactNum}" id="relative_state_${contactNum}">
+                                    ${stateOptions}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_city_${contactNum}" fieldLabel="City">
+                                </x-forms.label>
+                                <select class="form-control height-35 f-14 relative-city-select" name="relative_city_${contactNum}" id="relative_city_${contactNum}">
+                                    <option value="">@lang('app.select')</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_zip_code_${contactNum}" fieldLabel="Zip Code">
@@ -2067,18 +2283,28 @@
                 
                 // Append to the relative-contact-rows-container
                 $('#relative-contact-rows-container').append(newRow);
-                
-                // Reinitialize select picker for the new row
-                setTimeout(function() {
-                    $('.select-picker').each(function() {
-                        if (!$(this).data('selectpicker')) {
-                            $(this).selectpicker();
-                        } else {
-                            $(this).selectpicker('refresh');
-                        }
+
+                // Init Select2 for state/city in the new row
+                const stateSel = '#relative_state_' + contactNum;
+                const citySel = '#relative_city_' + contactNum;
+                initSelect2IfNeeded(stateSel, '@lang("app.select") @lang("app.state")');
+                initSelect2IfNeeded(citySel, '@lang("app.select") @lang("app.city")');
+                resetCitySelect($(citySel));
+
+                $(document).off('change.relativeState' + contactNum, stateSel).on('change.relativeState' + contactNum, stateSel, function () {
+                    loadCities($(this).val(), $(citySel));
+                });
+
+                // If editing existing contact data (saved as text), set state then load cities then set city
+                if (contactData) {
+                    setSelectBySavedText($(stateSel), contactData.relative_state || '');
+                    loadCities($(stateSel).val(), $(citySel)).then(function () {
+                        setSelectBySavedText($(citySel), contactData.relative_city || '');
                     });
-                    
-                    // Update remove buttons visibility and contact row numbers
+                }
+
+                // Update remove buttons visibility and contact row numbers
+                setTimeout(function () {
                     updateRelativeContactRemoveButtons();
                     updateRelativeContactRowNumbers();
                 }, 100);
@@ -2625,6 +2851,12 @@
                 const companyName = jobData && jobData.job_company_name ? jobData.job_company_name : '';
                 const salary = jobData && jobData.job_salary ? jobData.job_salary : '';
                 
+                // Build country options from master
+                let countryOptions = '<option value="">@lang("app.select")</option>';
+                countryMasters.forEach(function (c) {
+                    countryOptions += `<option value="${c.id}">${c.name}</option>`;
+                });
+
                 return `
                     <div class="job-row mb-4" id="job-row-${jobNum}" data-job-index="${jobNum}">
                         <div class="job-row-header mb-3">
@@ -2649,7 +2881,9 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_country_${jobNum}" fieldLabel="Country">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_country_${jobNum}" id="job_country_${jobNum}" value="${country}">
+                                <select class="form-control height-35 f-14 job-country-select" name="job_country_${jobNum}" id="job_country_${jobNum}">
+                                    ${countryOptions}
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_designation_${jobNum}" fieldLabel="Designation">
@@ -2678,6 +2912,15 @@
                 
                 // Append to the job-rows-container
                 $('#job-rows-container').append(newRow);
+
+                // Init Select2 for job country
+                const jobCountrySel = '#job_country_' + jobNum;
+                initSelect2IfNeeded(jobCountrySel, '@lang("app.select") Country');
+
+                // If editing existing job data (saved as text), set country
+                if (jobData && jobData.job_country) {
+                    setSelectBySavedText($(jobCountrySel), jobData.job_country);
+                }
                 
                 // Update file URLs for existing files if jobData is provided
                 if (jobData) {
@@ -3259,7 +3502,12 @@
                         $('#date_of_birth').val('');
                     }
                     $('#marital_status').val(data.marital_status || '').selectpicker('refresh');
-                    $('#country_of_origin').val(data.country_of_origin || '');
+                    // Country of origin (Nationality) - saved as text, select stores id
+                    if (data.country_of_origin) {
+                        setSelectBySavedText($('#country_of_origin'), data.country_of_origin);
+                    } else {
+                        $('#country_of_origin').val(null).trigger('change');
+                    }
                     $('#email_address').val(data.email_address || data.email || '');
                     $('#mobile').val(data.mobile || '');
                     $('#primary_phone').val(data.primary_phone || '');
@@ -3300,17 +3548,25 @@
                     
                     // Home address
                     $('#home_address').val(data.home_address || '');
-                    $('#home_city').val(data.home_city || '');
-                    $('#home_state').val(data.home_state || '');
-                    $('#home_country').val(data.home_country || '').selectpicker('refresh');
                     $('#home_pin_code').val(data.home_pin_code || '');
                     
                     // Mailing address
                     $('#mailing_address').val(data.mailing_address || '');
-                    $('#mailing_city').val(data.mailing_city || '');
-                    $('#mailing_state').val(data.mailing_state || '');
-                    $('#mailing_country').val(data.mailing_country || '').selectpicker('refresh');
                     $('#mailing_pin_code').val(data.mailing_pin_code || '');
+
+                    // Load states/cities based on selected country, then set saved state/city (saved as text)
+                    const selectedCountryId = $('#country_of_origin').val();
+                    loadStates(selectedCountryId).then(function () {
+                        setSelectBySavedText($('#home_state'), data.home_state || '');
+                        return loadCities($('#home_state').val(), $('#home_city')).then(function () {
+                            setSelectBySavedText($('#home_city'), data.home_city || '');
+                        });
+                    }).then(function () {
+                        setSelectBySavedText($('#mailing_state'), data.mailing_state || '');
+                        return loadCities($('#mailing_state').val(), $('#mailing_city')).then(function () {
+                            setSelectBySavedText($('#mailing_city'), data.mailing_city || '');
+                        });
+                    });
                     
                     if (data.mailing_same_as_home) {
                         $('#mailing_same_as_home').prop('checked', true).trigger('change');
@@ -3677,6 +3933,17 @@
                                 updateChildRowNumbers();
                             }, 300);
                         }
+
+                        // Step 5 - spouse city/state (saved as text) -> set state then load cities then set city
+                        if (stepNum === 5) {
+                            setSelectBySavedText($('#spouse_country'), stepDataObj.spouse_country || '');
+                            loadSpouseStates($('#spouse_country').val()).then(function () {
+                                setSelectBySavedText($('#spouse_state'), stepDataObj.spouse_state || '');
+                                return loadCities($('#spouse_state').val(), $('#spouse_city'));
+                            }).then(function () {
+                                setSelectBySavedText($('#spouse_city'), stepDataObj.spouse_city || '');
+                            });
+                        }
                         
                         // Special handling for Step 6 - other degrees data
                         if (stepNum === 6 && stepDataObj.other_degrees && Array.isArray(stepDataObj.other_degrees)) {
@@ -3766,6 +4033,10 @@
                             if (fieldName === 'jobs') {
                                 return;
                             }
+                            // Skip spouse country/state/city (handled above to support dependent city loading)
+                            if (stepNum === 5 && (fieldName === 'spouse_country' || fieldName === 'spouse_state' || fieldName === 'spouse_city')) {
+                                return;
+                            }
                             
                             const $field = $('#' + fieldName + ', [name="' + fieldName + '"]').first();
                             if ($field.length) {
@@ -3775,7 +4046,11 @@
                                 if ($field.is('input[type="file"]')) {
                                     return; // Skip file fields
                                 } else if ($field.is('select')) {
-                                    $field.val(value).selectpicker('refresh');
+                                    if ($field.hasClass('select2-hidden-accessible')) {
+                                        setSelectBySavedText($field, value);
+                                    } else {
+                                        $field.val(value).selectpicker('refresh');
+                                    }
                                 } else if ($field.is(':checkbox') || $field.is(':radio')) {
                                     if ($field.is(':checkbox')) {
                                         $field.prop('checked', value === true || value === '1' || value === 1);
@@ -4249,11 +4524,21 @@
                         const orgName = $('#relative_organization_name_' + contactIndex).val() || '';
                         const relationship = $('#relative_relationship_' + contactIndex).val() || '';
                         const address = $('#relative_contact_address_' + contactIndex).val() || '';
-                        const city = $('#relative_city_' + contactIndex).val() || '';
-                        const state = $('#relative_state_' + contactIndex).val() || '';
+                        let city = $('#relative_city_' + contactIndex).val() || '';
+                        let state = $('#relative_state_' + contactIndex).val() || '';
                         const zipCode = $('#relative_zip_code_' + contactIndex).val() || '';
                         const email = $('#relative_email_address_' + contactIndex).val() || '';
                         const phone = $('#relative_phone_number_' + contactIndex).val() || '';
+
+                        // Resolve state/city ids to names
+                        if (state && !isNaN(state)) {
+                            const stObj = stateMasters.find(function (s) { return s.id == state; });
+                            if (stObj) state = stObj.name;
+                        }
+                        if (city && !isNaN(city)) {
+                            const ctObj = cityMasters.find(function (c) { return c.id == city; });
+                            if (ctObj) city = ctObj.name;
+                        }
                         
                         // Only add contact if at least one field has a value
                         if (surname || givenName || orgName || relationship || address || city || state || zipCode || email || phone) {
@@ -4345,10 +4630,16 @@
                         const jobIndex = $(this).data('job-index');
                         const durationFrom = $('#job_duration_from_' + jobIndex).val() || '';
                         const durationTo = $('#job_duration_to_' + jobIndex).val() || '';
-                        const country = $('#job_country_' + jobIndex).val() || '';
+                        let country = $('#job_country_' + jobIndex).val() || '';
                         const designation = $('#job_designation_' + jobIndex).val() || '';
                         const companyName = $('#job_company_name_' + jobIndex).val() || '';
                         const salary = $('#job_salary_' + jobIndex).val() || '';
+
+                        // Resolve country id to name
+                        if (country && !isNaN(country)) {
+                            const cObj = countryMasters.find(function (c) { return c.id == country; });
+                            if (cObj) country = cObj.name;
+                        }
                         
                         // Only add job if at least one field has a value
                         if (durationFrom || durationTo || country || designation || companyName || salary) {
