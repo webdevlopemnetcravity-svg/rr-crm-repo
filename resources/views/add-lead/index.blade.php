@@ -686,9 +686,6 @@
                                 </x-forms.label>
                                 <select class="form-control height-35 f-14 city-master-select" name="city_where_issued" id="city_where_issued">
                                     <option value="">@lang('app.select')</option>
-                                    @foreach($cityMasters ?? [] as $city)
-                                        <option value="{{ $city->id }}">{{ $city->name }}</option>
-                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -1531,6 +1528,7 @@
             // Initialize searchable Select2 for Country/State/City masters (Tab 1)
             const stateUrlTemplate = "{{ route('add-lead.get-states', ':countryId') }}";
             const cityUrlTemplate = "{{ route('add-lead.get-cities', ':stateId') }}";
+            const cityByCountryUrlTemplate = "{{ route('add-lead.get-cities-by-country', ':countryId') }}";
 
             function initSelect2IfNeeded(selector, placeholderText) {
                 if ($(selector).length && !$(selector).hasClass('select2-hidden-accessible')) {
@@ -1615,6 +1613,19 @@
                 });
             }
 
+            function loadCitiesByCountry(countryId, $citySelect) {
+                if (!countryId) {
+                    $citySelect.html('<option value="">@lang('app.select')</option>').val(null).trigger('change');
+                    return $.Deferred().resolve().promise();
+                }
+                const url = cityByCountryUrlTemplate.replace(':countryId', countryId);
+                return $.get(url).then(function (res) {
+                    if (res && res.options) {
+                        $citySelect.html(res.options).prop('disabled', false).val(null).trigger('change');
+                    }
+                });
+            }
+
             function setSelectBySavedText($select, savedText) {
                 if (!savedText) return;
 
@@ -1642,6 +1653,11 @@
             $('#country_of_origin').on('change', function () {
                 const countryId = $(this).val();
                 loadStates(countryId);
+            });
+
+            // Issuing country change -> reload City Where Issued (cities in that country)
+            $('#issuing_country').on('change', function () {
+                loadCitiesByCountry($(this).val(), $('#city_where_issued'));
             });
 
             // Spouse country change -> reload spouse states/cities
@@ -3865,6 +3881,14 @@
                     if (stepData[stepKey] && typeof stepData[stepKey] === 'object') {
                         const stepDataObj = stepData[stepKey];
                         
+                        // Step 3 - passport: City Where Issued depends on Issuing Country
+                        if (stepNum === 3) {
+                            setSelectBySavedText($('#issuing_country'), stepDataObj.issuing_country || '');
+                            loadCitiesByCountry($('#issuing_country').val(), $('#city_where_issued')).then(function () {
+                                setSelectBySavedText($('#city_where_issued'), stepDataObj.city_where_issued || '');
+                            });
+                        }
+
                         // Special handling for Step 4 - relative contacts data
                         if (stepNum === 4 && stepDataObj.relative_contacts && Array.isArray(stepDataObj.relative_contacts)) {
                             const relativeContacts = stepDataObj.relative_contacts;
@@ -4031,6 +4055,10 @@
                             }
                             // Skip jobs field - it's handled above
                             if (fieldName === 'jobs') {
+                                return;
+                            }
+                            // Skip passport issuing country/city (handled above to support cities-by-country loading)
+                            if (stepNum === 3 && (fieldName === 'issuing_country' || fieldName === 'city_where_issued')) {
                                 return;
                             }
                             // Skip spouse country/state/city (handled above to support dependent city loading)

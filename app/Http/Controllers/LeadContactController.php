@@ -408,6 +408,29 @@ class LeadContactController extends AccountBaseController
         return Reply::dataOnly(['status' => 'success', 'options' => $options, 'cities' => $cities]);
     }
 
+    /**
+     * Get cities by country (for passport City Where Issued)
+     */
+    public function getCitiesByCountry($countryId)
+    {
+        $cities = NewCityMaster::whereHas('state', function ($query) use ($countryId) {
+            $query->where('country_id', $countryId);
+        })
+            ->where(function ($query) {
+                $query->where('company_id', company()->id)
+                    ->orWhereNull('company_id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $options = '<option value="">' . __('app.select') . '</option>';
+        foreach ($cities as $city) {
+            $options .= '<option value="' . $city->id . '">' . htmlspecialchars($city->name, ENT_QUOTES, 'UTF-8') . '</option>';
+        }
+
+        return Reply::dataOnly(['status' => 'success', 'options' => $options, 'cities' => $cities]);
+    }
+
     public function leadDetails($id = null)
     {
         // Redirect to lead list if ID is not provided
