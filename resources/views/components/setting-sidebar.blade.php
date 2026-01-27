@@ -130,6 +130,21 @@
         @endif
 
         @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_stream_master" :href="route('new-stream-master.index')"
+                                 :text="__('app.menu.newStreamMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_course_master" :href="route('new-course-master.index')"
+                                 :text="__('app.menu.newCourseMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_institution_type_master" :href="route('new-institution-type-master.index')"
+                                 :text="__('app.menu.newInstitutionTypeMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
             <x-setting-menu-item :active="$activeMenu" menu="new_visa_category_master" :href="route('new-visa-category-master.index')"
                                  :text="__('app.menu.newVisaCategoryMaster')"/>
         @endif

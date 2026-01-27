@@ -15,6 +15,9 @@ use App\Http\Controllers\NewLeadTemplateDocumentController;
 use App\Http\Controllers\NewLanguageMasterController;
 use App\Http\Controllers\NewHighestQualificationMasterController;
 use App\Http\Controllers\NewEducationLevelMasterController;
+use App\Http\Controllers\NewStreamMasterController;
+use App\Http\Controllers\NewCourseMasterController;
+use App\Http\Controllers\NewInstitutionTypeMasterController;
 use App\Http\Controllers\NewVisaCategoryMasterController;
 use App\Http\Controllers\NewCountryMasterController;
 use App\Http\Controllers\CountryController;
@@ -234,6 +237,15 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
 
     /* Education Level Master */
     Route::resource('new-education-level-master', NewEducationLevelMasterController::class);
+
+    /* Stream Master */
+    Route::resource('new-stream-master', NewStreamMasterController::class);
+
+    /* Course Master */
+    Route::resource('new-course-master', NewCourseMasterController::class);
+
+    /* Institution Type Master */
+    Route::resource('new-institution-type-master', NewInstitutionTypeMasterController::class);
 
     /* Visa Category Master */
     Route::resource('new-visa-category-master', NewVisaCategoryMasterController::class);
