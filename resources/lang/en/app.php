@@ -248,6 +248,8 @@ return array(
         'taxSettings' => 'Tax Settings',
         'newLeadTemplateDocuments' => 'Lead Template Documents',
         'newLanguageMaster' => 'Language Master',
+        'newHighestQualificationMaster' => 'Highest Qualification Master',
+        'newEducationLevelMaster' => 'Education Level Master',
         'newVisaCategoryMaster' => 'Visa Category Master',
         'newCountryMaster' => 'Country Master',
         'country' => 'Country',

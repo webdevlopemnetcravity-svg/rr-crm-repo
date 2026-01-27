@@ -13,6 +13,8 @@ use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\LeadSettingController;
 use App\Http\Controllers\NewLeadTemplateDocumentController;
 use App\Http\Controllers\NewLanguageMasterController;
+use App\Http\Controllers\NewHighestQualificationMasterController;
+use App\Http\Controllers\NewEducationLevelMasterController;
 use App\Http\Controllers\NewVisaCategoryMasterController;
 use App\Http\Controllers\NewCountryMasterController;
 use App\Http\Controllers\CountryController;
@@ -226,6 +228,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
 
     /* Language Master */
     Route::resource('new-language-master', NewLanguageMasterController::class);
+
+    /* Highest Qualification Master */
+    Route::resource('new-highest-qualification-master', NewHighestQualificationMasterController::class);
+
+    /* Education Level Master */
+    Route::resource('new-education-level-master', NewEducationLevelMasterController::class);
 
     /* Visa Category Master */
     Route::resource('new-visa-category-master', NewVisaCategoryMasterController::class);
