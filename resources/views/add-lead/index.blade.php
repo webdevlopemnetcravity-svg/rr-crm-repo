@@ -1408,6 +1408,8 @@
             const countryMasters = @json($countryMasters ?? []);
             const stateMasters = @json($stateMasters ?? []);
             const cityMasters = @json($cityMasters ?? []);
+            const industryMasters = @json($industryMasters ?? []);
+            const sectorsMaster = @json($sectorsMaster ?? []);
         
         // Hide Move to Lead button immediately if no lead_id in URL
         (function() {
@@ -1624,6 +1626,55 @@
                         $citySelect.html(res.options).prop('disabled', false).val(null).trigger('change');
                     }
                 });
+            }
+
+            // Calculate and display job experience only when both Duration From and Duration To are selected
+            function updateJobExperience(jobNum) {
+                const fromVal = $('#job_duration_from_' + jobNum).val();
+                const isCurrentJob = $('#job_current_job_' + jobNum).is(':checked');
+                const $out = $('#job_experience_' + jobNum);
+                if (isCurrentJob) {
+                    $out.val('');
+                    return;
+                }
+                const toVal = $('#job_duration_to_' + jobNum).val();
+                if (!fromVal || !toVal) {
+                    $out.val('');
+                    return;
+                }
+                const from = new Date(fromVal);
+                const to = new Date(toVal);
+                if (to < from) {
+                    $out.val('');
+                    return;
+                }
+                let months = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
+                if (to.getDate() < from.getDate()) months -= 1;
+                if (months < 0) months = 0;
+                const years = Math.floor(months / 12);
+                const remMonths = months % 12;
+                const parts = [];
+                if (years > 0) parts.push(years + ' year' + (years !== 1 ? 's' : ''));
+                if (remMonths > 0) parts.push(remMonths + ' month' + (remMonths !== 1 ? 's' : ''));
+                $out.val(parts.length ? parts.join(' ') : '0 months');
+            }
+
+            // Filter sector dropdown: show all sectors when no industry; show only that industry's sectors when industry selected
+            function filterSectorsByIndustry(jobNum) {
+                const industryId = $('#job_industry_' + jobNum).val();
+                const $sectorSelect = $('#job_sector_' + jobNum);
+                let optionsHtml = '<option value="">@lang("app.select")</option>';
+                sectorsMaster.forEach(function (s) {
+                    const show = !industryId || String(s.industry_id) === String(industryId);
+                    if (show) {
+                        optionsHtml += '<option value="' + s.id + '">' + (s.name || '') + '</option>';
+                    }
+                });
+                if ($sectorSelect.hasClass('select2-hidden-accessible')) {
+                    $sectorSelect.select2('destroy');
+                }
+                $sectorSelect.html(optionsHtml).val(null).trigger('change');
+                initSelect2IfNeeded('#job_sector_' + jobNum, '@lang("app.select") @lang("app.menu.sector")');
             }
 
             function setSelectBySavedText($select, savedText) {
@@ -2863,14 +2914,56 @@
                 const durationFrom = jobData && jobData.job_duration_from ? jobData.job_duration_from : '';
                 const durationTo = jobData && jobData.job_duration_to ? jobData.job_duration_to : '';
                 const country = jobData && jobData.job_country ? jobData.job_country : '';
+                const employmentType = jobData && jobData.job_employment_type ? jobData.job_employment_type : '';
                 const designation = jobData && jobData.job_designation ? jobData.job_designation : '';
                 const companyName = jobData && jobData.job_company_name ? jobData.job_company_name : '';
+                const industry = jobData && jobData.job_industry ? jobData.job_industry : '';
+                const sector = jobData && jobData.job_sector ? jobData.job_sector : '';
                 const salary = jobData && jobData.job_salary ? jobData.job_salary : '';
+                const isCurrentJob = !!(jobData && (jobData.job_current_job === true || jobData.job_current_job === '1' || jobData.job_current_job === 1));
                 
                 // Build country options from master
                 let countryOptions = '<option value="">@lang("app.select")</option>';
                 countryMasters.forEach(function (c) {
                     countryOptions += `<option value="${c.id}">${c.name}</option>`;
+                });
+
+                const employmentTypeOptions = [
+                    'Full Time', 'Part Time', 'Contract', 'Internship', 'Apprenticeship', 'Self Employed', 'Freelancer'
+                ];
+                let employmentTypeSelect = '<option value="">@lang("app.select")</option>';
+                employmentTypeOptions.forEach(function (opt) {
+                    const sel = (employmentType === opt) ? ' selected' : '';
+                    employmentTypeSelect += `<option value="${opt}"${sel}>${opt}</option>`;
+                });
+
+                const designationOptions = [
+                    'Software Developer', 'Web Developer', 'Accountant', 'Sales Executive', 'Marketing Executive',
+                    'Business Development Executive', 'HR Executive', 'Office Assistant', 'Clerk', 'Supervisor',
+                    'Manager', 'Store Manager', 'Restaurant Manager', 'Chef', 'Cook', 'Helper', 'Warehouse Associate',
+                    'Delivery Executive', 'Driver', 'Electrician', 'Plumber', 'Welder', 'Fitter', 'Machine Operator',
+                    'Quality Analyst', 'Data Entry Operator', 'Graphic Designer', 'Digital Marketer'
+                ];
+                let designationSelect = '<option value="">@lang("app.select")</option>';
+                designationOptions.forEach(function (opt) {
+                    const sel = (designation === opt) ? ' selected' : '';
+                    designationSelect += `<option value="${opt}"${sel}>${opt}</option>`;
+                });
+                if (designation && designationOptions.indexOf(designation) === -1) {
+                    designationSelect += `<option value="${designation}" selected>${designation}</option>`;
+                }
+
+                // Build industry options from master (same pattern as Country)
+                let industryOptions = '<option value="">@lang("app.select")</option>';
+                industryMasters.forEach(function (i) {
+                    const sel = (industry && (String(i.id) === String(industry) || i.name === industry)) ? ' selected' : '';
+                    industryOptions += `<option value="${i.id}"${sel}>${i.name}</option>`;
+                });
+                // Sector: show ALL sectors initially; when industry is selected we filter to that industry's sectors via filterSectorsByIndustry()
+                let sectorOptions = '<option value="">@lang("app.select")</option>';
+                sectorsMaster.forEach(function (s) {
+                    const sel = (sector && (String(s.id) === String(sector) || s.name === sector)) ? ' selected' : '';
+                    sectorOptions += '<option value="' + s.id + '"' + sel + '>' + (s.name || '') + '</option>';
                 });
 
                 return `
@@ -2883,16 +2976,26 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="border-bottom mb-3"></div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input job-current-job-cb" type="checkbox" name="job_current_job_${jobNum}" id="job_current_job_${jobNum}" value="1" ${isCurrentJob ? 'checked' : ''}>
+                            <label class="form-check-label pl-3 f-14" for="job_current_job_${jobNum}">Current job</label>
+                        </div>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_duration_from_${jobNum}" fieldLabel="Duration - From">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="job_duration_from_${jobNum}" id="job_duration_from_${jobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}" value="${durationFrom}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3 job-duration-to-col" id="job_duration_to_col_${jobNum}" data-job-num="${jobNum}" style="${isCurrentJob ? 'display:none' : ''}">
                                 <x-forms.label class="mt-3" fieldId="job_duration_to_${jobNum}" fieldLabel="Duration - To">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="job_duration_to_${jobNum}" id="job_duration_to_${jobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}" value="${durationTo}">
+                            </div>
+                            <div class="col-md-3 job-experience-col" id="job_experience_col_${jobNum}" data-job-num="${jobNum}" style="${isCurrentJob ? 'display:none' : ''}">
+                                <x-forms.label class="mt-3" fieldId="job_experience_${jobNum}" fieldLabel="Job Experience">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14 bg-light" name="job_experience_${jobNum}" id="job_experience_${jobNum}" readonly placeholder="Auto calculated">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_country_${jobNum}" fieldLabel="Country">
@@ -2902,14 +3005,37 @@
                                 </select>
                             </div>
                             <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_employment_type_${jobNum}" fieldLabel="Employment Type">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="job_employment_type_${jobNum}" id="job_employment_type_${jobNum}">
+                                    ${employmentTypeSelect}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_designation_${jobNum}" fieldLabel="Designation">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_designation_${jobNum}" id="job_designation_${jobNum}" value="${designation}">
+                                <select class="form-control height-35 f-14 job-designation-select" name="job_designation_${jobNum}" id="job_designation_${jobNum}">
+                                    ${designationSelect}
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_company_name_${jobNum}" fieldLabel="Company Name">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="job_company_name_${jobNum}" id="job_company_name_${jobNum}" value="${companyName}">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_industry_${jobNum}" fieldLabel="Industry">
+                                </x-forms.label>
+                                <select class="form-control height-35 f-14 job-industry-select" name="job_industry_${jobNum}" id="job_industry_${jobNum}">
+                                    ${industryOptions}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_sector_${jobNum}" fieldLabel="Sector">
+                                </x-forms.label>
+                                <select class="form-control height-35 f-14 job-sector-select" name="job_sector_${jobNum}" id="job_sector_${jobNum}">
+                                    ${sectorOptions}
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_salary_${jobNum}" fieldLabel="Salary">
@@ -2932,6 +3058,76 @@
                 // Init Select2 for job country
                 const jobCountrySel = '#job_country_' + jobNum;
                 initSelect2IfNeeded(jobCountrySel, '@lang("app.select") Country');
+
+                // Init Select2 for job industry & sector (binding like PR Preferred Country -> Preferred State)
+                initSelect2IfNeeded('#job_industry_' + jobNum, '@lang("app.select") @lang("app.menu.industry")');
+                initSelect2IfNeeded('#job_sector_' + jobNum, '@lang("app.select") @lang("app.menu.sector")');
+
+                // When industry changes: show all sectors if no industry, or only that industry's sectors
+                $('#job_industry_' + jobNum).off('change.jobIndustry').on('change.jobIndustry', function() {
+                    filterSectorsByIndustry(jobNum);
+                });
+
+                // Current job checkbox: only one job can be current; when checked, uncheck all other rows
+                $('#job_current_job_' + jobNum).off('change.currentJob').on('change.currentJob', function() {
+                    const isChecked = $(this).is(':checked');
+                    if (isChecked) {
+                        $('.job-row').each(function() {
+                            const otherNum = $(this).data('job-index');
+                            if (otherNum != null && String(otherNum) !== String(jobNum)) {
+                                $('#job_current_job_' + otherNum).prop('checked', false);
+                                $('#job_duration_to_col_' + otherNum).show();
+                                $('#job_experience_col_' + otherNum).show();
+                                updateJobExperience(otherNum);
+                            }
+                        });
+                    }
+                    $('#job_duration_to_col_' + jobNum).toggle(!isChecked);
+                    $('#job_experience_col_' + jobNum).toggle(!isChecked);
+                    if (isChecked) {
+                        $('#job_duration_to_' + jobNum).val('');
+                        $('#job_experience_' + jobNum).val('');
+                    }
+                    updateJobExperience(jobNum);
+                });
+
+                // Job Experience auto-calc: recompute when Duration From or Duration To changes
+                $('#job_duration_from_' + jobNum).off('change.jobExp input.jobExp').on('change.jobExp input.jobExp', function() { updateJobExperience(jobNum); });
+                $('#job_duration_to_' + jobNum).off('change.jobExp input.jobExp').on('change.jobExp input.jobExp', function() { updateJobExperience(jobNum); });
+                updateJobExperience(jobNum);
+
+                // If editing: industry may be set; filter sector list to that industry then set sector
+                if (jobData && (jobData.job_industry || jobData.job_sector)) {
+                    filterSectorsByIndustry(jobNum);
+                    if (jobData.job_sector) {
+                        setSelectBySavedText($('#job_sector_' + jobNum), jobData.job_sector);
+                    }
+                }
+
+                // Init Select2 for job designation (same design as country; tags:true allows custom text)
+                const jobDesignationSel = '#job_designation_' + jobNum;
+                if ($(jobDesignationSel).length && !$(jobDesignationSel).hasClass('select2-hidden-accessible')) {
+                    $(jobDesignationSel).select2({
+                        placeholder: 'Select or type custom',
+                        allowClear: false,
+                        width: '100%',
+                        tags: true
+                    });
+                }
+                if (jobData && jobData.job_designation) {
+                    $(jobDesignationSel).val(jobData.job_designation).trigger('change');
+                }
+
+                // Init select-picker for job employment type (same design as IELTS/PTE/OET/TOEFL exam dropdowns – no search)
+                const $jobRow = $('#job-row-' + jobNum);
+                $jobRow.find('.select-picker').each(function() {
+                    if (!$(this).data('selectpicker')) {
+                        $(this).selectpicker();
+                    }
+                });
+                if (jobData && jobData.job_employment_type) {
+                    $('#job_employment_type_' + jobNum).val(jobData.job_employment_type).selectpicker('refresh');
+                }
 
                 // If editing existing job data (saved as text), set country
                 if (jobData && jobData.job_country) {
@@ -4007,6 +4203,15 @@
                         // Special handling for Step 7 - jobs data
                         if (stepNum === 7 && stepDataObj.jobs && Array.isArray(stepDataObj.jobs)) {
                             const jobs = stepDataObj.jobs;
+                            // Ensure only one job is current when loading (first one with job_current_job wins)
+                            let currentJobAssigned = false;
+                            jobs.forEach(function(job) {
+                                if (job.job_current_job && currentJobAssigned) {
+                                    job.job_current_job = 0;
+                                } else if (job.job_current_job) {
+                                    currentJobAssigned = true;
+                                }
+                            });
                             // Clear any existing jobs
                             $('#job-rows-container').empty();
                             jobCounter = 0;
@@ -4658,25 +4863,45 @@
                         const jobIndex = $(this).data('job-index');
                         const durationFrom = $('#job_duration_from_' + jobIndex).val() || '';
                         const durationTo = $('#job_duration_to_' + jobIndex).val() || '';
+                        const jobExperience = $('#job_experience_' + jobIndex).val() || '';
                         let country = $('#job_country_' + jobIndex).val() || '';
+                        const employmentType = $('#job_employment_type_' + jobIndex).val() || '';
                         const designation = $('#job_designation_' + jobIndex).val() || '';
                         const companyName = $('#job_company_name_' + jobIndex).val() || '';
+                        let jobIndustry = $('#job_industry_' + jobIndex).val() || '';
+                        let jobSector = $('#job_sector_' + jobIndex).val() || '';
                         const salary = $('#job_salary_' + jobIndex).val() || '';
+                        const jobCurrentJob = $('#job_current_job_' + jobIndex).is(':checked') ? 1 : 0;
 
                         // Resolve country id to name
                         if (country && !isNaN(country)) {
                             const cObj = countryMasters.find(function (c) { return c.id == country; });
                             if (cObj) country = cObj.name;
                         }
+                        // Resolve industry id to name
+                        if (jobIndustry && !isNaN(jobIndustry)) {
+                            const iObj = industryMasters.find(function (i) { return i.id == jobIndustry; });
+                            if (iObj) jobIndustry = iObj.name;
+                        }
+                        // Resolve sector id to name (use selected option text)
+                        if (jobSector) {
+                            const $sec = $('#job_sector_' + jobIndex).find('option:selected');
+                            if ($sec.length && $sec.text()) jobSector = $sec.text().trim();
+                        }
                         
                         // Only add job if at least one field has a value
-                        if (durationFrom || durationTo || country || designation || companyName || salary) {
+                        if (durationFrom || durationTo || country || employmentType || designation || companyName || jobIndustry || jobSector || salary) {
                             const jobData = {
                                 job_duration_from: durationFrom,
-                                job_duration_to: durationTo,
+                                job_duration_to: jobCurrentJob ? '' : durationTo,
+                                job_current_job: jobCurrentJob,
+                                job_experience: jobExperience,
                                 job_country: country,
+                                job_employment_type: employmentType,
                                 job_designation: designation,
                                 job_company_name: companyName,
+                                job_industry: jobIndustry,
+                                job_sector: jobSector,
                                 job_salary: salary
                             };
                             jobs.push(jobData);

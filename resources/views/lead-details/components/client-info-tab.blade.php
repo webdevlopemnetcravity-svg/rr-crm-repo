@@ -1013,11 +1013,19 @@
                                         </div>
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Duration - To</div>
-                                            <div class="info-field-value-text">{{ $formatDate($job['job_duration_to'] ?? null) }}</div>
+                                            <div class="info-field-value-text">{{ !empty($job['job_current_job']) ? 'Present' : $formatDate($job['job_duration_to'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Job Experience</div>
+                                            <div class="info-field-value-text">{{ $getValue($job['job_experience'] ?? null) }}</div>
                                         </div>
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Country</div>
                                             <div class="info-field-value-text">{{ $getValue($job['job_country'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Employment Type</div>
+                                            <div class="info-field-value-text">{{ $getValue($job['job_employment_type'] ?? null) }}</div>
                                         </div>
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Designation</div>
@@ -1025,9 +1033,17 @@
                                         </div>
                                     </div>
                                     <div class="info-grid-row row">
-                                        <div class="info-field-item col-md-6 mb-3">
+                                        <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Company Name</div>
                                             <div class="info-field-value-text">{{ $getValue($job['job_company_name'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Industry</div>
+                                            <div class="info-field-value-text">{{ $getValue($job['job_industry'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Sector</div>
+                                            <div class="info-field-value-text">{{ $getValue($job['job_sector'] ?? null) }}</div>
                                         </div>
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Salary</div>

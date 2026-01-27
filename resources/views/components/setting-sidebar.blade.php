@@ -160,6 +160,11 @@
         @endif
 
         @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="industry_settings" :href="route('industry-settings.index')"
+                                 :text="__('app.menu.industrySettings')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
             <x-setting-menu-item :active="$activeMenu" menu="lead_document_settings" :href="route('lead-document-settings.index')"
                                  :text="__('app.menu.leadDocumentSettings')"/>
         @endif

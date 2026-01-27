@@ -26,6 +26,9 @@ use App\Http\Controllers\CityMasterController;
 use App\Http\Controllers\VisaTypeSettingController;
 use App\Http\Controllers\VisaTypeController;
 use App\Http\Controllers\SubclassController;
+use App\Http\Controllers\IndustrySettingController;
+use App\Http\Controllers\IndustryController;
+use App\Http\Controllers\SectorController;
 use App\Http\Controllers\LeadDocumentSettingController;
 use App\Http\Controllers\MainDocumentController;
 use App\Http\Controllers\DependsDocumentController;
@@ -260,6 +263,11 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     Route::get('visa-type-settings', [VisaTypeSettingController::class, 'index'])->name('visa-type-settings.index');
     Route::resource('visaTypes', VisaTypeController::class);
     Route::resource('subclasses', SubclassController::class);
+
+    /* Industry Master (Industry + Sector) */
+    Route::get('industry-settings', [IndustrySettingController::class, 'index'])->name('industry-settings.index');
+    Route::resource('industries', IndustryController::class);
+    Route::resource('sectors', SectorController::class);
 
     /* Lead Document Settings */
     Route::get('lead-document-settings', [LeadDocumentSettingController::class, 'index'])->name('lead-document-settings.index');

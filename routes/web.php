@@ -542,6 +542,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::get('add-lead/get-states/{countryId}', [LeadContactController::class, 'getStatesByCountry'])->name('add-lead.get-states');
     Route::get('add-lead/get-cities/{stateId}', [LeadContactController::class, 'getCitiesByState'])->name('add-lead.get-cities');
     Route::get('add-lead/get-cities-by-country/{countryId}', [LeadContactController::class, 'getCitiesByCountry'])->name('add-lead.get-cities-by-country');
+    Route::get('add-lead/get-sectors-by-industry/{industryId}', [LeadContactController::class, 'getSectorsByIndustry'])->name('add-lead.get-sectors-by-industry');
     Route::delete('new-leads/{id}', [LeadContactController::class, 'destroyNewLead'])->name('new-leads.destroy');
     Route::post('new-leads/apply-quick-action', [LeadContactController::class, 'applyQuickActionNewLeads'])->name('new-leads.apply_quick_action');
     Route::post('new-leads/update-priority', [LeadContactController::class, 'updateLeadPriority'])->name('new-leads.update_priority');

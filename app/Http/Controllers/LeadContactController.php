@@ -36,6 +36,8 @@ use App\Models\NewLanguageMaster;
 use App\Models\NewCountryMaster;
 use App\Models\NewStateMaster;
 use App\Models\NewCityMaster;
+use App\Models\NewIndustryMaster;
+use App\Models\NewSectorMaster;
 use App\Models\NewGoogleToken;
 use App\Models\SocialAuthSetting;
 use App\Services\Google;
@@ -319,6 +321,18 @@ class LeadContactController extends AccountBaseController
                 ->orWhereNull('company_id');
         })->orderBy('name')->get();
 
+        // Load industry master (for Professional Experience Industry/Sector)
+        $this->industryMasters = NewIndustryMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load all sectors with industry_id (show all first; filter by industry when industry selected)
+        $this->sectorsMaster = NewSectorMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
         // Load lead data if editing
         $this->newLead = null;
         $this->newLeadStepStatus = null;
@@ -429,6 +443,27 @@ class LeadContactController extends AccountBaseController
         }
 
         return Reply::dataOnly(['status' => 'success', 'options' => $options, 'cities' => $cities]);
+    }
+
+    /**
+     * Get sectors by industry (for Professional Experience Industry/Sector binding)
+     */
+    public function getSectorsByIndustry($industryId)
+    {
+        $sectors = NewSectorMaster::where('industry_id', $industryId)
+            ->where(function ($query) {
+                $query->where('company_id', company()->id)
+                    ->orWhereNull('company_id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $options = '<option value="">' . __('app.select') . '</option>';
+        foreach ($sectors as $sector) {
+            $options .= '<option value="' . $sector->id . '">' . htmlspecialchars($sector->name, ENT_QUOTES, 'UTF-8') . '</option>';
+        }
+
+        return Reply::dataOnly(['status' => 'success', 'options' => $options, 'sectors' => $sectors]);
     }
 
     public function leadDetails($id = null)
@@ -3644,7 +3679,7 @@ class LeadContactController extends AccountBaseController
             
             // If no jobs from JSON, try old format (backward compatibility)
             if (empty($jobData)) {
-                $jobFields = ['job_duration_from', 'job_duration_to', 'job_country', 'job_designation', 'job_company_name', 'job_salary'];
+                $jobFields = ['job_duration_from', 'job_duration_to', 'job_current_job', 'job_experience', 'job_country', 'job_employment_type', 'job_designation', 'job_company_name', 'job_industry', 'job_sector', 'job_salary'];
                 
                 // Get Job 1 data (single values)
                 $job1Data = [];
@@ -3697,7 +3732,7 @@ class LeadContactController extends AccountBaseController
             $stepData['jobs'] = $jobData;
             
             // Remove individual job fields from stepData (they're now in jobs array)
-            $jobFields = ['job_duration_from', 'job_duration_to', 'job_country', 'job_designation', 'job_company_name', 'job_salary'];
+            $jobFields = ['job_duration_from', 'job_duration_to', 'job_current_job', 'job_experience', 'job_country', 'job_employment_type', 'job_designation', 'job_company_name', 'job_industry', 'job_sector', 'job_salary'];
             foreach ($jobFields as $field) {
                 unset($stepData[$field]);
             }
