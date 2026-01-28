@@ -669,7 +669,48 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="passport_number" fieldLabel="Passport Number">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="passport_number" id="passport_number">
+                                <input type="text" class="form-control height-35 f-14" name="passport_number" id="passport_number" minlength="8" maxlength="9" pattern="[A-Za-z0-9]{8,9}" placeholder="letters and numbers only" autocomplete="off">
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="passport_type" fieldLabel="Passport Type">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="passport_type" id="passport_type">
+                                    <option value="Ordinary Passport" selected>Ordinary Passport</option>
+                                    <option value="Official Passport">Official Passport</option>
+                                    <option value="Diplomatic Passport">Diplomatic Passport</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="passport_category" fieldLabel="Passport Category">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="passport_category" id="passport_category">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Non-ECR">Non-ECR</option>
+                                    <option value="ECR">ECR</option>
+                                </select>
+                                <div id="passport-category-message" class="mt-1 f-12" style="min-height: 1.4em;" aria-live="polite"></div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="place_of_issue" fieldLabel="Place of Issue">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="place_of_issue" id="place_of_issue">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Passport Office">Passport Office</option>
+                                    <option value="Passport Seva Kendra (PSK)">Passport Seva Kendra (PSK)</option>
+                                    <option value="Regional Passport Office (RPO)">Regional Passport Office (RPO)</option>
+                                    <option value="Indian Mission Abroad">Indian Mission Abroad</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="passport_verification_status" fieldLabel="Verification Status">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="passport_verification_status" id="passport_verification_status">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Not Verified">Not Verified</option>
+                                    <option value="Verified – Original Seen">Verified – Original Seen</option>
+                                    <option value="Verified – Copy Only">Verified – Copy Only</option>
+                                    <option value="Mismatch Found">Mismatch Found</option>
+                                </select>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="issuing_country" fieldLabel="Issuing Country">
@@ -677,7 +718,7 @@
                                 <select class="form-control height-35 f-14 country-master-select" name="issuing_country" id="issuing_country">
                                     <option value="">@lang('app.select')</option>
                                     @foreach($countryMasters ?? [] as $country)
-                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                        <option value="{{ $country->id }}" {{ strtolower($country->name ?? '') === 'india' ? 'selected' : '' }}>{{ $country->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -697,6 +738,7 @@
                                 <x-forms.label class="mt-3" fieldId="expiration_date" fieldLabel="Expiration Date">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="expiration_date" id="expiration_date">
+                                <div id="passport-validity-warning" class="mt-1 f-12" style="min-height: 1.4em;" aria-live="polite"></div>
                                 <script>
                                     $(document).ready(function() {
                                         $('#issuance_date').on('change', function() {
@@ -704,11 +746,77 @@
                                             if (issuanceDate) {
                                                 $('#expiration_date').attr('min', issuanceDate);
                                             }
+                                            updatePassportValidityWarning();
                                         });
+                                        $('#expiration_date').on('change', function() { updatePassportValidityWarning(); });
+                                        function updatePassportValidityWarning() {
+                                            var $msg = $('#passport-validity-warning');
+                                            var expVal = ($('#expiration_date').val() || '').trim();
+                                            if (!expVal) {
+                                                $msg.removeClass('text-danger text-warning').html('');
+                                                return;
+                                            }
+                                            var today = new Date();
+                                            today.setHours(0, 0, 0, 0);
+                                            var exp = new Date(expVal);
+                                            exp.setHours(0, 0, 0, 0);
+                                            var diffMs = exp - today;
+                                            var monthsRemaining = diffMs / (1000 * 60 * 60 * 24 * 30.44);
+                                            $msg.removeClass('text-danger text-warning');
+                                            if (monthsRemaining < 0) {
+                                                $msg.addClass('text-danger').html('<span class="font-weight-semibold">&lt; 6 months validity (Australia risk)</span>');
+                                            } else if (monthsRemaining < 6) {
+                                                $msg.addClass('text-danger').html('<span class="font-weight-semibold">&lt; 6 months validity (Australia risk)</span>');
+                                            } else if (monthsRemaining < 12) {
+                                                $msg.addClass('text-warning').html('<span class="font-weight-semibold">&lt; 12 months validity (Warning)</span>');
+                                            } else {
+                                                $msg.html('');
+                                            }
+                                        }
+                                        // Run once on load if expiration already has a value (e.g. restored from saved data)
+                                        $(function() { updatePassportValidityWarning(); });
                                     });
                                 </script>
                             </div>
                             <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="last_passport_history" fieldLabel="Last Passport History">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="last_passport_history" id="last_passport_history">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="No Previous Passport">No Previous Passport</option>
+                                    <option value="Old Passport Expired">Old Passport Expired</option>
+                                    <option value="Old Passport Cancelled">Old Passport Cancelled</option>
+                                    <option value="Passport Lost">Passport Lost</option>
+                                    <option value="Passport Damaged">Passport Damaged</option>
+                                    <option value="Passport Reissued">Passport Reissued</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 old-passport-dependent-col">
+                                <x-forms.label class="mt-3" fieldId="old_passport_number" fieldLabel="Old Passport Number">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="old_passport_number" id="old_passport_number" minlength="8" maxlength="9" pattern="[A-Za-z0-9]{8,9}" placeholder="letters and numbers only" autocomplete="off">
+                            </div>
+                            <div class="col-md-3 old-passport-dependent-col">
+                                <x-forms.label class="mt-3" fieldId="old_passport_issue_year" fieldLabel="Old Passport Issue Year">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="old_passport_issue_year" id="old_passport_issue_year">
+                                    <option value="">@lang('app.select')</option>
+                                    @for($y = (int)date('Y'); $y >= 1950; $y--)
+                                        <option value="{{ $y }}">{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="passport_status" fieldLabel="Passport Status">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="passport_status" id="passport_status">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Expired">Expired</option>
+                                    <option value="Lost">Lost</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="Reissued">Reissued</option>
+                                </select>
                             </div>
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3" fieldId="lost_passport_history" fieldLabel="Lost Passport History">
@@ -1542,11 +1650,23 @@
                 }
             }
 
+            function initSelect2NoSearch(selector, placeholderText) {
+                if ($(selector).length && !$(selector).hasClass('select2-hidden-accessible')) {
+                    $(selector).select2({
+                        placeholder: placeholderText,
+                        allowClear: false,
+                        width: '100%',
+                        minimumResultsForSearch: Infinity
+                    });
+                }
+            }
+
             initSelect2IfNeeded('#country_of_origin', '@lang("app.select") @lang("app.countryOfOrigin")');
             initSelect2IfNeeded('#home_state', '@lang("app.select") @lang("app.state")');
             initSelect2IfNeeded('#home_city', '@lang("app.select") @lang("app.city")');
             initSelect2IfNeeded('#mailing_state', '@lang("app.select") @lang("app.state")');
             initSelect2IfNeeded('#mailing_city', '@lang("app.select") @lang("app.city")');
+            // Passport dropdowns without search (passport_type, passport_category, place_of_issue, last_passport_history, old_passport_issue_year) use select-picker — same as Education Passing Year — inited via initializeSelectPickers()
             initSelect2IfNeeded('#issuing_country', '@lang("app.select") Issuing Country');
             initSelect2IfNeeded('#city_where_issued', '@lang("app.select") City Where Issued');
             initSelect2IfNeeded('#spouse_country', '@lang("app.select") Spouse\'s Country');
@@ -1706,10 +1826,71 @@
                 loadStates(countryId);
             });
 
-            // Issuing country change -> reload City Where Issued (cities in that country)
+            // Issuing country change -> reload City Where Issued (cities in that country only)
             $('#issuing_country').on('change', function () {
                 loadCitiesByCountry($(this).val(), $('#city_where_issued'));
             });
+            // On load: if Issuing Country already has a value (e.g. India), load its cities into City Where Issued
+            var initialIssuingCountry = $('#issuing_country').val();
+            if (initialIssuingCountry) {
+                loadCitiesByCountry(initialIssuingCountry, $('#city_where_issued'));
+            }
+
+            // Passport Category: Non-ECR -> green tag, ECR -> red warning under field
+            function updatePassportCategoryMessage() {
+                var $msg = $('#passport-category-message');
+                var val = ($('#passport_category').val() || '').trim();
+                $msg.removeClass('text-danger text-success').html('');
+                if (val === 'Non-ECR') {
+                    $msg.addClass('text-success').html('<span class="badge badge-success" style="background-color:#28a745;color:#fff;">Non-ECR</span>');
+                } else if (val === 'ECR') {
+                    $msg.addClass('text-danger').html('<span class="font-weight-semibold">ECR passport – additional clearance may be required</span>');
+                }
+            }
+            $(document).on('change', '#passport_category', updatePassportCategoryMessage);
+            updatePassportCategoryMessage();
+
+            // Last Passport History: when "No Previous Passport" hide Old Passport Number & Old Passport Issue Year; otherwise show
+            function toggleOldPassportFields() {
+                var val = ($('#last_passport_history').val() || '').trim();
+                if (val === 'No Previous Passport') {
+                    $('.old-passport-dependent-col').hide();
+                    $('#old_passport_number').val('');
+                    var $yr = $('#old_passport_issue_year');
+                    $yr.val(null);
+                    if ($yr.data('selectpicker')) {
+                        $yr.selectpicker('refresh');
+                    }
+                    $yr.trigger('change');
+                } else {
+                    $('.old-passport-dependent-col').show();
+                }
+            }
+            $(document).on('change', '#last_passport_history', toggleOldPassportFields);
+            toggleOldPassportFields();
+
+            // Passport Status: if expiration date is before today, auto-select "Expired"
+            function syncPassportStatusFromExpiry() {
+                var $st = $('#passport_status');
+                if (!$st.length) return;
+                var expVal = ($('#expiration_date').val() || '').trim();
+                if (!expVal) return;
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
+                var exp = new Date(expVal);
+                exp.setHours(0, 0, 0, 0);
+                if (exp < today) {
+                    $st.val('Expired');
+                } else {
+                    // Future date or today: do not auto-select any option
+                    $st.val('');
+                }
+                if ($st.data('selectpicker')) {
+                    $st.selectpicker('refresh');
+                }
+            }
+            $(document).on('change', '#expiration_date', syncPassportStatusFromExpiry);
+            syncPassportStatusFromExpiry();
 
             // Spouse country change -> reload spouse states/cities
             $('#spouse_country').on('change', function () {
@@ -3246,6 +3427,25 @@
                 $('#total_income').val(total);
             });
             
+            // Restrict passport number to alphanumeric only (no special characters)
+            $(document).on('input', '#passport_number', function() {
+                var $el = $(this);
+                var val = $el.val();
+                var filtered = val.replace(/[^A-Za-z0-9]/g, '');
+                if (val !== filtered) {
+                    $el.val(filtered);
+                }
+            });
+            // Restrict old passport number to alphanumeric only (min 8, max 9, no special characters)
+            $(document).on('input', '#old_passport_number', function() {
+                var $el = $(this);
+                var val = $el.val();
+                var filtered = val.replace(/[^A-Za-z0-9]/g, '');
+                if (val !== filtered) {
+                    $el.val(filtered);
+                }
+            });
+            
             // Handle Father Have Passport - show/hide passport file field
             $('#father_have_passport').on('changed.bs.select', function() {
                 const havePassport = $(this).val();
@@ -4298,6 +4498,19 @@
                     }
                 }
                 
+                // Update passport validity warning when step 3 data was populated (e.g. expiration_date)
+                if ($('#expiration_date').length && $('#expiration_date').val()) {
+                    $('#expiration_date').trigger('change');
+                }
+                // Update passport category message (Non-ECR green tag / ECR red warning) when step 3 data was populated
+                if ($('#passport_category').length) {
+                    $('#passport_category').trigger('change');
+                }
+                // Update Last Passport History visibility (hide Old Passport Number/Year when "No Previous Passport")
+                if ($('#last_passport_history').length) {
+                    $('#last_passport_history').trigger('change');
+                }
+                
                 // Update tab navigation after form fields are populated
                 // Use a delay to ensure all selectpickers are refreshed
                 setTimeout(function() {
@@ -4663,13 +4876,34 @@
                         
                     case 3:
                         // Step 3 - Passport Details
-                        // All passport fields are optional - no validation required
+                        // Passport number: if provided, min 8, max 9, alphanumeric only
+                        const passportNumber = ($('#passport_number').val() || '').trim().toUpperCase();
+                        if (passportNumber) {
+                            if (passportNumber.length < 8 || passportNumber.length > 9) {
+                                isValid = false;
+                                showFieldError('#passport_number', 'Passport Number must be 8 to 9 characters');
+                            } else if (!/^[A-Za-z0-9]+$/.test(passportNumber)) {
+                                isValid = false;
+                                showFieldError('#passport_number', 'Passport Number must contain only letters and numbers');
+                            }
+                        }
                         // Only validate date logic if both dates are provided
                         const issuanceDate = $('#issuance_date').val();
                         const expirationDate = $('#expiration_date').val();
                         if (issuanceDate && expirationDate && expirationDate <= issuanceDate) {
                             isValid = false;
                             showFieldError('#expiration_date', 'Expiration Date must be greater than Issuance Date');
+                        }
+                        // Old passport number: if provided, min 8, max 9, alphanumeric only
+                        const oldPassportNumber = ($('#old_passport_number').val() || '').trim();
+                        if (oldPassportNumber) {
+                            if (oldPassportNumber.length < 8 || oldPassportNumber.length > 9) {
+                                isValid = false;
+                                showFieldError('#old_passport_number', 'Old Passport Number must be 8 to 9 characters');
+                            } else if (!/^[A-Za-z0-9]+$/.test(oldPassportNumber)) {
+                                isValid = false;
+                                showFieldError('#old_passport_number', 'Old Passport Number must contain only letters and numbers');
+                            }
                         }
                         break;
                         

@@ -2251,17 +2251,31 @@ class LeadContactController extends AccountBaseController
 
             case 3:
                 // Step 3 - Passport Details
-                // All passport fields are optional
+                // Passport number: optional, but if provided min 8, max 9, alphanumeric only; duplicate not allowed globally
                 $rules = [
-                    'passport_number' => 'nullable|string|max:255',
+                    'passport_number' => 'nullable|string|min:8|max:9|regex:/^[A-Za-z0-9]+$/',
+                    'passport_type' => 'nullable|string|in:Ordinary Passport,Official Passport,Diplomatic Passport',
+                    'passport_category' => 'nullable|string|in:Non-ECR,ECR',
+                    'place_of_issue' => 'nullable|string|in:Passport Office,Passport Seva Kendra (PSK),Regional Passport Office (RPO),Indian Mission Abroad',
+                    'passport_verification_status' => 'nullable|string|in:Not Verified,Verified – Original Seen,Verified – Copy Only,Mismatch Found',
                     'issuing_country' => 'nullable|string|max:255',
                     'city_where_issued' => 'nullable|string|max:255',
                     'issuance_date' => 'nullable|date',
                     'expiration_date' => 'nullable|date',
+                    'last_passport_history' => 'nullable|string|in:No Previous Passport,Old Passport Expired,Old Passport Cancelled,Passport Lost,Passport Damaged,Passport Reissued',
+                    'old_passport_number' => 'nullable|string|min:8|max:9|regex:/^[A-Za-z0-9]+$/',
+                    'old_passport_issue_year' => 'nullable|integer|min:1950|max:' . (int)date('Y'),
+                    'passport_status' => 'nullable|string|in:Active,Expired,Lost,Cancelled,Reissued',
                     'passport_file_upload' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
                 ];
-                
-                // Validate expiration_date is after issuance_date only if both are provided
+                $messages = [
+                    'passport_number.min' => 'Passport Number must be at least 8 characters.',
+                    'passport_number.max' => 'Passport Number must not exceed 9 characters.',
+                    'passport_number.regex' => 'Passport Number must contain only letters and numbers (alphanumeric).',
+                    'old_passport_number.min' => 'Old Passport Number must be at least 8 characters.',
+                    'old_passport_number.max' => 'Old Passport Number must not exceed 9 characters.',
+                    'old_passport_number.regex' => 'Old Passport Number must contain only letters and numbers (alphanumeric).',
+                ];
                 if ($request->issuance_date && $request->expiration_date) {
                     $rules['expiration_date'] = 'nullable|date|after:issuance_date';
                 }
@@ -2393,6 +2407,31 @@ class LeadContactController extends AccountBaseController
 
             $leadId = $request->lead_id;
             $isNewLead = false;
+
+            // Global duplicate passport check (step 3)
+            if ($stepNumber == 3 && $request->filled('passport_number')) {
+                $pn = trim((string) $request->passport_number);
+                if ($pn !== '') {
+                    $normalized = strtoupper($pn);
+                    $existsInLeads = NewLead::where('company_id', company()->id)
+                        ->when($leadId, fn($q) => $q->where('id', '!=', $leadId))
+                        ->whereNotNull('step_3_data')
+                        ->whereRaw("UPPER(TRIM(JSON_UNQUOTE(JSON_EXTRACT(step_3_data, '$.passport_number')))) = ?", [$normalized])
+                        ->exists();
+                    if ($existsInLeads) {
+                        return Reply::error('This passport number is already used by another lead. Duplicate passport numbers are not allowed.');
+                    }
+                    $existsInProcess = NewLeadProcess::whereHas('newLead', function ($q) use ($leadId) {
+                        $q->where('company_id', company()->id);
+                        if ($leadId) {
+                            $q->where('id', '!=', $leadId);
+                        }
+                    })->whereRaw('UPPER(TRIM(COALESCE(passport_number, ""))) = ?', [$normalized])->exists();
+                    if ($existsInProcess) {
+                        return Reply::error('This passport number is already used by another lead. Duplicate passport numbers are not allowed.');
+                    }
+                }
+            }
 
             // Check for duplicate leads (only for step 1 and new leads)
             if ($stepNumber == 1 && !$leadId) {
@@ -2595,10 +2634,18 @@ class LeadContactController extends AccountBaseController
             3 => [
                 // Step 3 - Passport Details
                 'passport_number',
+                'passport_type',
+                'passport_category',
+                'place_of_issue',
+                'passport_verification_status',
                 'issuing_country',
                 'city_where_issued',
                 'issuance_date',
                 'expiration_date',
+                'last_passport_history',
+                'old_passport_number',
+                'old_passport_issue_year',
+                'passport_status',
                 'lost_passport_history',
                 'passport_file_upload',
             ],
