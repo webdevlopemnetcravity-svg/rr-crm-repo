@@ -818,8 +818,8 @@
                                     <option value="Reissued">Reissued</option>
                                 </select>
                             </div>
-                            <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="lost_passport_history" fieldLabel="Lost Passport History">
+                            <div class="col-md-12 old-passport-dependent-col">
+                                <x-forms.label class="mt-3" fieldId="lost_passport_history" fieldLabel="Reason">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="3" name="lost_passport_history" id="lost_passport_history"></textarea>
                             </div>
@@ -1862,6 +1862,7 @@
                         $yr.selectpicker('refresh');
                     }
                     $yr.trigger('change');
+                    $('#lost_passport_history').val('');
                 } else {
                     $('.old-passport-dependent-col').show();
                 }

@@ -594,12 +594,14 @@
                                     <div class="info-field-value-text">{{ $getValue($step3Data['passport_status'] ?? null) }}</div>
                                 </div>
                             </div>
+                            @if(($step3Data['last_passport_history'] ?? '') !== 'No Previous Passport')
                             <div class="info-grid-row row">
                                 <div class="info-field-item col-md-12 mb-3">
-                                    <div class="info-field-label-text">Lost Passport History</div>
+                                    <div class="info-field-label-text">Reason</div>
                                     <div class="info-field-value-text">{{ $getValue($step3Data['lost_passport_history'] ?? null) }}</div>
                                 </div>
                             </div>
+                            @endif
                         </div>
 
                         <!-- Relative Contact Information Section -->
