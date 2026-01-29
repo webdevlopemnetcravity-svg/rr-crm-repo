@@ -40,6 +40,8 @@ use App\Models\NewCountryMaster;
 use App\Models\NewStateMaster;
 use App\Models\NewCityMaster;
 use App\Models\NewIndustryMaster;
+use App\Models\NewOrganizationTypesMaster;
+use App\Models\NewRelationshipsMaster;
 use App\Models\NewSectorMaster;
 use App\Models\NewGoogleToken;
 use App\Models\SocialAuthSetting;
@@ -344,6 +346,18 @@ class LeadContactController extends AccountBaseController
 
         // Load industry master (for Professional Experience Industry/Sector)
         $this->industryMasters = NewIndustryMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load organization types master (for Relative Contact Organization Name)
+        $this->organizationTypes = NewOrganizationTypesMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load relationships master (for Relative Contact Relationship To You)
+        $this->relationshipsMaster = NewRelationshipsMaster::where(function ($query) {
             $query->where('company_id', company()->id)
                 ->orWhereNull('company_id');
         })->orderBy('name')->get();
@@ -2677,6 +2691,7 @@ class LeadContactController extends AccountBaseController
                 'relative_organization_name',
                 'relative_relationship',
                 'relative_contact_address',
+                'relative_country',
                 'relative_city',
                 'relative_state',
                 'relative_zip_code',
@@ -3179,7 +3194,7 @@ class LeadContactController extends AccountBaseController
             
             // If no relative contacts from JSON, try old format (backward compatibility)
             if (empty($relativeContactData)) {
-                $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
+                $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_country', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
                 
                 // Get Relative Contact 1 data (single values)
                 $relative1Data = [];
@@ -3232,7 +3247,7 @@ class LeadContactController extends AccountBaseController
             $stepData['relative_contacts'] = $relativeContactData;
             
             // Remove individual relative contact fields from stepData (they're now in relative_contacts array)
-            $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
+            $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_country', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
             foreach ($relativeFields as $field) {
                 unset($stepData[$field]);
             }
