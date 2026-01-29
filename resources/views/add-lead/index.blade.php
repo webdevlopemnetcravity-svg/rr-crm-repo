@@ -1503,27 +1503,47 @@
                     <div class="tab-pane fade" id="nav-financial" role="tabpanel" aria-labelledby="nav-financial-tab">
                         <p class="small-text mt-2 mb-3">@lang('app.enterIncomeForEachUsers')</p>
                         
-                        <!-- Income Inputs -->
+                        <!-- Income Inputs (currency symbol and validation same as Property Details) -->
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="father_income" fieldLabel="Father's Income">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 income-input" name="father_income" id="father_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 income-input" name="father_income" id="father_income" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mother_income" fieldLabel="Mother's Income">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 income-input" name="mother_income" id="mother_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 income-input" name="mother_income" id="mother_income" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="candidate_income" fieldLabel="Candidate's Income">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 income-input" name="candidate_income" id="candidate_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 income-input" name="candidate_income" id="candidate_income" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_income" fieldLabel="Spouse Income">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 income-input" name="spouse_income" id="spouse_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 income-input" name="spouse_income" id="spouse_income" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                             </div>
@@ -1536,7 +1556,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_income" fieldLabel="Total Income">
                                 </x-forms.label>
-                                <input type="number" id="total_income" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" id="total_income" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_income">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3810,6 +3835,17 @@
             syncTotalLoanValueCopy();
             updateNetWorth();
 
+            // Financial Status: block - and + from income fields; only digits and one decimal allowed (same as Property Details)
+            $(document).on('input paste change', '.income-input', function() {
+                const $el = $(this);
+                let val = ($el.val() || '').toString();
+                val = val.replace(/[^0-9.]/g, '');
+                const parts = val.split('.');
+                if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+                if (val !== $el.val()) $el.val(val);
+                const num = parseFloat(val);
+                if (val !== '' && !isNaN(num) && num < 0) $el.val(0);
+            });
             // Auto-calculate total income for Financial Status
             $('.income-input').on('input', function() {
                 let total = 0;
@@ -5460,6 +5496,21 @@
                     const tlvVal = $tlv.val();
                     if (tlvVal === '' || tlvVal === null || tlvVal === undefined) {
                         $tlv.val(0);
+                    }
+                }
+                // Step 9 (Financial Status): blank income fields auto-store as 0 (same as Tab 8)
+                if (currentStep === 9) {
+                    $('.income-input').each(function() {
+                        const $el = $(this);
+                        const val = $el.val();
+                        if (val === '' || val === null || val === undefined) {
+                            $el.val(0);
+                        }
+                    });
+                    const $ti = $('#total_income');
+                    const tiVal = $ti.val();
+                    if (tiVal === '' || tiVal === null || tiVal === undefined) {
+                        $ti.val(0);
                     }
                 }
                 
