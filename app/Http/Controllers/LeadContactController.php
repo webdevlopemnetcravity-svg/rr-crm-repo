@@ -33,6 +33,9 @@ use App\Models\NewLeadProcess;
 use App\Models\NewLeadVisaType;
 use App\Models\NewVisaCategoryMaster;
 use App\Models\NewLanguageMaster;
+use App\Models\NewPassportTypesMaster;
+use App\Models\NewPassportStatusMaster;
+use App\Models\NewPassportHistoryMaster;
 use App\Models\NewCountryMaster;
 use App\Models\NewStateMaster;
 use App\Models\NewCityMaster;
@@ -300,6 +303,24 @@ class LeadContactController extends AccountBaseController
 
         // Load languages from master (for Languages Spoken)
         $this->languages = NewLanguageMaster::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load passport types from master (for Passport Details)
+        $this->passportTypes = NewPassportTypesMaster::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load passport statuses from master (for Passport Details)
+        $this->passportStatuses = NewPassportStatusMaster::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load passport histories from master (for Passport Details)
+        $this->passportHistories = NewPassportHistoryMaster::where(function($query) {
             $query->where('company_id', company()->id)
                   ->orWhereNull('company_id');
         })->orderBy('name')->get();
@@ -2254,7 +2275,7 @@ class LeadContactController extends AccountBaseController
                 // Passport number: optional, but if provided min 8, max 9, alphanumeric only; duplicate not allowed globally
                 $rules = [
                     'passport_number' => 'nullable|string|min:8|max:9|regex:/^[A-Za-z0-9]+$/',
-                    'passport_type' => 'nullable|string|in:Ordinary Passport,Official Passport,Diplomatic Passport',
+                    'passport_type' => 'nullable|string|exists:new_passport_types_master,name',
                     'passport_category' => 'nullable|string|in:Non-ECR,ECR',
                     'place_of_issue' => 'nullable|string|in:Passport Office,Passport Seva Kendra (PSK),Regional Passport Office (RPO),Indian Mission Abroad',
                     'passport_verification_status' => 'nullable|string|in:Not Verified,Verified – Original Seen,Verified – Copy Only,Mismatch Found',
@@ -2262,10 +2283,10 @@ class LeadContactController extends AccountBaseController
                     'city_where_issued' => 'nullable|string|max:255',
                     'issuance_date' => 'nullable|date',
                     'expiration_date' => 'nullable|date',
-                    'last_passport_history' => 'nullable|string|in:No Previous Passport,Old Passport Expired,Old Passport Cancelled,Passport Lost,Passport Damaged,Passport Reissued',
+                    'last_passport_history' => 'nullable|string|exists:new_passport_history_master,name',
                     'old_passport_number' => 'nullable|string|min:8|max:9|regex:/^[A-Za-z0-9]+$/',
                     'old_passport_issue_year' => 'nullable|integer|min:1950|max:' . (int)date('Y'),
-                    'passport_status' => 'nullable|string|in:Active,Expired,Lost,Cancelled,Reissued',
+                    'passport_status' => 'nullable|string|exists:new_passport_status_master,name',
                     'passport_file_upload' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
                 ];
                 $messages = [

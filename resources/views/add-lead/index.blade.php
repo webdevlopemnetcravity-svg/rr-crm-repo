@@ -675,9 +675,10 @@
                                 <x-forms.label class="mt-3" fieldId="passport_type" fieldLabel="Passport Type">
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="passport_type" id="passport_type">
-                                    <option value="Ordinary Passport" selected>Ordinary Passport</option>
-                                    <option value="Official Passport">Official Passport</option>
-                                    <option value="Diplomatic Passport">Diplomatic Passport</option>
+                                    <option value="">@lang('app.select')</option>
+                                    @foreach($passportTypes ?? [] as $passportType)
+                                        <option value="{{ $passportType->name }}" data-passport-type-id="{{ $passportType->id }}">{{ $passportType->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -783,12 +784,9 @@
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="last_passport_history" id="last_passport_history">
                                     <option value="">@lang('app.select')</option>
-                                    <option value="No Previous Passport">No Previous Passport</option>
-                                    <option value="Old Passport Expired">Old Passport Expired</option>
-                                    <option value="Old Passport Cancelled">Old Passport Cancelled</option>
-                                    <option value="Passport Lost">Passport Lost</option>
-                                    <option value="Passport Damaged">Passport Damaged</option>
-                                    <option value="Passport Reissued">Passport Reissued</option>
+                                    @foreach($passportHistories ?? [] as $passportHistory)
+                                        <option value="{{ $passportHistory->name }}" data-passport-history-id="{{ $passportHistory->id }}">{{ $passportHistory->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-3 old-passport-dependent-col">
@@ -811,11 +809,9 @@
                                 </x-forms.label>
                                 <select class="form-control select-picker height-35 f-14" name="passport_status" id="passport_status">
                                     <option value="">@lang('app.select')</option>
-                                    <option value="Active">Active</option>
-                                    <option value="Expired">Expired</option>
-                                    <option value="Lost">Lost</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                    <option value="Reissued">Reissued</option>
+                                    @foreach($passportStatuses ?? [] as $passportStatus)
+                                        <option value="{{ $passportStatus->name }}" data-passport-status-id="{{ $passportStatus->id }}">{{ $passportStatus->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-12 old-passport-dependent-col">
@@ -1511,6 +1507,15 @@
             
             // Make languages available in JavaScript
             const languages = @json($languages ?? []);
+            
+            // Make passport types available in JavaScript
+            const passportTypes = @json($passportTypes ?? []);
+            
+            // Make passport statuses available in JavaScript
+            const passportStatuses = @json($passportStatuses ?? []);
+            
+            // Make passport histories available in JavaScript
+            const passportHistories = @json($passportHistories ?? []);
 
             // Make country/state/city masters available in JavaScript
             const countryMasters = @json($countryMasters ?? []);
@@ -1667,6 +1672,29 @@
             initSelect2IfNeeded('#mailing_state', '@lang("app.select") @lang("app.state")');
             initSelect2IfNeeded('#mailing_city', '@lang("app.select") @lang("app.city")');
             // Passport dropdowns without search (passport_type, passport_category, place_of_issue, last_passport_history, old_passport_issue_year) use select-picker — same as Education Passing Year — inited via initializeSelectPickers()
+            
+            // Set default passport type to "Ordinary Passport" (id 1) if no value is set
+            function setDefaultPassportType() {
+                const $passportType = $('#passport_type');
+                if ($passportType.length && (!$passportType.val() || $passportType.val() === '')) {
+                    // Find "Ordinary Passport" option (id 1) and select it
+                    const ordinaryPassportOption = $passportType.find('option[data-passport-type-id="1"]');
+                    if (ordinaryPassportOption.length) {
+                        $passportType.val(ordinaryPassportOption.val()).selectpicker('refresh');
+                    }
+                }
+            }
+            
+            // Set default after selectpickers are initialized (only for new forms)
+            setTimeout(function() {
+                // Only set default if we're not loading existing data (check if lead_id exists in URL)
+                const urlParams = new URLSearchParams(window.location.search);
+                const leadId = urlParams.get('lead_id');
+                if (!leadId) {
+                    setDefaultPassportType();
+                }
+            }, 500);
+            
             initSelect2IfNeeded('#issuing_country', '@lang("app.select") Issuing Country');
             initSelect2IfNeeded('#city_where_issued', '@lang("app.select") City Where Issued');
             initSelect2IfNeeded('#spouse_country', '@lang("app.select") Spouse\'s Country');
@@ -1881,7 +1909,16 @@
                 var exp = new Date(expVal);
                 exp.setHours(0, 0, 0, 0);
                 if (exp < today) {
-                    $st.val('Expired');
+                    // Find "Expired" option from master data
+                    var expiredOption = $st.find('option').filter(function() {
+                        return $(this).text().trim() === 'Expired';
+                    });
+                    if (expiredOption.length) {
+                        $st.val(expiredOption.val());
+                    } else {
+                        // Fallback: try to set by value if "Expired" exists
+                        $st.val('Expired');
+                    }
                 } else {
                     // Future date or today: do not auto-select any option
                     $st.val('');
@@ -4507,6 +4544,17 @@
                 if ($('#passport_category').length) {
                     $('#passport_category').trigger('change');
                 }
+                // Set default passport type if no value was loaded from step_3_data
+                setTimeout(function() {
+                    const $passportType = $('#passport_type');
+                    if ($passportType.length && (!$passportType.val() || $passportType.val() === '')) {
+                        // Find "Ordinary Passport" option (id 1) and select it
+                        const ordinaryPassportOption = $passportType.find('option[data-passport-type-id="1"]');
+                        if (ordinaryPassportOption.length) {
+                            $passportType.val(ordinaryPassportOption.val()).selectpicker('refresh');
+                        }
+                    }
+                }, 100);
                 // Update Last Passport History visibility (hide Old Passport Number/Year when "No Previous Passport")
                 if ($('#last_passport_history').length) {
                     $('#last_passport_history').trigger('change');

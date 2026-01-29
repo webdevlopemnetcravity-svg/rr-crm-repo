@@ -120,6 +120,21 @@
         @endif
 
         @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_passport_types_master" :href="route('new-passport-types-master.index')"
+                                 :text="__('app.menu.newPassportTypesMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_passport_status_master" :href="route('new-passport-status-master.index')"
+                                 :text="__('app.menu.newPassportStatusMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_passport_history_master" :href="route('new-passport-history-master.index')"
+                                 :text="__('app.menu.newPassportHistoryMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
             <x-setting-menu-item :active="$activeMenu" menu="new_highest_qualification_master" :href="route('new-highest-qualification-master.index')"
                                  :text="__('app.menu.newHighestQualificationMaster')"/>
         @endif

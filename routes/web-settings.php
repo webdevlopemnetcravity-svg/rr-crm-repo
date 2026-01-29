@@ -13,6 +13,9 @@ use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\LeadSettingController;
 use App\Http\Controllers\NewLeadTemplateDocumentController;
 use App\Http\Controllers\NewLanguageMasterController;
+use App\Http\Controllers\NewPassportTypesMasterController;
+use App\Http\Controllers\NewPassportStatusMasterController;
+use App\Http\Controllers\NewPassportHistoryMasterController;
 use App\Http\Controllers\NewHighestQualificationMasterController;
 use App\Http\Controllers\NewEducationLevelMasterController;
 use App\Http\Controllers\NewStreamMasterController;
@@ -234,6 +237,15 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
 
     /* Language Master */
     Route::resource('new-language-master', NewLanguageMasterController::class);
+
+    /* Passport Types Master */
+    Route::resource('new-passport-types-master', NewPassportTypesMasterController::class);
+
+    /* Passport Status Master */
+    Route::resource('new-passport-status-master', NewPassportStatusMasterController::class);
+
+    /* Passport History Master */
+    Route::resource('new-passport-history-master', NewPassportHistoryMasterController::class);
 
     /* Highest Qualification Master */
     Route::resource('new-highest-qualification-master', NewHighestQualificationMasterController::class);
