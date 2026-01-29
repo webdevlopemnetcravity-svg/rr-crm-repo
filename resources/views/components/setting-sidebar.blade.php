@@ -120,6 +120,16 @@
         @endif
 
         @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_relationships_master" :href="route('new-relationships-master.index')"
+                                 :text="__('app.menu.newRelationshipsMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_organization_types_master" :href="route('new-organization-types-master.index')"
+                                 :text="__('app.menu.newOrganizationTypesMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
             <x-setting-menu-item :active="$activeMenu" menu="new_passport_types_master" :href="route('new-passport-types-master.index')"
                                  :text="__('app.menu.newPassportTypesMaster')"/>
         @endif

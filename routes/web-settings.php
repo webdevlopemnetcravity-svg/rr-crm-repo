@@ -13,6 +13,8 @@ use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\LeadSettingController;
 use App\Http\Controllers\NewLeadTemplateDocumentController;
 use App\Http\Controllers\NewLanguageMasterController;
+use App\Http\Controllers\NewRelationshipsMasterController;
+use App\Http\Controllers\NewOrganizationTypesMasterController;
 use App\Http\Controllers\NewPassportTypesMasterController;
 use App\Http\Controllers\NewPassportStatusMasterController;
 use App\Http\Controllers\NewPassportHistoryMasterController;
@@ -237,6 +239,12 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
 
     /* Language Master */
     Route::resource('new-language-master', NewLanguageMasterController::class);
+
+    /* Relationships Master */
+    Route::resource('new-relationships-master', NewRelationshipsMasterController::class);
+
+    /* Organization Types Master */
+    Route::resource('new-organization-types-master', NewOrganizationTypesMasterController::class);
 
     /* Passport Types Master */
     Route::resource('new-passport-types-master', NewPassportTypesMasterController::class);
