@@ -1350,53 +1350,90 @@
                     <!-- Property Details Tab -->
                     <div class="tab-pane fade" id="nav-property" role="tabpanel" aria-labelledby="nav-property-tab">
                         <p class="small-text mt-2 mb-3">Enter the valuation for each property type. The total valuation will be calculated automatically. If you do not have a property, enter a value of 0.</p>
-                        
+                        @php
+                            $defaultCurrencySymbol = (company()->currency && company()->currency->currency_symbol) ? company()->currency->currency_symbol : '₹';
+                        @endphp
                         <!-- Property Valuation Inputs -->
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_home" fieldLabel="Home">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_home" id="property_home">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_home" id="property_home" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_land" fieldLabel="Land">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_land" id="property_land">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_land" id="property_land" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_plot" fieldLabel="Plot">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_plot" id="property_plot">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_plot" id="property_plot" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_commercials" fieldLabel="Commercials">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_commercials" id="property_commercials">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_commercials" id="property_commercials" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_other" fieldLabel="Other">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_other" id="property_other">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_other" id="property_other" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_shop" fieldLabel="Shop">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_shop" id="property_shop">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_shop" id="property_shop" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_gold" fieldLabel="Gold">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_gold" id="property_gold">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_gold" id="property_gold" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_silver" fieldLabel="Silver">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_silver" id="property_silver">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="total_valuation" fieldLabel="Total Asset Valuation">
-                                </x-forms.label>
-                                <input type="number" id="total_valuation" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_valuation">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_silver" id="property_silver" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                         </div>
 
@@ -1408,7 +1445,13 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_loan_value" fieldLabel="Total Loan Value">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="total_loan_value" id="total_loan_value">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14" name="total_loan_value" id="total_loan_value" min="0" step="1">
+                                </div>
+                                <div id="total_loan_value_level" class="small mt-1" style="display:none;" role="alert"></div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="loan_years" fieldLabel="Loan Years">
@@ -1418,9 +1461,41 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="loan_availed_on" fieldLabel="Loan Availed On">
                                 </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="loan_availed_on" id="loan_availed_on">
+                                <input type="date" class="form-control height-35 f-14" name="loan_availed_on" id="loan_availed_on" max="{{ date('Y-m-d') }}">
                             </div>
                             <div class="col-md-3">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="total_valuation" fieldLabel="Total Asset Valuation">
+                                </x-forms.label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" id="total_valuation" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_valuation">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="total_loan_value_copy" fieldLabel="Total Loan Value">
+                                </x-forms.label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" id="total_loan_value_copy" class="form-control height-35 f-14" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="net_worth" fieldLabel="Net Worth">
+                                </x-forms.label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" id="net_worth" class="form-control height-35 f-14" readonly name="net_worth">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2532,6 +2607,7 @@
                 const zipCode = contactData && contactData.relative_zip_code ? contactData.relative_zip_code : '';
                 const email = contactData && contactData.relative_email_address ? contactData.relative_email_address : '';
                 const phone = contactData && contactData.relative_phone_number ? contactData.relative_phone_number : '';
+                const whatsappEnable = contactData && (contactData.relative_whatsapp_enable === true || contactData.relative_whatsapp_enable === '1' || contactData.relative_whatsapp_enable === 1);
                 
                 // Resolve organization name to dropdown value: id if matches master, or "other" with text
                 let orgTypeSelected = '';
@@ -2689,6 +2765,16 @@
                                         <span class="input-group-text height-35 f-14 bg-light">+91</span>
                                     </div>
                                     <input type="number" max="9999999999" class="form-control height-35 f-14" name="relative_phone_number_${contactNum}" id="relative_phone_number_${contactNum}" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);" value="${phone}" placeholder="10 digits">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_whatsapp_enable_${contactNum}" fieldLabel="WhatsApp Enable">
+                                </x-forms.label>
+                                <div class="d-flex align-items-center height-35 f-14">
+                                    <div class="form-check mb-0 pl-0 d-flex align-items-center flex-row-reverse justify-content-start">
+                                        <input type="checkbox" class="form-check-input ml-2" name="relative_whatsapp_enable_${contactNum}" id="relative_whatsapp_enable_${contactNum}" value="1" ${whatsappEnable ? 'checked' : ''}>
+                                        <label class="form-check-label mb-0 f-14" for="relative_whatsapp_enable_${contactNum}">Yes</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -3635,6 +3721,17 @@
                 });
             }
 
+            // Property Details: block - and + from appearing; only digits and one decimal allowed
+            $(document).on('input paste change', '.valuation-input', function() {
+                const $el = $(this);
+                let val = ($el.val() || '').toString();
+                val = val.replace(/[^0-9.]/g, '');
+                const parts = val.split('.');
+                if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+                if (val !== $el.val()) $el.val(val);
+                const num = parseFloat(val);
+                if (val !== '' && !isNaN(num) && num < 0) $el.val(0);
+            });
             // Auto-calculate total valuation for Property Details
             $('.valuation-input').on('input', function() {
                 let total = 0;
@@ -3643,7 +3740,75 @@
                     total += val;
                 });
                 $('#total_valuation').val(total);
+                updateTotalLoanValueLevel();
+                updateNetWorth();
             });
+
+            // Loan level message: Low Loan < 30%, Medium 30–60%, High > 60% of Total Asset Valuation
+            function updateTotalLoanValueLevel() {
+                const $msg = $('#total_loan_value_level');
+                const assets = parseFloat($('#total_valuation').val()) || 0;
+                const loan = parseFloat($('#total_loan_value').val()) || 0;
+                $msg.removeClass('text-info text-warning text-danger').hide();
+                if (assets <= 0) {
+                    $msg.hide();
+                    return;
+                }
+                const pct = (loan / assets) * 100;
+                if (loan <= 0) {
+                    $msg.hide();
+                    return;
+                }
+                let text = '';
+                if (pct < 30) {
+                    text = 'Low Loan';
+                    $msg.addClass('text-info');
+                } else if (pct <= 60) {
+                    text = 'Medium Loan';
+                    $msg.addClass('text-warning');
+                } else {
+                    text = 'High Loan';
+                    $msg.addClass('text-danger');
+                }
+                $msg.text(text).show();
+            }
+            function syncTotalLoanValueCopy() {
+                const v = $('#total_loan_value').val();
+                $('#total_loan_value_copy').val(v === '' || v === null || v === undefined ? '' : v);
+            }
+            // Net Worth = Total Asset Valuation - Total Loan Value (auto-calculated)
+            function updateNetWorth() {
+                const assets = parseFloat($('#total_valuation').val()) || 0;
+                const loan = parseFloat($('#total_loan_value').val()) || 0;
+                const netWorth = assets - loan;
+                $('#net_worth').val(netWorth);
+            }
+            $('#total_loan_value').on('input change', function() {
+                const val = $(this).val();
+                if (val === '' || val === null || val === undefined || String(val).trim() === '') {
+                    $('#loan_years').val('');
+                    $('#loan_availed_on').val('');
+                }
+                updateTotalLoanValueLevel();
+                syncTotalLoanValueCopy();
+                updateNetWorth();
+            });
+            // Loan Availed On: do not allow future dates
+            function getTodayYMD() {
+                const d = new Date();
+                return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+            }
+            $('#loan_availed_on').attr('max', getTodayYMD());
+            $('#loan_availed_on').on('focus', function() {
+                $(this).attr('max', getTodayYMD());
+            });
+            $('#loan_availed_on').on('input change', function() {
+                const max = $(this).attr('max');
+                const val = $(this).val();
+                if (val && max && val > max) $(this).val('');
+            });
+            syncTotalLoanValueCopy();
+            updateNetWorth();
 
             // Auto-calculate total income for Financial Status
             $('.income-input').on('input', function() {
@@ -4754,6 +4919,15 @@
                 // Use a delay to ensure all selectpickers are refreshed
                 setTimeout(function() {
                     updateTabNavigation();
+                    if (typeof updateTotalLoanValueLevel === 'function') {
+                        updateTotalLoanValueLevel();
+                    }
+                    if (typeof syncTotalLoanValueCopy === 'function') {
+                        syncTotalLoanValueCopy();
+                    }
+                    if (typeof updateNetWorth === 'function') {
+                        updateNetWorth();
+                    }
                 }, 300);
             }
 
@@ -5273,6 +5447,22 @@
                     return;
                 }
                 
+                // Step 8 (Property Details): blank valuation and total_loan_value fields auto-store as 0
+                if (currentStep === 8) {
+                    $('.valuation-input').each(function() {
+                        const $el = $(this);
+                        const val = $el.val();
+                        if (val === '' || val === null || val === undefined) {
+                            $el.val(0);
+                        }
+                    });
+                    const $tlv = $('#total_loan_value');
+                    const tlvVal = $tlv.val();
+                    if (tlvVal === '' || tlvVal === null || tlvVal === undefined) {
+                        $tlv.val(0);
+                    }
+                }
+                
                 const formData = new FormData($('#addLeadForm')[0]);
                 
                 // Ensure step 4 relative contacts data is collected
@@ -5306,6 +5496,7 @@
                         const zipCode = $('#relative_zip_code_' + contactIndex).val() || '';
                         const email = $('#relative_email_address_' + contactIndex).val() || '';
                         const phone = $('#relative_phone_number_' + contactIndex).val() || '';
+                        const whatsappEnable = $('#relative_whatsapp_enable_' + contactIndex).is(':checked');
 
                         // Resolve country/state/city ids to names
                         if (country && !isNaN(country)) {
@@ -5334,7 +5525,8 @@
                                 relative_state: state,
                                 relative_zip_code: zipCode,
                                 relative_email_address: email,
-                                relative_phone_number: phone
+                                relative_phone_number: phone,
+                                relative_whatsapp_enable: whatsappEnable
                             };
                             relativeContacts.push(contactData);
                         }

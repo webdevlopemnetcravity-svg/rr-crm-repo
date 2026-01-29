@@ -2785,6 +2785,7 @@ class LeadContactController extends AccountBaseController
                 'property_silver',
                 'total_valuation',
                 'total_loan_value',
+                'net_worth',
                 'loan_years',
                 'loan_availed_on',
                 'valuation_report_file',

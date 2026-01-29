@@ -660,6 +660,10 @@
                                             <div class="info-field-label-text">Phone Number</div>
                                             <div class="info-field-value-text">{{ $getValue($relative['relative_phone_number'] ?? null) }}</div>
                                         </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">WhatsApp Enable</div>
+                                            <div class="info-field-value-text">{{ $getValue(!empty($relative['relative_whatsapp_enable']) ? __('app.yes') : __('app.no')) }}</div>
+                                        </div>
                                     </div>
                                 @endforeach
                             @else
@@ -1141,12 +1145,6 @@
                                     <div class="info-field-value-text">{{ $getValue(($step8Data['property_silver'] ?? null) ? '₹ ' . number_format($step8Data['property_silver'] ?? 0) : null) }}</div>
                                 </div>
                             </div>
-                            <div class="info-grid-row row mb-4">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Total Asset Valuation</div>
-                                    <div class="info-field-value-text">{{ $getValue(($step8Data['total_valuation'] ?? null) ? '₹ ' . number_format($step8Data['total_valuation'] ?? 0) : null) }}</div>
-                                </div>
-                            </div>
 
                             <!-- Loan Information -->
                             <div class="info-subsection-title mb-2">
@@ -1164,6 +1162,16 @@
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Loan Availed On</div>
                                     <div class="info-field-value-text">{{ $formatDate($step8Data['loan_availed_on'] ?? null) }}</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Total Asset Valuation</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['total_valuation'] ?? null) ? '₹ ' . number_format($step8Data['total_valuation'] ?? 0) : null) }}</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Net Worth</div>
+                                    <div class="info-field-value-text">{{ $getValue(isset($step8Data['net_worth']) ? '₹ ' . number_format($step8Data['net_worth']) : null) }}</div>
                                 </div>
                             </div>
                         </div>
