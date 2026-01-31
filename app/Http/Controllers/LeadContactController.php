@@ -6,6 +6,7 @@ use App\DataTables\DealsDataTable;
 use App\DataTables\LeadContactDataTable;
 use App\DataTables\LeadNotesDataTable;
 use App\DataTables\NewLeadDataTable;
+use App\DataTables\MetaLeadsDataTable;
 use App\Enums\Salutation;
 use App\Helper\Reply;
 use App\Http\Requests\Admin\Employee\ImportProcessRequest;
@@ -37,6 +38,10 @@ use App\Models\NewCountryMaster;
 use App\Models\NewStateMaster;
 use App\Models\NewCityMaster;
 use App\Models\NewGoogleToken;
+use App\Models\NewFacebookToken;
+use App\Models\NewMetaPage;
+use App\Models\NewMetaForm;
+use App\Models\NewMetaLead;
 use App\Models\SocialAuthSetting;
 use App\Services\Google;
 use App\Mail\LeadAppointmentBookedToLead;
@@ -201,6 +206,835 @@ class LeadContactController extends AccountBaseController
 
         return $dataTable->render('lead-list.index', $this->data);
 
+    }
+
+    /**
+     * Display Meta Leads page
+     */
+    public function metaLeads(MetaLeadsDataTable $dataTable)
+    {
+        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
+        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+
+        $this->pageTitle = 'Meta Leads';
+
+        // Set custom breadcrumb: Home • Lead • Meta Leads
+        $this->customBreadcrumb = [
+            [
+                'text' => __('app.menu.home'),
+                'url' => route('dashboard')
+            ],
+            [
+                'text' => 'Lead',
+                'url' => route('lead-list.index')
+            ],
+            [
+                'text' => 'Meta Leads'
+            ]
+        ];
+
+        return $dataTable->render('meta-leads.index', $this->data);
+    }
+
+    /**
+     * Display Meta Lead detail in modal (all fields + field_data).
+     */
+    public function metaLeadDetail($id)
+    {
+        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
+        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+
+        $lead = NewMetaLead::where('id', $id)
+            ->where('user_id', user()->id)
+            ->where('company_id', company()->id)
+            ->firstOrFail();
+
+        $this->metaLead = $lead;
+        return view('meta-leads.lead-detail-modal', $this->data);
+    }
+
+    /**
+     * Move selected Meta leads to lead-list: create NewLead with full_name, email, phone; assign lead number and store in new_meta_leads.
+     */
+    public function moveMetaLeadsToLead(Request $request)
+    {
+        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
+        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+
+        $request->validate([
+            'meta_lead_ids' => 'required|array',
+            'meta_lead_ids.*' => 'integer|exists:new_meta_leads,id',
+        ]);
+
+        $currentUser = user();
+        $company = company();
+        $ids = $request->meta_lead_ids;
+        $metaLeads = NewMetaLead::whereIn('id', $ids)
+            ->where('user_id', $currentUser->id)
+            ->where('company_id', $company->id)
+            ->get();
+
+        $moved = 0;
+        $skipped = 0;
+
+        foreach ($metaLeads as $metaLead) {
+            if ($metaLead->new_lead_id) {
+                $skipped++;
+                continue;
+            }
+
+            $fullName = $metaLead->full_name ?? '';
+            $email = $metaLead->email ?? '';
+            $phone = trim((string) ($metaLead->phone ?? ''));
+            // Normalize phone to 10 digits so step_1_data primary_phone passes add-lead validation (regex: ^[0-9]{10}$).
+            // Meta often sends +91xxxxxxxxxx; strip +91 and non-digits so primary_phone is stored correctly.
+            $primaryPhone = $this->normalizePhoneToTenDigits($phone);
+            if ($primaryPhone === '' && $phone !== '') {
+                $primaryPhone = $phone; // keep original if normalization yielded empty
+            }
+            // Step 1 data: given_name, surname, email_address, primary_phone (used by lead forms/display)
+            $step1Data = [
+                'given_name' => $fullName,
+                'surname' => '',
+                'email_address' => $email,
+                'primary_phone' => $primaryPhone,
+            ];
+
+            $newLead = NewLead::create([
+                'company_id' => $company->id,
+                'client_name' => $fullName,
+                'client_email' => $email,
+                'mobile' => $primaryPhone,
+                'lead_source' => 'Meta Lead Ads',
+                'added_by' => $currentUser->id,
+                'lead_status' => 'Open Lead',
+                'lead_quality' => 'Open',
+                'step_1_data' => $step1Data,
+            ]);
+
+            LeadStepStatus::getOrCreateForLead($newLead->id);
+
+            $leadNumber = 'LEAD-' . str_pad($newLead->id, 4, '0', STR_PAD_LEFT);
+            $metaLead->update([
+                'new_lead_id' => $newLead->id,
+                'lead_number' => $leadNumber,
+            ]);
+            $moved++;
+        }
+
+        $message = $moved > 0
+            ? "Moved {$moved} lead(s) to Lead List. Assigned lead numbers have been saved."
+            : "No leads moved.";
+        if ($skipped > 0) {
+            $message .= " {$skipped} already had a lead assigned and were skipped.";
+        }
+
+        return Reply::success($message);
+    }
+
+    /**
+     * Normalize phone to 10 digits for step_1_data primary_phone (add-lead expects ^[0-9]{10}$).
+     * Strips +91, spaces, etc. and returns 10-digit string or empty.
+     */
+    private function normalizePhoneToTenDigits(string $phone): string
+    {
+        $digits = preg_replace('/\D/', '', $phone);
+        if (strlen($digits) === 12 && str_starts_with($digits, '91')) {
+            return substr($digits, 2, 10);
+        }
+        if (strlen($digits) === 11 && $digits[0] === '0') {
+            return substr($digits, 1, 10);
+        }
+        if (strlen($digits) === 10) {
+            return $digits;
+        }
+        return '';
+    }
+
+    /**
+     * Sync Meta Leads from Facebook Lead Ads API.
+     * Loads all synced forms from new_meta_forms and fetches leads for each form one by one.
+     */
+    public function syncMetaLeads()
+    {
+        try {
+            $currentUser = user();
+            $company = company();
+
+            $forms = NewMetaForm::where('user_id', $currentUser->id)
+                ->where('company_id', $company->id)
+                ->orderBy('page_name')
+                ->orderBy('form_name')
+                ->get();
+
+            if ($forms->isEmpty()) {
+                return Reply::error('No Meta forms found. Please sync Meta Forms first (View Meta Forms → Sync Forms).');
+            }
+
+            $pagesByPageId = NewMetaPage::where('user_id', $currentUser->id)
+                ->where('company_id', $company->id)
+                ->whereNotNull('page_access_token')
+                ->where('page_access_token', '!=', '')
+                ->get()
+                ->keyBy('page_id');
+
+            $baseUrl = 'https://graph.facebook.com/v18.0';
+            $totalLeads = 0;
+
+            foreach ($forms as $form) {
+                $page = $pagesByPageId->get($form->page_id);
+                if (!$page || empty($page->page_access_token)) {
+                    \Log::warning('Meta Leads: No page token for form', [
+                        'form_id' => $form->form_id,
+                        'page_id' => $form->page_id
+                    ]);
+                    continue;
+                }
+
+                $pageToken = $page->page_access_token;
+                $pageId = $form->page_id;
+                $pageName = $form->page_name ?? $page->page_name;
+                $formId = $form->form_id;
+                $formName = $form->form_name;
+
+                $leadsUrl = $baseUrl . '/' . $formId . '/leads';
+                $leadsParams = [
+                    'access_token' => $pageToken,
+                    'fields' => 'id,created_time,field_data',
+                    'limit' => 500
+                ];
+                $leadsRequestUrl = $leadsUrl . '?' . http_build_query($leadsParams);
+
+                \Log::info('Meta Leads: API request (leads for form)', [
+                    'user_id' => $currentUser->id,
+                    'company_id' => $company->id,
+                    'form_id' => $formId,
+                    'form_name' => $formName,
+                    'page_id' => $pageId,
+                    'url' => $leadsUrl . '?' . http_build_query(array_merge($leadsParams, ['access_token' => '[REDACTED]'])),
+                ]);
+
+                $leadsResponse = $this->metaGraphGet($leadsRequestUrl);
+                $leadsData = is_string($leadsResponse) ? json_decode($leadsResponse, true) : $leadsResponse;
+
+                if (!is_array($leadsData) || isset($leadsData['error'])) {
+                    \Log::warning('Meta Leads: Failed to fetch leads for form', [
+                        'form_id' => $formId,
+                        'response' => $leadsData ?? $leadsResponse
+                    ]);
+                    continue;
+                }
+
+                $leads = $leadsData['data'] ?? [];
+                foreach ($leads as $lead) {
+                    $metaLeadId = $lead['id'] ?? null;
+                    if (!$metaLeadId) {
+                        continue;
+                    }
+                    $fieldData = $lead['field_data'] ?? [];
+                    $createdTime = isset($lead['created_time']) ? $lead['created_time'] : null;
+                    $extracted = NewMetaLead::extractFieldsFromFieldData($fieldData);
+
+                    NewMetaLead::updateOrCreate(
+                        ['meta_lead_id' => $metaLeadId],
+                        [
+                            'company_id' => $company->id,
+                            'user_id' => $currentUser->id,
+                            'page_id' => $pageId,
+                            'page_name' => $pageName,
+                            'form_id' => $formId,
+                            'form_name' => $formName,
+                            'field_data' => json_encode($fieldData),
+                            'full_name' => $extracted['full_name'],
+                            'email' => $extracted['email'],
+                            'phone' => $extracted['phone'],
+                            'lead_created_time' => $createdTime ? \Carbon\Carbon::parse($createdTime) : null,
+                            'status' => 'new',
+                        ]
+                    );
+                    $totalLeads++;
+                }
+
+                // Pagination for leads
+                while (isset($leadsData['paging']['next']) && !empty($leadsData['paging']['next'])) {
+                    $nextUrl = $leadsData['paging']['next'];
+                    $nextResponse = $this->metaGraphGet($nextUrl);
+                    $leadsData = is_string($nextResponse) ? json_decode($nextResponse, true) : $nextResponse;
+                    if (!is_array($leadsData) || isset($leadsData['error']) || empty($leadsData['data'])) {
+                        break;
+                    }
+                    $leads = $leadsData['data'];
+                    foreach ($leads as $lead) {
+                        $metaLeadId = $lead['id'] ?? null;
+                        if (!$metaLeadId) {
+                            continue;
+                        }
+                        $fieldData = $lead['field_data'] ?? [];
+                        $createdTime = isset($lead['created_time']) ? $lead['created_time'] : null;
+                        $extracted = NewMetaLead::extractFieldsFromFieldData($fieldData);
+                        NewMetaLead::updateOrCreate(
+                            ['meta_lead_id' => $metaLeadId],
+                            [
+                                'company_id' => $company->id,
+                                'user_id' => $currentUser->id,
+                                'page_id' => $pageId,
+                                'page_name' => $pageName,
+                                'form_id' => $formId,
+                                'form_name' => $formName,
+                                'field_data' => json_encode($fieldData),
+                                'full_name' => $extracted['full_name'],
+                                'email' => $extracted['email'],
+                                'phone' => $extracted['phone'],
+                                'lead_created_time' => $createdTime ? \Carbon\Carbon::parse($createdTime) : null,
+                                'status' => 'new',
+                            ]
+                        );
+                        $totalLeads++;
+                    }
+                }
+            }
+
+            \Log::info('Meta Leads: Sync completed', [
+                'user_id' => $currentUser->id,
+                'company_id' => $company->id,
+                'total_synced' => $totalLeads,
+                'forms_processed' => $forms->count()
+            ]);
+
+            return Reply::success('Meta leads synced successfully. Total leads: ' . $totalLeads . '.');
+
+        } catch (\Exception $e) {
+            \Log::error('Meta Leads: Sync failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return Reply::error('Failed to sync Meta leads: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Simple GET request for Meta Graph API (used by syncMetaLeads).
+     */
+    private function metaGraphGet(string $url)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return $response;
+    }
+
+    /**
+     * Display Meta Pages Modal
+     */
+    public function metaPagesModal()
+    {
+        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
+        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+
+        $this->pageTitle = 'Meta Pages';
+        $this->metaPages = NewMetaPage::where('user_id', user()->id)
+            ->where('company_id', company()->id)
+            ->orderBy('page_name')
+            ->get();
+
+        \Log::info('Meta Pages: Loading modal', [
+            'user_id' => user()->id,
+            'company_id' => company()->id,
+            'pages_count' => $this->metaPages->count()
+        ]);
+
+        return view('meta-leads.meta-pages-modal', $this->data);
+    }
+
+    /**
+     * Sync Meta Pages from Facebook
+     */
+    public function syncMetaPages()
+    {
+        try {
+            // Get Facebook token for current user
+            $facebookToken = NewFacebookToken::where('user_id', user()->id)
+                ->where('company_id', company()->id)
+                ->where('verification_status', 'verified')
+                ->first();
+
+            if (!$facebookToken || empty($facebookToken->access_token)) {
+                return Reply::error('Facebook token not found. Please authenticate with Facebook first.');
+            }
+
+            // Check if token is expired
+            if ($facebookToken->isExpired()) {
+                return Reply::error('Facebook token has expired. Please re-authenticate with Facebook.');
+            }
+
+            $accessToken = $facebookToken->access_token;
+            $currentUser = user();
+            $company = company();
+
+            // First, check what permissions the token has
+            $debugUrl = 'https://graph.facebook.com/v18.0/me/permissions';
+            $debugParams = ['access_token' => $accessToken];
+            
+            $debugCh = curl_init($debugUrl . '?' . http_build_query($debugParams));
+            curl_setopt($debugCh, CURLOPT_RETURNTRANSFER, true);
+            $debugResponse = curl_exec($debugCh);
+            $debugHttpCode = curl_getinfo($debugCh, CURLINFO_HTTP_CODE);
+            curl_close($debugCh);
+            
+            if ($debugHttpCode === 200) {
+                $debugData = json_decode($debugResponse, true);
+                \Log::info('Meta Pages: Token permissions', [
+                    'permissions' => $debugData['data'] ?? []
+                ]);
+            }
+
+            // Also check user info to see what we can access
+            $userInfoUrl = 'https://graph.facebook.com/v18.0/me';
+            $userInfoParams = [
+                'access_token' => $accessToken,
+                'fields' => 'id,name,accounts'
+            ];
+            
+            $userInfoCh = curl_init($userInfoUrl . '?' . http_build_query($userInfoParams));
+            curl_setopt($userInfoCh, CURLOPT_RETURNTRANSFER, true);
+            $userInfoResponse = curl_exec($userInfoCh);
+            $userInfoHttpCode = curl_getinfo($userInfoCh, CURLINFO_HTTP_CODE);
+            curl_close($userInfoCh);
+            
+            \Log::info('Meta Pages: User info with accounts', [
+                'http_code' => $userInfoHttpCode,
+                'response' => $userInfoResponse
+            ]);
+
+            // Fetch pages using Facebook Graph API
+            // GET /me/accounts - returns pages the user manages
+            $graphUrl = 'https://graph.facebook.com/v18.0/me/accounts';
+            $params = [
+                'access_token' => $accessToken,
+                'fields' => 'id,name,access_token,category,picture,about,website,verification_status,followers_count,fan_count',
+                'limit' => 100 // Get up to 100 pages
+            ];
+
+            \Log::info('Meta Pages: Fetching pages from Facebook', [
+                'user_id' => $currentUser->id,
+                'company_id' => $company->id,
+                'endpoint' => $graphUrl
+            ]);
+
+            $ch = curl_init($graphUrl . '?' . http_build_query($params));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            // Log the full response for debugging
+            \Log::info('Meta Pages: API Response', [
+                'http_code' => $httpCode,
+                'response' => $response,
+                'curl_error' => $curlError,
+                'url' => $graphUrl . '?' . http_build_query($params)
+            ]);
+
+            if ($httpCode !== 200) {
+                $errorData = json_decode($response, true);
+                $errorMessage = 'Failed to fetch pages from Facebook.';
+                
+                if (isset($errorData['error'])) {
+                    $errorMessage .= ' Error: ' . ($errorData['error']['message'] ?? 'Unknown error');
+                    $errorMessage .= ' (Code: ' . ($errorData['error']['code'] ?? 'N/A') . ')';
+                }
+                
+                \Log::error('Meta Pages: Failed to fetch pages', [
+                    'http_code' => $httpCode,
+                    'response' => $response,
+                    'error_data' => $errorData ?? null
+                ]);
+                
+                return Reply::error($errorMessage);
+            }
+
+            $data = json_decode($response, true);
+
+            // Check for API errors in response
+            if (isset($data['error'])) {
+                \Log::error('Meta Pages: API Error in response', [
+                    'error' => $data['error']
+                ]);
+                return Reply::error('Facebook API Error: ' . ($data['error']['message'] ?? 'Unknown error') . '. Make sure you have the pages_show_list permission.');
+            }
+
+            // Handle pagination if present
+            $pages = [];
+            if (isset($data['data']) && is_array($data['data'])) {
+                $pages = $data['data'];
+                
+                // Handle pagination - fetch all pages if there are more
+                while (isset($data['paging']['next'])) {
+                    $nextUrl = $data['paging']['next'];
+                    \Log::info('Meta Pages: Fetching next page', ['next_url' => $nextUrl]);
+                    
+                    $ch = curl_init($nextUrl);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    $nextResponse = curl_exec($ch);
+                    $nextHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    curl_close($ch);
+                    
+                    if ($nextHttpCode === 200) {
+                        $nextData = json_decode($nextResponse, true);
+                        if (isset($nextData['data']) && is_array($nextData['data'])) {
+                            $pages = array_merge($pages, $nextData['data']);
+                            $data = $nextData;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                \Log::error('Meta Pages: Invalid response format', [
+                    'response' => $data,
+                    'has_data' => isset($data['data']),
+                    'data_type' => isset($data['data']) ? gettype($data['data']) : 'not set'
+                ]);
+                return Reply::error('Invalid response from Facebook API. Please check logs for details.');
+            }
+            // Check if pages array is empty after all attempts
+            if (empty($pages)) {
+                // Try to get debug info about what the user can access
+                $debugMeUrl = 'https://graph.facebook.com/v18.0/me';
+                $debugMeParams = [
+                    'access_token' => $accessToken,
+                    'fields' => 'id,name'
+                ];
+                
+                $debugMeCh = curl_init($debugMeUrl . '?' . http_build_query($debugMeParams));
+                curl_setopt($debugMeCh, CURLOPT_RETURNTRANSFER, true);
+                $debugMeResponse = curl_exec($debugMeCh);
+                $debugMeHttpCode = curl_getinfo($debugMeCh, CURLINFO_HTTP_CODE);
+                curl_close($debugMeCh);
+                
+                \Log::info('Meta Pages: Debug user info', [
+                    'http_code' => $debugMeHttpCode,
+                    'response' => $debugMeResponse
+                ]);
+            }
+
+            $syncedCount = 0;
+            $errors = [];
+
+            \Log::info('Meta Pages: Pages received from API', [
+                'pages_count' => count($pages),
+                'pages' => $pages
+            ]);
+
+            if (empty($pages)) {
+                // Try alternative endpoint: /me?fields=accounts
+                \Log::info('Meta Pages: Trying alternative endpoint /me?fields=accounts');
+                $altUrl = 'https://graph.facebook.com/v18.0/me';
+                $altParams = [
+                    'access_token' => $accessToken,
+                    'fields' => 'accounts{id,name,access_token,category,picture,about,website,verification_status,followers_count,fan_count}'
+                ];
+                
+                $altCh = curl_init($altUrl . '?' . http_build_query($altParams));
+                curl_setopt($altCh, CURLOPT_RETURNTRANSFER, true);
+                $altResponse = curl_exec($altCh);
+                $altHttpCode = curl_getinfo($altCh, CURLINFO_HTTP_CODE);
+                curl_close($altCh);
+                
+                if ($altHttpCode === 200) {
+                    $altData = json_decode($altResponse, true);
+                    \Log::info('Meta Pages: Alternative endpoint response', [
+                        'response' => $altData
+                    ]);
+                    
+                    if (isset($altData['accounts']['data']) && is_array($altData['accounts']['data']) && !empty($altData['accounts']['data'])) {
+                        $pages = $altData['accounts']['data'];
+                        \Log::info('Meta Pages: Found pages via alternative endpoint', [
+                            'pages_count' => count($pages)
+                        ]);
+                    }
+                }
+                
+                // If still no pages, return helpful error message
+                if (empty($pages)) {
+                    \Log::warning('Meta Pages: No pages returned from API', [
+                        'response' => $data,
+                        'alternative_response' => $altData ?? null
+                    ]);
+                    return Reply::error('No pages found. This could mean: 1) You don\'t have any pages associated with your Facebook account, 2) The pages are managed through Business Manager (requires different API), or 3) Your token doesn\'t have the pages_show_list permission. Please check your Facebook App permissions and ensure pages_show_list is granted.');
+                }
+            }
+
+            foreach ($pages as $pageData) {
+                try {
+                    $pageId = $pageData['id'] ?? null;
+                    $pageName = $pageData['name'] ?? 'Unknown Page';
+                    $pageAccessToken = $pageData['access_token'] ?? null;
+
+                    if (!$pageId) {
+                        continue;
+                    }
+
+                    // Extract picture URL
+                    $pictureUrl = null;
+                    if (isset($pageData['picture']['data']['url'])) {
+                        $pictureUrl = $pageData['picture']['data']['url'];
+                    }
+
+                    // Store or update page in database
+                    $metaPage = NewMetaPage::updateOrCreate(
+                        [
+                            'page_id' => $pageId,
+                            'user_id' => $currentUser->id,
+                            'company_id' => $company->id,
+                        ],
+                        [
+                            'page_name' => $pageName,
+                            'page_access_token' => $pageAccessToken,
+                            'page_category' => $pageData['category'] ?? null,
+                            'page_picture_url' => $pictureUrl,
+                            'page_about' => $pageData['about'] ?? null,
+                            'page_website' => $pageData['website'] ?? null,
+                            'page_verification_status' => $pageData['verification_status'] ?? null,
+                            'page_followers_count' => $pageData['followers_count'] ?? $pageData['fan_count'] ?? null,
+                            'page_likes_count' => $pageData['fan_count'] ?? null,
+                            'sync_status' => 'synced',
+                            'last_synced_at' => now(),
+                        ]
+                    );
+
+                    \Log::info('Meta Pages: Page stored', [
+                        'page_id' => $pageId,
+                        'page_name' => $pageName,
+                        'meta_page_id' => $metaPage->id
+                    ]);
+
+                    $syncedCount++;
+                } catch (\Exception $e) {
+                    \Log::error('Meta Pages: Error syncing page', [
+                        'page_id' => $pageData['id'] ?? 'unknown',
+                        'error' => $e->getMessage()
+                    ]);
+                    $errors[] = $pageData['name'] ?? 'Unknown Page';
+                }
+            }
+
+            \Log::info('Meta Pages: Sync completed', [
+                'user_id' => $currentUser->id,
+                'company_id' => $company->id,
+                'synced_count' => $syncedCount,
+                'total_pages' => count($pages)
+            ]);
+
+            $message = "Successfully synced {$syncedCount} page(s) from Facebook.";
+            if (!empty($errors)) {
+                $message .= " Failed to sync: " . implode(', ', $errors);
+            }
+
+            return Reply::success($message);
+
+        } catch (\Exception $e) {
+            \Log::error('Meta Pages: Sync failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return Reply::error('Failed to sync Meta pages: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Display Meta Forms Modal
+     */
+    public function metaFormsModal()
+    {
+        $this->viewLeadPermission = $viewPermission = user()->permission('view_lead');
+        abort_403(!in_array($viewPermission, ['all','added','owned','both']));
+
+        $this->pageTitle = 'Meta Forms';
+
+        $userId = user()->id;
+        $companyId = company()->id;
+
+        $this->metaForms = NewMetaForm::query()
+            ->select('new_meta_forms.*')
+            ->join('new_meta_pages', function ($join) use ($userId, $companyId) {
+                $join->on('new_meta_forms.page_id', '=', 'new_meta_pages.page_id')
+                    ->whereColumn('new_meta_forms.user_id', 'new_meta_pages.user_id')
+                    ->whereColumn('new_meta_forms.company_id', 'new_meta_pages.company_id');
+            })
+            ->where('new_meta_forms.user_id', $userId)
+            ->where('new_meta_forms.company_id', $companyId)
+            ->orderBy('new_meta_pages.page_name')
+            ->orderBy('new_meta_forms.form_name')
+            ->get();
+
+        $this->noDataMessage = $this->metaForms->isEmpty()
+            ? 'No Meta lead forms synced yet. Sync Meta Pages first, then click "Sync Forms" to fetch lead gen forms from all pages.'
+            : null;
+
+        return view('meta-leads.meta-forms-modal', $this->data);
+    }
+
+    /**
+     * Sync Meta Forms from Facebook: for each page, fetch leadgen_forms one by one.
+     */
+    public function syncMetaForms()
+    {
+        try {
+            $facebookToken = NewFacebookToken::where('user_id', user()->id)
+                ->where('company_id', company()->id)
+                ->where('verification_status', 'verified')
+                ->first();
+
+            if (!$facebookToken || empty($facebookToken->access_token)) {
+                return Reply::error('Facebook token not found. Please authenticate with Facebook first.');
+            }
+
+            if ($facebookToken->isExpired()) {
+                return Reply::error('Facebook token has expired. Please re-authenticate with Facebook.');
+            }
+
+            $currentUser = user();
+            $company = company();
+            $pages = NewMetaPage::where('user_id', $currentUser->id)
+                ->where('company_id', $company->id)
+                ->whereNotNull('page_access_token')
+                ->where('page_access_token', '!=', '')
+                ->orderBy('page_name')
+                ->get();
+
+            if ($pages->isEmpty()) {
+                return Reply::error('No Meta pages with access found. Please sync Meta Pages first (View Meta Pages → Sync Pages).');
+            }
+
+            $baseUrl = 'https://graph.facebook.com/v18.0';
+            $totalForms = 0;
+
+            foreach ($pages as $page) {
+                $pageToken = $page->page_access_token;
+                $pageId = $page->page_id;
+                $pageName = $page->page_name;
+
+                $formsUrl = $baseUrl . '/' . $pageId . '/leadgen_forms';
+                $formsParams = [
+                    'access_token' => $pageToken,
+                    'fields' => 'id,name',
+                    'limit' => 100
+                ];
+                $formsRequestUrl = $formsUrl . '?' . http_build_query($formsParams);
+
+                \Log::info('Meta Forms: API request', [
+                    'user_id' => $currentUser->id,
+                    'company_id' => $company->id,
+                    'request_type' => 'leadgen_forms',
+                    'endpoint' => '/' . $pageId . '/leadgen_forms',
+                    'page_id' => $pageId,
+                    'page_name' => $pageName,
+                    'url' => $formsUrl . '?' . http_build_query(array_merge($formsParams, ['access_token' => '[REDACTED]'])),
+                ]);
+
+                $formsResponse = $this->metaGraphGet($formsRequestUrl);
+                $formsData = is_string($formsResponse) ? json_decode($formsResponse, true) : $formsResponse;
+
+                if (!is_array($formsData) || isset($formsData['error'])) {
+                    \Log::warning('Meta Forms: Failed to fetch forms for page', [
+                        'page_id' => $pageId,
+                        'response' => $formsData ?? $formsResponse
+                    ]);
+                    continue;
+                }
+
+                $forms = $formsData['data'] ?? [];
+                foreach ($forms as $form) {
+                    $formId = $form['id'] ?? null;
+                    $formName = $form['name'] ?? null;
+                    if (!$formId) {
+                        continue;
+                    }
+                    NewMetaForm::updateOrCreate(
+                        [
+                            'user_id' => $currentUser->id,
+                            'company_id' => $company->id,
+                            'form_id' => $formId,
+                        ],
+                        [
+                            'page_id' => $pageId,
+                            'page_name' => $pageName,
+                            'form_name' => $formName,
+                            'sync_status' => 'synced',
+                            'last_synced_at' => now(),
+                        ]
+                    );
+                    $totalForms++;
+                }
+
+                // Pagination for forms if API returns next
+                while (isset($formsData['paging']['next']) && !empty($formsData['paging']['next'])) {
+                    $nextUrl = $formsData['paging']['next'];
+                    \Log::info('Meta Forms: API request (pagination)', [
+                        'user_id' => $currentUser->id,
+                        'company_id' => $company->id,
+                        'request_type' => 'leadgen_forms_pagination',
+                        'page_id' => $pageId,
+                        'page_name' => $pageName,
+                        'url' => preg_replace('/access_token=[^&]+/', 'access_token=[REDACTED]', $nextUrl),
+                    ]);
+                    $nextResponse = $this->metaGraphGet($nextUrl);
+                    $formsData = is_string($nextResponse) ? json_decode($nextResponse, true) : $nextResponse;
+                    if (!is_array($formsData) || isset($formsData['error']) || empty($formsData['data'])) {
+                        break;
+                    }
+                    foreach ($formsData['data'] as $form) {
+                        $formId = $form['id'] ?? null;
+                        $formName = $form['name'] ?? null;
+                        if (!$formId) {
+                            continue;
+                        }
+                        NewMetaForm::updateOrCreate(
+                            [
+                                'user_id' => $currentUser->id,
+                                'company_id' => $company->id,
+                                'form_id' => $formId,
+                            ],
+                            [
+                                'page_id' => $pageId,
+                                'page_name' => $pageName,
+                                'form_name' => $formName,
+                                'sync_status' => 'synced',
+                                'last_synced_at' => now(),
+                            ]
+                        );
+                        $totalForms++;
+                    }
+                }
+            }
+
+            \Log::info('Meta Forms: Sync completed', [
+                'user_id' => $currentUser->id,
+                'company_id' => $company->id,
+                'total_forms' => $totalForms
+            ]);
+
+            return Reply::success('Meta forms synced successfully. Total forms: ' . $totalForms . '.');
+
+        } catch (\Exception $e) {
+            \Log::error('Meta Forms: Sync failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return Reply::error('Failed to sync Meta forms: ' . $e->getMessage());
+        }
     }
 
     public function addLead()

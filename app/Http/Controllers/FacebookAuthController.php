@@ -48,10 +48,10 @@ class FacebookAuthController extends Controller
                 // Set Graph API version to v18.0 and use setScopes to replace all scopes (prevents default email scope)
                 $redirect = Socialite::driver('facebook')
                     ->usingGraphVersion('v18.0')
-                    ->setScopes(['pages_show_list', 'pages_read_engagement', 'leads_retrieval'])
+                    ->setScopes(['pages_show_list', 'pages_read_engagement', 'pages_manage_ads', 'leads_retrieval'])
                     ->redirect();
                 
-                Log::info('FacebookAuthController: Redirecting to Facebook OAuth with scopes: pages_show_list, pages_read_engagement, leads_retrieval');
+                Log::info('FacebookAuthController: Redirecting to Facebook OAuth with scopes: pages_show_list, pages_read_engagement, pages_manage_ads, leads_retrieval');
                 return $redirect;
             } catch (\Exception $e) {
                 Log::error('FacebookAuthController: Error redirecting to Facebook', [

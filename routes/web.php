@@ -537,6 +537,14 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::resource('lead-contact', LeadContactController::class);
     Route::post('lead-contact/apply-quick-action', [LeadContactController::class, 'applyQuickAction'])->name('lead-contact.apply_quick_action');
     Route::get('lead-list', [LeadContactController::class, 'leadList'])->name('lead-list.index');
+    Route::get('meta-leads', [LeadContactController::class, 'metaLeads'])->name('meta-leads.index');
+    Route::get('meta-leads/{id}/detail', [LeadContactController::class, 'metaLeadDetail'])->name('meta-leads.detail');
+    Route::post('meta-leads/move-to-lead', [LeadContactController::class, 'moveMetaLeadsToLead'])->name('meta-leads.move-to-lead');
+    Route::post('meta-leads/sync', [LeadContactController::class, 'syncMetaLeads'])->name('meta-leads.sync');
+    Route::get('meta-pages/modal', [LeadContactController::class, 'metaPagesModal'])->name('meta-pages.modal');
+    Route::post('meta-pages/sync', [LeadContactController::class, 'syncMetaPages'])->name('meta-pages.sync');
+    Route::get('meta-forms/modal', [LeadContactController::class, 'metaFormsModal'])->name('meta-forms.modal');
+    Route::post('meta-forms/sync', [LeadContactController::class, 'syncMetaForms'])->name('meta-forms.sync');
     Route::get('add-lead', [LeadContactController::class, 'addLead'])->name('add-lead.index');
     Route::get('add-lead/get-subclasses/{visaTypeId}', [LeadContactController::class, 'getSubclassesByVisaType'])->name('add-lead.get-subclasses');
     Route::get('add-lead/get-states/{countryId}', [LeadContactController::class, 'getStatesByCountry'])->name('add-lead.get-states');

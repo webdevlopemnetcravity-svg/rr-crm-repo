@@ -256,6 +256,13 @@
                         Import Lead
                     </x-forms.button-primary>
                 @endif
+                @if (in_array('admin', user_roles()) || in_array('receptionist', user_roles()) || in_array('consultant', user_roles()))
+                    <a href="{{ route('meta-leads.index') }}">
+                        <x-forms.button-primary class="ml-2 mb-2 mb-lg-0">
+                            View Meta Lead
+                        </x-forms.button-primary>
+                    </a>
+                @endif
                 @if (in_array('admin', user_roles()))
                     <x-forms.button-primary class="ml-2 mb-2 mb-lg-0" icon="file-excel" id="export-lead-btn">
                         Export XLSX
