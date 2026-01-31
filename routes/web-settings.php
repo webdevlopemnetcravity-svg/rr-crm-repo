@@ -275,6 +275,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
 
     /* Country Master */
     Route::get('new-country-master', [NewCountryMasterController::class, 'index'])->name('new-country-master.index');
+    Route::post('new-country-master/import-countries-csv', [NewCountryMasterController::class, 'importCountriesFromCsv'])->name('new-country-master.import-countries-csv');
+    Route::post('new-country-master/import-states-csv', [NewCountryMasterController::class, 'importStatesFromCsv'])->name('new-country-master.import-states-csv');
+    Route::post('new-country-master/import-cities-csv', [NewCountryMasterController::class, 'importCitiesFromCsv'])->name('new-country-master.import-cities-csv');
     Route::resource('countries', CountryController::class);
     Route::resource('states', StateMasterController::class);
     Route::resource('cities', CityMasterController::class);

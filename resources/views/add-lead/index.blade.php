@@ -969,10 +969,15 @@
                                     <button type="button" class="btn btn-link p-0 select2-clear-btn" id="spouse_country_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="spouse_city_of_birth" fieldLabel="Spouse's City of Birth">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="spouse_city_of_birth" id="spouse_city_of_birth">
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 city-master-select" name="spouse_city_of_birth" id="spouse_city_of_birth">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="spouse_city_of_birth_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_have_passport" fieldLabel="Have Passport">
@@ -1773,6 +1778,41 @@
                 }
             }
 
+            // City dropdowns: same as Designation – suggestions from API + type custom and save
+            function initSelect2CityWithTags(selector, placeholderText) {
+                if ($(selector).length && !$(selector).hasClass('select2-hidden-accessible')) {
+                    $(selector).select2({
+                        placeholder: placeholderText || 'Select or type city',
+                        allowClear: false,
+                        width: '100%',
+                        tags: true
+                    });
+                }
+            }
+
+            // Set select value by saved text; for city (tags:true) add option if not found so custom city is restored
+            function setSelectBySavedTextOrTag($select, savedText) {
+                if (!savedText) return;
+                var str = String(savedText).trim();
+                if (!str) return;
+                if (!isNaN(str)) {
+                    $select.val(str).trigger('change');
+                    return;
+                }
+                var found = false;
+                $select.find('option').each(function () {
+                    if ($(this).text().trim() === str || $(this).val() === str) {
+                        $select.val($(this).val()).trigger('change');
+                        found = true;
+                        return false;
+                    }
+                });
+                if (!found) {
+                    var $opt = $('<option></option>').attr('value', str).text(str);
+                    $select.append($opt).val(str).trigger('change');
+                }
+            }
+
             // Reusable clear button for any Select2 dropdown (single or multiple)
             function attachSelect2ClearButton(selectSelector, clearButtonId) {
                 const $sel = $(selectSelector);
@@ -1805,9 +1845,9 @@
 
             initSelect2IfNeeded('#country_of_origin', '@lang("app.select") @lang("app.countryOfOrigin")');
             initSelect2IfNeeded('#home_state', '@lang("app.select") @lang("app.state")');
-            initSelect2IfNeeded('#home_city', '@lang("app.select") @lang("app.city")');
+            initSelect2CityWithTags('#home_city', '@lang("app.select") @lang("app.city")');
             initSelect2IfNeeded('#mailing_state', '@lang("app.select") @lang("app.state")');
-            initSelect2IfNeeded('#mailing_city', '@lang("app.select") @lang("app.city")');
+            initSelect2CityWithTags('#mailing_city', '@lang("app.select") @lang("app.city")');
             attachSelect2ClearButton('#country_of_origin', 'country_of_origin_clear');
             attachSelect2ClearButton('#home_state', 'home_state_clear');
             attachSelect2ClearButton('#home_city', 'home_city_clear');
@@ -1838,15 +1878,17 @@
             }, 500);
             
             initSelect2IfNeeded('#issuing_country', '@lang("app.select") Issuing Country');
-            initSelect2IfNeeded('#city_where_issued', '@lang("app.select") City Where Issued');
+            initSelect2CityWithTags('#city_where_issued', '@lang("app.select") City Where Issued');
             initSelect2IfNeeded('#spouse_country', '@lang("app.select") Spouse\'s Country');
             initSelect2IfNeeded('#spouse_state', '@lang("app.select") @lang("app.state")');
-            initSelect2IfNeeded('#spouse_city', '@lang("app.select") @lang("app.city")');
+            initSelect2CityWithTags('#spouse_city', '@lang("app.select") @lang("app.city")');
+            initSelect2CityWithTags('#spouse_city_of_birth', '@lang("app.select") Spouse\'s City of Birth');
             attachSelect2ClearButton('#issuing_country', 'issuing_country_clear');
             attachSelect2ClearButton('#city_where_issued', 'city_where_issued_clear');
             attachSelect2ClearButton('#spouse_country', 'spouse_country_clear');
             attachSelect2ClearButton('#spouse_state', 'spouse_state_clear');
             attachSelect2ClearButton('#spouse_city', 'spouse_city_clear');
+            attachSelect2ClearButton('#spouse_city_of_birth', 'spouse_city_of_birth_clear');
 
             function resetCitySelect($citySelect) {
                 $citySelect.html('<option value="">@lang("app.select")</option>');
@@ -1972,17 +2014,18 @@
                 $out.val(parts.length ? parts.join(' ') : '0 months');
             }
 
-            // Filter sector dropdown: show all sectors when no industry; show only that industry's sectors when industry selected
+            // Filter sector dropdown: show all sectors when no industry or industry is "other"; show only that industry's sectors when industry selected
             function filterSectorsByIndustry(jobNum) {
                 const industryId = $('#job_industry_' + jobNum).val();
                 const $sectorSelect = $('#job_sector_' + jobNum);
                 let optionsHtml = '<option value="">@lang("app.select")</option>';
                 sectorsMaster.forEach(function (s) {
-                    const show = !industryId || String(s.industry_id) === String(industryId);
+                    const show = !industryId || industryId === 'other' || String(s.industry_id) === String(industryId);
                     if (show) {
                         optionsHtml += '<option value="' + s.id + '">' + (s.name || '') + '</option>';
                     }
                 });
+                optionsHtml += '<option value="other">@lang("app.other")</option>';
                 if ($sectorSelect.hasClass('select2-hidden-accessible')) {
                     $sectorSelect.select2('destroy');
                 }
@@ -2095,9 +2138,11 @@
             $(document).on('change', '#expiration_date', syncPassportStatusFromExpiry);
             syncPassportStatusFromExpiry();
 
-            // Spouse country change -> reload spouse states/cities
+            // Spouse country change -> reload spouse states/cities and spouse city of birth
             $('#spouse_country').on('change', function () {
-                loadSpouseStates($(this).val());
+                var countryId = $(this).val();
+                loadSpouseStates(countryId);
+                loadCitiesByCountry(countryId, $('#spouse_city_of_birth'));
             });
 
             // Home state change -> reload home cities
@@ -2821,7 +2866,7 @@
                 const citySel = '#relative_city_' + contactNum;
                 initSelect2IfNeeded(countrySel, 'Select country');
                 initSelect2IfNeeded(stateSel, '@lang("app.select") @lang("app.state")');
-                initSelect2IfNeeded(citySel, '@lang("app.select") @lang("app.city")');
+                initSelect2CityWithTags(citySel, '@lang("app.select") @lang("app.city")');
                 attachSelect2ClearButton(countrySel, 'relative_country_clear_' + contactNum);
                 attachSelect2ClearButton(stateSel, 'relative_state_clear_' + contactNum);
                 attachSelect2ClearButton(citySel, 'relative_city_clear_' + contactNum);
@@ -2842,7 +2887,7 @@
                         setSelectBySavedText($(stateSel), contactData.relative_state || '');
                         return loadCities($(stateSel).val(), $(citySel));
                     }).then(function () {
-                        setSelectBySavedText($(citySel), contactData.relative_city || '');
+                        setSelectBySavedTextOrTag($(citySel), contactData.relative_city || '');
                     });
                 }
 
@@ -2994,10 +3039,15 @@
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="child_date_of_birth_${childNum}" id="child_date_of_birth_${childNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}" value="${childDob}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="child_city_of_birth_${childNum}" fieldLabel="City of Birth">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="child_city_of_birth_${childNum}" id="child_city_of_birth_${childNum}" value="${childCity}">
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 child-city-of-birth-select" name="child_city_of_birth_${childNum}" id="child_city_of_birth_${childNum}">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="child_city_of_birth_clear_${childNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="child_gender_${childNum}" fieldLabel="Gender">
@@ -3032,6 +3082,21 @@
                 
                 // Append to the child-rows-container
                 $('#child-rows-container').append(newRow);
+                
+                // Init city-of-birth select (city master + type custom) same as other city fields
+                const childCitySel = '#child_city_of_birth_' + childNum;
+                initSelect2CityWithTags(childCitySel, '@lang("app.select") City of Birth');
+                attachSelect2ClearButton(childCitySel, 'child_city_of_birth_clear_' + childNum);
+                var defaultCountryId = (countryMasters && countryMasters.length) ? (countryMasters.find(function(c){ return (c.name || '').toLowerCase() === 'india'; }) || countryMasters[0]).id : null;
+                if (defaultCountryId) {
+                    loadCitiesByCountry(defaultCountryId, $(childCitySel)).then(function () {
+                        if (childData && childData.child_city_of_birth) {
+                            setSelectBySavedTextOrTag($(childCitySel), childData.child_city_of_birth);
+                        }
+                    });
+                } else if (childData && childData.child_city_of_birth) {
+                    setSelectBySavedTextOrTag($(childCitySel), childData.child_city_of_birth);
+                }
                 
                 // Update file URLs for existing files if childData is provided
                 if (childData) {
@@ -3425,7 +3490,31 @@
                 const sector = jobData && jobData.job_sector ? jobData.job_sector : '';
                 const salary = jobData && jobData.job_salary ? jobData.job_salary : '';
                 const isCurrentJob = !!(jobData && (jobData.job_current_job === true || jobData.job_current_job === '1' || jobData.job_current_job === 1));
-                
+
+                // Resolve industry/sector for "Other": if value does not match master, use "other" + other text field
+                let jobIndustrySelected = '';
+                let jobIndustryOther = '';
+                if (industry) {
+                    const industryMatch = industryMasters.find(function (i) { return String(i.id) === String(industry) || (i.name && i.name.trim() === String(industry).trim()); });
+                    if (industryMatch) {
+                        jobIndustrySelected = industryMatch.id;
+                    } else {
+                        jobIndustrySelected = 'other';
+                        jobIndustryOther = industry;
+                    }
+                }
+                let jobSectorSelected = '';
+                let jobSectorOther = '';
+                if (sector) {
+                    const sectorMatch = sectorsMaster.find(function (s) { return String(s.id) === String(sector) || (s.name && s.name.trim() === String(sector).trim()); });
+                    if (sectorMatch) {
+                        jobSectorSelected = sectorMatch.id;
+                    } else {
+                        jobSectorSelected = 'other';
+                        jobSectorOther = sector;
+                    }
+                }
+
                 // Build country options from master
                 let countryOptions = '<option value="">@lang("app.select")</option>';
                 countryMasters.forEach(function (c) {
@@ -3457,18 +3546,19 @@
                     designationSelect += `<option value="${designation}" selected>${designation}</option>`;
                 }
 
-                // Build industry options from master (same pattern as Country)
+                // Build industry options from master (same pattern as Country); "Other" is appended below
                 let industryOptions = '<option value="">@lang("app.select")</option>';
                 industryMasters.forEach(function (i) {
-                    const sel = (industry && (String(i.id) === String(industry) || i.name === industry)) ? ' selected' : '';
+                    const sel = (jobIndustrySelected && String(i.id) === String(jobIndustrySelected)) ? ' selected' : '';
                     industryOptions += `<option value="${i.id}"${sel}>${i.name}</option>`;
                 });
-                // Sector: show ALL sectors initially; when industry is selected we filter to that industry's sectors via filterSectorsByIndustry()
+                // Sector: show ALL sectors initially; when industry is selected we filter via filterSectorsByIndustry(); include "Other" option
                 let sectorOptions = '<option value="">@lang("app.select")</option>';
                 sectorsMaster.forEach(function (s) {
-                    const sel = (sector && (String(s.id) === String(sector) || s.name === sector)) ? ' selected' : '';
+                    const sel = (jobSectorSelected && String(s.id) === String(jobSectorSelected)) ? ' selected' : '';
                     sectorOptions += '<option value="' + s.id + '"' + sel + '>' + (s.name || '') + '</option>';
                 });
+                sectorOptions += '<option value="other"' + (jobSectorSelected === 'other' ? ' selected' : '') + '>@lang("app.other")</option>';
 
                 return `
                     <div class="job-row mb-4" id="job-row-${jobNum}" data-job-index="${jobNum}">
@@ -3538,20 +3628,28 @@
                                 </x-forms.label>
                                 <div style="position: relative;">
                                     <select class="form-control height-35 f-14 job-industry-select" name="job_industry_${jobNum}" id="job_industry_${jobNum}">
-                                        ${industryOptions}
+                                        ${industryOptions} <option value="other" ${jobIndustrySelected === 'other' ? ' selected' : ''}>@lang('app.other')</option>
                                     </select>
                                     <button type="button" class="btn btn-link p-0 select2-clear-btn" id="job_industry_clear_${jobNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
                                 </div>
+                            </div>
+                            <div class="col-md-3" id="job_industry_other_wrapper_${jobNum}" style="display: ${jobIndustrySelected === 'other' ? 'block' : 'none'};">
+                                <x-forms.label class="mt-3" fieldId="job_industry_other_${jobNum}" fieldLabel="Other Industry"></x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="job_industry_other_${jobNum}" id="job_industry_other_${jobNum}" value="${jobIndustryOther}">
                             </div>
                             <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="job_sector_${jobNum}" fieldLabel="Sector">
                                 </x-forms.label>
                                 <div style="position: relative;">
                                     <select class="form-control height-35 f-14 job-sector-select" name="job_sector_${jobNum}" id="job_sector_${jobNum}">
-                                        ${sectorOptions}
+                                        ${sectorOptions} <option value="other" ${jobSectorSelected === 'other' ? ' selected' : ''}>@lang('app.other')</option>
                                     </select>
                                     <button type="button" class="btn btn-link p-0 select2-clear-btn" id="job_sector_clear_${jobNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
                                 </div>
+                            </div>
+                            <div class="col-md-3" id="job_sector_other_wrapper_${jobNum}" style="display: ${jobSectorSelected === 'other' ? 'block' : 'none'};">
+                                <x-forms.label class="mt-3" fieldId="job_sector_other_${jobNum}" fieldLabel="Other Sector"></x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="job_sector_other_${jobNum}" id="job_sector_other_${jobNum}" value="${jobSectorOther}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_salary_${jobNum}" fieldLabel="Salary">
@@ -3582,10 +3680,30 @@
                 attachSelect2ClearButton('#job_industry_' + jobNum, 'job_industry_clear_' + jobNum);
                 attachSelect2ClearButton('#job_sector_' + jobNum, 'job_sector_clear_' + jobNum);
 
-                // When industry changes: show all sectors if no industry, or only that industry's sectors
+                // When industry changes: show all sectors if no industry, or only that industry's sectors; show/hide Other Industry text field
                 $('#job_industry_' + jobNum).off('change.jobIndustry').on('change.jobIndustry', function() {
                     filterSectorsByIndustry(jobNum);
+                    const isOther = $(this).val() === 'other';
+                    if (isOther) {
+                        $('#job_industry_other_wrapper_' + jobNum).show();
+                    } else {
+                        $('#job_industry_other_wrapper_' + jobNum).hide();
+                        $('#job_industry_other_' + jobNum).val('');
+                    }
                 });
+                // When sector changes: show/hide Other Sector text field
+                $('#job_sector_' + jobNum).off('change.jobSector').on('change.jobSector', function() {
+                    const isOther = $(this).val() === 'other';
+                    if (isOther) {
+                        $('#job_sector_other_wrapper_' + jobNum).show();
+                    } else {
+                        $('#job_sector_other_wrapper_' + jobNum).hide();
+                        $('#job_sector_other_' + jobNum).val('');
+                    }
+                });
+                // Initial visibility for Other wrappers (when editing with "other" pre-selected)
+                if ($('#job_industry_' + jobNum).val() === 'other') $('#job_industry_other_wrapper_' + jobNum).show();
+                if ($('#job_sector_' + jobNum).val() === 'other') $('#job_sector_other_wrapper_' + jobNum).show();
 
                 // Current job checkbox: only one job can be current; when checked, uncheck all other rows
                 $('#job_current_job_' + jobNum).off('change.currentJob').on('change.currentJob', function() {
@@ -3615,11 +3733,17 @@
                 $('#job_duration_to_' + jobNum).off('change.jobExp input.jobExp').on('change.jobExp input.jobExp', function() { updateJobExperience(jobNum); });
                 updateJobExperience(jobNum);
 
-                // If editing: industry may be set; filter sector list to that industry then set sector
+                // If editing: industry may be set; filter sector list to that industry then set sector (or "other" + custom text)
                 if (jobData && (jobData.job_industry || jobData.job_sector)) {
                     filterSectorsByIndustry(jobNum);
                     if (jobData.job_sector) {
                         setSelectBySavedText($('#job_sector_' + jobNum), jobData.job_sector);
+                        // If no option matched (custom sector), set "other" and show Other Sector text field
+                        if (!$('#job_sector_' + jobNum).val()) {
+                            $('#job_sector_' + jobNum).val('other').trigger('change');
+                            $('#job_sector_other_' + jobNum).val(jobData.job_sector);
+                            $('#job_sector_other_wrapper_' + jobNum).show();
+                        }
                     }
                 }
 
@@ -4400,12 +4524,12 @@
                     loadStates(selectedCountryId).then(function () {
                         setSelectBySavedText($('#home_state'), data.home_state || '');
                         return loadCities($('#home_state').val(), $('#home_city')).then(function () {
-                            setSelectBySavedText($('#home_city'), data.home_city || '');
+                            setSelectBySavedTextOrTag($('#home_city'), data.home_city || '');
                         });
                     }).then(function () {
                         setSelectBySavedText($('#mailing_state'), data.mailing_state || '');
                         return loadCities($('#mailing_state').val(), $('#mailing_city')).then(function () {
-                            setSelectBySavedText($('#mailing_city'), data.mailing_city || '');
+                            setSelectBySavedTextOrTag($('#mailing_city'), data.mailing_city || '');
                         });
                     });
                     
@@ -4710,7 +4834,7 @@
                         if (stepNum === 3) {
                             setSelectBySavedText($('#issuing_country'), stepDataObj.issuing_country || '');
                             loadCitiesByCountry($('#issuing_country').val(), $('#city_where_issued')).then(function () {
-                                setSelectBySavedText($('#city_where_issued'), stepDataObj.city_where_issued || '');
+                                setSelectBySavedTextOrTag($('#city_where_issued'), stepDataObj.city_where_issued || '');
                             });
                         }
 
@@ -4783,14 +4907,18 @@
                             }, 300);
                         }
 
-                        // Step 5 - spouse city/state (saved as text) -> set state then load cities then set city
+                        // Step 5 - spouse city/state/city_of_birth (saved as text) -> set state then load cities then set city; city of birth by country
                         if (stepNum === 5) {
                             setSelectBySavedText($('#spouse_country'), stepDataObj.spouse_country || '');
-                            loadSpouseStates($('#spouse_country').val()).then(function () {
+                            var spouseCountryId = $('#spouse_country').val();
+                            loadSpouseStates(spouseCountryId).then(function () {
                                 setSelectBySavedText($('#spouse_state'), stepDataObj.spouse_state || '');
                                 return loadCities($('#spouse_state').val(), $('#spouse_city'));
                             }).then(function () {
-                                setSelectBySavedText($('#spouse_city'), stepDataObj.spouse_city || '');
+                                setSelectBySavedTextOrTag($('#spouse_city'), stepDataObj.spouse_city || '');
+                            });
+                            loadCitiesByCountry(spouseCountryId, $('#spouse_city_of_birth')).then(function () {
+                                setSelectBySavedTextOrTag($('#spouse_city_of_birth'), stepDataObj.spouse_city_of_birth || '');
                             });
                         }
                         
@@ -4895,8 +5023,8 @@
                             if (stepNum === 3 && (fieldName === 'issuing_country' || fieldName === 'city_where_issued')) {
                                 return;
                             }
-                            // Skip spouse country/state/city (handled above to support dependent city loading)
-                            if (stepNum === 5 && (fieldName === 'spouse_country' || fieldName === 'spouse_state' || fieldName === 'spouse_city')) {
+                            // Skip spouse country/state/city/city_of_birth (handled above to support dependent city loading)
+                            if (stepNum === 5 && (fieldName === 'spouse_country' || fieldName === 'spouse_state' || fieldName === 'spouse_city' || fieldName === 'spouse_city_of_birth')) {
                                 return;
                             }
                             
@@ -5670,13 +5798,17 @@
                             const cObj = countryMasters.find(function (c) { return c.id == country; });
                             if (cObj) country = cObj.name;
                         }
-                        // Resolve industry id to name
-                        if (jobIndustry && !isNaN(jobIndustry)) {
+                        // Industry: if "other" use Other Industry text; else resolve id to name
+                        if (jobIndustry === 'other') {
+                            jobIndustry = ($('#job_industry_other_' + jobIndex).val() || '').trim();
+                        } else if (jobIndustry && !isNaN(jobIndustry)) {
                             const iObj = industryMasters.find(function (i) { return i.id == jobIndustry; });
                             if (iObj) jobIndustry = iObj.name;
                         }
-                        // Resolve sector id to name (use selected option text)
-                        if (jobSector) {
+                        // Sector: if "other" use Other Sector text; else resolve id to name (use selected option text)
+                        if (jobSector === 'other') {
+                            jobSector = ($('#job_sector_other_' + jobIndex).val() || '').trim();
+                        } else if (jobSector) {
                             const $sec = $('#job_sector_' + jobIndex).find('option:selected');
                             if ($sec.length && $sec.text()) jobSector = $sec.text().trim();
                         }

@@ -28,6 +28,10 @@
                                 aria-selected="true">@lang('app.menu.city')
                             </a>
 
+                            {{-- <button type="button" class="btn btn-outline-secondary btn-sm ml-3 align-self-center" id="importCountriesCsvBtn">Import Countries</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm ml-2 align-self-center" id="importStatesCsvBtn">Import States</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm ml-2 align-self-center" id="importCitiesCsvBtn">Import Cities</button> --}}
+
                         </div>
                     </nav>
                 </div>
@@ -324,6 +328,52 @@
             var url = "{{ route('cities.create') }}";
             $(MODAL_LG + ' ' + MODAL_HEADING).html('...');
             $.ajaxModal(MODAL_LG, url);
+        });
+
+        function runCsvImport(url, btnId) {
+            var $btn = $('#' + btnId);
+            $btn.prop('disabled', true);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: { _token: '{{ csrf_token() }}' },
+                blockUI: true,
+                success: function(response) {
+                    $btn.prop('disabled', false);
+                    if (response.status === 'success') {
+                        Swal.fire({ icon: 'success', text: response.message || 'Import completed.' });
+                        var reloadUrl = "{{ route('new-country-master.index') }}";
+                        $.easyAjax({
+                            url: reloadUrl,
+                            blockUI: true,
+                            container: "#nav-tabContent",
+                            success: function(res) {
+                                if (res.status === "success") {
+                                    $('#nav-tabContent .flex-wrap').html(res.html);
+                                    init('#nav-tabContent');
+                                }
+                            }
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', text: response.message || 'Import failed.' });
+                    }
+                },
+                error: function(xhr) {
+                    $btn.prop('disabled', false);
+                    var msg = (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : 'Import failed.';
+                    Swal.fire({ icon: 'error', text: msg });
+                }
+            });
+        }
+
+        $('body').on('click', '#importCountriesCsvBtn', function() {
+            runCsvImport("{{ route('new-country-master.import-countries-csv') }}", 'importCountriesCsvBtn');
+        });
+        $('body').on('click', '#importStatesCsvBtn', function() {
+            runCsvImport("{{ route('new-country-master.import-states-csv') }}", 'importStatesCsvBtn');
+        });
+        $('body').on('click', '#importCitiesCsvBtn', function() {
+            runCsvImport("{{ route('new-country-master.import-cities-csv') }}", 'importCitiesCsvBtn');
         });
 
     </script>
