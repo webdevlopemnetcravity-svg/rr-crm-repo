@@ -1663,6 +1663,7 @@
             const organizationTypes = @json($organizationTypes ?? []);
             const relationshipsMaster = @json($relationshipsMaster ?? []);
             const sectorsMaster = @json($sectorsMaster ?? []);
+            const designationsMaster = @json($designationsMaster ?? []);
         
         // Hide Move to Lead button immediately if no lead_id in URL
         (function() {
@@ -3530,20 +3531,24 @@
                     employmentTypeSelect += `<option value="${opt}"${sel}>${opt}</option>`;
                 });
 
-                const designationOptions = [
-                    'Software Developer', 'Web Developer', 'Accountant', 'Sales Executive', 'Marketing Executive',
-                    'Business Development Executive', 'HR Executive', 'Office Assistant', 'Clerk', 'Supervisor',
-                    'Manager', 'Store Manager', 'Restaurant Manager', 'Chef', 'Cook', 'Helper', 'Warehouse Associate',
-                    'Delivery Executive', 'Driver', 'Electrician', 'Plumber', 'Welder', 'Fitter', 'Machine Operator',
-                    'Quality Analyst', 'Data Entry Operator', 'Graphic Designer', 'Digital Marketer'
-                ];
+                // Build designation options from master (same pattern as Industry); allow custom text when editing
+                let jobDesignationSelected = '';
+                if (designation) {
+                    const designationMatch = designationsMaster.find(function (d) { return String(d.id) === String(designation) || (d.name && d.name.trim() === String(designation).trim()); });
+                    if (designationMatch) {
+                        jobDesignationSelected = designationMatch.id;
+                    } else {
+                        jobDesignationSelected = designation; // custom text
+                    }
+                }
                 let designationSelect = '<option value="">@lang("app.select")</option>';
-                designationOptions.forEach(function (opt) {
-                    const sel = (designation === opt) ? ' selected' : '';
-                    designationSelect += `<option value="${opt}"${sel}>${opt}</option>`;
+                designationsMaster.forEach(function (d) {
+                    const sel = (jobDesignationSelected && String(d.id) === String(jobDesignationSelected)) ? ' selected' : '';
+                    designationSelect += '<option value="' + d.id + '"' + sel + '>' + (d.name || '') + '</option>';
                 });
-                if (designation && designationOptions.indexOf(designation) === -1) {
-                    designationSelect += `<option value="${designation}" selected>${designation}</option>`;
+                if (designation && jobDesignationSelected && designationsMaster.findIndex(function (d) { return String(d.id) === String(jobDesignationSelected); }) === -1) {
+                    const esc = function (s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
+                    designationSelect += '<option value="' + esc(jobDesignationSelected) + '" selected>' + esc(jobDesignationSelected) + '</option>';
                 }
 
                 // Build industry options from master (same pattern as Country); "Other" is appended below
@@ -3759,7 +3764,10 @@
                 }
                 attachSelect2ClearButton(jobDesignationSel, 'job_designation_clear_' + jobNum);
                 if (jobData && jobData.job_designation) {
-                    $(jobDesignationSel).val(jobData.job_designation).trigger('change');
+                    let designationVal = jobData.job_designation;
+                    const designationMatch = designationsMaster.find(function (d) { return d.name && d.name.trim() === String(jobData.job_designation).trim(); });
+                    if (designationMatch) designationVal = designationMatch.id;
+                    $(jobDesignationSel).val(designationVal).trigger('change');
                 }
 
                 // Init select-picker for job employment type (same design as IELTS/PTE/OET/TOEFL exam dropdowns – no search)
@@ -5786,7 +5794,7 @@
                         const jobExperience = $('#job_experience_' + jobIndex).val() || '';
                         let country = $('#job_country_' + jobIndex).val() || '';
                         const employmentType = $('#job_employment_type_' + jobIndex).val() || '';
-                        const designation = $('#job_designation_' + jobIndex).val() || '';
+                        let designation = $('#job_designation_' + jobIndex).val() || '';
                         const companyName = $('#job_company_name_' + jobIndex).val() || '';
                         let jobIndustry = $('#job_industry_' + jobIndex).val() || '';
                         let jobSector = $('#job_sector_' + jobIndex).val() || '';
@@ -5804,6 +5812,11 @@
                         } else if (jobIndustry && !isNaN(jobIndustry)) {
                             const iObj = industryMasters.find(function (i) { return i.id == jobIndustry; });
                             if (iObj) jobIndustry = iObj.name;
+                        }
+                        // Designation: if value is id (numeric), resolve to name; else use as-is (custom text)
+                        if (designation && !isNaN(designation)) {
+                            const dObj = designationsMaster.find(function (d) { return d.id == designation; });
+                            if (dObj) designation = dObj.name;
                         }
                         // Sector: if "other" use Other Sector text; else resolve id to name (use selected option text)
                         if (jobSector === 'other') {

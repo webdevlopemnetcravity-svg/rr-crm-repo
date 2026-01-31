@@ -120,6 +120,11 @@
         @endif
 
         @if (in_array('admin', user_roles()))
+            <x-setting-menu-item :active="$activeMenu" menu="new_designation_master" :href="route('new-designation-master.index')"
+                                 :text="__('app.menu.newDesignationMaster')"/>
+        @endif
+
+        @if (in_array('admin', user_roles()))
             <x-setting-menu-item :active="$activeMenu" menu="new_relationships_master" :href="route('new-relationships-master.index')"
                                  :text="__('app.menu.newRelationshipsMaster')"/>
         @endif

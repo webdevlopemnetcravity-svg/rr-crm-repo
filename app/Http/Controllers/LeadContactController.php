@@ -40,6 +40,7 @@ use App\Models\NewPassportHistoryMaster;
 use App\Models\NewCountryMaster;
 use App\Models\NewStateMaster;
 use App\Models\NewCityMaster;
+use App\Models\NewDesignationMaster;
 use App\Models\NewIndustryMaster;
 use App\Models\NewOrganizationTypesMaster;
 use App\Models\NewRelationshipsMaster;
@@ -1198,6 +1199,12 @@ class LeadContactController extends AccountBaseController
 
         // Load all sectors with industry_id (show all first; filter by industry when industry selected)
         $this->sectorsMaster = NewSectorMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load designation master (for Professional Experience Designation)
+        $this->designationsMaster = NewDesignationMaster::where(function ($query) {
             $query->where('company_id', company()->id)
                 ->orWhereNull('company_id');
         })->orderBy('name')->get();

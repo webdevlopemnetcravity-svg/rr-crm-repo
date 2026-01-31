@@ -248,6 +248,7 @@ return array(
         'taxSettings' => 'Tax Settings',
         'newLeadTemplateDocuments' => 'Lead Template Documents',
         'newLanguageMaster' => 'Language Master',
+        'newDesignationMaster' => 'Designation Master',
         'newRelationshipsMaster' => 'Relationships Master',
         'newOrganizationTypesMaster' => 'Organization Types Master',
         'newPassportTypesMaster' => 'Passport Types Master',
