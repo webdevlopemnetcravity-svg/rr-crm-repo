@@ -116,15 +116,18 @@
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="date_of_birth" id="date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="country_of_origin" :fieldLabel="__('app.countryOfOrigin')">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 country-origin-select" name="country_of_origin" id="country_of_origin">
-                                    <option value="">@lang('app.select')</option>
-                                    @foreach($countryMasters ?? [] as $country)
-                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 country-origin-select" name="country_of_origin" id="country_of_origin">
+                                        <option value="">@lang('app.select')</option>
+                                        @foreach($countryMasters ?? [] as $country)
+                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="country_of_origin_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                         </div>
 
@@ -138,19 +141,25 @@
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="home_address" id="home_address">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="home_state" :fieldLabel="__('app.state')">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 address-state-select" name="home_state" id="home_state">
-                                    <option value="">@lang('app.select')</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 address-state-select" name="home_state" id="home_state">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="home_state_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="home_city" :fieldLabel="__('app.city')">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 address-city-select" name="home_city" id="home_city">
-                                    <option value="">@lang('app.select')</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 address-city-select" name="home_city" id="home_city">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="home_city_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="home_pin_code" :fieldLabel="__('app.pinCode')">
@@ -177,19 +186,25 @@
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="mailing_address" id="mailing_address">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="mailing_state" :fieldLabel="__('app.state')">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 address-state-select" name="mailing_state" id="mailing_state">
-                                    <option value="">@lang('app.select')</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 address-state-select" name="mailing_state" id="mailing_state">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="mailing_state_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="mailing_city" :fieldLabel="__('app.city')">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 address-city-select" name="mailing_city" id="mailing_city">
-                                    <option value="">@lang('app.select')</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 address-city-select" name="mailing_city" id="mailing_city">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="mailing_city_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mailing_pin_code" :fieldLabel="__('app.pinCode')">
@@ -334,14 +349,17 @@
 
                         <!-- Languages Spoken Section -->
                 <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-12" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="languages_spoken" :fieldLabel="__('app.languagesSpoken')">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 languages-spoken-select" name="languages_spoken[]" id="languages_spoken" multiple>
-                                    @foreach($languages ?? [] as $lang)
-                                        <option value="{{ $lang->id }}">{{ $lang->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 languages-spoken-select" name="languages_spoken[]" id="languages_spoken" multiple>
+                                        @foreach($languages ?? [] as $lang)
+                                            <option value="{{ $lang->id }}">{{ $lang->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="languages_spoken_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -669,24 +687,72 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="passport_number" fieldLabel="Passport Number">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="passport_number" id="passport_number">
+                                <input type="text" class="form-control height-35 f-14" name="passport_number" id="passport_number" minlength="8" maxlength="9" pattern="[A-Za-z0-9]{8,9}" placeholder="letters and numbers only" autocomplete="off">
                             </div>
                             <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="issuing_country" fieldLabel="Issuing Country">
+                                <x-forms.label class="mt-3" fieldId="passport_type" fieldLabel="Passport Type">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 country-master-select" name="issuing_country" id="issuing_country">
+                                <select class="form-control select-picker height-35 f-14" name="passport_type" id="passport_type">
                                     <option value="">@lang('app.select')</option>
-                                    @foreach($countryMasters ?? [] as $country)
-                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @foreach($passportTypes ?? [] as $passportType)
+                                        <option value="{{ $passportType->name }}" data-passport-type-id="{{ $passportType->id }}">{{ $passportType->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="passport_category" fieldLabel="Passport Category">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="passport_category" id="passport_category">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Non-ECR">Non-ECR</option>
+                                    <option value="ECR">ECR</option>
+                                </select>
+                                <div id="passport-category-message" class="mt-1 f-12" style="min-height: 1.4em;" aria-live="polite"></div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="place_of_issue" fieldLabel="Place of Issue">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="place_of_issue" id="place_of_issue">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Passport Office">Passport Office</option>
+                                    <option value="Passport Seva Kendra (PSK)">Passport Seva Kendra (PSK)</option>
+                                    <option value="Regional Passport Office (RPO)">Regional Passport Office (RPO)</option>
+                                    <option value="Indian Mission Abroad">Indian Mission Abroad</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="passport_verification_status" fieldLabel="Verification Status">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="passport_verification_status" id="passport_verification_status">
+                                    <option value="">@lang('app.select')</option>
+                                    <option value="Not Verified">Not Verified</option>
+                                    <option value="Verified – Original Seen">Verified – Original Seen</option>
+                                    <option value="Verified – Copy Only">Verified – Copy Only</option>
+                                    <option value="Mismatch Found">Mismatch Found</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3" style="position: relative;">
+                                <x-forms.label class="mt-3" fieldId="issuing_country" fieldLabel="Issuing Country">
+                                </x-forms.label>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 country-master-select" name="issuing_country" id="issuing_country">
+                                        <option value="">@lang('app.select')</option>
+                                        @foreach($countryMasters ?? [] as $country)
+                                            <option value="{{ $country->id }}" {{ strtolower($country->name ?? '') === 'india' ? 'selected' : '' }}>{{ $country->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="issuing_country_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="city_where_issued" fieldLabel="City Where Issued">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 city-master-select" name="city_where_issued" id="city_where_issued">
-                                    <option value="">@lang('app.select')</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 city-master-select" name="city_where_issued" id="city_where_issued">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="city_where_issued_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="issuance_date" fieldLabel="Issue Date">
@@ -697,6 +763,7 @@
                                 <x-forms.label class="mt-3" fieldId="expiration_date" fieldLabel="Expiration Date">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="expiration_date" id="expiration_date">
+                                <div id="passport-validity-warning" class="mt-1 f-12" style="min-height: 1.4em;" aria-live="polite"></div>
                                 <script>
                                     $(document).ready(function() {
                                         $('#issuance_date').on('change', function() {
@@ -704,14 +771,75 @@
                                             if (issuanceDate) {
                                                 $('#expiration_date').attr('min', issuanceDate);
                                             }
+                                            updatePassportValidityWarning();
                                         });
+                                        $('#expiration_date').on('change', function() { updatePassportValidityWarning(); });
+                                        function updatePassportValidityWarning() {
+                                            var $msg = $('#passport-validity-warning');
+                                            var expVal = ($('#expiration_date').val() || '').trim();
+                                            if (!expVal) {
+                                                $msg.removeClass('text-danger text-warning').html('');
+                                                return;
+                                            }
+                                            var today = new Date();
+                                            today.setHours(0, 0, 0, 0);
+                                            var exp = new Date(expVal);
+                                            exp.setHours(0, 0, 0, 0);
+                                            var diffMs = exp - today;
+                                            var monthsRemaining = diffMs / (1000 * 60 * 60 * 24 * 30.44);
+                                            $msg.removeClass('text-danger text-warning');
+                                            if (monthsRemaining < 0) {
+                                                $msg.addClass('text-danger').html('<span class="font-weight-semibold">&lt; 6 months validity (Australia risk)</span>');
+                                            } else if (monthsRemaining < 6) {
+                                                $msg.addClass('text-danger').html('<span class="font-weight-semibold">&lt; 6 months validity (Australia risk)</span>');
+                                            } else if (monthsRemaining < 12) {
+                                                $msg.addClass('text-warning').html('<span class="font-weight-semibold">&lt; 12 months validity (Warning)</span>');
+                                            } else {
+                                                $msg.html('');
+                                            }
+                                        }
+                                        // Run once on load if expiration already has a value (e.g. restored from saved data)
+                                        $(function() { updatePassportValidityWarning(); });
                                     });
                                 </script>
                             </div>
                             <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="last_passport_history" fieldLabel="Last Passport History">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="last_passport_history" id="last_passport_history">
+                                    <option value="">@lang('app.select')</option>
+                                    @foreach($passportHistories ?? [] as $passportHistory)
+                                        <option value="{{ $passportHistory->name }}" data-passport-history-id="{{ $passportHistory->id }}">{{ $passportHistory->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="col-md-12">
-                                <x-forms.label class="mt-3" fieldId="lost_passport_history" fieldLabel="Lost Passport History">
+                            <div class="col-md-3 old-passport-dependent-col">
+                                <x-forms.label class="mt-3" fieldId="old_passport_number" fieldLabel="Old Passport Number">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="old_passport_number" id="old_passport_number" minlength="8" maxlength="9" pattern="[A-Za-z0-9]{8,9}" placeholder="letters and numbers only" autocomplete="off">
+                            </div>
+                            <div class="col-md-3 old-passport-dependent-col">
+                                <x-forms.label class="mt-3" fieldId="old_passport_issue_year" fieldLabel="Old Passport Issue Year">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="old_passport_issue_year" id="old_passport_issue_year">
+                                    <option value="">@lang('app.select')</option>
+                                    @for($y = (int)date('Y'); $y >= 1950; $y--)
+                                        <option value="{{ $y }}">{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="passport_status" fieldLabel="Passport Status">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="passport_status" id="passport_status">
+                                    <option value="">@lang('app.select')</option>
+                                    @foreach($passportStatuses ?? [] as $passportStatus)
+                                        <option value="{{ $passportStatus->name }}" data-passport-status-id="{{ $passportStatus->id }}">{{ $passportStatus->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-12 old-passport-dependent-col">
+                                <x-forms.label class="mt-3" fieldId="lost_passport_history" fieldLabel="Reason">
                                 </x-forms.label>
                                 <textarea class="form-control f-14" rows="3" name="lost_passport_history" id="lost_passport_history"></textarea>
                             </div>
@@ -828,15 +956,18 @@
                                     </x-forms.label>
                                     <input type="date" class="form-control height-35 f-14" name="spouse_date_of_birth" id="spouse_date_of_birth" max="{{ date('Y-m-d', strtotime('-1 day')) }}">
                                 </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="spouse_country" fieldLabel="Spouse's Country">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 country-master-select" name="spouse_country" id="spouse_country">
-                                    <option value="">@lang('app.select')</option>
-                                    @foreach($countryMasters ?? [] as $country)
-                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                    @endforeach
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 country-master-select" name="spouse_country" id="spouse_country">
+                                        <option value="">@lang('app.select')</option>
+                                        @foreach($countryMasters ?? [] as $country)
+                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="spouse_country_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_city_of_birth" fieldLabel="Spouse's City of Birth">
@@ -859,19 +990,25 @@
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="spouse_address" id="spouse_address">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="spouse_state" fieldLabel="State">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 state-master-select" name="spouse_state" id="spouse_state">
-                                    <option value="">@lang('app.select')</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 state-master-select" name="spouse_state" id="spouse_state">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="spouse_state_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="spouse_city" fieldLabel="City">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 city-master-select" name="spouse_city" id="spouse_city">
-                                    <option value="">@lang('app.select')</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 city-master-select" name="spouse_city" id="spouse_city">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="spouse_city_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_postal_code" fieldLabel="Postal Code">
@@ -1213,53 +1350,90 @@
                     <!-- Property Details Tab -->
                     <div class="tab-pane fade" id="nav-property" role="tabpanel" aria-labelledby="nav-property-tab">
                         <p class="small-text mt-2 mb-3">Enter the valuation for each property type. The total valuation will be calculated automatically. If you do not have a property, enter a value of 0.</p>
-                        
+                        @php
+                            $defaultCurrencySymbol = (company()->currency && company()->currency->currency_symbol) ? company()->currency->currency_symbol : '₹';
+                        @endphp
                         <!-- Property Valuation Inputs -->
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_home" fieldLabel="Home">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_home" id="property_home">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_home" id="property_home" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_land" fieldLabel="Land">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_land" id="property_land">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_land" id="property_land" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_plot" fieldLabel="Plot">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_plot" id="property_plot">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_plot" id="property_plot" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_commercials" fieldLabel="Commercials">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_commercials" id="property_commercials">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_commercials" id="property_commercials" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_other" fieldLabel="Other">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_other" id="property_other">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_other" id="property_other" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_shop" fieldLabel="Shop">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_shop" id="property_shop">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_shop" id="property_shop" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_gold" fieldLabel="Gold">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_gold" id="property_gold">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_gold" id="property_gold" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="property_silver" fieldLabel="Silver">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 valuation-input" name="property_silver" id="property_silver">
-                            </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="total_valuation" fieldLabel="Total Asset Valuation">
-                                </x-forms.label>
-                                <input type="number" id="total_valuation" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_valuation">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 valuation-input" name="property_silver" id="property_silver" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                         </div>
 
@@ -1271,7 +1445,13 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_loan_value" fieldLabel="Total Loan Value">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14" name="total_loan_value" id="total_loan_value">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14" name="total_loan_value" id="total_loan_value" min="0" step="1">
+                                </div>
+                                <div id="total_loan_value_level" class="small mt-1" style="display:none;" role="alert"></div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="loan_years" fieldLabel="Loan Years">
@@ -1281,9 +1461,41 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="loan_availed_on" fieldLabel="Loan Availed On">
                                 </x-forms.label>
-                                <input type="date" class="form-control height-35 f-14" name="loan_availed_on" id="loan_availed_on">
+                                <input type="date" class="form-control height-35 f-14" name="loan_availed_on" id="loan_availed_on" max="{{ date('Y-m-d') }}">
                             </div>
                             <div class="col-md-3">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="total_valuation" fieldLabel="Total Asset Valuation">
+                                </x-forms.label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" id="total_valuation" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_valuation">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="total_loan_value_copy" fieldLabel="Total Loan Value">
+                                </x-forms.label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" id="total_loan_value_copy" class="form-control height-35 f-14" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="net_worth" fieldLabel="Net Worth">
+                                </x-forms.label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol }}</span>
+                                    </div>
+                                    <input type="number" id="net_worth" class="form-control height-35 f-14" readonly name="net_worth">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1291,27 +1503,47 @@
                     <div class="tab-pane fade" id="nav-financial" role="tabpanel" aria-labelledby="nav-financial-tab">
                         <p class="small-text mt-2 mb-3">@lang('app.enterIncomeForEachUsers')</p>
                         
-                        <!-- Income Inputs -->
+                        <!-- Income Inputs (currency symbol and validation same as Property Details) -->
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="father_income" fieldLabel="Father's Income">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 income-input" name="father_income" id="father_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 income-input" name="father_income" id="father_income" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="mother_income" fieldLabel="Mother's Income">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 income-input" name="mother_income" id="mother_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 income-input" name="mother_income" id="mother_income" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="candidate_income" fieldLabel="Candidate's Income">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 income-input" name="candidate_income" id="candidate_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 income-input" name="candidate_income" id="candidate_income" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="spouse_income" fieldLabel="Spouse Income">
                                 </x-forms.label>
-                                <input type="number" class="form-control height-35 f-14 income-input" name="spouse_income" id="spouse_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" class="form-control height-35 f-14 income-input" name="spouse_income" id="spouse_income" min="0" step="1" onkeypress="return event.key !== '-' && event.key !== '+' && event.key !== 'e' && event.key !== 'E';">
+                                </div>
                             </div>
                             <div class="col-md-3">
                             </div>
@@ -1324,7 +1556,12 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="total_income" fieldLabel="Total Income">
                                 </x-forms.label>
-                                <input type="number" id="total_income" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_income">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">{{ $defaultCurrencySymbol ?? '₹' }}</span>
+                                    </div>
+                                    <input type="number" id="total_income" class="form-control height-35 f-14" readonly placeholder="@lang('app.autoCalculated')" name="total_income">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1403,11 +1640,24 @@
             
             // Make languages available in JavaScript
             const languages = @json($languages ?? []);
+            
+            // Make passport types available in JavaScript
+            const passportTypes = @json($passportTypes ?? []);
+            
+            // Make passport statuses available in JavaScript
+            const passportStatuses = @json($passportStatuses ?? []);
+            
+            // Make passport histories available in JavaScript
+            const passportHistories = @json($passportHistories ?? []);
 
             // Make country/state/city masters available in JavaScript
             const countryMasters = @json($countryMasters ?? []);
             const stateMasters = @json($stateMasters ?? []);
             const cityMasters = @json($cityMasters ?? []);
+            const industryMasters = @json($industryMasters ?? []);
+            const organizationTypes = @json($organizationTypes ?? []);
+            const relationshipsMaster = @json($relationshipsMaster ?? []);
+            const sectorsMaster = @json($sectorsMaster ?? []);
         
         // Hide Move to Lead button immediately if no lead_id in URL
         (function() {
@@ -1485,27 +1735,9 @@
                     width: '100%'
                 });
             }
-            
-            // Function to toggle custom clear button visibility
-            function toggleVisaCategoryClearButton() {
-                var val = $('#visa_category').val();
-                if (val && val !== '') {
-                    $('#visa_category_clear').show();
-                } else {
-                    $('#visa_category_clear').hide();
-                }
-            }
-            
-            // Custom clear button click handler
-            $('#visa_category_clear').on('click', function(e) {
-                e.preventDefault();
-                $('#visa_category').val(null).trigger('change');
-                toggleVisaCategoryClearButton();
-            });
-            
-            $('#visa_category').on('change', function() {
+            attachSelect2ClearButton('#visa_category', 'visa_category_clear');
+            $('#visa_category').off('change.visaCategoryOther').on('change.visaCategoryOther', function() {
                 var v = $(this).val();
-                toggleVisaCategoryClearButton();
                 if (v === 'other') {
                     $('#visa_category_other_wrapper').show();
                 } else {
@@ -1524,6 +1756,7 @@
                     closeOnSelect: false
                 });
             }
+            attachSelect2ClearButton('#languages_spoken', 'languages_spoken_clear');
 
             // Initialize searchable Select2 for Country/State/City masters (Tab 1)
             const stateUrlTemplate = "{{ route('add-lead.get-states', ':countryId') }}";
@@ -1540,16 +1773,80 @@
                 }
             }
 
+            // Reusable clear button for any Select2 dropdown (single or multiple)
+            function attachSelect2ClearButton(selectSelector, clearButtonId) {
+                const $sel = $(selectSelector);
+                const $clearBtn = $('#' + clearButtonId);
+                if (!$sel.length || !$clearBtn.length) return;
+                function toggleClear() {
+                    const val = $sel.val();
+                    const hasVal = Array.isArray(val) ? (val && val.length > 0) : (val && val !== '');
+                    $clearBtn.toggle(!!hasVal);
+                }
+                $clearBtn.off('click').on('click', function(e) {
+                    e.preventDefault();
+                    $sel.val(null).trigger('change');
+                    toggleClear();
+                });
+                $sel.off('change.clearBtn').on('change.clearBtn', toggleClear);
+                toggleClear();
+            }
+
+            function initSelect2NoSearch(selector, placeholderText) {
+                if ($(selector).length && !$(selector).hasClass('select2-hidden-accessible')) {
+                    $(selector).select2({
+                        placeholder: placeholderText,
+                        allowClear: false,
+                        width: '100%',
+                        minimumResultsForSearch: Infinity
+                    });
+                }
+            }
+
             initSelect2IfNeeded('#country_of_origin', '@lang("app.select") @lang("app.countryOfOrigin")');
             initSelect2IfNeeded('#home_state', '@lang("app.select") @lang("app.state")');
             initSelect2IfNeeded('#home_city', '@lang("app.select") @lang("app.city")');
             initSelect2IfNeeded('#mailing_state', '@lang("app.select") @lang("app.state")');
             initSelect2IfNeeded('#mailing_city', '@lang("app.select") @lang("app.city")');
+            attachSelect2ClearButton('#country_of_origin', 'country_of_origin_clear');
+            attachSelect2ClearButton('#home_state', 'home_state_clear');
+            attachSelect2ClearButton('#home_city', 'home_city_clear');
+            attachSelect2ClearButton('#mailing_state', 'mailing_state_clear');
+            attachSelect2ClearButton('#mailing_city', 'mailing_city_clear');
+            // Passport dropdowns without search (passport_type, passport_category, place_of_issue, last_passport_history, old_passport_issue_year) use select-picker — same as Education Passing Year — inited via initializeSelectPickers()
+            
+            // Set default passport type to "Ordinary Passport" (id 1) if no value is set
+            function setDefaultPassportType() {
+                const $passportType = $('#passport_type');
+                if ($passportType.length && (!$passportType.val() || $passportType.val() === '')) {
+                    // Find "Ordinary Passport" option (id 1) and select it
+                    const ordinaryPassportOption = $passportType.find('option[data-passport-type-id="1"]');
+                    if (ordinaryPassportOption.length) {
+                        $passportType.val(ordinaryPassportOption.val()).selectpicker('refresh');
+                    }
+                }
+            }
+            
+            // Set default after selectpickers are initialized (only for new forms)
+            setTimeout(function() {
+                // Only set default if we're not loading existing data (check if lead_id exists in URL)
+                const urlParams = new URLSearchParams(window.location.search);
+                const leadId = urlParams.get('lead_id');
+                if (!leadId) {
+                    setDefaultPassportType();
+                }
+            }, 500);
+            
             initSelect2IfNeeded('#issuing_country', '@lang("app.select") Issuing Country');
             initSelect2IfNeeded('#city_where_issued', '@lang("app.select") City Where Issued');
             initSelect2IfNeeded('#spouse_country', '@lang("app.select") Spouse\'s Country');
             initSelect2IfNeeded('#spouse_state', '@lang("app.select") @lang("app.state")');
             initSelect2IfNeeded('#spouse_city', '@lang("app.select") @lang("app.city")');
+            attachSelect2ClearButton('#issuing_country', 'issuing_country_clear');
+            attachSelect2ClearButton('#city_where_issued', 'city_where_issued_clear');
+            attachSelect2ClearButton('#spouse_country', 'spouse_country_clear');
+            attachSelect2ClearButton('#spouse_state', 'spouse_state_clear');
+            attachSelect2ClearButton('#spouse_city', 'spouse_city_clear');
 
             function resetCitySelect($citySelect) {
                 $citySelect.html('<option value="">@lang("app.select")</option>');
@@ -1613,6 +1910,24 @@
                 });
             }
 
+            // Load states for a relative contact row (same as Personal Details: country -> state)
+            function loadStatesForRelativeRow(countryId, contactNum) {
+                const stateSel = '#relative_state_' + contactNum;
+                const citySel = '#relative_city_' + contactNum;
+                if (!countryId) {
+                    resetStateSelect($(stateSel));
+                    resetCitySelect($(citySel));
+                    return $.Deferred().resolve().promise();
+                }
+                const url = stateUrlTemplate.replace(':countryId', countryId);
+                return $.get(url).then(function (res) {
+                    if (res && res.options) {
+                        $(stateSel).html(res.options).prop('disabled', false).val(null).trigger('change');
+                        resetCitySelect($(citySel));
+                    }
+                });
+            }
+
             function loadCitiesByCountry(countryId, $citySelect) {
                 if (!countryId) {
                     $citySelect.html('<option value="">@lang('app.select')</option>').val(null).trigger('change');
@@ -1624,6 +1939,55 @@
                         $citySelect.html(res.options).prop('disabled', false).val(null).trigger('change');
                     }
                 });
+            }
+
+            // Calculate and display job experience only when both Duration From and Duration To are selected
+            function updateJobExperience(jobNum) {
+                const fromVal = $('#job_duration_from_' + jobNum).val();
+                const isCurrentJob = $('#job_current_job_' + jobNum).is(':checked');
+                const $out = $('#job_experience_' + jobNum);
+                if (isCurrentJob) {
+                    $out.val('');
+                    return;
+                }
+                const toVal = $('#job_duration_to_' + jobNum).val();
+                if (!fromVal || !toVal) {
+                    $out.val('');
+                    return;
+                }
+                const from = new Date(fromVal);
+                const to = new Date(toVal);
+                if (to < from) {
+                    $out.val('');
+                    return;
+                }
+                let months = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
+                if (to.getDate() < from.getDate()) months -= 1;
+                if (months < 0) months = 0;
+                const years = Math.floor(months / 12);
+                const remMonths = months % 12;
+                const parts = [];
+                if (years > 0) parts.push(years + ' year' + (years !== 1 ? 's' : ''));
+                if (remMonths > 0) parts.push(remMonths + ' month' + (remMonths !== 1 ? 's' : ''));
+                $out.val(parts.length ? parts.join(' ') : '0 months');
+            }
+
+            // Filter sector dropdown: show all sectors when no industry; show only that industry's sectors when industry selected
+            function filterSectorsByIndustry(jobNum) {
+                const industryId = $('#job_industry_' + jobNum).val();
+                const $sectorSelect = $('#job_sector_' + jobNum);
+                let optionsHtml = '<option value="">@lang("app.select")</option>';
+                sectorsMaster.forEach(function (s) {
+                    const show = !industryId || String(s.industry_id) === String(industryId);
+                    if (show) {
+                        optionsHtml += '<option value="' + s.id + '">' + (s.name || '') + '</option>';
+                    }
+                });
+                if ($sectorSelect.hasClass('select2-hidden-accessible')) {
+                    $sectorSelect.select2('destroy');
+                }
+                $sectorSelect.html(optionsHtml).val(null).trigger('change');
+                initSelect2IfNeeded('#job_sector_' + jobNum, '@lang("app.select") @lang("app.menu.sector")');
             }
 
             function setSelectBySavedText($select, savedText) {
@@ -1655,10 +2019,81 @@
                 loadStates(countryId);
             });
 
-            // Issuing country change -> reload City Where Issued (cities in that country)
+            // Issuing country change -> reload City Where Issued (cities in that country only)
             $('#issuing_country').on('change', function () {
                 loadCitiesByCountry($(this).val(), $('#city_where_issued'));
             });
+            // On load: if Issuing Country already has a value (e.g. India), load its cities into City Where Issued
+            var initialIssuingCountry = $('#issuing_country').val();
+            if (initialIssuingCountry) {
+                loadCitiesByCountry(initialIssuingCountry, $('#city_where_issued'));
+            }
+
+            // Passport Category: Non-ECR -> green tag, ECR -> red warning under field
+            function updatePassportCategoryMessage() {
+                var $msg = $('#passport-category-message');
+                var val = ($('#passport_category').val() || '').trim();
+                $msg.removeClass('text-danger text-success').html('');
+                if (val === 'Non-ECR') {
+                    $msg.addClass('text-success').html('<span class="badge badge-success" style="background-color:#28a745;color:#fff;">Non-ECR</span>');
+                } else if (val === 'ECR') {
+                    $msg.addClass('text-danger').html('<span class="font-weight-semibold">ECR passport – additional clearance may be required</span>');
+                }
+            }
+            $(document).on('change', '#passport_category', updatePassportCategoryMessage);
+            updatePassportCategoryMessage();
+
+            // Last Passport History: when "No Previous Passport" hide Old Passport Number & Old Passport Issue Year; otherwise show
+            function toggleOldPassportFields() {
+                var val = ($('#last_passport_history').val() || '').trim();
+                if (val === 'No Previous Passport') {
+                    $('.old-passport-dependent-col').hide();
+                    $('#old_passport_number').val('');
+                    var $yr = $('#old_passport_issue_year');
+                    $yr.val(null);
+                    if ($yr.data('selectpicker')) {
+                        $yr.selectpicker('refresh');
+                    }
+                    $yr.trigger('change');
+                    $('#lost_passport_history').val('');
+                } else {
+                    $('.old-passport-dependent-col').show();
+                }
+            }
+            $(document).on('change', '#last_passport_history', toggleOldPassportFields);
+            toggleOldPassportFields();
+
+            // Passport Status: if expiration date is before today, auto-select "Expired"
+            function syncPassportStatusFromExpiry() {
+                var $st = $('#passport_status');
+                if (!$st.length) return;
+                var expVal = ($('#expiration_date').val() || '').trim();
+                if (!expVal) return;
+                var today = new Date();
+                today.setHours(0, 0, 0, 0);
+                var exp = new Date(expVal);
+                exp.setHours(0, 0, 0, 0);
+                if (exp < today) {
+                    // Find "Expired" option from master data
+                    var expiredOption = $st.find('option').filter(function() {
+                        return $(this).text().trim() === 'Expired';
+                    });
+                    if (expiredOption.length) {
+                        $st.val(expiredOption.val());
+                    } else {
+                        // Fallback: try to set by value if "Expired" exists
+                        $st.val('Expired');
+                    }
+                } else {
+                    // Future date or today: do not auto-select any option
+                    $st.val('');
+                }
+                if ($st.data('selectpicker')) {
+                    $st.selectpicker('refresh');
+                }
+            }
+            $(document).on('change', '#expiration_date', syncPassportStatusFromExpiry);
+            syncPassportStatusFromExpiry();
 
             // Spouse country change -> reload spouse states/cities
             $('#spouse_country').on('change', function () {
@@ -1877,9 +2312,9 @@
                                 </div>
                             </div>
                             <div class="col-md-3" id="visa_refusal_category_other_wrapper_${refusalNum}" style="display: none;">
-                                <x-forms.label class="mt-3" fieldId="visa_refusal_category_other_${refusalNum}" :fieldLabel="__('placeholders.otherInfo')">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_category_other_${refusalNum}" fieldLabel="Other Visa Category">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="visa_refusal_category_other_${refusalNum}" id="visa_refusal_category_other_${refusalNum}" placeholder="@lang('placeholders.otherInfo')">
+                                <input type="text" class="form-control height-35 f-14" name="visa_refusal_category_other_${refusalNum}" id="visa_refusal_category_other_${refusalNum}">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="visa_refusal_reason_${refusalNum}" :fieldLabel="__('app.reason')">
@@ -1908,28 +2343,9 @@
                         width: '100%'
                     });
                 }
-                
-                // Function to toggle clear button visibility for visa refusal category
-                function toggleVisaRefusalCategoryClearButton() {
-                    const val = $(categorySelectId).val();
-                    if (val && val !== '') {
-                        $('#visa_refusal_category_clear_' + refusalNum).show();
-                    } else {
-                        $('#visa_refusal_category_clear_' + refusalNum).hide();
-                    }
-                }
-                
-                // Custom clear button click handler for visa refusal category
-                $('#visa_refusal_category_clear_' + refusalNum).on('click', function(e) {
-                    e.preventDefault();
-                    $(categorySelectId).val(null).trigger('change');
-                    toggleVisaRefusalCategoryClearButton();
-                });
-                
-                // Change handler for visa refusal category
-                $(categorySelectId).on('change', function() {
+                attachSelect2ClearButton(categorySelectId, 'visa_refusal_category_clear_' + refusalNum);
+                $(categorySelectId).off('change.visaRefusalOther').on('change.visaRefusalOther', function() {
                     const v = $(this).val();
-                    toggleVisaRefusalCategoryClearButton();
                     if (v === 'other') {
                         $('#visa_refusal_category_other_wrapper_' + refusalNum).show();
                     } else {
@@ -2210,17 +2626,63 @@
                 const orgName = contactData && contactData.relative_organization_name ? contactData.relative_organization_name : '';
                 const relationship = contactData && contactData.relative_relationship ? contactData.relative_relationship : '';
                 const address = contactData && contactData.relative_contact_address ? contactData.relative_contact_address : '';
-                const city = contactData && contactData.relative_city ? contactData.relative_city : '';
+                const country = contactData && contactData.relative_country ? contactData.relative_country : '';
                 const state = contactData && contactData.relative_state ? contactData.relative_state : '';
+                const city = contactData && contactData.relative_city ? contactData.relative_city : '';
                 const zipCode = contactData && contactData.relative_zip_code ? contactData.relative_zip_code : '';
                 const email = contactData && contactData.relative_email_address ? contactData.relative_email_address : '';
                 const phone = contactData && contactData.relative_phone_number ? contactData.relative_phone_number : '';
+                const whatsappEnable = contactData && (contactData.relative_whatsapp_enable === true || contactData.relative_whatsapp_enable === '1' || contactData.relative_whatsapp_enable === 1);
                 
-                // Build state options from master
-                let stateOptions = '<option value="">@lang("app.select")</option>';
-                stateMasters.forEach(function (st) {
-                    stateOptions += `<option value="${st.id}">${st.name}</option>`;
+                // Resolve organization name to dropdown value: id if matches master, or "other" with text
+                let orgTypeSelected = '';
+                let orgNameOther = '';
+                if (orgName) {
+                    const matched = organizationTypes.find(function(ot) { return ot.name === orgName || String(ot.id) === String(orgName); });
+                    if (matched) {
+                        orgTypeSelected = String(matched.id);
+                    } else {
+                        orgTypeSelected = 'other';
+                        orgNameOther = orgName;
+                    }
+                }
+                
+                // Build organization type options from master + Other
+                let orgTypeOptions = '<option value="">@lang("app.select")</option>';
+                organizationTypes.forEach(function(ot) {
+                    const sel = orgTypeSelected === String(ot.id) ? ' selected' : '';
+                    orgTypeOptions += `<option value="${ot.id}"${sel}>${ot.name}</option>`;
                 });
+                orgTypeOptions += '<option value="other"' + (orgTypeSelected === 'other' ? ' selected' : '') + '>@lang("app.other")</option>';
+                
+                // Resolve relationship to dropdown value: id if matches master, or "other" with text
+                let relationshipSelected = '';
+                let relationshipOther = '';
+                if (relationship) {
+                    const relMatched = relationshipsMaster.find(function(r) { return r.name === relationship || String(r.id) === String(relationship); });
+                    if (relMatched) {
+                        relationshipSelected = String(relMatched.id);
+                    } else {
+                        relationshipSelected = 'other';
+                        relationshipOther = relationship;
+                    }
+                }
+                // Build relationship options from master + Other
+                let relationshipOptions = '<option value="">@lang("app.select")</option>';
+                relationshipsMaster.forEach(function(r) {
+                    const sel = relationshipSelected === String(r.id) ? ' selected' : '';
+                    relationshipOptions += `<option value="${r.id}"${sel}>${r.name}</option>`;
+                });
+                relationshipOptions += '<option value="other"' + (relationshipSelected === 'other' ? ' selected' : '') + '>@lang("app.other")</option>';
+                
+                // Build country options from master (same as Personal Details)
+                let countryOptions = '<option value="">Select country</option>';
+                countryMasters.forEach(function (c) {
+                    const sel = (country && (String(c.id) === String(country) || c.name === country)) ? ' selected' : '';
+                    countryOptions += `<option value="${c.id}"${sel}>${c.name}</option>`;
+                });
+                // State options loaded via API when country is selected (start empty)
+                let stateOptions = '<option value="">@lang("app.select")</option>';
 
                 return `
                     <div class="relative-contact-row mb-4" id="relative-contact-row-${contactNum}" data-contact-index="${contactNum}">
@@ -2236,41 +2698,79 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_surname_${contactNum}" fieldLabel="Surname">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_surname_${contactNum}" id="relative_surname_${contactNum}" value="${surname}">
+                                <input type="text" class="form-control height-35 f-14" name="relative_surname_${contactNum}" id="relative_surname_${contactNum}" value="${surname}" pattern="[A-Za-z]*" title="Alphabets only. Either leave empty or enter at least 3 characters" onkeypress="return /[A-Za-z]/.test(event.key)">
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_given_name_${contactNum}" fieldLabel="Given Name">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_given_name_${contactNum}" id="relative_given_name_${contactNum}" value="${givenName}">
+                                <input type="text" class="form-control height-35 f-14" name="relative_given_name_${contactNum}" id="relative_given_name_${contactNum}" value="${givenName}" pattern="[A-Za-z\s]*" title="Alphabets only" onkeypress="return /[A-Za-z\s]/.test(event.key)">
                             </div>
-                            <div class="col-md-3">
-                                <x-forms.label class="mt-3" fieldId="relative_organization_name_${contactNum}" fieldLabel="Organization Name">
+                            <div class="col-md-3" style="position: relative;">
+                                <x-forms.label class="mt-3" fieldId="relative_organization_type_${contactNum}" fieldLabel="Organization Name">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_organization_name_${contactNum}" id="relative_organization_name_${contactNum}" value="${orgName}">
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 relative-organization-type-select" name="relative_organization_type_${contactNum}" id="relative_organization_type_${contactNum}">
+                                        ${orgTypeOptions}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 relative-organization-type-clear-btn" id="relative_organization_type_clear_${contactNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" id="relative_organization_name_other_wrapper_${contactNum}" style="display: ${orgTypeSelected === 'other' ? 'block' : 'none'};">
+                                <x-forms.label class="mt-3" fieldId="relative_organization_name_other_${contactNum}" fieldLabel="Other Organization Name">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_organization_name_other_${contactNum}" id="relative_organization_name_other_${contactNum}" value="${orgNameOther}">
+                            </div>
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="relative_relationship_${contactNum}" fieldLabel="Relationship To You">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="relative_relationship_${contactNum}" id="relative_relationship_${contactNum}" value="${relationship}">
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 relative-relationship-select" name="relative_relationship_${contactNum}" id="relative_relationship_${contactNum}">
+                                        ${relationshipOptions}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="relative_relationship_clear_${contactNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-3" id="relative_relationship_other_wrapper_${contactNum}" style="display: ${relationshipSelected === 'other' ? 'block' : 'none'};">
+                                <x-forms.label class="mt-3" fieldId="relative_relationship_other_${contactNum}" fieldLabel="Other Relationship To You">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14" name="relative_relationship_other_${contactNum}" id="relative_relationship_other_${contactNum}" value="${relationshipOther}">
                             </div>
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3" fieldId="relative_contact_address_${contactNum}" fieldLabel="Contact Address">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="relative_contact_address_${contactNum}" id="relative_contact_address_${contactNum}" value="${address}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
+                                <x-forms.label class="mt-3" fieldId="relative_country_${contactNum}" fieldLabel="Country">
+                                </x-forms.label>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 relative-country-select" name="relative_country_${contactNum}" id="relative_country_${contactNum}">
+                                        ${countryOptions}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="relative_country_clear_${contactNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="relative_state_${contactNum}" fieldLabel="State">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 relative-state-select" name="relative_state_${contactNum}" id="relative_state_${contactNum}">
-                                    ${stateOptions}
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 relative-state-select" name="relative_state_${contactNum}" id="relative_state_${contactNum}">
+                                        ${stateOptions}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="relative_state_clear_${contactNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="relative_city_${contactNum}" fieldLabel="City">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 relative-city-select" name="relative_city_${contactNum}" id="relative_city_${contactNum}">
-                                    <option value="">@lang('app.select')</option>
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 relative-city-select" name="relative_city_${contactNum}" id="relative_city_${contactNum}">
+                                        <option value="">@lang('app.select')</option>
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="relative_city_clear_${contactNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_zip_code_${contactNum}" fieldLabel="Zip Code">
@@ -2285,7 +2785,22 @@
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="relative_phone_number_${contactNum}" fieldLabel="Phone Number">
                                 </x-forms.label>
-                                <input type="number" max="9999999999" class="form-control height-35 f-14" name="relative_phone_number_${contactNum}" id="relative_phone_number_${contactNum}" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);" value="${phone}">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text height-35 f-14 bg-light">+91</span>
+                                    </div>
+                                    <input type="number" max="9999999999" class="form-control height-35 f-14" name="relative_phone_number_${contactNum}" id="relative_phone_number_${contactNum}" oninput="if(this.value.length > 10) this.value = this.value.slice(0,10);" value="${phone}" placeholder="10 digits">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="relative_whatsapp_enable_${contactNum}" fieldLabel="WhatsApp Enable">
+                                </x-forms.label>
+                                <div class="d-flex align-items-center height-35 f-14">
+                                    <div class="form-check mb-0 pl-0 d-flex align-items-center flex-row-reverse justify-content-start">
+                                        <input type="checkbox" class="form-check-input ml-2" name="relative_whatsapp_enable_${contactNum}" id="relative_whatsapp_enable_${contactNum}" value="1" ${whatsappEnable ? 'checked' : ''}>
+                                        <label class="form-check-label mb-0 f-14" for="relative_whatsapp_enable_${contactNum}">Yes</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2300,24 +2815,64 @@
                 // Append to the relative-contact-rows-container
                 $('#relative-contact-rows-container').append(newRow);
 
-                // Init Select2 for state/city in the new row
+                // Init Select2 for country/state/city in the new row (same order as Personal Details)
+                const countrySel = '#relative_country_' + contactNum;
                 const stateSel = '#relative_state_' + contactNum;
                 const citySel = '#relative_city_' + contactNum;
+                initSelect2IfNeeded(countrySel, 'Select country');
                 initSelect2IfNeeded(stateSel, '@lang("app.select") @lang("app.state")');
                 initSelect2IfNeeded(citySel, '@lang("app.select") @lang("app.city")');
+                attachSelect2ClearButton(countrySel, 'relative_country_clear_' + contactNum);
+                attachSelect2ClearButton(stateSel, 'relative_state_clear_' + contactNum);
+                attachSelect2ClearButton(citySel, 'relative_city_clear_' + contactNum);
+                resetStateSelect($(stateSel));
                 resetCitySelect($(citySel));
 
+                $(document).off('change.relativeCountry' + contactNum, countrySel).on('change.relativeCountry' + contactNum, countrySel, function () {
+                    loadStatesForRelativeRow($(this).val(), contactNum);
+                });
                 $(document).off('change.relativeState' + contactNum, stateSel).on('change.relativeState' + contactNum, stateSel, function () {
                     loadCities($(this).val(), $(citySel));
                 });
 
-                // If editing existing contact data (saved as text), set state then load cities then set city
+                // If editing existing contact data (saved as text), set country then load states then set state then load cities then set city
                 if (contactData) {
-                    setSelectBySavedText($(stateSel), contactData.relative_state || '');
-                    loadCities($(stateSel).val(), $(citySel)).then(function () {
+                    setSelectBySavedText($(countrySel), contactData.relative_country || '');
+                    loadStatesForRelativeRow($(countrySel).val(), contactNum).then(function () {
+                        setSelectBySavedText($(stateSel), contactData.relative_state || '');
+                        return loadCities($(stateSel).val(), $(citySel));
+                    }).then(function () {
                         setSelectBySavedText($(citySel), contactData.relative_city || '');
                     });
                 }
+
+                // Init Select2 for Organization Name (Organization Type) dropdown
+                const orgTypeSel = '#relative_organization_type_' + contactNum;
+                initSelect2IfNeeded(orgTypeSel, '@lang("app.select") Organization Name');
+                attachSelect2ClearButton(orgTypeSel, 'relative_organization_type_clear_' + contactNum);
+                $(orgTypeSel).off('change.relativeOrgType' + contactNum).on('change.relativeOrgType' + contactNum, function() {
+                    const v = $(this).val();
+                    if (v === 'other') {
+                        $('#relative_organization_name_other_wrapper_' + contactNum).show();
+                    } else {
+                        $('#relative_organization_name_other_wrapper_' + contactNum).hide();
+                        $('#relative_organization_name_other_' + contactNum).val('');
+                    }
+                });
+
+                // Init Select2 for Relationship To You dropdown
+                const relationshipSel = '#relative_relationship_' + contactNum;
+                initSelect2IfNeeded(relationshipSel, '@lang("app.select") Relationship To You');
+                attachSelect2ClearButton(relationshipSel, 'relative_relationship_clear_' + contactNum);
+                $(relationshipSel).off('change.relativeRelationship' + contactNum).on('change.relativeRelationship' + contactNum, function() {
+                    const v = $(this).val();
+                    if (v === 'other') {
+                        $('#relative_relationship_other_wrapper_' + contactNum).show();
+                    } else {
+                        $('#relative_relationship_other_wrapper_' + contactNum).hide();
+                        $('#relative_relationship_other_' + contactNum).val('');
+                    }
+                });
 
                 // Update remove buttons visibility and contact row numbers
                 setTimeout(function () {
@@ -2863,14 +3418,56 @@
                 const durationFrom = jobData && jobData.job_duration_from ? jobData.job_duration_from : '';
                 const durationTo = jobData && jobData.job_duration_to ? jobData.job_duration_to : '';
                 const country = jobData && jobData.job_country ? jobData.job_country : '';
+                const employmentType = jobData && jobData.job_employment_type ? jobData.job_employment_type : '';
                 const designation = jobData && jobData.job_designation ? jobData.job_designation : '';
                 const companyName = jobData && jobData.job_company_name ? jobData.job_company_name : '';
+                const industry = jobData && jobData.job_industry ? jobData.job_industry : '';
+                const sector = jobData && jobData.job_sector ? jobData.job_sector : '';
                 const salary = jobData && jobData.job_salary ? jobData.job_salary : '';
+                const isCurrentJob = !!(jobData && (jobData.job_current_job === true || jobData.job_current_job === '1' || jobData.job_current_job === 1));
                 
                 // Build country options from master
                 let countryOptions = '<option value="">@lang("app.select")</option>';
                 countryMasters.forEach(function (c) {
                     countryOptions += `<option value="${c.id}">${c.name}</option>`;
+                });
+
+                const employmentTypeOptions = [
+                    'Full Time', 'Part Time', 'Contract', 'Internship', 'Apprenticeship', 'Self Employed', 'Freelancer'
+                ];
+                let employmentTypeSelect = '<option value="">@lang("app.select")</option>';
+                employmentTypeOptions.forEach(function (opt) {
+                    const sel = (employmentType === opt) ? ' selected' : '';
+                    employmentTypeSelect += `<option value="${opt}"${sel}>${opt}</option>`;
+                });
+
+                const designationOptions = [
+                    'Software Developer', 'Web Developer', 'Accountant', 'Sales Executive', 'Marketing Executive',
+                    'Business Development Executive', 'HR Executive', 'Office Assistant', 'Clerk', 'Supervisor',
+                    'Manager', 'Store Manager', 'Restaurant Manager', 'Chef', 'Cook', 'Helper', 'Warehouse Associate',
+                    'Delivery Executive', 'Driver', 'Electrician', 'Plumber', 'Welder', 'Fitter', 'Machine Operator',
+                    'Quality Analyst', 'Data Entry Operator', 'Graphic Designer', 'Digital Marketer'
+                ];
+                let designationSelect = '<option value="">@lang("app.select")</option>';
+                designationOptions.forEach(function (opt) {
+                    const sel = (designation === opt) ? ' selected' : '';
+                    designationSelect += `<option value="${opt}"${sel}>${opt}</option>`;
+                });
+                if (designation && designationOptions.indexOf(designation) === -1) {
+                    designationSelect += `<option value="${designation}" selected>${designation}</option>`;
+                }
+
+                // Build industry options from master (same pattern as Country)
+                let industryOptions = '<option value="">@lang("app.select")</option>';
+                industryMasters.forEach(function (i) {
+                    const sel = (industry && (String(i.id) === String(industry) || i.name === industry)) ? ' selected' : '';
+                    industryOptions += `<option value="${i.id}"${sel}>${i.name}</option>`;
+                });
+                // Sector: show ALL sectors initially; when industry is selected we filter to that industry's sectors via filterSectorsByIndustry()
+                let sectorOptions = '<option value="">@lang("app.select")</option>';
+                sectorsMaster.forEach(function (s) {
+                    const sel = (sector && (String(s.id) === String(sector) || s.name === sector)) ? ' selected' : '';
+                    sectorOptions += '<option value="' + s.id + '"' + sel + '>' + (s.name || '') + '</option>';
                 });
 
                 return `
@@ -2883,33 +3480,78 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="border-bottom mb-3"></div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input job-current-job-cb" type="checkbox" name="job_current_job_${jobNum}" id="job_current_job_${jobNum}" value="1" ${isCurrentJob ? 'checked' : ''}>
+                            <label class="form-check-label pl-3 f-14" for="job_current_job_${jobNum}">Current job</label>
+                        </div>
                         <div class="row">
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_duration_from_${jobNum}" fieldLabel="Duration - From">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="job_duration_from_${jobNum}" id="job_duration_from_${jobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}" value="${durationFrom}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3 job-duration-to-col" id="job_duration_to_col_${jobNum}" data-job-num="${jobNum}" style="${isCurrentJob ? 'display:none' : ''}">
                                 <x-forms.label class="mt-3" fieldId="job_duration_to_${jobNum}" fieldLabel="Duration - To">
                                 </x-forms.label>
                                 <input type="date" class="form-control height-35 f-14" name="job_duration_to_${jobNum}" id="job_duration_to_${jobNum}" max="{{ date('Y-m-d', strtotime('-1 day')) }}" value="${durationTo}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-3 job-experience-col" id="job_experience_col_${jobNum}" data-job-num="${jobNum}" style="${isCurrentJob ? 'display:none' : ''}">
+                                <x-forms.label class="mt-3" fieldId="job_experience_${jobNum}" fieldLabel="Job Experience">
+                                </x-forms.label>
+                                <input type="text" class="form-control height-35 f-14 bg-light" name="job_experience_${jobNum}" id="job_experience_${jobNum}" readonly placeholder="Auto calculated">
+                            </div>
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="job_country_${jobNum}" fieldLabel="Country">
                                 </x-forms.label>
-                                <select class="form-control height-35 f-14 job-country-select" name="job_country_${jobNum}" id="job_country_${jobNum}">
-                                    ${countryOptions}
-                                </select>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 job-country-select" name="job_country_${jobNum}" id="job_country_${jobNum}">
+                                        ${countryOptions}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="job_country_clear_${jobNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
+                                <x-forms.label class="mt-3" fieldId="job_employment_type_${jobNum}" fieldLabel="Employment Type">
+                                </x-forms.label>
+                                <select class="form-control select-picker height-35 f-14" name="job_employment_type_${jobNum}" id="job_employment_type_${jobNum}">
+                                    ${employmentTypeSelect}
+                                </select>
+                            </div>
+                            <div class="col-md-3" style="position: relative;">
                                 <x-forms.label class="mt-3" fieldId="job_designation_${jobNum}" fieldLabel="Designation">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="job_designation_${jobNum}" id="job_designation_${jobNum}" value="${designation}">
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 job-designation-select" name="job_designation_${jobNum}" id="job_designation_${jobNum}">
+                                        ${designationSelect}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="job_designation_clear_${jobNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_company_name_${jobNum}" fieldLabel="Company Name">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="job_company_name_${jobNum}" id="job_company_name_${jobNum}" value="${companyName}">
+                            </div>
+                            <div class="col-md-3" style="position: relative;">
+                                <x-forms.label class="mt-3" fieldId="job_industry_${jobNum}" fieldLabel="Industry">
+                                </x-forms.label>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 job-industry-select" name="job_industry_${jobNum}" id="job_industry_${jobNum}">
+                                        ${industryOptions}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="job_industry_clear_${jobNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-3" style="position: relative;">
+                                <x-forms.label class="mt-3" fieldId="job_sector_${jobNum}" fieldLabel="Sector">
+                                </x-forms.label>
+                                <div style="position: relative;">
+                                    <select class="form-control height-35 f-14 job-sector-select" name="job_sector_${jobNum}" id="job_sector_${jobNum}">
+                                        ${sectorOptions}
+                                    </select>
+                                    <button type="button" class="btn btn-link p-0 select2-clear-btn" id="job_sector_clear_${jobNum}" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <x-forms.label class="mt-3" fieldId="job_salary_${jobNum}" fieldLabel="Salary">
@@ -2932,6 +3574,80 @@
                 // Init Select2 for job country
                 const jobCountrySel = '#job_country_' + jobNum;
                 initSelect2IfNeeded(jobCountrySel, '@lang("app.select") Country');
+                attachSelect2ClearButton(jobCountrySel, 'job_country_clear_' + jobNum);
+
+                // Init Select2 for job industry & sector (binding like PR Preferred Country -> Preferred State)
+                initSelect2IfNeeded('#job_industry_' + jobNum, '@lang("app.select") @lang("app.menu.industry")');
+                initSelect2IfNeeded('#job_sector_' + jobNum, '@lang("app.select") @lang("app.menu.sector")');
+                attachSelect2ClearButton('#job_industry_' + jobNum, 'job_industry_clear_' + jobNum);
+                attachSelect2ClearButton('#job_sector_' + jobNum, 'job_sector_clear_' + jobNum);
+
+                // When industry changes: show all sectors if no industry, or only that industry's sectors
+                $('#job_industry_' + jobNum).off('change.jobIndustry').on('change.jobIndustry', function() {
+                    filterSectorsByIndustry(jobNum);
+                });
+
+                // Current job checkbox: only one job can be current; when checked, uncheck all other rows
+                $('#job_current_job_' + jobNum).off('change.currentJob').on('change.currentJob', function() {
+                    const isChecked = $(this).is(':checked');
+                    if (isChecked) {
+                        $('.job-row').each(function() {
+                            const otherNum = $(this).data('job-index');
+                            if (otherNum != null && String(otherNum) !== String(jobNum)) {
+                                $('#job_current_job_' + otherNum).prop('checked', false);
+                                $('#job_duration_to_col_' + otherNum).show();
+                                $('#job_experience_col_' + otherNum).show();
+                                updateJobExperience(otherNum);
+                            }
+                        });
+                    }
+                    $('#job_duration_to_col_' + jobNum).toggle(!isChecked);
+                    $('#job_experience_col_' + jobNum).toggle(!isChecked);
+                    if (isChecked) {
+                        $('#job_duration_to_' + jobNum).val('');
+                        $('#job_experience_' + jobNum).val('');
+                    }
+                    updateJobExperience(jobNum);
+                });
+
+                // Job Experience auto-calc: recompute when Duration From or Duration To changes
+                $('#job_duration_from_' + jobNum).off('change.jobExp input.jobExp').on('change.jobExp input.jobExp', function() { updateJobExperience(jobNum); });
+                $('#job_duration_to_' + jobNum).off('change.jobExp input.jobExp').on('change.jobExp input.jobExp', function() { updateJobExperience(jobNum); });
+                updateJobExperience(jobNum);
+
+                // If editing: industry may be set; filter sector list to that industry then set sector
+                if (jobData && (jobData.job_industry || jobData.job_sector)) {
+                    filterSectorsByIndustry(jobNum);
+                    if (jobData.job_sector) {
+                        setSelectBySavedText($('#job_sector_' + jobNum), jobData.job_sector);
+                    }
+                }
+
+                // Init Select2 for job designation (same design as country; tags:true allows custom text)
+                const jobDesignationSel = '#job_designation_' + jobNum;
+                if ($(jobDesignationSel).length && !$(jobDesignationSel).hasClass('select2-hidden-accessible')) {
+                    $(jobDesignationSel).select2({
+                        placeholder: 'Select or type custom',
+                        allowClear: false,
+                        width: '100%',
+                        tags: true
+                    });
+                }
+                attachSelect2ClearButton(jobDesignationSel, 'job_designation_clear_' + jobNum);
+                if (jobData && jobData.job_designation) {
+                    $(jobDesignationSel).val(jobData.job_designation).trigger('change');
+                }
+
+                // Init select-picker for job employment type (same design as IELTS/PTE/OET/TOEFL exam dropdowns – no search)
+                const $jobRow = $('#job-row-' + jobNum);
+                $jobRow.find('.select-picker').each(function() {
+                    if (!$(this).data('selectpicker')) {
+                        $(this).selectpicker();
+                    }
+                });
+                if (jobData && jobData.job_employment_type) {
+                    $('#job_employment_type_' + jobNum).val(jobData.job_employment_type).selectpicker('refresh');
+                }
 
                 // If editing existing job data (saved as text), set country
                 if (jobData && jobData.job_country) {
@@ -3030,6 +3746,17 @@
                 });
             }
 
+            // Property Details: block - and + from appearing; only digits and one decimal allowed
+            $(document).on('input paste change', '.valuation-input', function() {
+                const $el = $(this);
+                let val = ($el.val() || '').toString();
+                val = val.replace(/[^0-9.]/g, '');
+                const parts = val.split('.');
+                if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+                if (val !== $el.val()) $el.val(val);
+                const num = parseFloat(val);
+                if (val !== '' && !isNaN(num) && num < 0) $el.val(0);
+            });
             // Auto-calculate total valuation for Property Details
             $('.valuation-input').on('input', function() {
                 let total = 0;
@@ -3038,8 +3765,87 @@
                     total += val;
                 });
                 $('#total_valuation').val(total);
+                updateTotalLoanValueLevel();
+                updateNetWorth();
             });
 
+            // Loan level message: Low Loan < 30%, Medium 30–60%, High > 60% of Total Asset Valuation
+            function updateTotalLoanValueLevel() {
+                const $msg = $('#total_loan_value_level');
+                const assets = parseFloat($('#total_valuation').val()) || 0;
+                const loan = parseFloat($('#total_loan_value').val()) || 0;
+                $msg.removeClass('text-info text-warning text-danger').hide();
+                if (assets <= 0) {
+                    $msg.hide();
+                    return;
+                }
+                const pct = (loan / assets) * 100;
+                if (loan <= 0) {
+                    $msg.hide();
+                    return;
+                }
+                let text = '';
+                if (pct < 30) {
+                    text = 'Low Loan';
+                    $msg.addClass('text-info');
+                } else if (pct <= 60) {
+                    text = 'Medium Loan';
+                    $msg.addClass('text-warning');
+                } else {
+                    text = 'High Loan';
+                    $msg.addClass('text-danger');
+                }
+                $msg.text(text).show();
+            }
+            function syncTotalLoanValueCopy() {
+                const v = $('#total_loan_value').val();
+                $('#total_loan_value_copy').val(v === '' || v === null || v === undefined ? '' : v);
+            }
+            // Net Worth = Total Asset Valuation - Total Loan Value (auto-calculated)
+            function updateNetWorth() {
+                const assets = parseFloat($('#total_valuation').val()) || 0;
+                const loan = parseFloat($('#total_loan_value').val()) || 0;
+                const netWorth = assets - loan;
+                $('#net_worth').val(netWorth);
+            }
+            $('#total_loan_value').on('input change', function() {
+                const val = $(this).val();
+                if (val === '' || val === null || val === undefined || String(val).trim() === '') {
+                    $('#loan_years').val('');
+                    $('#loan_availed_on').val('');
+                }
+                updateTotalLoanValueLevel();
+                syncTotalLoanValueCopy();
+                updateNetWorth();
+            });
+            // Loan Availed On: do not allow future dates
+            function getTodayYMD() {
+                const d = new Date();
+                return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+            }
+            $('#loan_availed_on').attr('max', getTodayYMD());
+            $('#loan_availed_on').on('focus', function() {
+                $(this).attr('max', getTodayYMD());
+            });
+            $('#loan_availed_on').on('input change', function() {
+                const max = $(this).attr('max');
+                const val = $(this).val();
+                if (val && max && val > max) $(this).val('');
+            });
+            syncTotalLoanValueCopy();
+            updateNetWorth();
+
+            // Financial Status: block - and + from income fields; only digits and one decimal allowed (same as Property Details)
+            $(document).on('input paste change', '.income-input', function() {
+                const $el = $(this);
+                let val = ($el.val() || '').toString();
+                val = val.replace(/[^0-9.]/g, '');
+                const parts = val.split('.');
+                if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+                if (val !== $el.val()) $el.val(val);
+                const num = parseFloat(val);
+                if (val !== '' && !isNaN(num) && num < 0) $el.val(0);
+            });
             // Auto-calculate total income for Financial Status
             $('.income-input').on('input', function() {
                 let total = 0;
@@ -3048,6 +3854,25 @@
                     total += val;
                 });
                 $('#total_income').val(total);
+            });
+            
+            // Restrict passport number to alphanumeric only (no special characters)
+            $(document).on('input', '#passport_number', function() {
+                var $el = $(this);
+                var val = $el.val();
+                var filtered = val.replace(/[^A-Za-z0-9]/g, '');
+                if (val !== filtered) {
+                    $el.val(filtered);
+                }
+            });
+            // Restrict old passport number to alphanumeric only (min 8, max 9, no special characters)
+            $(document).on('input', '#old_passport_number', function() {
+                var $el = $(this);
+                var val = $el.val();
+                var filtered = val.replace(/[^A-Za-z0-9]/g, '');
+                if (val !== filtered) {
+                    $el.val(filtered);
+                }
             });
             
             // Handle Father Have Passport - show/hide passport file field
@@ -4007,6 +4832,15 @@
                         // Special handling for Step 7 - jobs data
                         if (stepNum === 7 && stepDataObj.jobs && Array.isArray(stepDataObj.jobs)) {
                             const jobs = stepDataObj.jobs;
+                            // Ensure only one job is current when loading (first one with job_current_job wins)
+                            let currentJobAssigned = false;
+                            jobs.forEach(function(job) {
+                                if (job.job_current_job && currentJobAssigned) {
+                                    job.job_current_job = 0;
+                                } else if (job.job_current_job) {
+                                    currentJobAssigned = true;
+                                }
+                            });
                             // Clear any existing jobs
                             $('#job-rows-container').empty();
                             jobCounter = 0;
@@ -4093,10 +4927,43 @@
                     }
                 }
                 
+                // Update passport validity warning when step 3 data was populated (e.g. expiration_date)
+                if ($('#expiration_date').length && $('#expiration_date').val()) {
+                    $('#expiration_date').trigger('change');
+                }
+                // Update passport category message (Non-ECR green tag / ECR red warning) when step 3 data was populated
+                if ($('#passport_category').length) {
+                    $('#passport_category').trigger('change');
+                }
+                // Set default passport type if no value was loaded from step_3_data
+                setTimeout(function() {
+                    const $passportType = $('#passport_type');
+                    if ($passportType.length && (!$passportType.val() || $passportType.val() === '')) {
+                        // Find "Ordinary Passport" option (id 1) and select it
+                        const ordinaryPassportOption = $passportType.find('option[data-passport-type-id="1"]');
+                        if (ordinaryPassportOption.length) {
+                            $passportType.val(ordinaryPassportOption.val()).selectpicker('refresh');
+                        }
+                    }
+                }, 100);
+                // Update Last Passport History visibility (hide Old Passport Number/Year when "No Previous Passport")
+                if ($('#last_passport_history').length) {
+                    $('#last_passport_history').trigger('change');
+                }
+                
                 // Update tab navigation after form fields are populated
                 // Use a delay to ensure all selectpickers are refreshed
                 setTimeout(function() {
                     updateTabNavigation();
+                    if (typeof updateTotalLoanValueLevel === 'function') {
+                        updateTotalLoanValueLevel();
+                    }
+                    if (typeof syncTotalLoanValueCopy === 'function') {
+                        syncTotalLoanValueCopy();
+                    }
+                    if (typeof updateNetWorth === 'function') {
+                        updateNetWorth();
+                    }
                 }, 300);
             }
 
@@ -4458,7 +5325,17 @@
                         
                     case 3:
                         // Step 3 - Passport Details
-                        // All passport fields are optional - no validation required
+                        // Passport number: if provided, min 8, max 9, alphanumeric only
+                        const passportNumber = ($('#passport_number').val() || '').trim().toUpperCase();
+                        if (passportNumber) {
+                            if (passportNumber.length < 8 || passportNumber.length > 9) {
+                                isValid = false;
+                                showFieldError('#passport_number', 'Passport Number must be 8 to 9 characters');
+                            } else if (!/^[A-Za-z0-9]+$/.test(passportNumber)) {
+                                isValid = false;
+                                showFieldError('#passport_number', 'Passport Number must contain only letters and numbers');
+                            }
+                        }
                         // Only validate date logic if both dates are provided
                         const issuanceDate = $('#issuance_date').val();
                         const expirationDate = $('#expiration_date').val();
@@ -4466,10 +5343,77 @@
                             isValid = false;
                             showFieldError('#expiration_date', 'Expiration Date must be greater than Issuance Date');
                         }
+                        // Old passport number: if provided, min 8, max 9, alphanumeric only
+                        const oldPassportNumber = ($('#old_passport_number').val() || '').trim();
+                        if (oldPassportNumber) {
+                            if (oldPassportNumber.length < 8 || oldPassportNumber.length > 9) {
+                                isValid = false;
+                                showFieldError('#old_passport_number', 'Old Passport Number must be 8 to 9 characters');
+                            } else if (!/^[A-Za-z0-9]+$/.test(oldPassportNumber)) {
+                                isValid = false;
+                                showFieldError('#old_passport_number', 'Old Passport Number must contain only letters and numbers');
+                            }
+                        }
                         break;
                         
                     case 4:
                         // Step 4 - Relative Contact Information
+                        // Validate each relative contact row: Surname required, min 2 characters, alphabets only
+                        $('.relative-contact-row').each(function() {
+                            const contactIndex = $(this).data('contact-index');
+                            const surnameVal = ($('#relative_surname_' + contactIndex).val() || '').trim();
+                            const givenNameVal = ($('#relative_given_name_' + contactIndex).val() || '').trim();
+                            const orgTypeVal = $('#relative_organization_type_' + contactIndex).val() || '';
+                            let orgNameVal = '';
+                            if (orgTypeVal === 'other') {
+                                orgNameVal = ($('#relative_organization_name_other_' + contactIndex).val() || '').trim();
+                            } else if (orgTypeVal) {
+                                const ot = organizationTypes.find(function(o) { return o.id == orgTypeVal; });
+                                orgNameVal = ot ? ot.name : '';
+                            }
+                            const relationshipTypeVal = $('#relative_relationship_' + contactIndex).val() || '';
+                            let relationshipVal = '';
+                            if (relationshipTypeVal === 'other') {
+                                relationshipVal = ($('#relative_relationship_other_' + contactIndex).val() || '').trim();
+                            } else if (relationshipTypeVal) {
+                                const rel = relationshipsMaster.find(function(r) { return r.id == relationshipTypeVal; });
+                                relationshipVal = rel ? rel.name : '';
+                            }
+                            const addressVal = ($('#relative_contact_address_' + contactIndex).val() || '').trim();
+                            const countryVal = $('#relative_country_' + contactIndex).val();
+                            const stateVal = $('#relative_state_' + contactIndex).val();
+                            const cityVal = $('#relative_city_' + contactIndex).val();
+                            const zipVal = ($('#relative_zip_code_' + contactIndex).val() || '').trim();
+                            const emailVal = ($('#relative_email_address_' + contactIndex).val() || '').trim();
+                            const phoneVal = ($('#relative_phone_number_' + contactIndex).val() || '').trim();
+                            const rowHasAnyValue = surnameVal || givenNameVal || orgNameVal || relationshipVal || addressVal || countryVal || stateVal || cityVal || zipVal || emailVal || phoneVal;
+                            if (rowHasAnyValue) {
+                                // Given Name: alphabets only when filled
+                                if (givenNameVal && !/^[A-Za-z\s]+$/.test(givenNameVal)) {
+                                    isValid = false;
+                                    showFieldError('#relative_given_name_' + contactIndex, 'Given Name must contain only alphabets');
+                                }
+                                // Surname: if filled, 0 or 3+ alphabets (1 or 2 not valid); 3+ must be alphabets only
+                                const surnameFilledAndValid = surnameVal.length >= 3 && /^[A-Za-z]+$/.test(surnameVal);
+                                if (surnameVal.length === 1 || surnameVal.length === 2) {
+                                    isValid = false;
+                                    showFieldError('#relative_surname_' + contactIndex, 'Surname must be either empty or at least 3 characters (1 or 2 characters are not valid)');
+                                } else if (surnameVal.length >= 3 && !/^[A-Za-z]+$/.test(surnameVal)) {
+                                    isValid = false;
+                                    showFieldError('#relative_surname_' + contactIndex, 'Surname must contain only alphabets');
+                                }
+                                // When Surname is filled (3+ alphabets), Given Name is compulsory
+                                if (surnameFilledAndValid) {
+                                    if (!givenNameVal) {
+                                        isValid = false;
+                                        showFieldError('#relative_given_name_' + contactIndex, 'Given Name is compulsory.');
+                                    } else if (!/^[A-Za-z\s]+$/.test(givenNameVal)) {
+                                        isValid = false;
+                                        showFieldError('#relative_given_name_' + contactIndex, 'Given Name must contain only alphabets');
+                                    }
+                                }
+                            }
+                        });
                         // Validate email format if provided
                         const relativeEmail = ($('#relative_email_address').val() || '').trim();
                         if (relativeEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(relativeEmail)) {
@@ -4539,6 +5483,37 @@
                     return;
                 }
                 
+                // Step 8 (Property Details): blank valuation and total_loan_value fields auto-store as 0
+                if (currentStep === 8) {
+                    $('.valuation-input').each(function() {
+                        const $el = $(this);
+                        const val = $el.val();
+                        if (val === '' || val === null || val === undefined) {
+                            $el.val(0);
+                        }
+                    });
+                    const $tlv = $('#total_loan_value');
+                    const tlvVal = $tlv.val();
+                    if (tlvVal === '' || tlvVal === null || tlvVal === undefined) {
+                        $tlv.val(0);
+                    }
+                }
+                // Step 9 (Financial Status): blank income fields auto-store as 0 (same as Tab 8)
+                if (currentStep === 9) {
+                    $('.income-input').each(function() {
+                        const $el = $(this);
+                        const val = $el.val();
+                        if (val === '' || val === null || val === undefined) {
+                            $el.val(0);
+                        }
+                    });
+                    const $ti = $('#total_income');
+                    const tiVal = $ti.val();
+                    if (tiVal === '' || tiVal === null || tiVal === undefined) {
+                        $ti.val(0);
+                    }
+                }
+                
                 const formData = new FormData($('#addLeadForm')[0]);
                 
                 // Ensure step 4 relative contacts data is collected
@@ -4549,16 +5524,36 @@
                         const contactIndex = $(this).data('contact-index');
                         const surname = $('#relative_surname_' + contactIndex).val() || '';
                         const givenName = $('#relative_given_name_' + contactIndex).val() || '';
-                        const orgName = $('#relative_organization_name_' + contactIndex).val() || '';
-                        const relationship = $('#relative_relationship_' + contactIndex).val() || '';
+                        const orgTypeVal = $('#relative_organization_type_' + contactIndex).val() || '';
+                        let orgName = '';
+                        if (orgTypeVal === 'other') {
+                            orgName = $('#relative_organization_name_other_' + contactIndex).val() || '';
+                        } else if (orgTypeVal) {
+                            const ot = organizationTypes.find(function(o) { return o.id == orgTypeVal; });
+                            orgName = ot ? ot.name : '';
+                        }
+                        const relationshipTypeVal = $('#relative_relationship_' + contactIndex).val() || '';
+                        let relationship = '';
+                        if (relationshipTypeVal === 'other') {
+                            relationship = $('#relative_relationship_other_' + contactIndex).val() || '';
+                        } else if (relationshipTypeVal) {
+                            const rel = relationshipsMaster.find(function(r) { return r.id == relationshipTypeVal; });
+                            relationship = rel ? rel.name : '';
+                        }
                         const address = $('#relative_contact_address_' + contactIndex).val() || '';
+                        let country = $('#relative_country_' + contactIndex).val() || '';
                         let city = $('#relative_city_' + contactIndex).val() || '';
                         let state = $('#relative_state_' + contactIndex).val() || '';
                         const zipCode = $('#relative_zip_code_' + contactIndex).val() || '';
                         const email = $('#relative_email_address_' + contactIndex).val() || '';
                         const phone = $('#relative_phone_number_' + contactIndex).val() || '';
+                        const whatsappEnable = $('#relative_whatsapp_enable_' + contactIndex).is(':checked');
 
-                        // Resolve state/city ids to names
+                        // Resolve country/state/city ids to names
+                        if (country && !isNaN(country)) {
+                            const coObj = countryMasters.find(function (c) { return c.id == country; });
+                            if (coObj) country = coObj.name;
+                        }
                         if (state && !isNaN(state)) {
                             const stObj = stateMasters.find(function (s) { return s.id == state; });
                             if (stObj) state = stObj.name;
@@ -4569,18 +5564,20 @@
                         }
                         
                         // Only add contact if at least one field has a value
-                        if (surname || givenName || orgName || relationship || address || city || state || zipCode || email || phone) {
+                        if (surname || givenName || orgName || relationship || address || country || city || state || zipCode || email || phone) {
                             const contactData = {
                                 relative_surname: surname,
                                 relative_given_name: givenName,
                                 relative_organization_name: orgName,
                                 relative_relationship: relationship,
                                 relative_contact_address: address,
+                                relative_country: country,
                                 relative_city: city,
                                 relative_state: state,
                                 relative_zip_code: zipCode,
                                 relative_email_address: email,
-                                relative_phone_number: phone
+                                relative_phone_number: phone,
+                                relative_whatsapp_enable: whatsappEnable
                             };
                             relativeContacts.push(contactData);
                         }
@@ -4658,25 +5655,45 @@
                         const jobIndex = $(this).data('job-index');
                         const durationFrom = $('#job_duration_from_' + jobIndex).val() || '';
                         const durationTo = $('#job_duration_to_' + jobIndex).val() || '';
+                        const jobExperience = $('#job_experience_' + jobIndex).val() || '';
                         let country = $('#job_country_' + jobIndex).val() || '';
+                        const employmentType = $('#job_employment_type_' + jobIndex).val() || '';
                         const designation = $('#job_designation_' + jobIndex).val() || '';
                         const companyName = $('#job_company_name_' + jobIndex).val() || '';
+                        let jobIndustry = $('#job_industry_' + jobIndex).val() || '';
+                        let jobSector = $('#job_sector_' + jobIndex).val() || '';
                         const salary = $('#job_salary_' + jobIndex).val() || '';
+                        const jobCurrentJob = $('#job_current_job_' + jobIndex).is(':checked') ? 1 : 0;
 
                         // Resolve country id to name
                         if (country && !isNaN(country)) {
                             const cObj = countryMasters.find(function (c) { return c.id == country; });
                             if (cObj) country = cObj.name;
                         }
+                        // Resolve industry id to name
+                        if (jobIndustry && !isNaN(jobIndustry)) {
+                            const iObj = industryMasters.find(function (i) { return i.id == jobIndustry; });
+                            if (iObj) jobIndustry = iObj.name;
+                        }
+                        // Resolve sector id to name (use selected option text)
+                        if (jobSector) {
+                            const $sec = $('#job_sector_' + jobIndex).find('option:selected');
+                            if ($sec.length && $sec.text()) jobSector = $sec.text().trim();
+                        }
                         
                         // Only add job if at least one field has a value
-                        if (durationFrom || durationTo || country || designation || companyName || salary) {
+                        if (durationFrom || durationTo || country || employmentType || designation || companyName || jobIndustry || jobSector || salary) {
                             const jobData = {
                                 job_duration_from: durationFrom,
-                                job_duration_to: durationTo,
+                                job_duration_to: jobCurrentJob ? '' : durationTo,
+                                job_current_job: jobCurrentJob,
+                                job_experience: jobExperience,
                                 job_country: country,
+                                job_employment_type: employmentType,
                                 job_designation: designation,
                                 job_company_name: companyName,
+                                job_industry: jobIndustry,
+                                job_sector: jobSector,
                                 job_salary: salary
                             };
                             jobs.push(jobData);

@@ -13,6 +13,11 @@ use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\LeadSettingController;
 use App\Http\Controllers\NewLeadTemplateDocumentController;
 use App\Http\Controllers\NewLanguageMasterController;
+use App\Http\Controllers\NewRelationshipsMasterController;
+use App\Http\Controllers\NewOrganizationTypesMasterController;
+use App\Http\Controllers\NewPassportTypesMasterController;
+use App\Http\Controllers\NewPassportStatusMasterController;
+use App\Http\Controllers\NewPassportHistoryMasterController;
 use App\Http\Controllers\NewHighestQualificationMasterController;
 use App\Http\Controllers\NewEducationLevelMasterController;
 use App\Http\Controllers\NewStreamMasterController;
@@ -26,6 +31,9 @@ use App\Http\Controllers\CityMasterController;
 use App\Http\Controllers\VisaTypeSettingController;
 use App\Http\Controllers\VisaTypeController;
 use App\Http\Controllers\SubclassController;
+use App\Http\Controllers\IndustrySettingController;
+use App\Http\Controllers\IndustryController;
+use App\Http\Controllers\SectorController;
 use App\Http\Controllers\LeadDocumentSettingController;
 use App\Http\Controllers\MainDocumentController;
 use App\Http\Controllers\DependsDocumentController;
@@ -232,6 +240,21 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     /* Language Master */
     Route::resource('new-language-master', NewLanguageMasterController::class);
 
+    /* Relationships Master */
+    Route::resource('new-relationships-master', NewRelationshipsMasterController::class);
+
+    /* Organization Types Master */
+    Route::resource('new-organization-types-master', NewOrganizationTypesMasterController::class);
+
+    /* Passport Types Master */
+    Route::resource('new-passport-types-master', NewPassportTypesMasterController::class);
+
+    /* Passport Status Master */
+    Route::resource('new-passport-status-master', NewPassportStatusMasterController::class);
+
+    /* Passport History Master */
+    Route::resource('new-passport-history-master', NewPassportHistoryMasterController::class);
+
     /* Highest Qualification Master */
     Route::resource('new-highest-qualification-master', NewHighestQualificationMasterController::class);
 
@@ -260,6 +283,11 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     Route::get('visa-type-settings', [VisaTypeSettingController::class, 'index'])->name('visa-type-settings.index');
     Route::resource('visaTypes', VisaTypeController::class);
     Route::resource('subclasses', SubclassController::class);
+
+    /* Industry Master (Industry + Sector) */
+    Route::get('industry-settings', [IndustrySettingController::class, 'index'])->name('industry-settings.index');
+    Route::resource('industries', IndustryController::class);
+    Route::resource('sectors', SectorController::class);
 
     /* Lead Document Settings */
     Route::get('lead-document-settings', [LeadDocumentSettingController::class, 'index'])->name('lead-document-settings.index');

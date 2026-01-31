@@ -34,9 +34,16 @@ use App\Models\NewLeadProcess;
 use App\Models\NewLeadVisaType;
 use App\Models\NewVisaCategoryMaster;
 use App\Models\NewLanguageMaster;
+use App\Models\NewPassportTypesMaster;
+use App\Models\NewPassportStatusMaster;
+use App\Models\NewPassportHistoryMaster;
 use App\Models\NewCountryMaster;
 use App\Models\NewStateMaster;
 use App\Models\NewCityMaster;
+use App\Models\NewIndustryMaster;
+use App\Models\NewOrganizationTypesMaster;
+use App\Models\NewRelationshipsMaster;
+use App\Models\NewSectorMaster;
 use App\Models\NewGoogleToken;
 use App\Models\NewFacebookToken;
 use App\Models\NewMetaPage;
@@ -1136,6 +1143,24 @@ class LeadContactController extends AccountBaseController
                   ->orWhereNull('company_id');
         })->orderBy('name')->get();
 
+        // Load passport types from master (for Passport Details)
+        $this->passportTypes = NewPassportTypesMaster::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load passport statuses from master (for Passport Details)
+        $this->passportStatuses = NewPassportStatusMaster::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load passport histories from master (for Passport Details)
+        $this->passportHistories = NewPassportHistoryMaster::where(function($query) {
+            $query->where('company_id', company()->id)
+                  ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
         // Load countries from master (for Country of Origin / address state/city)
         $this->countryMasters = NewCountryMaster::where(function($query) {
             $query->where('company_id', company()->id)
@@ -1149,6 +1174,30 @@ class LeadContactController extends AccountBaseController
         })->orderBy('name')->get();
 
         $this->cityMasters = NewCityMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load industry master (for Professional Experience Industry/Sector)
+        $this->industryMasters = NewIndustryMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load organization types master (for Relative Contact Organization Name)
+        $this->organizationTypes = NewOrganizationTypesMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load relationships master (for Relative Contact Relationship To You)
+        $this->relationshipsMaster = NewRelationshipsMaster::where(function ($query) {
+            $query->where('company_id', company()->id)
+                ->orWhereNull('company_id');
+        })->orderBy('name')->get();
+
+        // Load all sectors with industry_id (show all first; filter by industry when industry selected)
+        $this->sectorsMaster = NewSectorMaster::where(function ($query) {
             $query->where('company_id', company()->id)
                 ->orWhereNull('company_id');
         })->orderBy('name')->get();
@@ -1263,6 +1312,27 @@ class LeadContactController extends AccountBaseController
         }
 
         return Reply::dataOnly(['status' => 'success', 'options' => $options, 'cities' => $cities]);
+    }
+
+    /**
+     * Get sectors by industry (for Professional Experience Industry/Sector binding)
+     */
+    public function getSectorsByIndustry($industryId)
+    {
+        $sectors = NewSectorMaster::where('industry_id', $industryId)
+            ->where(function ($query) {
+                $query->where('company_id', company()->id)
+                    ->orWhereNull('company_id');
+            })
+            ->orderBy('name')
+            ->get();
+
+        $options = '<option value="">' . __('app.select') . '</option>';
+        foreach ($sectors as $sector) {
+            $options .= '<option value="' . $sector->id . '">' . htmlspecialchars($sector->name, ENT_QUOTES, 'UTF-8') . '</option>';
+        }
+
+        return Reply::dataOnly(['status' => 'success', 'options' => $options, 'sectors' => $sectors]);
     }
 
     public function leadDetails($id = null)
@@ -3050,17 +3120,31 @@ class LeadContactController extends AccountBaseController
 
             case 3:
                 // Step 3 - Passport Details
-                // All passport fields are optional
+                // Passport number: optional, but if provided min 8, max 9, alphanumeric only; duplicate not allowed globally
                 $rules = [
-                    'passport_number' => 'nullable|string|max:255',
+                    'passport_number' => 'nullable|string|min:8|max:9|regex:/^[A-Za-z0-9]+$/',
+                    'passport_type' => 'nullable|string|exists:new_passport_types_master,name',
+                    'passport_category' => 'nullable|string|in:Non-ECR,ECR',
+                    'place_of_issue' => 'nullable|string|in:Passport Office,Passport Seva Kendra (PSK),Regional Passport Office (RPO),Indian Mission Abroad',
+                    'passport_verification_status' => 'nullable|string|in:Not Verified,Verified – Original Seen,Verified – Copy Only,Mismatch Found',
                     'issuing_country' => 'nullable|string|max:255',
                     'city_where_issued' => 'nullable|string|max:255',
                     'issuance_date' => 'nullable|date',
                     'expiration_date' => 'nullable|date',
+                    'last_passport_history' => 'nullable|string|exists:new_passport_history_master,name',
+                    'old_passport_number' => 'nullable|string|min:8|max:9|regex:/^[A-Za-z0-9]+$/',
+                    'old_passport_issue_year' => 'nullable|integer|min:1950|max:' . (int)date('Y'),
+                    'passport_status' => 'nullable|string|exists:new_passport_status_master,name',
                     'passport_file_upload' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
                 ];
-                
-                // Validate expiration_date is after issuance_date only if both are provided
+                $messages = [
+                    'passport_number.min' => 'Passport Number must be at least 8 characters.',
+                    'passport_number.max' => 'Passport Number must not exceed 9 characters.',
+                    'passport_number.regex' => 'Passport Number must contain only letters and numbers (alphanumeric).',
+                    'old_passport_number.min' => 'Old Passport Number must be at least 8 characters.',
+                    'old_passport_number.max' => 'Old Passport Number must not exceed 9 characters.',
+                    'old_passport_number.regex' => 'Old Passport Number must contain only letters and numbers (alphanumeric).',
+                ];
                 if ($request->issuance_date && $request->expiration_date) {
                     $rules['expiration_date'] = 'nullable|date|after:issuance_date';
                 }
@@ -3192,6 +3276,31 @@ class LeadContactController extends AccountBaseController
 
             $leadId = $request->lead_id;
             $isNewLead = false;
+
+            // Global duplicate passport check (step 3)
+            if ($stepNumber == 3 && $request->filled('passport_number')) {
+                $pn = trim((string) $request->passport_number);
+                if ($pn !== '') {
+                    $normalized = strtoupper($pn);
+                    $existsInLeads = NewLead::where('company_id', company()->id)
+                        ->when($leadId, fn($q) => $q->where('id', '!=', $leadId))
+                        ->whereNotNull('step_3_data')
+                        ->whereRaw("UPPER(TRIM(JSON_UNQUOTE(JSON_EXTRACT(step_3_data, '$.passport_number')))) = ?", [$normalized])
+                        ->exists();
+                    if ($existsInLeads) {
+                        return Reply::error('This passport number is already used by another lead. Duplicate passport numbers are not allowed.');
+                    }
+                    $existsInProcess = NewLeadProcess::whereHas('newLead', function ($q) use ($leadId) {
+                        $q->where('company_id', company()->id);
+                        if ($leadId) {
+                            $q->where('id', '!=', $leadId);
+                        }
+                    })->whereRaw('UPPER(TRIM(COALESCE(passport_number, ""))) = ?', [$normalized])->exists();
+                    if ($existsInProcess) {
+                        return Reply::error('This passport number is already used by another lead. Duplicate passport numbers are not allowed.');
+                    }
+                }
+            }
 
             // Check for duplicate leads (only for step 1 and new leads)
             if ($stepNumber == 1 && !$leadId) {
@@ -3394,10 +3503,18 @@ class LeadContactController extends AccountBaseController
             3 => [
                 // Step 3 - Passport Details
                 'passport_number',
+                'passport_type',
+                'passport_category',
+                'place_of_issue',
+                'passport_verification_status',
                 'issuing_country',
                 'city_where_issued',
                 'issuance_date',
                 'expiration_date',
+                'last_passport_history',
+                'old_passport_number',
+                'old_passport_issue_year',
+                'passport_status',
                 'lost_passport_history',
                 'passport_file_upload',
             ],
@@ -3408,6 +3525,7 @@ class LeadContactController extends AccountBaseController
                 'relative_organization_name',
                 'relative_relationship',
                 'relative_contact_address',
+                'relative_country',
                 'relative_city',
                 'relative_state',
                 'relative_zip_code',
@@ -3501,6 +3619,7 @@ class LeadContactController extends AccountBaseController
                 'property_silver',
                 'total_valuation',
                 'total_loan_value',
+                'net_worth',
                 'loan_years',
                 'loan_availed_on',
                 'valuation_report_file',
@@ -3910,7 +4029,7 @@ class LeadContactController extends AccountBaseController
             
             // If no relative contacts from JSON, try old format (backward compatibility)
             if (empty($relativeContactData)) {
-                $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
+                $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_country', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
                 
                 // Get Relative Contact 1 data (single values)
                 $relative1Data = [];
@@ -3963,7 +4082,7 @@ class LeadContactController extends AccountBaseController
             $stepData['relative_contacts'] = $relativeContactData;
             
             // Remove individual relative contact fields from stepData (they're now in relative_contacts array)
-            $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
+            $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_country', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
             foreach ($relativeFields as $field) {
                 unset($stepData[$field]);
             }
@@ -4478,7 +4597,7 @@ class LeadContactController extends AccountBaseController
             
             // If no jobs from JSON, try old format (backward compatibility)
             if (empty($jobData)) {
-                $jobFields = ['job_duration_from', 'job_duration_to', 'job_country', 'job_designation', 'job_company_name', 'job_salary'];
+                $jobFields = ['job_duration_from', 'job_duration_to', 'job_current_job', 'job_experience', 'job_country', 'job_employment_type', 'job_designation', 'job_company_name', 'job_industry', 'job_sector', 'job_salary'];
                 
                 // Get Job 1 data (single values)
                 $job1Data = [];
@@ -4531,7 +4650,7 @@ class LeadContactController extends AccountBaseController
             $stepData['jobs'] = $jobData;
             
             // Remove individual job fields from stepData (they're now in jobs array)
-            $jobFields = ['job_duration_from', 'job_duration_to', 'job_country', 'job_designation', 'job_company_name', 'job_salary'];
+            $jobFields = ['job_duration_from', 'job_duration_to', 'job_current_job', 'job_experience', 'job_country', 'job_employment_type', 'job_designation', 'job_company_name', 'job_industry', 'job_sector', 'job_salary'];
             foreach ($jobFields as $field) {
                 unset($stepData[$field]);
             }

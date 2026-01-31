@@ -540,6 +540,22 @@
                                     <div class="info-field-value-text">{{ $getValue($step3Data['passport_number'] ?? null) }}</div>
                                 </div>
                                 <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passport Type</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['passport_type'] ?? null) }}</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passport Category</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['passport_category'] ?? null) }}</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Place of Issue</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['place_of_issue'] ?? null) }}</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Verification Status</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['passport_verification_status'] ?? null) }}</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Issuing Country</div>
                                     <div class="info-field-value-text">{{ $getValue($step3Data['issuing_country'] ?? null) }}</div>
                                 </div>
@@ -557,11 +573,35 @@
                                     <div class="info-field-label-text">Expiration Date</div>
                                     <div class="info-field-value-text">{{ $formatDate($step3Data['expiration_date'] ?? null) }}</div>
                                 </div>
-                                <div class="info-field-item col-md-9 mb-3">
-                                    <div class="info-field-label-text">Lost Passport History</div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Last Passport History</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['last_passport_history'] ?? null) }}</div>
+                                </div>
+                                @if(($step3Data['last_passport_history'] ?? '') !== 'No Previous Passport')
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Old Passport Number</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['old_passport_number'] ?? null) }}</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Old Passport Issue Year</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['old_passport_issue_year'] ?? null) }}</div>
+                                </div>
+                                @else
+                                <div class="info-field-item col-md-6 mb-3"></div>
+                                @endif
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Passport Status</div>
+                                    <div class="info-field-value-text">{{ $getValue($step3Data['passport_status'] ?? null) }}</div>
+                                </div>
+                            </div>
+                            @if(($step3Data['last_passport_history'] ?? '') !== 'No Previous Passport')
+                            <div class="info-grid-row row">
+                                <div class="info-field-item col-md-12 mb-3">
+                                    <div class="info-field-label-text">Reason</div>
                                     <div class="info-field-value-text">{{ $getValue($step3Data['lost_passport_history'] ?? null) }}</div>
                                 </div>
                             </div>
+                            @endif
                         </div>
 
                         <!-- Relative Contact Information Section -->
@@ -619,6 +659,10 @@
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Phone Number</div>
                                             <div class="info-field-value-text">{{ $getValue($relative['relative_phone_number'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">WhatsApp Enable</div>
+                                            <div class="info-field-value-text">{{ $getValue(!empty($relative['relative_whatsapp_enable']) ? __('app.yes') : __('app.no')) }}</div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -1013,11 +1057,19 @@
                                         </div>
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Duration - To</div>
-                                            <div class="info-field-value-text">{{ $formatDate($job['job_duration_to'] ?? null) }}</div>
+                                            <div class="info-field-value-text">{{ !empty($job['job_current_job']) ? 'Present' : $formatDate($job['job_duration_to'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Job Experience</div>
+                                            <div class="info-field-value-text">{{ $getValue($job['job_experience'] ?? null) }}</div>
                                         </div>
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Country</div>
                                             <div class="info-field-value-text">{{ $getValue($job['job_country'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Employment Type</div>
+                                            <div class="info-field-value-text">{{ $getValue($job['job_employment_type'] ?? null) }}</div>
                                         </div>
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Designation</div>
@@ -1025,9 +1077,17 @@
                                         </div>
                                     </div>
                                     <div class="info-grid-row row">
-                                        <div class="info-field-item col-md-6 mb-3">
+                                        <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Company Name</div>
                                             <div class="info-field-value-text">{{ $getValue($job['job_company_name'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Industry</div>
+                                            <div class="info-field-value-text">{{ $getValue($job['job_industry'] ?? null) }}</div>
+                                        </div>
+                                        <div class="info-field-item col-md-3 mb-3">
+                                            <div class="info-field-label-text">Sector</div>
+                                            <div class="info-field-value-text">{{ $getValue($job['job_sector'] ?? null) }}</div>
                                         </div>
                                         <div class="info-field-item col-md-3 mb-3">
                                             <div class="info-field-label-text">Salary</div>
@@ -1085,12 +1145,6 @@
                                     <div class="info-field-value-text">{{ $getValue(($step8Data['property_silver'] ?? null) ? '₹ ' . number_format($step8Data['property_silver'] ?? 0) : null) }}</div>
                                 </div>
                             </div>
-                            <div class="info-grid-row row mb-4">
-                                <div class="info-field-item col-md-3 mb-3">
-                                    <div class="info-field-label-text">Total Asset Valuation</div>
-                                    <div class="info-field-value-text">{{ $getValue(($step8Data['total_valuation'] ?? null) ? '₹ ' . number_format($step8Data['total_valuation'] ?? 0) : null) }}</div>
-                                </div>
-                            </div>
 
                             <!-- Loan Information -->
                             <div class="info-subsection-title mb-2">
@@ -1108,6 +1162,16 @@
                                 <div class="info-field-item col-md-3 mb-3">
                                     <div class="info-field-label-text">Loan Availed On</div>
                                     <div class="info-field-value-text">{{ $formatDate($step8Data['loan_availed_on'] ?? null) }}</div>
+                                </div>
+                            </div>
+                            <div class="info-grid-row row mb-4">
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Total Asset Valuation</div>
+                                    <div class="info-field-value-text">{{ $getValue(($step8Data['total_valuation'] ?? null) ? '₹ ' . number_format($step8Data['total_valuation'] ?? 0) : null) }}</div>
+                                </div>
+                                <div class="info-field-item col-md-3 mb-3">
+                                    <div class="info-field-label-text">Net Worth</div>
+                                    <div class="info-field-value-text">{{ $getValue(isset($step8Data['net_worth']) ? '₹ ' . number_format($step8Data['net_worth']) : null) }}</div>
                                 </div>
                             </div>
                         </div>
