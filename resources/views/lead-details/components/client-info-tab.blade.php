@@ -56,6 +56,28 @@
                                 return $subclassId;
                             }
                         };
+                        // Helper to resolve work industry/sector ID or "other" to display name
+                        $getWorkIndustryDisplay = function($id, $otherText = null) use ($getValue) {
+                            if (empty($id)) return '-';
+                            if ((string)$id === 'other') return $getValue($otherText);
+                            $m = \App\Models\NewIndustryMaster::find($id);
+                            return $m ? $m->name : $getValue($id);
+                        };
+                        $getWorkSectorDisplay = function($id, $otherText = null) use ($getValue) {
+                            if (empty($id)) return '-';
+                            if ((string)$id === 'other') return $getValue($otherText);
+                            $m = \App\Models\NewSectorMaster::find($id);
+                            return $m ? $m->name : $getValue($id);
+                        };
+                        // Helper to resolve work designation ID to name (or show as-is for custom text)
+                        $getWorkDesignationDisplay = function($id) use ($getValue) {
+                            if (empty($id)) return '-';
+                            if (is_numeric($id)) {
+                                $m = \App\Models\NewDesignationMaster::find($id);
+                                return $m ? $m->name : $getValue($id);
+                            }
+                            return $getValue($id);
+                        };
                     @endphp
                     <!-- Tab Header -->
                     <div class="tab-section-header">
@@ -99,14 +121,6 @@
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Marital Status</div>
                                         <div class="info-field-value-text">{{ $getValue($step1Data['marital_status'] ?? null) }}</div>
-                                    </div>
-                                    <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Visa Expiry Date</div>
-                                        <div class="info-field-value-text">{{ $formatDate($step1Data['visa_expire_date'] ?? null) }}</div>
-                                    </div>
-                                    <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Passport Number</div>
-                                        <div class="info-field-value-text">{{ $getValue($step3Data['passport_number'] ?? null) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -190,10 +204,6 @@
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Instagram Link</div>
                                         <div class="info-field-value-text">{{ $getValue($step1Data['instagram_profile_url'] ?? null) }}</div>
-                                    </div>
-                                    <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Sub Agent</div>
-                                        <div class="info-field-value-text">{{ $getValue($step1Data['sub_agent'] ?? null) }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -312,12 +322,12 @@
                                                 }
                                             }
                                         } catch (\Exception $e) {
-                                            // If lookup fails, try to determine from subclass fields
+                                            // If lookup fails, try to determine from subclass or preference fields
                                             if (!empty($step2Data['pr_subclass'])) {
                                                 $sectionId = 'pr';
                                             } elseif (!empty($step2Data['visit_subclass'])) {
                                                 $sectionId = 'visit';
-                                            } elseif (!empty($step2Data['work_subclass'])) {
+                                            } elseif (!empty($step2Data['work_subclass']) || !empty($step2Data['work_preferred_work_country']) || !empty($step2Data['work_industry_sector']) || !empty($step2Data['work_sector'])) {
                                                 $sectionId = 'work';
                                             } elseif (!empty($step2Data['student_subclass'])) {
                                                 $sectionId = 'student';
@@ -329,12 +339,12 @@
                                         if (in_array($visaTypeLower, ['pr', 'visit', 'work', 'student'])) {
                                             $sectionId = $visaTypeLower;
                                         } else {
-                                            // Try to determine from subclass fields
+                                            // Try to determine from subclass or preference fields
                                             if (!empty($step2Data['pr_subclass'])) {
                                                 $sectionId = 'pr';
                                             } elseif (!empty($step2Data['visit_subclass'])) {
                                                 $sectionId = 'visit';
-                                            } elseif (!empty($step2Data['work_subclass'])) {
+                                            } elseif (!empty($step2Data['work_subclass']) || !empty($step2Data['work_preferred_work_country']) || !empty($step2Data['work_industry_sector']) || !empty($step2Data['work_sector'])) {
                                                 $sectionId = 'work';
                                             } elseif (!empty($step2Data['student_subclass'])) {
                                                 $sectionId = 'student';
@@ -342,12 +352,12 @@
                                         }
                                     }
                                 } else {
-                                    // No visa type, try to determine from subclass fields
+                                    // No visa type, try to determine from subclass or preference fields
                                     if (!empty($step2Data['pr_subclass'])) {
                                         $sectionId = 'pr';
                                     } elseif (!empty($step2Data['visit_subclass'])) {
                                         $sectionId = 'visit';
-                                    } elseif (!empty($step2Data['work_subclass'])) {
+                                    } elseif (!empty($step2Data['work_subclass']) || !empty($step2Data['work_preferred_work_country']) || !empty($step2Data['work_industry_sector']) || !empty($step2Data['work_sector'])) {
                                         $sectionId = 'work';
                                     } elseif (!empty($step2Data['student_subclass'])) {
                                         $sectionId = 'student';
@@ -371,26 +381,44 @@
                                         </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Skill Assessment Letter</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['skill_assessment_letter'] ?? null) }}</div>
+                                        <div class="info-field-label-text">PR Pathway</div>
+                                        <div class="info-field-value-text">{{ ($step2Data['pr_pathway'] ?? null) === 'Other' && !empty($step2Data['pr_pathway_other']) ? $getValue($step2Data['pr_pathway_other']) : $getValue($step2Data['pr_pathway'] ?? null) }}</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Occupation Category</div>
+                                        <div class="info-field-value-text">{{ ($step2Data['pr_occupation_category'] ?? null) === 'Other' && !empty($step2Data['pr_occupation_category_other']) ? $getValue($step2Data['pr_occupation_category_other']) : $getValue($step2Data['pr_occupation_category'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Preferred Country</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['pr_preferred_country'] ?? null) }}</div>
-                                    </div>
-                                    <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Preferred State</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['pr_preferred_state'] ?? null) }}</div>
+                                        <div class="info-field-value-text">
+                                            @php
+                                                $prCountries = $step2Data['pr_preferred_country'] ?? null;
+                                                if (is_array($prCountries)) {
+                                                    $parts = [];
+                                                    foreach ($prCountries as $c) {
+                                                        $parts[] = ($c === 'Other' && !empty($step2Data['pr_preferred_country_other'])) ? $step2Data['pr_preferred_country_other'] : $c;
+                                                    }
+                                                    echo $getValue(implode(', ', $parts));
+                                                } else {
+                                                    $val = ($prCountries === 'Other' && !empty($step2Data['pr_preferred_country_other'])) ? $step2Data['pr_preferred_country_other'] : $prCountries;
+                                                    echo $getValue($val);
+                                                }
+                                            @endphp
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Family Type</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['pr_family'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Points System Awareness</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['pr_points_system_awareness'] ?? null) }}</div>
                                     </div>
-                                    <div class="info-field-item col-md-9 mb-3">
-                                        <div class="info-field-label-text">Subclass</div>
-                                        <div class="info-field-value-text">{{ $getSubclassName($step2Data['pr_subclass'] ?? null) }}</div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Skill Assessment Status</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['pr_skill_assessment_status'] ?? null) }}</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Language Test Status</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['pr_language_test_status'] ?? null) }}</div>
                                     </div>
                                 </div>
                             @elseif($sectionId == 'visit')
@@ -410,26 +438,26 @@
                                         </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Visiting Country</div>
+                                        <div class="info-field-value-text">{{ ($step2Data['visit_visiting_country'] ?? null) === 'Other' && !empty($step2Data['visit_visiting_country_other']) ? $getValue($step2Data['visit_visiting_country_other']) : $getValue($step2Data['visit_visiting_country'] ?? null) }}</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Purpose of Visit</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['purpose_of_visit'] ?? null) }}</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['visit_purpose'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Preferred Country</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['visit_preferred_country'] ?? null) }}</div>
-                                    </div>
-                                    <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Preferred State</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['visit_preferred_state'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Duration of Stay</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['visit_duration_of_stay'] ?? null) }}</div>
                                     </div>
                                 </div>
                                 <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Family Type</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['visit_family'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Sponsor Type</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['visit_sponsor_type'] ?? null) }}</div>
                                     </div>
-                                    <div class="info-field-item col-md-9 mb-3">
-                                        <div class="info-field-label-text">Subclass</div>
-                                        <div class="info-field-value-text">{{ $getSubclassName($step2Data['visit_subclass'] ?? null) }}</div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Invitation Letter</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['visit_invitation_letter'] ?? null) }}</div>
                                     </div>
                                 </div>
                             @elseif($sectionId == 'work')
@@ -449,34 +477,35 @@
                                         </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Preferred Designation</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['preferred_designation'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Preferred Work Country</div>
+                                        <div class="info-field-value-text">@php
+                                            $workCountry = $step2Data['work_preferred_work_country'] ?? null;
+                                            echo $getValue(($workCountry === 'Other' && !empty($step2Data['work_preferred_work_country_other'])) ? $step2Data['work_preferred_work_country_other'] : $workCountry);
+                                        @endphp</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
                                         <div class="info-field-label-text">Industry</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['industry'] ?? null) }}</div>
+                                        <div class="info-field-value-text">{{ $getWorkIndustryDisplay($step2Data['work_industry_sector'] ?? null, $step2Data['work_industry_sector_other'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Role</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['on_role_off_role'] ?? null) }}</div>
-                                    </div>
-                                </div>
-                                <div class="info-grid-row row">
-                                    <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Preferred Country</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['work_preferred_country'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Sector</div>
+                                        <div class="info-field-value-text">{{ $getWorkSectorDisplay($step2Data['work_sector'] ?? null, $step2Data['work_sector_other'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Preferred State</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['work_preferred_state'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Designation</div>
+                                        <div class="info-field-value-text">{{ $getWorkDesignationDisplay($step2Data['work_designation'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Work Category</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['work_category'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Job Offer Status</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['work_job_offer_status'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Subclass</div>
-                                        <div class="info-field-value-text">{{ $getSubclassName($step2Data['work_subclass'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Employer Type</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['work_employer_type'] ?? null) }}</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Language Requirement</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['work_language_requirement'] ?? null) }}</div>
                                     </div>
                                 </div>
                             @elseif($sectionId == 'student')
@@ -496,26 +525,46 @@
                                         </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Preferred Course</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['preferred_course'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Preferred Study Country</div>
+                                        <div class="info-field-value-text">
+                                            @php
+                                                $studyCountries = $step2Data['student_preferred_study_country'] ?? null;
+                                                if (is_array($studyCountries)) {
+                                                    $parts = [];
+                                                    foreach ($studyCountries as $c) {
+                                                        $parts[] = ($c === 'Other' && !empty($step2Data['student_preferred_study_country_other'])) ? $step2Data['student_preferred_study_country_other'] : $c;
+                                                    }
+                                                    echo $getValue(implode(', ', $parts));
+                                                } else {
+                                                    $val = ($studyCountries === 'Other' && !empty($step2Data['student_preferred_study_country_other'])) ? $step2Data['student_preferred_study_country_other'] : $studyCountries;
+                                                    echo $getValue($val);
+                                                }
+                                            @endphp
+                                        </div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Country</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['student_country'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Education Level Applying For</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['student_education_level_applying_for'] ?? null) }}</div>
                                     </div>
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">University</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['university'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Field of Study</div>
+                                        <div class="info-field-value-text">{{ ($step2Data['student_field_of_study'] ?? null) === 'Other' && !empty($step2Data['student_field_of_study_other']) ? $getValue($step2Data['student_field_of_study_other']) : $getValue($step2Data['student_field_of_study'] ?? null) }}</div>
                                     </div>
-                                </div>
-                                <div class="info-grid-row row">
                                     <div class="info-field-item col-md-3 mb-3">
-                                        <div class="info-field-label-text">Term Intake</div>
-                                        <div class="info-field-value-text">{{ $getValue($step2Data['term_intake'] ?? null) }}</div>
+                                        <div class="info-field-label-text">Intake</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['student_intake'] ?? null) }}</div>
                                     </div>
-                                    <div class="info-field-item col-md-9 mb-3">
-                                        <div class="info-field-label-text">Subclass</div>
-                                        <div class="info-field-value-text">{{ $getSubclassName($step2Data['student_subclass'] ?? null) }}</div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Intake Year</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['student_intake_year'] ?? null) }}</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">Budget Range</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['student_budget_range'] ?? null) }}</div>
+                                    </div>
+                                    <div class="info-field-item col-md-3 mb-3">
+                                        <div class="info-field-label-text">English Test Status</div>
+                                        <div class="info-field-value-text">{{ $getValue($step2Data['student_english_test_status'] ?? null) }}</div>
                                     </div>
                                 </div>
                             @else
@@ -646,6 +695,14 @@
                                                         $relativeAddress = $relative['relative_contact_address'];
                                                         if (!empty($relative['relative_city'])) $relativeAddress .= ', ' . $relative['relative_city'];
                                                         if (!empty($relative['relative_state'])) $relativeAddress .= ', ' . $relative['relative_state'];
+                                                        if (!empty($relative['relative_country'])) {
+                                                            $countryVal = $relative['relative_country'];
+                                                            if (is_numeric($countryVal)) {
+                                                                $countryModel = \App\Models\NewCountryMaster::find($countryVal);
+                                                                $countryVal = $countryModel ? $countryModel->name : $countryVal;
+                                                            }
+                                                            $relativeAddress .= ', ' . $countryVal;
+                                                        }
                                                         if (!empty($relative['relative_zip_code'])) $relativeAddress .= ', ' . $relative['relative_zip_code'];
                                                     }
                                                 @endphp

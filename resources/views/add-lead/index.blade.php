@@ -72,6 +72,7 @@
                                 <select class="form-control select-picker height-35 f-14" name="lead_source" id="lead_source">
                                     <option value="">@lang('app.select') @lang('modules.lead.leadSource')</option>
                                     <option value="Facebook">Facebook</option>
+                                    <option value="Meta Lead Ads">Meta Lead Ads</option>
                                     <option value="Google Ads">Google Ads</option>
                                     <option value="Walk-in">Walk-in</option>
                                     <option value="WhatsApp Inquiry">WhatsApp Inquiry</option>
@@ -308,7 +309,7 @@
                                 <input type="month" class="form-control height-35 f-14" name="visa_expire_date" id="visa_expire_date">
                             </div>
                             <div class="col-md-3" style="position: relative;">
-                                <x-forms.label class="mt-3" fieldId="visa_category" :fieldLabel="__('app.visaCategory')">
+                                <x-forms.label class="mt-3" fieldId="visa_category" fieldLabel="Visa Refusal Visa Category">
                                 </x-forms.label>
                                 <div style="position: relative;">
                                     <select class="form-control height-35 f-14 visa-category-select" name="visa_category" id="visa_category">
@@ -324,9 +325,9 @@
                                 </div>
                             </div>
                             <div class="col-md-3" id="visa_category_other_wrapper" style="display: none;">
-                                <x-forms.label class="mt-3" fieldId="visa_category_other" :fieldLabel="__('placeholders.otherInfo')">
+                                <x-forms.label class="mt-3" fieldId="visa_category_other" fieldLabel="Other Visa Category">
                                 </x-forms.label>
-                                <input type="text" class="form-control height-35 f-14" name="visa_category_other" id="visa_category_other" placeholder="@lang('placeholders.otherInfo')">
+                                <input type="text" class="form-control height-35 f-14" name="visa_category_other" id="visa_category_other" placeholder="">
                             </div>
                         </div>
                         
@@ -423,65 +424,108 @@
                         <!-- PR Section -->
                         <div id="prSection" class="form-section d-none">
                 <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="skill_assessment_letter" :fieldLabel="__('app.skillAssessmentLetter')">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="skill_assessment_letter" id="skill_assessment_letter">
-                                        <option value="">@lang('app.select')</option>
-                                        <option value="Positive">@lang('app.positive')</option>
-                                        <option value="Negative">@lang('app.negative')</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
+                                <div class="col-md-3" style="position: relative;">
                                     <x-forms.label class="mt-3" fieldId="pr_preferred_country" :fieldLabel="__('app.preferredCountry')">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="pr_preferred_country" id="pr_preferred_country">
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 pr-preferred-country-select" name="pr_preferred_country[]" id="pr_preferred_country" multiple>
+                                            <option value="Canada">Canada</option>
+                                            <option value="Australia">Australia</option>
+                                            <option value="United Kingdom">United Kingdom</option>
+                                            <option value="New Zealand">New Zealand</option>
+                                            <option value="Germany">Germany</option>
+                                            <option value="Ireland">Ireland</option>
+                                            <option value="Portugal">Portugal</option>
+                                            <option value="Other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="pr_preferred_country_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="pr_preferred_country_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="pr_preferred_country_other" fieldLabel="Other Preferred Country">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="pr_preferred_country_other" id="pr_preferred_country_other" value="">
+                                </div>
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="pr_pathway" fieldLabel="PR Pathway">
+                                    </x-forms.label>
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 pr-pathway-select" name="pr_pathway" id="pr_pathway">
+                                            <option value="">@lang('app.select')</option>
+                                            <option value="Express Entry">Express Entry</option>
+                                            <option value="PNP (Provincial Nominee Program)">PNP (Provincial Nominee Program)</option>
+                                            <option value="State Nomination">State Nomination</option>
+                                            <option value="Skilled Independent">Skilled Independent</option>
+                                            <option value="Skilled Nominated">Skilled Nominated</option>
+                                            <option value="Regional Migration">Regional Migration</option>
+                                            <option value="Family Sponsored PR">Family Sponsored PR</option>
+                                            <option value="Business PR">Business PR</option>
+                                            <option value="Investor PR">Investor PR</option>
+                                            <option value="Other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="pr_pathway_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="pr_pathway_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="pr_pathway_other" fieldLabel="Other PR Pathway">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="pr_pathway_other" id="pr_pathway_other" value="">
+                                </div>
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="pr_occupation_category" fieldLabel="Occupation Category">
+                                    </x-forms.label>
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 pr-occupation-category-select" name="pr_occupation_category" id="pr_occupation_category">
+                                            <option value="">@lang('app.select')</option>
+                                            <option value="IT & Technology">IT & Technology</option>
+                                            <option value="Healthcare">Healthcare</option>
+                                            <option value="Engineering">Engineering</option>
+                                            <option value="Trades">Trades</option>
+                                            <option value="Hospitality">Hospitality</option>
+                                            <option value="Education">Education</option>
+                                            <option value="Finance">Finance</option>
+                                            <option value="Logistics">Logistics</option>
+                                            <option value="Agriculture">Agriculture</option>
+                                            <option value="Other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="pr_occupation_category_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="pr_occupation_category_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="pr_occupation_category_other" fieldLabel="Other Occupation Category">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="pr_occupation_category_other" id="pr_occupation_category_other" value="">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="pr_points_system_awareness" fieldLabel="Points System Awareness">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="pr_points_system_awareness" id="pr_points_system_awareness">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Australia">@lang('app.countryAustralia')</option>
-                                        <option value="New Zealand">@lang('app.countryNewZealand')</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                        <option value="Not Sure">Not Sure</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_preferred_state" :fieldLabel="__('app.preferredState')">
+                                    <x-forms.label class="mt-3" fieldId="pr_skill_assessment_status" fieldLabel="Skill Assessment Status">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="pr_preferred_state" id="pr_preferred_state">
+                                    <select class="form-control select-picker height-35 f-14" name="pr_skill_assessment_status" id="pr_skill_assessment_status">
                                         <option value="">@lang('app.select')</option>
-                                        <!-- Australian States -->
-                                        <option value="Western Australia (WA)" data-country="Australia">@lang('app.stateWesternAustralia')</option>
-                                        <option value="South Australia (SA)" data-country="Australia">@lang('app.stateSouthAustralia')</option>
-                                        <option value="Australian Capital Territory (ACT)" data-country="Australia">@lang('app.stateAustralianCapitalTerritory')</option>
-                                        <option value="Queensland (QLD)" data-country="Australia">@lang('app.stateQueensland')</option>
-                                        <option value="New South Wales (NSW)" data-country="Australia">@lang('app.stateNewSouthWales')</option>
-                                        <option value="Victoria (VIC)" data-country="Australia">@lang('app.stateVictoria')</option>
-                                        <option value="Tasmania (TAS)" data-country="Australia">@lang('app.stateTasmania')</option>
-                                        <option value="Northern Territory (NT)" data-country="Australia">@lang('app.stateNorthernTerritory')</option>
-                                        <!-- New Zealand Regions -->
-                                        <option value="Waikato" data-country="New Zealand">@lang('app.stateWaikato')</option>
-                                        <option value="Bay of Plenty" data-country="New Zealand">@lang('app.stateBayOfPlenty')</option>
-                                        <option value="Hawke's Bay" data-country="New Zealand">@lang('app.stateHawkesBay')</option>
-                                        <option value="Manawatu-Whanganui" data-country="New Zealand">@lang('app.stateManawatuWhanganui')</option>
-                                        <option value="Taranaki" data-country="New Zealand">@lang('app.stateTaranaki')</option>
-                                        <option value="Canterbury" data-country="New Zealand">@lang('app.stateCanterbury')</option>
-                                        <option value="Otago" data-country="New Zealand">@lang('app.stateOtago')</option>
-                                        <option value="Southland" data-country="New Zealand">@lang('app.stateSouthland')</option>
+                                        <option value="Completed">Completed</option>
+                                        <option value="In Process">In Process</option>
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="Not Required">Not Required</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_family" :fieldLabel="__('app.family')">
+                                    <x-forms.label class="mt-3" fieldId="pr_language_test_status" fieldLabel="Language Test Status">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="pr_family" id="pr_family">
+                                    <select class="form-control select-picker height-35 f-14" name="pr_language_test_status" id="pr_language_test_status">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Single">@lang('app.single')</option>
-                                        <option value="Couple Visa">@lang('app.coupleVisa')</option>
-                                        <option value="Couple + Children Visa">@lang('app.coupleChildrenVisa')</option>
-                                        <option value="Family Visa">@lang('app.familyVisa')</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="pr_subclass" :fieldLabel="__('app.subclass')">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14 subclass-select" name="pr_subclass" id="pr_subclass" data-section="pr">
-                                        <option value="">@lang('app.select')</option>
+                                        <option value="IELTS Given">IELTS Given</option>
+                                        <option value="IELTS Booked">IELTS Booked</option>
+                                        <option value="Planning to Give">Planning to Give</option>
+                                        <option value="Not Required">Not Required</option>
                                     </select>
                                 </div>
                             </div>
@@ -490,61 +534,71 @@
                         <!-- Visit Visa Section -->
                         <div id="visitSection" class="form-section d-none">
                             <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="purpose_of_visit" :fieldLabel="__('app.purposeOfVisit')">
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="visit_visiting_country" fieldLabel="Visiting Country">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="purpose_of_visit" id="purpose_of_visit">
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 visit-visiting-country-select" name="visit_visiting_country" id="visit_visiting_country">
+                                            <option value="">@lang('app.select')</option>
+                                            <option value="USA">USA</option>
+                                            <option value="UK">UK</option>
+                                            <option value="Canada">Canada</option>
+                                            <option value="Australia">Australia</option>
+                                            <option value="Schengen">Schengen</option>
+                                            <option value="UAE">UAE</option>
+                                            <option value="Singapore">Singapore</option>
+                                            <option value="Thailand">Thailand</option>
+                                            <option value="Other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="visit_visiting_country_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="visit_visiting_country_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="visit_visiting_country_other" fieldLabel="Other Visiting Country">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="visit_visiting_country_other" id="visit_visiting_country_other" value="">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_family" :fieldLabel="__('app.family')">
+                                    <x-forms.label class="mt-3" fieldId="visit_purpose" fieldLabel="Purpose of Visit">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="visit_family" id="visit_family">
+                                    <select class="form-control select-picker height-35 f-14" name="visit_purpose" id="visit_purpose">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Single">@lang('app.single')</option>
-                                        <option value="Couple Visa">@lang('app.coupleVisa')</option>
-                                        <option value="Couple + Children Visa">@lang('app.coupleChildrenVisa')</option>
-                                        <option value="Family Visa">@lang('app.familyVisa')</option>
+                                        <option value="Tourism">Tourism</option>
+                                        <option value="Family Visit">Family Visit</option>
+                                        <option value="Business Meeting">Business Meeting</option>
+                                        <option value="Medical Treatment">Medical Treatment</option>
+                                        <option value="Conference / Event">Conference / Event</option>
+                                        <option value="Transit">Transit</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_preferred_country" :fieldLabel="__('app.preferredCountry')">
+                                    <x-forms.label class="mt-3" fieldId="visit_duration_of_stay" fieldLabel="Duration of Stay">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="visit_preferred_country" id="visit_preferred_country">
+                                    <select class="form-control select-picker height-35 f-14" name="visit_duration_of_stay" id="visit_duration_of_stay">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Australia">@lang('app.countryAustralia')</option>
-                                        <option value="New Zealand">@lang('app.countryNewZealand')</option>
+                                        <option value="Up to 15 Days">Up to 15 Days</option>
+                                        <option value="15 – 30 Days">15 – 30 Days</option>
+                                        <option value="1 – 3 Months">1 – 3 Months</option>
+                                        <option value="3 – 6 Months">3 – 6 Months</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_preferred_state" :fieldLabel="__('app.preferredState')">
+                                    <x-forms.label class="mt-3" fieldId="visit_sponsor_type" fieldLabel="Sponsor Type">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="visit_preferred_state" id="visit_preferred_state">
+                                    <select class="form-control select-picker height-35 f-14" name="visit_sponsor_type" id="visit_sponsor_type">
                                         <option value="">@lang('app.select')</option>
-                                        <!-- Australian States -->
-                                        <option value="Western Australia (WA)" data-country="Australia">@lang('app.stateWesternAustralia')</option>
-                                        <option value="South Australia (SA)" data-country="Australia">@lang('app.stateSouthAustralia')</option>
-                                        <option value="Australian Capital Territory (ACT)" data-country="Australia">@lang('app.stateAustralianCapitalTerritory')</option>
-                                        <option value="Queensland (QLD)" data-country="Australia">@lang('app.stateQueensland')</option>
-                                        <option value="New South Wales (NSW)" data-country="Australia">@lang('app.stateNewSouthWales')</option>
-                                        <option value="Victoria (VIC)" data-country="Australia">@lang('app.stateVictoria')</option>
-                                        <option value="Tasmania (TAS)" data-country="Australia">@lang('app.stateTasmania')</option>
-                                        <option value="Northern Territory (NT)" data-country="Australia">@lang('app.stateNorthernTerritory')</option>
-                                        <!-- New Zealand Regions -->
-                                        <option value="Waikato" data-country="New Zealand">@lang('app.stateWaikato')</option>
-                                        <option value="Bay of Plenty" data-country="New Zealand">@lang('app.stateBayOfPlenty')</option>
-                                        <option value="Hawke's Bay" data-country="New Zealand">@lang('app.stateHawkesBay')</option>
-                                        <option value="Manawatu-Whanganui" data-country="New Zealand">@lang('app.stateManawatuWhanganui')</option>
-                                        <option value="Taranaki" data-country="New Zealand">@lang('app.stateTaranaki')</option>
-                                        <option value="Canterbury" data-country="New Zealand">@lang('app.stateCanterbury')</option>
-                                        <option value="Otago" data-country="New Zealand">@lang('app.stateOtago')</option>
-                                        <option value="Southland" data-country="New Zealand">@lang('app.stateSouthland')</option>
+                                        <option value="Self Sponsored">Self Sponsored</option>
+                                        <option value="Family Sponsored">Family Sponsored</option>
+                                        <option value="Company Sponsored">Company Sponsored</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="visit_subclass" :fieldLabel="__('app.subclass')">
+                                    <x-forms.label class="mt-3" fieldId="visit_invitation_letter" fieldLabel="Invitation Letter">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14 subclass-select" name="visit_subclass" id="visit_subclass" data-section="visit">
+                                    <select class="form-control select-picker height-35 f-14" name="visit_invitation_letter" id="visit_invitation_letter">
                                         <option value="">@lang('app.select')</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
                                     </select>
                                 </div>
                             </div>
@@ -553,92 +607,111 @@
                         <!-- Work Permit Section -->
                         <div id="workSection" class="form-section d-none">
                             <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="preferred_designation" :fieldLabel="__('app.preferredDesignation')">
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="work_preferred_work_country" fieldLabel="Preferred Work Country">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="preferred_designation" id="preferred_designation" placeholder="@lang('app.enterDesignation')">
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 work-preferred-work-country-select" name="work_preferred_work_country" id="work_preferred_work_country">
+                                            <option value="">@lang('app.select')</option>
+                                            <option value="Canada">Canada</option>
+                                            <option value="Australia">Australia</option>
+                                            <option value="UK">UK</option>
+                                            <option value="Germany">Germany</option>
+                                            <option value="Poland">Poland</option>
+                                            <option value="Lithuania">Lithuania</option>
+                                            <option value="Malta">Malta</option>
+                                            <option value="Romania">Romania</option>
+                                            <option value="UAE">UAE</option>
+                                            <option value="Other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="work_preferred_work_country_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="work_preferred_work_country_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="work_preferred_work_country_other" fieldLabel="Other Preferred Work Country">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="work_preferred_work_country_other" id="work_preferred_work_country_other" value="">
+                                </div>
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="work_industry_sector" fieldLabel="Industry">
+                                    </x-forms.label>
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 work-industry-sector-select" name="work_industry_sector" id="work_industry_sector">
+                                            <option value="">@lang('app.select')</option>
+                                            @foreach($industryMasters ?? [] as $i)
+                                                <option value="{{ $i->id }}">{{ $i->name }}</option>
+                                            @endforeach
+                                            <option value="other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="work_industry_sector_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="work_industry_sector_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="work_industry_sector_other" fieldLabel="Other Industry">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="work_industry_sector_other" id="work_industry_sector_other" value="">
+                                </div>
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="work_sector" fieldLabel="Sector">
+                                    </x-forms.label>
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 work-sector-select" name="work_sector" id="work_sector">
+                                            <option value="">@lang('app.select')</option>
+                                            @foreach($sectorsMaster ?? [] as $s)
+                                                <option value="{{ $s->id }}" data-industry-id="{{ $s->industry_id ?? '' }}">{{ $s->name }}</option>
+                                            @endforeach
+                                            <option value="other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="work_sector_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="work_sector_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="work_sector_other" fieldLabel="Other Sector">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="work_sector_other" id="work_sector_other" value="">
+                                </div>
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="work_designation" fieldLabel="Designation">
+                                    </x-forms.label>
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 work-designation-select" name="work_designation" id="work_designation">
+                                            <option value="">@lang('app.select')</option>
+                                            @foreach($designationsMaster ?? [] as $d)
+                                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="work_designation_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="industry" :fieldLabel="__('app.industry')">
+                                    <x-forms.label class="mt-3" fieldId="work_job_offer_status" fieldLabel="Job Offer Status">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="industry" id="industry">
+                                    <select class="form-control select-picker height-35 f-14" name="work_job_offer_status" id="work_job_offer_status">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Agriculture">@lang('app.industryAgriculture')</option>
-                                        <option value="Aviation Ground Staff">@lang('app.industryAviationGroundStaff')</option>
-                                        <option value="Call Centres / BPO">@lang('app.industryCallCentresBPO')</option>
-                                        <option value="Catering Services">@lang('app.industryCateringServices')</option>
-                                        <option value="Chemical Manufacturing">@lang('app.industryChemicalManufacturing')</option>
-                                        <option value="Childcare">@lang('app.industryChildcare')</option>
-                                        <option value="Cleaning & Facility Management">@lang('app.industryCleaningFacilityManagement')</option>
-                                        <option value="Construction">@lang('app.industryConstruction')</option>
-                                        <option value="Courier & Delivery Services">@lang('app.industryCourierDeliveryServices')</option>
-                                        <option value="Dairy & Livestock">@lang('app.industryDairyLivestock')</option>
-                                        <option value="Data Entry Services">@lang('app.industryDataEntryServices')</option>
-                                        <option value="Education">@lang('app.industryEducation')</option>
-                                        <option value="Electronics Manufacturing">@lang('app.industryElectronicsManufacturing')</option>
-                                        <option value="Events & Entertainment">@lang('app.industryEventsEntertainment')</option>
-                                        <option value="Food Chains">@lang('app.industryFoodChains')</option>
-                                        <option value="Food Processing">@lang('app.industryFoodProcessing')</option>
-                                        <option value="Healthcare Services">@lang('app.industryHealthcareServices')</option>
-                                        <option value="Hospitals & Clinics">@lang('app.industryHospitalsClinics')</option>
-                                        <option value="Hotels & Hospitality">@lang('app.industryHotelsHospitality')</option>
-                                        <option value="Industrial Production">@lang('app.industryIndustrialProduction')</option>
-                                        <option value="Infrastructure">@lang('app.industryInfrastructure')</option>
-                                        <option value="IT Services">@lang('app.industryITServices')</option>
-                                        <option value="Logistics & Transport">@lang('app.industryLogisticsTransport')</option>
-                                        <option value="Manufacturing">@lang('app.industryManufacturing')</option>
-                                        <option value="Nursing & Aged Care">@lang('app.industryNursingAgedCare')</option>
-                                        <option value="Pharma">@lang('app.industryPharma')</option>
-                                        <option value="Real Estate">@lang('app.industryRealEstate')</option>
-                                        <option value="Repair & Maintenance Services (Electrical/Plumbing/AC)">@lang('app.industryRepairMaintenanceServices')</option>
-                                        <option value="Restaurants & Cafes">@lang('app.industryRestaurantsCafes')</option>
-                                        <option value="Retail (Apparel)">@lang('app.industryRetailApparel')</option>
-                                        <option value="Retail (Electronics)">@lang('app.industryRetailElectronics')</option>
-                                        <option value="Retail (Showrooms & Specialty Stores)">@lang('app.industryRetailShowroomsSpecialtyStores')</option>
-                                        <option value="Schools & Colleges">@lang('app.industrySchoolsColleges')</option>
-                                        <option value="Security Services">@lang('app.industrySecurityServices')</option>
-                                        <option value="Software Development">@lang('app.industrySoftwareDevelopment')</option>
-                                        <option value="Supermarket / Grocery">@lang('app.industrySupermarketGrocery')</option>
-                                        <option value="Technical Support">@lang('app.industryTechnicalSupport')</option>
-                                        <option value="Textiles & Garments">@lang('app.industryTextilesGarments')</option>
-                                        <option value="Training Institutes">@lang('app.industryTrainingInstitutes')</option>
-                                        <option value="Transport (Drivers)">@lang('app.industryTransportDrivers')</option>
-                                        <option value="Warehousing">@lang('app.industryWarehousing')</option>
+                                        <option value="Available">Available</option>
+                                        <option value="Applied">Applied</option>
+                                        <option value="Not Available">Not Available</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="on_role_off_role" :fieldLabel="__('app.onRoleOffRole')">
+                                    <x-forms.label class="mt-3" fieldId="work_employer_type" fieldLabel="Employer Type">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="on_role_off_role" id="on_role_off_role">
+                                    <select class="form-control select-picker height-35 f-14" name="work_employer_type" id="work_employer_type">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="On Role">@lang('app.onRole')</option>
-                                        <option value="Off Role">@lang('app.offRole')</option>
+                                        <option value="Government">Government</option>
+                                        <option value="Private">Private</option>
+                                        <option value="Staffing Agency">Staffing Agency</option>
+                                        <option value="Direct Employer">Direct Employer</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="work_preferred_country" :fieldLabel="__('app.preferredCountry')">
+                                    <x-forms.label class="mt-3" fieldId="work_language_requirement" fieldLabel="Language Requirement">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="work_preferred_country" id="work_preferred_country">
+                                    <select class="form-control select-picker height-35 f-14" name="work_language_requirement" id="work_language_requirement">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Australia">@lang('app.countryAustralia')</option>
-                                        <option value="New Zealand">@lang('app.countryNewZealand')</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="work_category" :fieldLabel="__('app.workCategory')">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="work_category" id="work_category">
-                                        <option value="">@lang('app.select')</option>
-                                        <option value="Skilled">@lang('app.skilled')</option>
-                                        <option value="Semi-Skilled">@lang('app.semiSkilled')</option>
-                                        <option value="Unskilled">@lang('app.unskilled')</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="work_subclass" :fieldLabel="__('app.subclass')">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14 subclass-select" name="work_subclass" id="work_subclass" data-section="work">
-                                        <option value="">@lang('app.select')</option>
+                                        <option value="IELTS Required">IELTS Required</option>
+                                        <option value="IELTS Not Required">IELTS Not Required</option>
+                                        <option value="Local Language Required">Local Language Required</option>
                                     </select>
                                 </div>
                             </div>
@@ -647,35 +720,111 @@
                         <!-- Student Visa Section -->
                         <div id="studentSection" class="form-section d-none">
                             <div class="row">
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="preferred_course" :fieldLabel="__('app.preferredCourse')">
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="student_preferred_study_country" fieldLabel="Preferred Study Country">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="preferred_course" id="preferred_course">
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 student-preferred-study-country-select" name="student_preferred_study_country[]" id="student_preferred_study_country" multiple>
+                                            <option value="Canada">Canada</option>
+                                            <option value="Australia">Australia</option>
+                                            <option value="United Kingdom">United Kingdom</option>
+                                            <option value="USA">USA</option>
+                                            <option value="New Zealand">New Zealand</option>
+                                            <option value="Germany">Germany</option>
+                                            <option value="Ireland">Ireland</option>
+                                            <option value="France">France</option>
+                                            <option value="Italy">Italy</option>
+                                            <option value="Other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="student_preferred_study_country_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="student_preferred_study_country_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="student_preferred_study_country_other" fieldLabel="Other Preferred Study Country">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="student_preferred_study_country_other" id="student_preferred_study_country_other" value="">
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="student_country" :fieldLabel="__('app.preferredCountry')">
+                                    <x-forms.label class="mt-3" fieldId="student_education_level_applying_for" fieldLabel="Education Level Applying For">
                                     </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14" name="student_country" id="student_country">
+                                    <select class="form-control select-picker height-35 f-14" name="student_education_level_applying_for" id="student_education_level_applying_for">
                                         <option value="">@lang('app.select')</option>
-                                        <option value="Australia">@lang('app.countryAustralia')</option>
-                                        <option value="New Zealand">@lang('app.countryNewZealand')</option>
+                                        <option value="Diploma">Diploma</option>
+                                        <option value="Advanced Diploma">Advanced Diploma</option>
+                                        <option value="Bachelor Degree">Bachelor Degree</option>
+                                        <option value="Post Graduate Diploma">Post Graduate Diploma</option>
+                                        <option value="Master Degree">Master Degree</option>
+                                        <option value="PhD">PhD</option>
+                                        <option value="Pathway Program">Pathway Program</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3" style="position: relative;">
+                                    <x-forms.label class="mt-3" fieldId="student_field_of_study" fieldLabel="Field of Study">
+                                    </x-forms.label>
+                                    <div style="position: relative;">
+                                        <select class="form-control height-35 f-14 student-field-of-study-select" name="student_field_of_study" id="student_field_of_study">
+                                            <option value="">@lang('app.select')</option>
+                                            <option value="Engineering">Engineering</option>
+                                            <option value="IT / Computer">IT / Computer</option>
+                                            <option value="Business / Management">Business / Management</option>
+                                            <option value="Hospitality">Hospitality</option>
+                                            <option value="Healthcare">Healthcare</option>
+                                            <option value="Nursing">Nursing</option>
+                                            <option value="Education">Education</option>
+                                            <option value="Agriculture">Agriculture</option>
+                                            <option value="Design">Design</option>
+                                            <option value="Science">Science</option>
+                                            <option value="Other">@lang('app.other')</option>
+                                        </select>
+                                        <button type="button" class="btn btn-link p-0 select2-clear-btn" id="student_field_of_study_clear" style="display: none; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 18px; line-height: 1; min-width: 20px; z-index: 10;" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3" id="student_field_of_study_other_wrapper" style="display: none;">
+                                    <x-forms.label class="mt-3" fieldId="student_field_of_study_other" fieldLabel="Other Field of Study">
+                                    </x-forms.label>
+                                    <input type="text" class="form-control height-35 f-14" name="student_field_of_study_other" id="student_field_of_study_other" value="">
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="student_intake" fieldLabel="Intake">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="student_intake" id="student_intake">
+                                        <option value="">@lang('app.select')</option>
+                                        <option value="January">January</option>
+                                        <option value="May">May</option>
+                                        <option value="September">September</option>
+                                        <option value="Flexible">Flexible</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="university" :fieldLabel="__('app.university')">
+                                    <x-forms.label class="mt-3" fieldId="student_intake_year" fieldLabel="Intake Year">
                                     </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="university" id="university">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="term_intake" :fieldLabel="__('app.termIntake')">
-                                    </x-forms.label>
-                                    <input type="text" class="form-control height-35 f-14" name="term_intake" id="term_intake">
-                                </div>
-                                <div class="col-md-3">
-                                    <x-forms.label class="mt-3" fieldId="student_subclass" :fieldLabel="__('app.subclass')">
-                                    </x-forms.label>
-                                    <select class="form-control select-picker height-35 f-14 subclass-select" name="student_subclass" id="student_subclass" data-section="student">
+                                    <select class="form-control select-picker height-35 f-14" name="student_intake_year" id="student_intake_year">
                                         <option value="">@lang('app.select')</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2026">2026</option>
+                                        <option value="2027">2027</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="student_budget_range" fieldLabel="Budget Range">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="student_budget_range" id="student_budget_range">
+                                        <option value="">@lang('app.select')</option>
+                                        <option value="Below ₹10 Lakhs">Below ₹10 Lakhs</option>
+                                        <option value="₹10 – 20 Lakhs">₹10 – 20 Lakhs</option>
+                                        <option value="₹20 – 30 Lakhs">₹20 – 30 Lakhs</option>
+                                        <option value="Above ₹30 Lakhs">Above ₹30 Lakhs</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <x-forms.label class="mt-3" fieldId="student_english_test_status" fieldLabel="English Test Status">
+                                    </x-forms.label>
+                                    <select class="form-control select-picker height-35 f-14" name="student_english_test_status" id="student_english_test_status">
+                                        <option value="">@lang('app.select')</option>
+                                        <option value="IELTS Given">IELTS Given</option>
+                                        <option value="IELTS Booked">IELTS Booked</option>
+                                        <option value="Preparing">Preparing</option>
+                                        <option value="Not Required">Not Required</option>
                                     </select>
                                 </div>
                             </div>
@@ -1752,6 +1901,161 @@
                 }
             });
 
+            // Occupation Category: same dropdown as Professional Experience Industry (Select2 + clear button)
+            initSelect2IfNeeded('#pr_occupation_category', '@lang("app.select") Occupation Category');
+            attachSelect2ClearButton('#pr_occupation_category', 'pr_occupation_category_clear');
+
+            // Preferred Country (PR): multi-select, same as Student Preferred Study Country
+            if ($('#pr_preferred_country').length && !$('#pr_preferred_country').hasClass('select2-hidden-accessible')) {
+                $('#pr_preferred_country').select2({
+                    placeholder: '@lang("app.select") @lang("app.preferredCountry")',
+                    allowClear: false,
+                    width: '100%',
+                    multiple: true,
+                    closeOnSelect: false
+                });
+            }
+            attachSelect2ClearButton('#pr_preferred_country', 'pr_preferred_country_clear');
+            $(document).on('change', '#pr_preferred_country', function() {
+                var v = $(this).val();
+                var hasOther = Array.isArray(v) && v.indexOf('Other') !== -1;
+                if (hasOther) {
+                    $('#pr_preferred_country_other_wrapper').show();
+                } else {
+                    $('#pr_preferred_country_other_wrapper').hide();
+                    $('#pr_preferred_country_other').val('');
+                }
+            });
+
+            // Visiting Country (Visit Visa): same as PR Pathway (Select2 + clear + Other)
+            initSelect2IfNeeded('#visit_visiting_country', '@lang("app.select") Visiting Country');
+            attachSelect2ClearButton('#visit_visiting_country', 'visit_visiting_country_clear');
+            $(document).on('change', '#visit_visiting_country', function() {
+                var v = $(this).val();
+                if (v === 'Other') {
+                    $('#visit_visiting_country_other_wrapper').show();
+                } else {
+                    $('#visit_visiting_country_other_wrapper').hide();
+                    $('#visit_visiting_country_other').val('');
+                }
+            });
+
+            // Preferred Work Country (Work Permit): same as Visiting Country (Select2 + clear + Other)
+            initSelect2IfNeeded('#work_preferred_work_country', '@lang("app.select") Preferred Work Country');
+            attachSelect2ClearButton('#work_preferred_work_country', 'work_preferred_work_country_clear');
+            $(document).on('change', '#work_preferred_work_country', function() {
+                var v = $(this).val();
+                if (v === 'Other') {
+                    $('#work_preferred_work_country_other_wrapper').show();
+                } else {
+                    $('#work_preferred_work_country_other_wrapper').hide();
+                    $('#work_preferred_work_country_other').val('');
+                }
+            });
+
+            // Work Permit: Industry / Sector (same as Professional Experience tab – master data + Other + filter sector by industry)
+            initSelect2IfNeeded('#work_industry_sector', '@lang("app.select") @lang("app.menu.industry")');
+            initSelect2IfNeeded('#work_sector', '@lang("app.select") @lang("app.menu.sector")');
+            attachSelect2ClearButton('#work_industry_sector', 'work_industry_sector_clear');
+            attachSelect2ClearButton('#work_sector', 'work_sector_clear');
+            // Work Permit: Designation (same as Professional Experience – master + tags for custom text)
+            if ($('#work_designation').length && !$('#work_designation').hasClass('select2-hidden-accessible')) {
+                $('#work_designation').select2({
+                    placeholder: 'Select or type custom',
+                    allowClear: false,
+                    width: '100%',
+                    tags: true
+                });
+            }
+            attachSelect2ClearButton('#work_designation', 'work_designation_clear');
+            $(document).on('change', '#work_industry_sector', function() {
+                var v = $(this).val();
+                if (v === 'other') {
+                    $('#work_industry_sector_other_wrapper').show();
+                } else {
+                    $('#work_industry_sector_other_wrapper').hide();
+                    $('#work_industry_sector_other').val('');
+                }
+                filterWorkSectorsByIndustry();
+            });
+            $(document).on('change', '#work_sector', function() {
+                var v = $(this).val();
+                if (v === 'other') {
+                    $('#work_sector_other_wrapper').show();
+                } else {
+                    $('#work_sector_other_wrapper').hide();
+                    $('#work_sector_other').val('');
+                }
+            });
+            function filterWorkSectorsByIndustry() {
+                const industryId = $('#work_industry_sector').val();
+                const $sectorSelect = $('#work_sector');
+                let optionsHtml = '<option value="">@lang("app.select")</option>';
+                sectorsMaster.forEach(function (s) {
+                    const show = !industryId || industryId === 'other' || String(s.industry_id) === String(industryId);
+                    if (show) {
+                        optionsHtml += '<option value="' + s.id + '">' + (s.name || '') + '</option>';
+                    }
+                });
+                optionsHtml += '<option value="other">@lang("app.other")</option>';
+                if ($sectorSelect.hasClass('select2-hidden-accessible')) {
+                    $sectorSelect.select2('destroy');
+                }
+                $sectorSelect.html(optionsHtml).val(null).trigger('change');
+                $('#work_sector_other_wrapper').hide();
+                $('#work_sector_other').val('');
+                initSelect2IfNeeded('#work_sector', '@lang("app.select") @lang("app.menu.sector")');
+                attachSelect2ClearButton('#work_sector', 'work_sector_clear');
+            }
+
+            // PR Pathway: same dropdown style (Select2 + clear button)
+            initSelect2IfNeeded('#pr_pathway', '@lang("app.select") PR Pathway');
+            attachSelect2ClearButton('#pr_pathway', 'pr_pathway_clear');
+            $(document).on('change', '#pr_pathway', function() {
+                var v = $(this).val();
+                if (v === 'Other') {
+                    $('#pr_pathway_other_wrapper').show();
+                } else {
+                    $('#pr_pathway_other_wrapper').hide();
+                    $('#pr_pathway_other').val('');
+                }
+            });
+
+            // Preferred Study Country (Student Visa): multi-select, same style as Languages Spoken + Other option
+            if ($('#student_preferred_study_country').length && !$('#student_preferred_study_country').hasClass('select2-hidden-accessible')) {
+                $('#student_preferred_study_country').select2({
+                    placeholder: '@lang("app.select") Preferred Study Country',
+                    allowClear: false,
+                    width: '100%',
+                    multiple: true,
+                    closeOnSelect: false
+                });
+            }
+            attachSelect2ClearButton('#student_preferred_study_country', 'student_preferred_study_country_clear');
+            $(document).on('change', '#student_preferred_study_country', function() {
+                var v = $(this).val();
+                var hasOther = Array.isArray(v) && v.indexOf('Other') !== -1;
+                if (hasOther) {
+                    $('#student_preferred_study_country_other_wrapper').show();
+                } else {
+                    $('#student_preferred_study_country_other_wrapper').hide();
+                    $('#student_preferred_study_country_other').val('');
+                }
+            });
+
+            // Field of Study (Student Visa): same as PR Pathway (Select2 + clear + Other)
+            initSelect2IfNeeded('#student_field_of_study', '@lang("app.select") Field of Study');
+            attachSelect2ClearButton('#student_field_of_study', 'student_field_of_study_clear');
+            $(document).on('change', '#student_field_of_study', function() {
+                var v = $(this).val();
+                if (v === 'Other') {
+                    $('#student_field_of_study_other_wrapper').show();
+                } else {
+                    $('#student_field_of_study_other_wrapper').hide();
+                    $('#student_field_of_study_other').val('');
+                }
+            });
+
             // Initialize searchable Select2 for Languages Spoken (multiple selection)
             if ($('#languages_spoken').length && !$('#languages_spoken').hasClass('select2-hidden-accessible')) {
                 $('#languages_spoken').select2({
@@ -2218,6 +2522,32 @@
                         $('#mailing_city').val(null).trigger('change');
                     }
                 }
+                // Update relative contacts that have "Contact Address Same As Home Address" checked
+                $('.relative-contact-same-as-home-cb:checked').each(function() {
+                    const num = $(this).data('contact-num');
+                    if (num && typeof copyHomeToRelativeContact === 'function') {
+                        copyHomeToRelativeContact(num);
+                    }
+                });
+            });
+
+            // When home address or pin or country change, update relative contacts with same-as-home checked
+            $('#home_address, #home_pin_code').on('input', function() {
+                $('.relative-contact-same-as-home-cb:checked').each(function() {
+                    const num = $(this).data('contact-num');
+                    if (num) {
+                        $('#relative_contact_address_' + num).val($('#home_address').val());
+                        $('#relative_zip_code_' + num).val($('#home_pin_code').val());
+                    }
+                });
+            });
+            $('#country_of_origin').on('change', function() {
+                $('.relative-contact-same-as-home-cb:checked').each(function() {
+                    const num = $(this).data('contact-num');
+                    if (num && typeof copyHomeToRelativeContact === 'function') {
+                        copyHomeToRelativeContact(num);
+                    }
+                });
             });
 
             // Handle visa status radio buttons
@@ -2346,7 +2676,7 @@
                                 <input type="month" class="form-control height-35 f-14" name="visa_rejection_date_${refusalNum}" id="visa_rejection_date_${refusalNum}" max="{{ date('Y-m') }}" value="${date}">
                             </div>
                             <div class="col-md-3" style="position: relative;">
-                                <x-forms.label class="mt-3" fieldId="visa_refusal_category_${refusalNum}" :fieldLabel="__('app.visaCategory')">
+                                <x-forms.label class="mt-3" fieldId="visa_refusal_category_${refusalNum}" fieldLabel="Visa Refusal Visa Category">
                                 </x-forms.label>
                                 <div style="position: relative;">
                                     <select class="form-control height-35 f-14 visa-refusal-category-select" name="visa_refusal_category_${refusalNum}" id="visa_refusal_category_${refusalNum}">
@@ -2483,7 +2813,19 @@
                 // Clear ALL other visa type forms when any visa type is selected
                 // Clear PR fields (if not selected)
                 if (sectionId !== 'pr') {
-                    $('#skill_assessment_letter, #pr_preferred_country, #pr_preferred_state, #pr_family, #pr_subclass').val('').selectpicker('refresh');
+                    $('#pr_points_system_awareness, #pr_skill_assessment_status, #pr_language_test_status').val('').selectpicker('refresh');
+                    $('#pr_preferred_country').val([]).trigger('change');
+                    $('#pr_preferred_country_other').val('');
+                    $('#pr_preferred_country_other_wrapper').hide();
+                    $('#pr_pathway').val(null).trigger('change');
+                    $('#pr_pathway_other').val('');
+                    $('#pr_pathway_other_wrapper').hide();
+                    $('#pr_occupation_category').val(null).trigger('change');
+                    $('#pr_occupation_category_other').val('');
+                    $('#pr_occupation_category_other_wrapper').hide();
+                    $('#pr_occupation_category_clear').hide();
+                    $('#pr_preferred_country_clear').hide();
+                    $('#pr_pathway_clear').hide();
                     $('#pr_assessment_letter_file').val('');
                     // Remove hidden file input if exists
                     $('#pr_assessment_letter_file_hidden').remove();
@@ -2493,17 +2835,43 @@
                 
                 // Clear Visit Visa fields (if not selected)
                 if (sectionId !== 'visit') {
-                    $('#purpose_of_visit, #visit_family, #visit_preferred_country, #visit_preferred_state, #visit_subclass').val('').selectpicker('refresh');
+                    $('#visit_purpose, #visit_duration_of_stay, #visit_sponsor_type, #visit_invitation_letter').val('').selectpicker('refresh');
+                    $('#visit_visiting_country').val(null).trigger('change');
+                    $('#visit_visiting_country_other').val('');
+                    $('#visit_visiting_country_other_wrapper').hide();
+                    $('#visit_visiting_country_clear').hide();
                 }
                 
                 // Clear Work Permit fields (if not selected)
                 if (sectionId !== 'work') {
-                    $('#preferred_designation, #work_industry, #on_role_off_role, #work_preferred_country, #work_preferred_state, #work_category, #work_subclass').val('').selectpicker('refresh');
+                    $('#work_preferred_work_country').val(null).trigger('change');
+                    $('#work_preferred_work_country_other').val('');
+                    $('#work_preferred_work_country_other_wrapper').hide();
+                    $('#work_preferred_work_country_clear').hide();
+                    $('#work_industry_sector').val(null).trigger('change');
+                    $('#work_industry_sector_other').val('');
+                    $('#work_industry_sector_other_wrapper').hide();
+                    $('#work_industry_sector_clear').hide();
+                    if (typeof filterWorkSectorsByIndustry === 'function') filterWorkSectorsByIndustry();
+                    $('#work_sector_other').val('');
+                    $('#work_sector_other_wrapper').hide();
+                    $('#work_sector_clear').hide();
+                    $('#work_designation').val(null).trigger('change');
+                    $('#work_designation_clear').hide();
+                    $('#work_job_offer_status, #work_employer_type, #work_language_requirement').val('').selectpicker('refresh');
                 }
                 
                 // Clear Student Visa fields (if not selected)
                 if (sectionId !== 'student') {
-                    $('#preferred_course, #student_country, #university, #term_intake, #student_subclass').val('').selectpicker('refresh');
+                    $('#student_education_level_applying_for, #student_intake, #student_intake_year, #student_budget_range, #student_english_test_status').val('').selectpicker('refresh');
+                    $('#student_preferred_study_country').val([]).trigger('change');
+                    $('#student_preferred_study_country_other').val('');
+                    $('#student_preferred_study_country_other_wrapper').hide();
+                    $('#student_preferred_study_country_clear').hide();
+                    $('#student_field_of_study').val(null).trigger('change');
+                    $('#student_field_of_study_other').val('');
+                    $('#student_field_of_study_other_wrapper').hide();
+                    $('#student_field_of_study_clear').hide();
                 }
                 
                 // Hide all sections
@@ -2520,8 +2888,8 @@
                     $('#studentSection').removeClass('d-none');
                 }
                 
-                // Load subclasses for the selected visa type (only if not loading form data)
-                if (visaTypeId && !isNaN(visaTypeId) && !isLoadingFormData) {
+                // Load subclasses for the selected visa type (only if not loading form data; PR, Visit, Work and Student have no subclass field)
+                if (visaTypeId && !isNaN(visaTypeId) && !isLoadingFormData && sectionId !== 'pr' && sectionId !== 'visit' && sectionId !== 'work' && sectionId !== 'student') {
                     loadSubclassesForVisaType(visaTypeId, sectionId);
                 }
                 
@@ -2536,6 +2904,19 @@
                     });
                 }, 100);
             });
+            
+            // Occupation Category: show/hide Other Occupation Category field when "Other" is selected; show/hide clear button
+            $(document).on('change', '#pr_occupation_category', function() {
+                const val = $(this).val();
+                if (val === 'Other') {
+                    $('#pr_occupation_category_other_wrapper').show();
+                } else {
+                    $('#pr_occupation_category_other_wrapper').hide();
+                    $('#pr_occupation_category_other').val('');
+                }
+                $('#pr_occupation_category_clear').toggle(!!val);
+            });
+            // Clear button for Occupation Category is handled by attachSelect2ClearButton; change handler above updates Other wrapper and clear visibility
             
             // Function to load subclasses for a visa type
             function loadSubclassesForVisaType(visaTypeId, sectionId, callback) {
@@ -2590,10 +2971,6 @@
             // Function to set subclass value after subclasses are loaded
             function setSubclassValue(sectionId, data) {
                 const subclassFieldMap = {
-                    'pr': 'pr_subclass',
-                    'visit': 'visit_subclass',
-                    'work': 'work_subclass',
-                    'student': 'student_subclass'
                 };
                 
                 const fieldName = subclassFieldMap[sectionId];
@@ -2643,6 +3020,32 @@
                 });
             }
             
+            // Copy home address to a relative contact (used when "Contact Address Same As Home Address" is checked)
+            function copyHomeToRelativeContact(num) {
+                if (!$('#relative_contact_address_' + num).length) return;
+                $('#relative_contact_address_' + num).val($('#home_address').val());
+                $('#relative_zip_code_' + num).val($('#home_pin_code').val());
+                const homeCountryVal = $('#country_of_origin').val();
+                const homeStateVal = $('#home_state').val();
+                const homeCityVal = $('#home_city').val();
+                $('#relative_country_' + num).val(homeCountryVal).trigger('change');
+                if (homeCountryVal) {
+                    loadStatesForRelativeRow(homeCountryVal, num).then(function () {
+                        $('#relative_state_' + num).val(homeStateVal).trigger('change');
+                        if (homeStateVal) {
+                            loadCities(homeStateVal, $('#relative_city_' + num)).then(function () {
+                                $('#relative_city_' + num).val(homeCityVal).trigger('change');
+                            });
+                        } else {
+                            $('#relative_city_' + num).val(null).trigger('change');
+                        }
+                    });
+                } else {
+                    $('#relative_state_' + num).val(null).trigger('change');
+                    $('#relative_city_' + num).val(null).trigger('change');
+                }
+            }
+
             // Function to update remove button visibility based on relative contact count
             function updateRelativeContactRemoveButtons() {
                 const relativeContactRows = $('.relative-contact-row');
@@ -2679,6 +3082,7 @@
                 const email = contactData && contactData.relative_email_address ? contactData.relative_email_address : '';
                 const phone = contactData && contactData.relative_phone_number ? contactData.relative_phone_number : '';
                 const whatsappEnable = contactData && (contactData.relative_whatsapp_enable === true || contactData.relative_whatsapp_enable === '1' || contactData.relative_whatsapp_enable === 1);
+                const sameAsHome = contactData && (contactData.relative_contact_same_as_home === true || contactData.relative_contact_same_as_home === '1' || contactData.relative_contact_same_as_home === 1);
                 
                 // Resolve organization name to dropdown value: id if matches master, or "other" with text
                 let orgTypeSelected = '';
@@ -2782,6 +3186,12 @@
                                 <x-forms.label class="mt-3" fieldId="relative_relationship_other_${contactNum}" fieldLabel="Other Relationship To You">
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="relative_relationship_other_${contactNum}" id="relative_relationship_other_${contactNum}" value="${relationshipOther}">
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="font-weight-bold d-block mb-1" for="relative_contact_same_as_home_${contactNum}">Contact Address Same As Home Address</label>
+                                <div class="form-check">
+                                    <input class="form-check-input relative-contact-same-as-home-cb" type="checkbox" name="relative_contact_same_as_home_${contactNum}" id="relative_contact_same_as_home_${contactNum}" value="1" data-contact-num="${contactNum}" ${sameAsHome ? 'checked' : ''}>
+                                </div>
                             </div>
                             <div class="col-md-12">
                                 <x-forms.label class="mt-3" fieldId="relative_contact_address_${contactNum}" fieldLabel="Contact Address">
@@ -2919,6 +3329,20 @@
                         $('#relative_relationship_other_' + contactNum).val('');
                     }
                 });
+
+                // Contact Address Same As Home Address checkbox
+                $('#relative_contact_same_as_home_' + contactNum).off('change.relativeSameAsHome').on('change.relativeSameAsHome', function() {
+                    if ($(this).is(':checked')) {
+                        copyHomeToRelativeContact(contactNum);
+                        $('#relative_contact_address_' + contactNum + ', #relative_country_' + contactNum + ', #relative_state_' + contactNum + ', #relative_city_' + contactNum + ', #relative_zip_code_' + contactNum).prop('disabled', true);
+                    } else {
+                        $('#relative_contact_address_' + contactNum + ', #relative_country_' + contactNum + ', #relative_state_' + contactNum + ', #relative_city_' + contactNum + ', #relative_zip_code_' + contactNum).prop('disabled', false);
+                    }
+                });
+                // If editing and same-as-home was checked, trigger change so copy + disable runs
+                if (contactData && (contactData.relative_contact_same_as_home === true || contactData.relative_contact_same_as_home === '1' || contactData.relative_contact_same_as_home === 1)) {
+                    $('#relative_contact_same_as_home_' + contactNum).prop('checked', true).trigger('change');
+                }
 
                 // Update remove buttons visibility and contact row numbers
                 setTimeout(function () {
@@ -4334,12 +4758,6 @@
                 }
             }
 
-            // Initialize state filtering for PR section
-            filterStatesByCountry('pr_preferred_country', 'pr_preferred_state');
-            
-            // Initialize state filtering for Visit Visa section
-            filterStatesByCountry('visit_preferred_country', 'visit_preferred_state');
-
             // ==================== STEP-BY-STEP LEAD SAVING ====================
             
             // Get lead_id from URL parameter or hidden input
@@ -4714,9 +5132,6 @@
                         // Wait a bit for the section to show, then populate fields
                         setTimeout(function() {
                             // PR Section fields
-                            if (data.skill_assessment_letter) {
-                                $('#skill_assessment_letter').val(data.skill_assessment_letter).selectpicker('refresh');
-                            }
                             // Store the file name in a hidden input for reference if exists
                             if (data.pr_assessment_letter_file) {
                                 const fileName = data.pr_assessment_letter_file;
@@ -4741,93 +5156,124 @@
                                 $('#pr_assessment_letter_file').next('.file-name-display').remove();
                             }
                             if (data.pr_preferred_country) {
-                                $('#pr_preferred_country').val(data.pr_preferred_country).selectpicker('refresh');
-                                // Filter states based on country
-                                const selectedCountry = data.pr_preferred_country;
-                                $('#pr_preferred_state').find('option[value!=""]').each(function() {
-                                    const $option = $(this);
-                                    if ($option.data('country') === selectedCountry) {
-                                        $option.prop('disabled', false);
-                                    } else {
-                                        $option.prop('disabled', true);
-                                    }
-                                });
+                                var prCountries = Array.isArray(data.pr_preferred_country) ? data.pr_preferred_country : [data.pr_preferred_country];
+                                $('#pr_preferred_country').val(prCountries).trigger('change');
+                                if (prCountries.indexOf('Other') !== -1 && data.pr_preferred_country_other) {
+                                    $('#pr_preferred_country_other').val(data.pr_preferred_country_other);
+                                }
+                            } else {
+                                $('#pr_preferred_country').val([]).trigger('change');
                             }
-                            if (data.pr_preferred_state) {
-                                $('#pr_preferred_state').val(data.pr_preferred_state).selectpicker('refresh');
+                            if (data.pr_pathway) {
+                                $('#pr_pathway').val(data.pr_pathway).trigger('change');
+                                if (data.pr_pathway === 'Other' && data.pr_pathway_other) {
+                                    $('#pr_pathway_other').val(data.pr_pathway_other);
+                                }
+                            } else {
+                                $('#pr_pathway').val(null).trigger('change');
                             }
-                            if (data.pr_family) {
-                                $('#pr_family').val(data.pr_family).selectpicker('refresh');
+                            if (data.pr_occupation_category) {
+                                $('#pr_occupation_category').val(data.pr_occupation_category).trigger('change');
+                                if (data.pr_occupation_category === 'Other' && data.pr_occupation_category_other) {
+                                    $('#pr_occupation_category_other').val(data.pr_occupation_category_other);
+                                }
+                            } else {
+                                $('#pr_occupation_category').val(null).trigger('change');
                             }
-                            // pr_subclass will be set by setSubclassValue function after subclasses are loaded
+                            if (data.pr_points_system_awareness) {
+                                $('#pr_points_system_awareness').val(data.pr_points_system_awareness).selectpicker('refresh');
+                            }
+                            if (data.pr_skill_assessment_status) {
+                                $('#pr_skill_assessment_status').val(data.pr_skill_assessment_status).selectpicker('refresh');
+                            }
+                            if (data.pr_language_test_status) {
+                                $('#pr_language_test_status').val(data.pr_language_test_status).selectpicker('refresh');
+                            }
                             
                             // Visit Section fields
-                            if (data.purpose_of_visit) {
-                                $('#purpose_of_visit').val(data.purpose_of_visit);
+                            if (data.visit_visiting_country) {
+                                $('#visit_visiting_country').val(data.visit_visiting_country).trigger('change');
+                                if (data.visit_visiting_country === 'Other' && data.visit_visiting_country_other) {
+                                    $('#visit_visiting_country_other').val(data.visit_visiting_country_other);
+                                }
                             }
-                            if (data.visit_family) {
-                                $('#visit_family').val(data.visit_family).selectpicker('refresh');
+                            if (data.visit_purpose) {
+                                $('#visit_purpose').val(data.visit_purpose).selectpicker('refresh');
                             }
-                            if (data.visit_preferred_country) {
-                                $('#visit_preferred_country').val(data.visit_preferred_country).selectpicker('refresh');
-                                // Filter states based on country
-                                const selectedCountry = data.visit_preferred_country;
-                                $('#visit_preferred_state').find('option[value!=""]').each(function() {
-                                    const $option = $(this);
-                                    if ($option.data('country') === selectedCountry) {
-                                        $option.prop('disabled', false);
-                                    } else {
-                                        $option.prop('disabled', true);
-                                    }
-                                });
+                            if (data.visit_duration_of_stay) {
+                                $('#visit_duration_of_stay').val(data.visit_duration_of_stay).selectpicker('refresh');
                             }
-                            if (data.visit_preferred_state) {
-                                $('#visit_preferred_state').val(data.visit_preferred_state).selectpicker('refresh');
+                            if (data.visit_sponsor_type) {
+                                $('#visit_sponsor_type').val(data.visit_sponsor_type).selectpicker('refresh');
                             }
-                            // visit_subclass will be set by setSubclassValue function after subclasses are loaded
+                            if (data.visit_invitation_letter) {
+                                $('#visit_invitation_letter').val(data.visit_invitation_letter).selectpicker('refresh');
+                            }
                             
                             // Work Section fields
-                            if (data.preferred_designation) {
-                                $('#preferred_designation').val(data.preferred_designation);
+                            if (data.work_preferred_work_country) {
+                                $('#work_preferred_work_country').val(data.work_preferred_work_country).trigger('change');
+                                if (data.work_preferred_work_country === 'Other' && data.work_preferred_work_country_other) {
+                                    $('#work_preferred_work_country_other').val(data.work_preferred_work_country_other);
+                                }
                             }
-                            if (data.industry) {
-                                $('#industry').val(data.industry).selectpicker('refresh');
+                            if (data.work_industry_sector) {
+                                $('#work_industry_sector').val(data.work_industry_sector).trigger('change');
+                                if (data.work_industry_sector === 'other' && data.work_industry_sector_other) {
+                                    $('#work_industry_sector_other').val(data.work_industry_sector_other);
+                                }
                             }
-                            if (data.on_role_off_role) {
-                                $('#on_role_off_role').val(data.on_role_off_role).selectpicker('refresh');
+                            if (data.work_sector) {
+                                $('#work_sector').val(data.work_sector).trigger('change');
+                                if (data.work_sector === 'other' && data.work_sector_other) {
+                                    $('#work_sector_other').val(data.work_sector_other);
+                                }
                             }
-                            if (data.work_preferred_country) {
-                                $('#work_preferred_country').val(data.work_preferred_country).selectpicker('refresh');
-                                // Filter states based on country
-                                const selectedCountry = data.work_preferred_country;
-                                $('#work_preferred_state').find('option[value!=""]').each(function() {
-                                    const $option = $(this);
-                                    if ($option.data('country') === selectedCountry) {
-                                        $option.prop('disabled', false);
-                                    } else {
-                                        $option.prop('disabled', true);
-                                    }
-                                });
+                            if (data.work_designation) {
+                                let workDesignationVal = data.work_designation;
+                                const workDesignationMatch = designationsMaster.find(function (d) { return d.name && d.name.trim() === String(data.work_designation).trim(); });
+                                if (workDesignationMatch) workDesignationVal = workDesignationMatch.id;
+                                $('#work_designation').val(workDesignationVal).trigger('change');
                             }
-                            if (data.work_preferred_state) {
-                                $('#work_preferred_state').val(data.work_preferred_state).selectpicker('refresh');
+                            if (data.work_job_offer_status) {
+                                $('#work_job_offer_status').val(data.work_job_offer_status).selectpicker('refresh');
                             }
-                            if (data.work_category) {
-                                $('#work_category').val(data.work_category).selectpicker('refresh');
+                            if (data.work_employer_type) {
+                                $('#work_employer_type').val(data.work_employer_type).selectpicker('refresh');
                             }
-                            // work_subclass will be set by setSubclassValue function after subclasses are loaded
+                            if (data.work_language_requirement) {
+                                $('#work_language_requirement').val(data.work_language_requirement).selectpicker('refresh');
+                            }
                             
                             // Student Section fields
-                            if (data.preferred_course) {
-                                $('#preferred_course').val(data.preferred_course);
+                            if (data.student_preferred_study_country) {
+                                var studyCountries = Array.isArray(data.student_preferred_study_country) ? data.student_preferred_study_country : [data.student_preferred_study_country];
+                                $('#student_preferred_study_country').val(studyCountries).trigger('change');
+                                if (studyCountries.indexOf('Other') !== -1 && data.student_preferred_study_country_other) {
+                                    $('#student_preferred_study_country_other').val(data.student_preferred_study_country_other);
+                                }
                             }
-                            if (data.student_country) {
-                                $('#student_country').val(data.student_country).selectpicker('refresh');
+                            if (data.student_education_level_applying_for) {
+                                $('#student_education_level_applying_for').val(data.student_education_level_applying_for).selectpicker('refresh');
                             }
-                            if (data.university) {
-                                $('#university').val(data.university);
+                            if (data.student_field_of_study) {
+                                $('#student_field_of_study').val(data.student_field_of_study).trigger('change');
+                                if (data.student_field_of_study === 'Other' && data.student_field_of_study_other) {
+                                    $('#student_field_of_study_other').val(data.student_field_of_study_other);
+                                }
                             }
-                            // student_subclass will be set by setSubclassValue function after subclasses are loaded
+                            if (data.student_intake) {
+                                $('#student_intake').val(data.student_intake).selectpicker('refresh');
+                            }
+                            if (data.student_intake_year) {
+                                $('#student_intake_year').val(data.student_intake_year).selectpicker('refresh');
+                            }
+                            if (data.student_budget_range) {
+                                $('#student_budget_range').val(data.student_budget_range).selectpicker('refresh');
+                            }
+                            if (data.student_english_test_status) {
+                                $('#student_english_test_status').val(data.student_english_test_status).selectpicker('refresh');
+                            }
                         }, 300);
                     }
                 }
@@ -5684,6 +6130,7 @@
                         const email = $('#relative_email_address_' + contactIndex).val() || '';
                         const phone = $('#relative_phone_number_' + contactIndex).val() || '';
                         const whatsappEnable = $('#relative_whatsapp_enable_' + contactIndex).is(':checked');
+                        const sameAsHome = $('#relative_contact_same_as_home_' + contactIndex).is(':checked');
 
                         // Resolve country/state/city ids to names
                         if (country && !isNaN(country)) {
@@ -5713,7 +6160,8 @@
                                 relative_zip_code: zipCode,
                                 relative_email_address: email,
                                 relative_phone_number: phone,
-                                relative_whatsapp_enable: whatsappEnable
+                                relative_whatsapp_enable: whatsappEnable,
+                                relative_contact_same_as_home: sameAsHome
                             };
                             relativeContacts.push(contactData);
                         }

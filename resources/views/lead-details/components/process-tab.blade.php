@@ -1,4 +1,4 @@
-﻿@php
+@php
     $processData = null;
     $hasProcessData = false;
     if (isset($lead) && $lead && $lead->process) {
@@ -81,7 +81,7 @@
                                     $visaTypes = $visaTypes ?? (isset($lead) && $lead ? \App\Models\NewLeadVisaType::where(function($query) {
                                         $query->where('company_id', company()->id)
                                               ->orWhereNull('company_id');
-                                    })->orderBy('name')->get() : collect());
+                                    })->orderBy('id', 'asc')->get() : collect());
                                 @endphp
                                 @foreach($visaTypes as $visaType)
                                     @php

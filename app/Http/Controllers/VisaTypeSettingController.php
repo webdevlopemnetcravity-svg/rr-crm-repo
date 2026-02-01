@@ -27,7 +27,7 @@ class VisaTypeSettingController extends AccountBaseController
      */
     public function index()
     {
-        $this->visaTypes = NewLeadVisaType::all();
+        $this->visaTypes = NewLeadVisaType::orderBy('id', 'asc')->get();
         $this->subclasses = NewLeadSubclass::with('visaType')->get();
 
         $this->view = 'visa-type-settings.ajax.visa-type';

@@ -22,7 +22,7 @@ class VisaTypeController extends AccountBaseController
      */
     public function create()
     {
-        $this->visaTypes = NewLeadVisaType::all();
+        $this->visaTypes = NewLeadVisaType::orderBy('id', 'asc')->get();
         return view('visa-type-settings.create-visa-type-modal', $this->data);
     }
 
@@ -43,7 +43,7 @@ class VisaTypeController extends AccountBaseController
         $visaType->name = $request->name;
         $visaType->save();
 
-        $allVisaTypes = NewLeadVisaType::all();
+        $allVisaTypes = NewLeadVisaType::orderBy('id', 'asc')->get();
 
         $select = '';
 

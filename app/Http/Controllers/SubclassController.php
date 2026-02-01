@@ -23,7 +23,7 @@ class SubclassController extends AccountBaseController
      */
     public function create()
     {
-        $this->visaTypes = NewLeadVisaType::all();
+        $this->visaTypes = NewLeadVisaType::orderBy('id', 'asc')->get();
         return view('visa-type-settings.create-subclass-modal', $this->data);
     }
 
@@ -58,7 +58,7 @@ class SubclassController extends AccountBaseController
     public function edit($id)
     {
         $this->subclass = NewLeadSubclass::findOrFail($id);
-        $this->visaTypes = NewLeadVisaType::all();
+        $this->visaTypes = NewLeadVisaType::orderBy('id', 'asc')->get();
         return view('visa-type-settings.edit-subclass-modal', $this->data);
     }
 

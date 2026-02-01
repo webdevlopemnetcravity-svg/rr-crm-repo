@@ -1126,11 +1126,11 @@ class LeadContactController extends AccountBaseController
             ->groupBy('users.id')
             ->get();
 
-        // Load visa types from master datatable
+        // Load visa types from master datatable (first in first show – order by id)
         $this->visaTypes = \App\Models\NewLeadVisaType::where(function($query) {
             $query->where('company_id', company()->id)
                   ->orWhereNull('company_id');
-        })->orderBy('name')->get();
+        })->orderBy('id', 'asc')->get();
 
         // Load visa categories from master (for Last Five Years Visa Status - Visa Granted)
         $this->visaCategories = \App\Models\NewVisaCategoryMaster::where(function($query) {
@@ -1371,11 +1371,11 @@ class LeadContactController extends AccountBaseController
         // Fetch the lead data if ID is provided
         $this->lead = null;
         
-        // Load visa types and subclasses for process tab
+        // Load visa types and subclasses for process tab (first in first show – order by id)
         $this->visaTypes = \App\Models\NewLeadVisaType::where(function($query) {
             $query->where('company_id', company()->id)
                   ->orWhereNull('company_id');
-        })->orderBy('name')->get();
+        })->orderBy('id', 'asc')->get();
         
         $this->subclasses = \App\Models\NewLeadSubclass::with('visaType')
             ->where(function($query) {
@@ -2060,25 +2060,26 @@ class LeadContactController extends AccountBaseController
                 // Get country based on section
                 if ($sectionId == 'pr' && isset($step2Data['pr_preferred_country'])) {
                     $country = $step2Data['pr_preferred_country'];
-                } elseif ($sectionId == 'visit' && isset($step2Data['visit_preferred_country'])) {
-                    $country = $step2Data['visit_preferred_country'];
-                } elseif ($sectionId == 'work' && isset($step2Data['work_preferred_country'])) {
-                    $country = $step2Data['work_preferred_country'];
-                } elseif ($sectionId == 'student' && isset($step2Data['student_country'])) {
-                    $country = $step2Data['student_country'];
+                } elseif ($sectionId == 'work' && isset($step2Data['work_preferred_work_country'])) {
+                    $country = $step2Data['work_preferred_work_country'];
                 }
             }
             
-            // Count country (case-insensitive matching)
+            // Count country (case-insensitive matching); pr_preferred_country may be array (multi-select)
             if ($country) {
-                $countryNormalized = ucwords(strtolower(trim($country)));
-                // Check for Australia variations
-                if (stripos($country, 'australia') !== false || $countryNormalized === 'Australia') {
-                    $countries['Australia']++;
-                }
-                // Check for New Zealand variations
-                elseif (stripos($country, 'new zealand') !== false || $countryNormalized === 'New Zealand') {
-                    $countries['New Zealand']++;
+                $countriesToCheck = is_array($country) ? $country : [$country];
+                foreach ($countriesToCheck as $c) {
+                    $c = is_string($c) ? trim($c) : $c;
+                    if (empty($c)) {
+                        continue;
+                    }
+                    $countryNormalized = ucwords(strtolower($c));
+                    if (stripos($c, 'australia') !== false || $countryNormalized === 'Australia') {
+                        $countries['Australia']++;
+                    }
+                    elseif (stripos($c, 'new zealand') !== false || $countryNormalized === 'New Zealand') {
+                        $countries['New Zealand']++;
+                    }
                 }
             }
         }
@@ -3114,13 +3115,8 @@ class LeadContactController extends AccountBaseController
                 }
                 
                 // All visa-specific fields are optional
-                $rules['skill_assessment_letter'] = 'nullable|string';
                 $rules['pr_assessment_letter_file'] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240';
-                $rules['pr_family'] = 'nullable|string';
-                $rules['purpose_of_visit'] = 'nullable|string|max:500';
-                $rules['visit_family'] = 'nullable|string';
                 $rules['preferred_designation'] = 'nullable|string|max:255';
-                $rules['term_intake'] = 'nullable|string';
                 
                 $messages = [];
                 break;
@@ -3483,29 +3479,41 @@ class LeadContactController extends AccountBaseController
             2 => [
                 // Step 2 - Client Preference
                 'visa_type',
-                'skill_assessment_letter',
                 'pr_assessment_letter_file',
                 'pr_preferred_country',
-                'pr_preferred_state',
-                'pr_family',
-                'pr_subclass',
-                'purpose_of_visit',
-                'visit_family',
-                'visit_preferred_country',
-                'visit_preferred_state',
-                'visit_subclass',
-                'preferred_designation',
-                'industry',
-                'on_role_off_role',
-                'work_preferred_country',
-                'work_preferred_state',
-                'work_category',
-                'work_subclass',
-                'preferred_course',
-                'student_country',
-                'university',
-                'term_intake',
-                'student_subclass',
+                'pr_preferred_country_other',
+                'pr_pathway',
+                'pr_pathway_other',
+                'pr_occupation_category',
+                'pr_occupation_category_other',
+                'pr_points_system_awareness',
+                'pr_skill_assessment_status',
+                'pr_language_test_status',
+                'visit_visiting_country',
+                'visit_visiting_country_other',
+                'visit_purpose',
+                'visit_duration_of_stay',
+                'visit_sponsor_type',
+                'visit_invitation_letter',
+                'work_preferred_work_country',
+                'work_preferred_work_country_other',
+                'work_industry_sector',
+                'work_industry_sector_other',
+                'work_sector',
+                'work_sector_other',
+                'work_designation',
+                'work_job_offer_status',
+                'work_employer_type',
+                'work_language_requirement',
+                'student_preferred_study_country',
+                'student_preferred_study_country_other',
+                'student_education_level_applying_for',
+                'student_field_of_study',
+                'student_field_of_study_other',
+                'student_intake',
+                'student_intake_year',
+                'student_budget_range',
+                'student_english_test_status',
             ],
             3 => [
                 // Step 3 - Passport Details
@@ -3538,6 +3546,7 @@ class LeadContactController extends AccountBaseController
                 'relative_zip_code',
                 'relative_email_address',
                 'relative_phone_number',
+                'relative_contact_same_as_home',
             ],
             5 => [
                 // Step 5 - Family Information
@@ -4036,7 +4045,7 @@ class LeadContactController extends AccountBaseController
             
             // If no relative contacts from JSON, try old format (backward compatibility)
             if (empty($relativeContactData)) {
-                $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_country', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
+                $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_country', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number', 'relative_contact_same_as_home'];
                 
                 // Get Relative Contact 1 data (single values)
                 $relative1Data = [];
@@ -4089,7 +4098,7 @@ class LeadContactController extends AccountBaseController
             $stepData['relative_contacts'] = $relativeContactData;
             
             // Remove individual relative contact fields from stepData (they're now in relative_contacts array)
-            $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_country', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number'];
+            $relativeFields = ['relative_surname', 'relative_given_name', 'relative_organization_name', 'relative_relationship', 'relative_contact_address', 'relative_country', 'relative_city', 'relative_state', 'relative_zip_code', 'relative_email_address', 'relative_phone_number', 'relative_contact_same_as_home'];
             foreach ($relativeFields as $field) {
                 unset($stepData[$field]);
             }
@@ -5591,11 +5600,11 @@ class LeadContactController extends AccountBaseController
             $this->lead = $lead;
             $this->data['lead'] = $lead;
             
-            // Load visa types and subclasses for process tab
+            // Load visa types and subclasses for process tab (first in first show – order by id)
             $this->data['visaTypes'] = \App\Models\NewLeadVisaType::where(function($query) {
                 $query->where('company_id', company()->id)
                       ->orWhereNull('company_id');
-            })->orderBy('name')->get();
+            })->orderBy('id', 'asc')->get();
             
             $this->data['subclasses'] = \App\Models\NewLeadSubclass::with('visaType')
                 ->where(function($query) {
