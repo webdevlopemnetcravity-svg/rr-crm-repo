@@ -3187,10 +3187,9 @@
                                 </x-forms.label>
                                 <input type="text" class="form-control height-35 f-14" name="relative_relationship_other_${contactNum}" id="relative_relationship_other_${contactNum}" value="${relationshipOther}">
                             </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="font-weight-bold d-block mb-1" for="relative_contact_same_as_home_${contactNum}">Contact Address Same As Home Address</label>
+                            <div class="col-md-12 mt-3 mb-2">
                                 <div class="form-check">
-                                    <input class="form-check-input relative-contact-same-as-home-cb" type="checkbox" name="relative_contact_same_as_home_${contactNum}" id="relative_contact_same_as_home_${contactNum}" value="1" data-contact-num="${contactNum}" ${sameAsHome ? 'checked' : ''}>
+                                    <input class="form-check-input relative-contact-same-as-home-cb mr-2" type="checkbox" name="relative_contact_same_as_home_${contactNum}" id="relative_contact_same_as_home_${contactNum}" value="1" data-contact-num="${contactNum}" ${sameAsHome ? 'checked' : ''}> <label class="pl-2 mb-0" for="relative_contact_same_as_home_${contactNum}">Contact Address Same As Client Address</label>
                                 </div>
                             </div>
                             <div class="col-md-12">
